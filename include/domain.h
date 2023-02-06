@@ -158,6 +158,8 @@ private:
                                            ///< indices(ispec) of all elements
                                            ///< in this domain
   specfem::HostMirror1d<int> h_ispec_domain;
+
+  specfem::DeviceView3d<type_real> dux_dx, dux_dz, duz_dx, duz_dz;
 };
 } // namespace Domain
 } // namespace specfem
