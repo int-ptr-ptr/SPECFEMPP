@@ -212,11 +212,9 @@ void specfem::Domain::Elastic::compute_stiffness_interaction() {
   scratch_size += 2 * specfem::DeviceScratchView3d<type_real>::shmem_size(
                           spectral_elems_per_block, ngllx, ngllz);
 
-  using DeviceTeam = Kokkos::TeamPolicy<specfem::DevExecSpace>;
-
   Kokkos::parallel_for(
       "specfem::Domain::Elastic::compute_gradient",
-      DeviceTeam(total_number_of_blocks, n_threads_per_block, 1)
+      specfem::DeviceTeam(total_number_of_blocks, n_threads_per_block, 1)
           .set_scratch_size(0, Kokkos::PerTeam(scratch_size)),
       KOKKOS_CLASS_LAMBDA(const specfem::DeviceTeam::member_type &team_member) {
         const int league_rank = team_member.league_rank();
@@ -321,7 +319,7 @@ void specfem::Domain::Elastic::compute_stiffness_interaction() {
 
   Kokkos::parallel_for(
       "specfem::Domain::Elastic::compute_stiffness_interaction",
-      DeviceTeam(total_number_of_blocks, n_threads_per_block, 1)
+      specfem::DeviceTeam(total_number_of_blocks, n_threads_per_block, 1)
           .set_scratch_size(0, Kokkos::PerTeam(scratch_size)),
       KOKKOS_CLASS_LAMBDA(const specfem::DeviceTeam::member_type &team_member) {
         const int league_rank = team_member.league_rank();
