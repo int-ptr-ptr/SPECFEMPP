@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data interface to compute forces &mdash; SPECFEM KOKKOS IMPLEMENTATION  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/scrollable_code_blocks.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Domain interface" href="domain.html" />
+    <link rel="prev" title="Input/Output module" href="IO.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SPECFEM KOKKOS IMPLEMENTATION
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user_documentation/index.html">User documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parameter_documentation/index.html">Parameter documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source_description/index.html">Source Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cookbooks/index.html">Cookbooks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer_documentation/index.html">Developer documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="IO.html">Input/Output module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Data interface to compute forces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="domain.html">Domain interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jacobian.html">Utilities to compute elemental Jacobian and shape functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kokkos_abstractions.html">SPECFEM abstractions for Kokkos interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="material.html">Material properties and helper routines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mesh.html">Mesh interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parameter.html">Simulation setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quadrature.html">Quadrature object and helper routines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solver.html">Solver interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sources_recievers.html">Sources and Recievers Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specfem_mpi.html">SPECFEM abstractions for MPI interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timescheme.html">Time marching schemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writer.html">Writer interface</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SPECFEM KOKKOS IMPLEMENTATION</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">API documentation</a></li>
+      <li class="breadcrumb-item active">Data interface to compute forces</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/compute.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="data-interface-to-compute-forces">
+<h1>Data interface to compute forces<a class="headerlink" href="#data-interface-to-compute-forces" title="Permalink to this heading"></a></h1>
+<p>The interfaces provided here stores data required to compute mass and stiffness terms at elemental level.</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv47specfem">
+<span id="_CPPv37specfem"></span><span id="_CPPv27specfem"></span><span id="specfem"></span><span class="target" id="namespacespecfem"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">specfem</span></span></span><br /></dt>
+<dd><dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7computeE">
+<span id="_CPPv3N7specfem7computeE"></span><span id="_CPPv2N7specfem7computeE"></span><span id="specfem::compute"></span><span class="target" id="namespacespecfem_1_1compute"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">compute</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7computeE" title="Permalink to this definition"></a><br /></dt>
+<dd><dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute7computeE">
+<span id="_CPPv3N7specfem7compute7computeE"></span><span id="_CPPv2N7specfem7compute7computeE"></span><span id="specfem::compute::compute"></span><span class="target" id="structspecfem_1_1compute_1_1compute"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">compute</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute7computeE" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute7compute7computeEv">
+<span id="_CPPv3N7specfem7compute7compute7computeEv"></span><span id="_CPPv2N7specfem7compute7compute7computeEv"></span><span id="specfem::compute::compute::compute"></span><span class="target" id="structspecfem_1_1compute_1_1compute_1a37645cd8b407f9e10ce690bcb92f55ae"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">compute</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem7compute7compute7computeEv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Default constructor. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute7compute7computeEKiKiKi">
+<span id="_CPPv3N7specfem7compute7compute7computeEKiKiKi"></span><span id="_CPPv2N7specfem7compute7compute7computeEKiKiKi"></span><span id="specfem::compute::compute::compute__iC.iC.iC"></span><span class="target" id="structspecfem_1_1compute_1_1compute_1afc6e29ad51379ef2a61d30343c424e9c"></span><span class="sig-name descname"><span class="n"><span class="pre">compute</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nspec</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ngllx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ngllz</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem7compute7compute7computeEKiKiKi" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Constructor to allocate views. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nspec</strong> – Number for spectral elements </p></li>
+<li><p><strong>ngllz</strong> – Number of quadrature points in z dimension </p></li>
+<li><p><strong>ngllx</strong> – Number of quadrature points in x dimension </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute7compute7computeEKN7specfem6kokkos10HostView2dI9type_realEEKN7specfem6kokkos10HostView2dIiEERKN7specfem10quadrature10quadratureERKN7specfem10quadrature10quadratureE">
+<span id="_CPPv3N7specfem7compute7compute7computeEKN7specfem6kokkos10HostView2dI9type_realEEKN7specfem6kokkos10HostView2dIiEERKN7specfem10quadrature10quadratureERKN7specfem10quadrature10quadratureE"></span><span id="_CPPv2N7specfem7compute7compute7computeEKN7specfem6kokkos10HostView2dI9type_realEEKN7specfem6kokkos10HostView2dIiEERKN7specfem10quadrature10quadratureERKN7specfem10quadrature10quadratureE"></span><span id="specfem::compute::compute::compute__specfem::kokkos::HostView2d:type_real:C.specfem::kokkos::HostView2d:i:C.specfem::quadrature::quadratureCR.specfem::quadrature::quadratureCR"></span><span class="target" id="structspecfem_1_1compute_1_1compute_1a9e213ad2d81748e737d7de5e1ac5c457"></span><span class="sig-name descname"><span class="n"><span class="pre">compute</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos10HostView2dE" title="specfem::kokkos::HostView2d"><span class="n"><span class="pre">HostView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">coorg</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos10HostView2dE" title="specfem::kokkos::HostView2d"><span class="n"><span class="pre">HostView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">knods</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="quadrature.html#_CPPv4N7specfem10quadratureE" title="specfem::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="quadrature.html#_CPPv4N7specfem10quadrature10quadratureE" title="specfem::quadrature::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">quadx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="quadrature.html#_CPPv4N7specfem10quadratureE" title="specfem::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="quadrature.html#_CPPv4N7specfem10quadrature10quadratureE" title="specfem::quadrature::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">quadz</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem7compute7compute7computeEKN7specfem6kokkos10HostView2dI9type_realEEKN7specfem6kokkos10HostView2dIiEERKN7specfem10quadrature10quadratureERKN7specfem10quadrature10quadratureE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Construct allocate and assign views. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coorg</strong> – (x_a, z_a) for every control node </p></li>
+<li><p><strong>knods</strong> – Global control element number for every control node </p></li>
+<li><p><strong>quadx</strong> – Quarature object in x dimension </p></li>
+<li><p><strong>quadz</strong> – Quadrature object in z dimension </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute7compute10sync_viewsEv">
+<span id="_CPPv3N7specfem7compute7compute10sync_viewsEv"></span><span id="_CPPv2N7specfem7compute7compute10sync_viewsEv"></span><span id="specfem::compute::compute::sync_views"></span><span class="target" id="structspecfem_1_1compute_1_1compute_1ab775a2eda050cbec2bc860b3559818b3"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sync_views</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem7compute7compute10sync_viewsEv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Helper routine to sync views within this struct. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute7compute5iboolE">
+<span id="_CPPv3N7specfem7compute7compute5iboolE"></span><span id="_CPPv2N7specfem7compute7compute5iboolE"></span><span id="specfem::compute::compute::ibool__specfem::kokkos::DeviceView3d:i:"></span><span class="target" id="structspecfem_1_1compute_1_1compute_1a099728b25ee7d151071072bb10882683"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12DeviceView3dE" title="specfem::kokkos::DeviceView3d"><span class="n"><span class="pre">DeviceView3d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ibool</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute7compute5iboolE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Global number for every quadrature point stored on device </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute7compute7h_iboolE">
+<span id="_CPPv3N7specfem7compute7compute7h_iboolE"></span><span id="_CPPv2N7specfem7compute7compute7h_iboolE"></span><span id="specfem::compute::compute::h_ibool__specfem::kokkos::HostMirror3d:i:"></span><span class="target" id="structspecfem_1_1compute_1_1compute_1a843f09c3ff3f0f0f5f616a09599c0173"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12HostMirror3dE" title="specfem::kokkos::HostMirror3d"><span class="n"><span class="pre">HostMirror3d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">h_ibool</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute7compute7h_iboolE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Global number for every quadrature point stored on host </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute7compute11coordinatesE">
+<span id="_CPPv3N7specfem7compute7compute11coordinatesE"></span><span id="_CPPv2N7specfem7compute7compute11coordinatesE"></span><span id="specfem::compute::compute::coordinates__specfem::compute::coordinates"></span><span class="target" id="structspecfem_1_1compute_1_1compute_1ab39ec2578a10dbd1236d2619790945bc"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N7specfem7computeE" title="specfem::compute"><span class="n"><span class="pre">compute</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N7specfem7compute11coordinatesE" title="specfem::compute::coordinates"><span class="n"><span class="pre">coordinates</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">coordinates</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute7compute11coordinatesE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Cartesian coordinates and related meta-data </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute11coordinatesE">
+<span id="_CPPv3N7specfem7compute11coordinatesE"></span><span id="_CPPv2N7specfem7compute11coordinatesE"></span><span id="specfem::compute::coordinates"></span><span class="target" id="structspecfem_1_1compute_1_1coordinates"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">coordinates</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute11coordinatesE" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-coodindates-meta-data">Coodindates meta data</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute11coordinates4xmaxE">
+<span id="_CPPv3N7specfem7compute11coordinates4xmaxE"></span><span id="_CPPv2N7specfem7compute11coordinates4xmaxE"></span><span id="specfem::compute::coordinates::xmax__type_real"></span><span class="target" id="structspecfem_1_1compute_1_1coordinates_1af6d872ea219a98df2ae976dc3976ddd5"></span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">xmax</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute11coordinates4xmaxE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>maximum x-coorinate of the quadrature point within this MPI slice </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute11coordinates4xminE">
+<span id="_CPPv3N7specfem7compute11coordinates4xminE"></span><span id="_CPPv2N7specfem7compute11coordinates4xminE"></span><span id="specfem::compute::coordinates::xmin__type_real"></span><span class="target" id="structspecfem_1_1compute_1_1coordinates_1a11afbabcf5fc1de9e9d046fd3057e064"></span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">xmin</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute11coordinates4xminE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>minimum x-coorinate of the quadrature point within this MPI slice </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute11coordinates4zmaxE">
+<span id="_CPPv3N7specfem7compute11coordinates4zmaxE"></span><span id="_CPPv2N7specfem7compute11coordinates4zmaxE"></span><span id="specfem::compute::coordinates::zmax__type_real"></span><span class="target" id="structspecfem_1_1compute_1_1coordinates_1a64d7a330360cf9ecddbf4a2fb191facb"></span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">zmax</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute11coordinates4zmaxE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>maximum z-coorinate of the quadrature point within this MPI slice </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute11coordinates4zminE">
+<span id="_CPPv3N7specfem7compute11coordinates4zminE"></span><span id="_CPPv2N7specfem7compute11coordinates4zminE"></span><span id="specfem::compute::coordinates::zmin__type_real"></span><span class="target" id="structspecfem_1_1compute_1_1coordinates_1a1b54f36554ae593121a0470e573cc533"></span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">zmin</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute11coordinates4zminE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>minimum z-coorinate of the quadrature point within this MPI slice </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute11coordinates5coordE">
+<span id="_CPPv3N7specfem7compute11coordinates5coordE"></span><span id="_CPPv2N7specfem7compute11coordinates5coordE"></span><span id="specfem::compute::coordinates::coord__specfem::kokkos::HostView2d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1coordinates_1a97605d95de609dd7ebb3e51ed00c3420"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos10HostView2dE" title="specfem::kokkos::HostView2d"><span class="n"><span class="pre">HostView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">coord</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute11coordinates5coordE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>(x, z) for every distinct control node </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute19partial_derivativesE">
+<span id="_CPPv3N7specfem7compute19partial_derivativesE"></span><span id="_CPPv2N7specfem7compute19partial_derivativesE"></span><span id="specfem::compute::partial_derivatives"></span><span class="target" id="structspecfem_1_1compute_1_1partial__derivatives"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">partial_derivatives</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute19partial_derivativesE" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;compute.h&gt;</em></div>
+<p>Partial derivates matrices required to compute integrals. </p>
+<p>The matrices are stored in (ispec, iz, ix) format </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute19partial_derivatives19partial_derivativesEv">
+<span id="_CPPv3N7specfem7compute19partial_derivatives19partial_derivativesEv"></span><span id="_CPPv2N7specfem7compute19partial_derivatives19partial_derivativesEv"></span><span id="specfem::compute::partial_derivatives::partial_derivatives"></span><span class="target" id="structspecfem_1_1compute_1_1partial__derivatives_1a2ef4c233af077587a1e841b6c00046b9"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">partial_derivatives</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem7compute19partial_derivatives19partial_derivativesEv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Default constructor. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute19partial_derivatives19partial_derivativesEKiKiKi">
+<span id="_CPPv3N7specfem7compute19partial_derivatives19partial_derivativesEKiKiKi"></span><span id="_CPPv2N7specfem7compute19partial_derivatives19partial_derivativesEKiKiKi"></span><span id="specfem::compute::partial_derivatives::partial_derivatives__iC.iC.iC"></span><span class="target" id="structspecfem_1_1compute_1_1partial__derivatives_1ab0d0b6b1d95fb46f5578791cd5f4cc92"></span><span class="sig-name descname"><span class="n"><span class="pre">partial_derivatives</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nspec</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ngllz</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ngllx</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem7compute19partial_derivatives19partial_derivativesEKiKiKi" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Constructor to allocate views. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nspec</strong> – Number of spectral elements </p></li>
+<li><p><strong>ngllz</strong> – Number of quadrature points in z direction </p></li>
+<li><p><strong>ngllx</strong> – Number of quadrature points in x direction </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute19partial_derivatives19partial_derivativesEKN7specfem6kokkos10HostView2dI9type_realEEKN7specfem6kokkos10HostView2dIiEERKN7specfem10quadrature10quadratureERKN7specfem10quadrature10quadratureE">
+<span id="_CPPv3N7specfem7compute19partial_derivatives19partial_derivativesEKN7specfem6kokkos10HostView2dI9type_realEEKN7specfem6kokkos10HostView2dIiEERKN7specfem10quadrature10quadratureERKN7specfem10quadrature10quadratureE"></span><span id="_CPPv2N7specfem7compute19partial_derivatives19partial_derivativesEKN7specfem6kokkos10HostView2dI9type_realEEKN7specfem6kokkos10HostView2dIiEERKN7specfem10quadrature10quadratureERKN7specfem10quadrature10quadratureE"></span><span id="specfem::compute::partial_derivatives::partial_derivatives__specfem::kokkos::HostView2d:type_real:C.specfem::kokkos::HostView2d:i:C.specfem::quadrature::quadratureCR.specfem::quadrature::quadratureCR"></span><span class="target" id="structspecfem_1_1compute_1_1partial__derivatives_1a6982ec285b31ca302de7f1b8737f5ad8"></span><span class="sig-name descname"><span class="n"><span class="pre">partial_derivatives</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos10HostView2dE" title="specfem::kokkos::HostView2d"><span class="n"><span class="pre">HostView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">coorg</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos10HostView2dE" title="specfem::kokkos::HostView2d"><span class="n"><span class="pre">HostView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">knods</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="quadrature.html#_CPPv4N7specfem10quadratureE" title="specfem::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="quadrature.html#_CPPv4N7specfem10quadrature10quadratureE" title="specfem::quadrature::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">quadx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="quadrature.html#_CPPv4N7specfem10quadratureE" title="specfem::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="quadrature.html#_CPPv4N7specfem10quadrature10quadratureE" title="specfem::quadrature::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">quadz</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem7compute19partial_derivatives19partial_derivativesEKN7specfem6kokkos10HostView2dI9type_realEEKN7specfem6kokkos10HostView2dIiEERKN7specfem10quadrature10quadratureERKN7specfem10quadrature10quadratureE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Constructor to allocate and assign views. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>coorg</strong> – (x,z) for every spectral element control node </p></li>
+<li><p><strong>knods</strong> – Global control element number for every control node </p></li>
+<li><p><strong>quadx</strong> – Quadrature object in x dimension </p></li>
+<li><p><strong>quadz</strong> – Quadrature object in z dimension </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute19partial_derivatives10sync_viewsEv">
+<span id="_CPPv3N7specfem7compute19partial_derivatives10sync_viewsEv"></span><span id="_CPPv2N7specfem7compute19partial_derivatives10sync_viewsEv"></span><span id="specfem::compute::partial_derivatives::sync_views"></span><span class="target" id="structspecfem_1_1compute_1_1partial__derivatives_1a152bd18f21c586f84eb7e5ecc3785d83"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sync_views</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem7compute19partial_derivatives10sync_viewsEv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Helper routine to sync views within this struct. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute19partial_derivatives3xixE">
+<span id="_CPPv3N7specfem7compute19partial_derivatives3xixE"></span><span id="_CPPv2N7specfem7compute19partial_derivatives3xixE"></span><span id="specfem::compute::partial_derivatives::xix__specfem::kokkos::DeviceView3d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1partial__derivatives_1a3abd044e24141815165192b76add9b40"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12DeviceView3dE" title="specfem::kokkos::DeviceView3d"><span class="n"><span class="pre">DeviceView3d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">xix</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute19partial_derivatives3xixE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>inverted partial derivates  <span class="math notranslate nohighlight">\(\partial \xi / \partial
+         &lt; x\)</span> stored on the device </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute19partial_derivatives5h_xixE">
+<span id="_CPPv3N7specfem7compute19partial_derivatives5h_xixE"></span><span id="_CPPv2N7specfem7compute19partial_derivatives5h_xixE"></span><span id="specfem::compute::partial_derivatives::h_xix__specfem::kokkos::HostMirror3d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1partial__derivatives_1a976ab49c3854e88a462a771416a384d8"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12HostMirror3dE" title="specfem::kokkos::HostMirror3d"><span class="n"><span class="pre">HostMirror3d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">h_xix</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute19partial_derivatives5h_xixE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>inverted partial derivates <span class="math notranslate nohighlight">\(\partial \xi
+         &lt; / \partial x\)</span> stored on the host </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute19partial_derivatives3xizE">
+<span id="_CPPv3N7specfem7compute19partial_derivatives3xizE"></span><span id="_CPPv2N7specfem7compute19partial_derivatives3xizE"></span><span id="specfem::compute::partial_derivatives::xiz__specfem::kokkos::DeviceView3d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1partial__derivatives_1a82d41264d57487e5f1bff393434053c6"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12DeviceView3dE" title="specfem::kokkos::DeviceView3d"><span class="n"><span class="pre">DeviceView3d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">xiz</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute19partial_derivatives3xizE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>inverted partial derivates  <span class="math notranslate nohighlight">\(\partial \xi / \partial
+         &lt; z\)</span> stored on the device </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute19partial_derivatives5h_xizE">
+<span id="_CPPv3N7specfem7compute19partial_derivatives5h_xizE"></span><span id="_CPPv2N7specfem7compute19partial_derivatives5h_xizE"></span><span id="specfem::compute::partial_derivatives::h_xiz__specfem::kokkos::HostMirror3d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1partial__derivatives_1a16e8cffdd1e96963d3e8312f812f090b"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12HostMirror3dE" title="specfem::kokkos::HostMirror3d"><span class="n"><span class="pre">HostMirror3d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">h_xiz</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute19partial_derivatives5h_xizE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>inverted partial derivates <span class="math notranslate nohighlight">\(\partial \xi
+         &lt; / \partial z\)</span> stored on the host </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute19partial_derivatives6gammaxE">
+<span id="_CPPv3N7specfem7compute19partial_derivatives6gammaxE"></span><span id="_CPPv2N7specfem7compute19partial_derivatives6gammaxE"></span><span id="specfem::compute::partial_derivatives::gammax__specfem::kokkos::DeviceView3d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1partial__derivatives_1a93d7f0e57266eade43a510eddc588357"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12DeviceView3dE" title="specfem::kokkos::DeviceView3d"><span class="n"><span class="pre">DeviceView3d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">gammax</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute19partial_derivatives6gammaxE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>inverted partial derivates <span class="math notranslate nohighlight">\(\partial
+         &lt; \gamma / \partial x\)</span> stored on device </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute19partial_derivatives8h_gammaxE">
+<span id="_CPPv3N7specfem7compute19partial_derivatives8h_gammaxE"></span><span id="_CPPv2N7specfem7compute19partial_derivatives8h_gammaxE"></span><span id="specfem::compute::partial_derivatives::h_gammax__specfem::kokkos::HostMirror3d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1partial__derivatives_1a53b4b5d119ff3f2015b5ef05815ca518"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12HostMirror3dE" title="specfem::kokkos::HostMirror3d"><span class="n"><span class="pre">HostMirror3d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">h_gammax</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute19partial_derivatives8h_gammaxE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>inverted partial derivates <span class="math notranslate nohighlight">\(\partial
+         &lt; \gamma / \partial x\)</span> stored on host </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute19partial_derivatives6gammazE">
+<span id="_CPPv3N7specfem7compute19partial_derivatives6gammazE"></span><span id="_CPPv2N7specfem7compute19partial_derivatives6gammazE"></span><span id="specfem::compute::partial_derivatives::gammaz__specfem::kokkos::DeviceView3d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1partial__derivatives_1a2ae251ab236e5854fecf8004f1f3addf"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12DeviceView3dE" title="specfem::kokkos::DeviceView3d"><span class="n"><span class="pre">DeviceView3d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">gammaz</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute19partial_derivatives6gammazE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>inverted partial derivates <span class="math notranslate nohighlight">\(\partial
+         &lt; \gamma / \partial z\)</span> stored on device </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute19partial_derivatives8h_gammazE">
+<span id="_CPPv3N7specfem7compute19partial_derivatives8h_gammazE"></span><span id="_CPPv2N7specfem7compute19partial_derivatives8h_gammazE"></span><span id="specfem::compute::partial_derivatives::h_gammaz__specfem::kokkos::HostMirror3d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1partial__derivatives_1a4f263a3927decf3596e981f6f55c46cf"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12HostMirror3dE" title="specfem::kokkos::HostMirror3d"><span class="n"><span class="pre">HostMirror3d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">h_gammaz</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute19partial_derivatives8h_gammazE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>inverted partial derivates <span class="math notranslate nohighlight">\(\partial
+         &lt; \gamma / \partial z\)</span> stored on host </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute19partial_derivatives8jacobianE">
+<span id="_CPPv3N7specfem7compute19partial_derivatives8jacobianE"></span><span id="_CPPv2N7specfem7compute19partial_derivatives8jacobianE"></span><span id="specfem::compute::partial_derivatives::jacobian__specfem::kokkos::DeviceView3d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1partial__derivatives_1a5e7b0cc575e4fe394cc193ebecff3e62"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12DeviceView3dE" title="specfem::kokkos::DeviceView3d"><span class="n"><span class="pre">DeviceView3d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">jacobian</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute19partial_derivatives8jacobianE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Jacobian values stored on device </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute19partial_derivatives10h_jacobianE">
+<span id="_CPPv3N7specfem7compute19partial_derivatives10h_jacobianE"></span><span id="_CPPv2N7specfem7compute19partial_derivatives10h_jacobianE"></span><span id="specfem::compute::partial_derivatives::h_jacobian__specfem::kokkos::HostMirror3d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1partial__derivatives_1aac1b8fedccadb48305789d26d5070c12"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12HostMirror3dE" title="specfem::kokkos::HostMirror3d"><span class="n"><span class="pre">HostMirror3d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">h_jacobian</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute19partial_derivatives10h_jacobianE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Jacobian values stored on host </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute10propertiesE">
+<span id="_CPPv3N7specfem7compute10propertiesE"></span><span id="_CPPv2N7specfem7compute10propertiesE"></span><span id="specfem::compute::properties"></span><span class="target" id="structspecfem_1_1compute_1_1properties"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">properties</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute10propertiesE" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;compute.h&gt;</em></div>
+<p>Material properties stored at every quadrature point. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-material-properties">Material properties</p>
+<p>h_ prefixes denote views stored on host </p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute10properties3rhoE">
+<span id="_CPPv3N7specfem7compute10properties3rhoE"></span><span id="_CPPv2N7specfem7compute10properties3rhoE"></span><span id="specfem::compute::properties::rho__specfem::kokkos::DeviceView3d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1properties_1aeacca5be043d2bc32a08107d4a3012e1"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12DeviceView3dE" title="specfem::kokkos::DeviceView3d"><span class="n"><span class="pre">DeviceView3d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">rho</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute10properties3rhoE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute10properties5h_rhoE">
+<span id="_CPPv3N7specfem7compute10properties5h_rhoE"></span><span id="_CPPv2N7specfem7compute10properties5h_rhoE"></span><span id="specfem::compute::properties::h_rho__specfem::kokkos::HostMirror3d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1properties_1ad200489704024ffb6fe653ac84eac4e7"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12HostMirror3dE" title="specfem::kokkos::HostMirror3d"><span class="n"><span class="pre">HostMirror3d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">h_rho</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute10properties5h_rhoE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute10properties2muE">
+<span id="_CPPv3N7specfem7compute10properties2muE"></span><span id="_CPPv2N7specfem7compute10properties2muE"></span><span id="specfem::compute::properties::mu__specfem::kokkos::DeviceView3d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1properties_1ae98dbf55b147c4a71391486741492805"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12DeviceView3dE" title="specfem::kokkos::DeviceView3d"><span class="n"><span class="pre">DeviceView3d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">mu</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute10properties2muE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute10properties4h_muE">
+<span id="_CPPv3N7specfem7compute10properties4h_muE"></span><span id="_CPPv2N7specfem7compute10properties4h_muE"></span><span id="specfem::compute::properties::h_mu__specfem::kokkos::HostMirror3d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1properties_1abd4423d9b228fee2e5e90336e9bda4d6"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12HostMirror3dE" title="specfem::kokkos::HostMirror3d"><span class="n"><span class="pre">HostMirror3d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">h_mu</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute10properties4h_muE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute10properties5kappaE">
+<span id="_CPPv3N7specfem7compute10properties5kappaE"></span><span id="_CPPv2N7specfem7compute10properties5kappaE"></span><span id="specfem::compute::properties::kappa__specfem::kokkos::HostView3d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1properties_1a364432fa455eef767efa299269f465f1"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos10HostView3dE" title="specfem::kokkos::HostView3d"><span class="n"><span class="pre">HostView3d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kappa</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute10properties5kappaE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute10properties3qmuE">
+<span id="_CPPv3N7specfem7compute10properties3qmuE"></span><span id="_CPPv2N7specfem7compute10properties3qmuE"></span><span id="specfem::compute::properties::qmu__specfem::kokkos::HostView3d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1properties_1abaa3875d63ba144b069dafa6b95eff01"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos10HostView3dE" title="specfem::kokkos::HostView3d"><span class="n"><span class="pre">HostView3d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qmu</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute10properties3qmuE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute10properties6qkappaE">
+<span id="_CPPv3N7specfem7compute10properties6qkappaE"></span><span id="_CPPv2N7specfem7compute10properties6qkappaE"></span><span id="specfem::compute::properties::qkappa__specfem::kokkos::HostView3d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1properties_1ad5f45e6f337cfe4ea180dc46ef48489f"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos10HostView3dE" title="specfem::kokkos::HostView3d"><span class="n"><span class="pre">HostView3d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qkappa</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute10properties6qkappaE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute10properties6rho_vpE">
+<span id="_CPPv3N7specfem7compute10properties6rho_vpE"></span><span id="_CPPv2N7specfem7compute10properties6rho_vpE"></span><span id="specfem::compute::properties::rho_vp__specfem::kokkos::HostView3d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1properties_1a82ca97c76b086497edb691c4390b00fd"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos10HostView3dE" title="specfem::kokkos::HostView3d"><span class="n"><span class="pre">HostView3d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">rho_vp</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute10properties6rho_vpE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute10properties6rho_vsE">
+<span id="_CPPv3N7specfem7compute10properties6rho_vsE"></span><span id="_CPPv2N7specfem7compute10properties6rho_vsE"></span><span id="specfem::compute::properties::rho_vs__specfem::kokkos::HostView3d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1properties_1a898effd854e83986933ae6ab4f9eb246"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos10HostView3dE" title="specfem::kokkos::HostView3d"><span class="n"><span class="pre">HostView3d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">rho_vs</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute10properties6rho_vsE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute10properties13lambdaplus2muE">
+<span id="_CPPv3N7specfem7compute10properties13lambdaplus2muE"></span><span id="_CPPv2N7specfem7compute10properties13lambdaplus2muE"></span><span id="specfem::compute::properties::lambdaplus2mu__specfem::kokkos::DeviceView3d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1properties_1a9bf2db5b1d42687c85c58668d0cb258e"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12DeviceView3dE" title="specfem::kokkos::DeviceView3d"><span class="n"><span class="pre">DeviceView3d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">lambdaplus2mu</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute10properties13lambdaplus2muE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute10properties15h_lambdaplus2muE">
+<span id="_CPPv3N7specfem7compute10properties15h_lambdaplus2muE"></span><span id="_CPPv2N7specfem7compute10properties15h_lambdaplus2muE"></span><span id="specfem::compute::properties::h_lambdaplus2mu__specfem::kokkos::HostMirror3d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1properties_1a798cfcec54167cf5edcc2cc017984fc1"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12HostMirror3dE" title="specfem::kokkos::HostMirror3d"><span class="n"><span class="pre">HostMirror3d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">h_lambdaplus2mu</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute10properties15h_lambdaplus2muE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute10properties10propertiesEv">
+<span id="_CPPv3N7specfem7compute10properties10propertiesEv"></span><span id="_CPPv2N7specfem7compute10properties10propertiesEv"></span><span id="specfem::compute::properties::properties"></span><span class="target" id="structspecfem_1_1compute_1_1properties_1a62f5d38c2784b002142fc702c5b7f025"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">properties</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem7compute10properties10propertiesEv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Default constructor. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute10properties10propertiesEKiKiKi">
+<span id="_CPPv3N7specfem7compute10properties10propertiesEKiKiKi"></span><span id="_CPPv2N7specfem7compute10properties10propertiesEKiKiKi"></span><span id="specfem::compute::properties::properties__iC.iC.iC"></span><span class="target" id="structspecfem_1_1compute_1_1properties_1a8b17abfe34cf6463760d0e69fddccf5e"></span><span class="sig-name descname"><span class="n"><span class="pre">properties</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nspec</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ngllz</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ngllx</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem7compute10properties10propertiesEKiKiKi" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Constructor to allocate views. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nspec</strong> – Number for spectral elements </p></li>
+<li><p><strong>ngllz</strong> – Number of quadrature points in z dimension </p></li>
+<li><p><strong>ngllx</strong> – Number of quadrature points in x dimension </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute10properties10propertiesEKN7specfem6kokkos10HostView1dIiEERKNSt6vectorIPN7specfem8materialEEEKiKiKi">
+<span id="_CPPv3N7specfem7compute10properties10propertiesEKN7specfem6kokkos10HostView1dIiEERKNSt6vectorIPN7specfem8materialEEEKiKiKi"></span><span id="_CPPv2N7specfem7compute10properties10propertiesEKN7specfem6kokkos10HostView1dIiEERKNSt6vectorIPN7specfem8materialEEEKiKiKi"></span><span id="specfem::compute::properties::properties__specfem::kokkos::HostView1d:i:C.std::vector:specfem::materialP:CR.iC.iC.iC"></span><span class="target" id="structspecfem_1_1compute_1_1properties_1ad6ec625c7c2dcaff7c6f2fca1440d7ab"></span><span class="sig-name descname"><span class="n"><span class="pre">properties</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos10HostView1dE" title="specfem::kokkos::HostView1d"><span class="n"><span class="pre">HostView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">kmato</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="material.html#_CPPv4N7specfem8materialE" title="specfem::material"><span class="n"><span class="pre">material</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">materials</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nspec</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ngllx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ngllz</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem7compute10properties10propertiesEKN7specfem6kokkos10HostView1dIiEERKNSt6vectorIPN7specfem8materialEEEKiKiKi" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Constructor to allocate and assign views. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>kmato</strong> – Material specification number </p></li>
+<li><p><strong>materials</strong> – Pointer to material objects read from database file </p></li>
+<li><p><strong>nspec</strong> – Number for spectral elements </p></li>
+<li><p><strong>ngllz</strong> – Number of quadrature points in z dimension </p></li>
+<li><p><strong>ngllx</strong> – Number of quadrature points in x dimension </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute10properties10sync_viewsEv">
+<span id="_CPPv3N7specfem7compute10properties10sync_viewsEv"></span><span id="_CPPv2N7specfem7compute10properties10sync_viewsEv"></span><span id="specfem::compute::properties::sync_views"></span><span class="target" id="structspecfem_1_1compute_1_1properties_1abf7118843a5186d0f15be8390942fbd1"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sync_views</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem7compute10properties10sync_viewsEv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Helper routine to sync views within this struct. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute10properties10ispec_typeE">
+<span id="_CPPv3N7specfem7compute10properties10ispec_typeE"></span><span id="_CPPv2N7specfem7compute10properties10ispec_typeE"></span><span id="specfem::compute::properties::ispec_type__specfem::kokkos::DeviceView1d:specfem::elements::type:"></span><span class="target" id="structspecfem_1_1compute_1_1properties_1a44f8d33671d99c2c6a7364c003bbc6d4"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12DeviceView1dE" title="specfem::kokkos::DeviceView1d"><span class="n"><span class="pre">DeviceView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="mesh.html#_CPPv4N7specfem8elementsE" title="specfem::elements"><span class="n"><span class="pre">elements</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ispec_type</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute10properties10ispec_typeE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>type of element stored on device </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute10properties12h_ispec_typeE">
+<span id="_CPPv3N7specfem7compute10properties12h_ispec_typeE"></span><span id="_CPPv2N7specfem7compute10properties12h_ispec_typeE"></span><span id="specfem::compute::properties::h_ispec_type__specfem::kokkos::HostMirror1d:specfem::elements::type:"></span><span class="target" id="structspecfem_1_1compute_1_1properties_1a55493b5e73a685fda8720eb19fb045ea"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12HostMirror1dE" title="specfem::kokkos::HostMirror1d"><span class="n"><span class="pre">HostMirror1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="mesh.html#_CPPv4N7specfem8elementsE" title="specfem::elements"><span class="n"><span class="pre">elements</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">h_ispec_type</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute10properties12h_ispec_typeE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>type of element stored on host </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute9receiversE">
+<span id="_CPPv3N7specfem7compute9receiversE"></span><span id="_CPPv2N7specfem7compute9receiversE"></span><span id="specfem::compute::receivers"></span><span class="target" id="structspecfem_1_1compute_1_1receivers"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">receivers</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute9receiversE" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;compute.h&gt;</em></div>
+<p>This struct is used to store receiver arrays required to interpolate fields during seismogram calculations. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute9receivers9receiversEv">
+<span id="_CPPv3N7specfem7compute9receivers9receiversEv"></span><span id="_CPPv2N7specfem7compute9receivers9receiversEv"></span><span id="specfem::compute::receivers::receivers"></span><span class="target" id="structspecfem_1_1compute_1_1receivers_1aecc357a71555904d23d33e8b13656d9c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">receivers</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem7compute9receivers9receiversEv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Default constructor. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute9receivers9receiversERKNSt6vectorIPN7specfem9receivers8receiverEEERKNSt6vectorIN7specfem10seismogram4typeEEERKN7specfem10quadrature10quadratureERKN7specfem10quadrature10quadratureEK9type_realK9type_realK9type_realK9type_realKiPN7specfem3MPI3MPIE">
+<span id="_CPPv3N7specfem7compute9receivers9receiversERKNSt6vectorIPN7specfem9receivers8receiverEEERKNSt6vectorIN7specfem10seismogram4typeEEERKN7specfem10quadrature10quadratureERKN7specfem10quadrature10quadratureEK9type_realK9type_realK9type_realK9type_realKiPN7specfem3MPI3MPIE"></span><span id="_CPPv2N7specfem7compute9receivers9receiversERKNSt6vectorIPN7specfem9receivers8receiverEEERKNSt6vectorIN7specfem10seismogram4typeEEERKN7specfem10quadrature10quadratureERKN7specfem10quadrature10quadratureEK9type_realK9type_realK9type_realK9type_realKiPN7specfem3MPI3MPIE"></span><span id="specfem::compute::receivers::receivers__std::vector:specfem::receivers::receiverP:CR.std::vector:specfem::seismogram::type:CR.specfem::quadrature::quadratureCR.specfem::quadrature::quadratureCR.type_realC.type_realC.type_realC.type_realC.iC.specfem::MPI::MPIP"></span><span class="target" id="structspecfem_1_1compute_1_1receivers_1a75f5d6be321188144a555db730543f33"></span><span class="sig-name descname"><span class="n"><span class="pre">receivers</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">receivers</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">receiver</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">receivers</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">seismogram</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">stypes</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="quadrature.html#_CPPv4N7specfem10quadratureE" title="specfem::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="quadrature.html#_CPPv4N7specfem10quadrature10quadratureE" title="specfem::quadrature::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">quadx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="quadrature.html#_CPPv4N7specfem10quadratureE" title="specfem::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="quadrature.html#_CPPv4N7specfem10quadrature10quadratureE" title="specfem::quadrature::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">quadz</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">xmax</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">xmin</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">zmax</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">zmin</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">max_sig_step</span></span>, <a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="specfem_mpi.html#_CPPv4N7specfem3MPIE" title="specfem::MPI"><span class="n"><span class="pre">MPI</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="specfem_mpi.html#_CPPv4N7specfem3MPI3MPIE" title="specfem::MPI::MPI"><span class="n"><span class="pre">MPI</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">mpi</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem7compute9receivers9receiversERKNSt6vectorIPN7specfem9receivers8receiverEEERKNSt6vectorIN7specfem10seismogram4typeEEERKN7specfem10quadrature10quadratureERKN7specfem10quadrature10quadratureEK9type_realK9type_realK9type_realK9type_realKiPN7specfem3MPI3MPIE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Constructor to allocate and assign views. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>receivers</strong> – Pointer to receivers objects read from sources file </p></li>
+<li><p><strong>stypes</strong> – Types of seismograms to be written </p></li>
+<li><p><strong>quadx</strong> – Quarature object in x dimension </p></li>
+<li><p><strong>quadz</strong> – Quadrature object in z dimension </p></li>
+<li><p><strong>mpi</strong> – Pointer to the MPI object </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute9receivers10sync_viewsEv">
+<span id="_CPPv3N7specfem7compute9receivers10sync_viewsEv"></span><span id="_CPPv2N7specfem7compute9receivers10sync_viewsEv"></span><span id="specfem::compute::receivers::sync_views"></span><span class="target" id="structspecfem_1_1compute_1_1receivers_1a0ad9c7072c5bca61c1e29e0b0aef621a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sync_views</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem7compute9receivers10sync_viewsEv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sync views within this struct from host to device. </p>
+<p>Sync views after they have been initialized on the host </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute9receivers16sync_seismogramsEv">
+<span id="_CPPv3N7specfem7compute9receivers16sync_seismogramsEv"></span><span id="_CPPv2N7specfem7compute9receivers16sync_seismogramsEv"></span><span id="specfem::compute::receivers::sync_seismograms"></span><span class="target" id="structspecfem_1_1compute_1_1receivers_1aea42a01274441b2abc7c9df00afae795"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sync_seismograms</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem7compute9receivers16sync_seismogramsEv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sync calculated seismogram from device to the host. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute9receivers14receiver_arrayE">
+<span id="_CPPv3N7specfem7compute9receivers14receiver_arrayE"></span><span id="_CPPv2N7specfem7compute9receivers14receiver_arrayE"></span><span id="specfem::compute::receivers::receiver_array__specfem::kokkos::DeviceView4d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1receivers_1ae00ede929f5245598339e2789f1894f4"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12DeviceView4dE" title="specfem::kokkos::DeviceView4d"><span class="n"><span class="pre">DeviceView4d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">receiver_array</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute9receivers14receiver_arrayE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Array to store lagrange interpolants for receivers on the device </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute9receivers16h_receiver_arrayE">
+<span id="_CPPv3N7specfem7compute9receivers16h_receiver_arrayE"></span><span id="_CPPv2N7specfem7compute9receivers16h_receiver_arrayE"></span><span id="specfem::compute::receivers::h_receiver_array__specfem::kokkos::HostMirror4d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1receivers_1ab6e4c5d702b9ddec43e75b48aa8c7f4a"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12HostMirror4dE" title="specfem::kokkos::HostMirror4d"><span class="n"><span class="pre">HostMirror4d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">h_receiver_array</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute9receivers16h_receiver_arrayE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Array to store lagrange interpolants for sources stored on host </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute9receivers11ispec_arrayE">
+<span id="_CPPv3N7specfem7compute9receivers11ispec_arrayE"></span><span id="_CPPv2N7specfem7compute9receivers11ispec_arrayE"></span><span id="specfem::compute::receivers::ispec_array__specfem::kokkos::DeviceView1d:i:"></span><span class="target" id="structspecfem_1_1compute_1_1receivers_1aa8bca427c27e3f40ac155966bf665521"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12DeviceView1dE" title="specfem::kokkos::DeviceView1d"><span class="n"><span class="pre">DeviceView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ispec_array</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute9receivers11ispec_arrayE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Spectral element number where the source lies stored on device </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute9receivers13h_ispec_arrayE">
+<span id="_CPPv3N7specfem7compute9receivers13h_ispec_arrayE"></span><span id="_CPPv2N7specfem7compute9receivers13h_ispec_arrayE"></span><span id="specfem::compute::receivers::h_ispec_array__specfem::kokkos::HostMirror1d:i:"></span><span class="target" id="structspecfem_1_1compute_1_1receivers_1aa2dee1f3b78dde16f709eb2127a980f9"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12HostMirror1dE" title="specfem::kokkos::HostMirror1d"><span class="n"><span class="pre">HostMirror1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">h_ispec_array</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute9receivers13h_ispec_arrayE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Spectral element number where the source lies stored on host </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute9receivers8cos_recsE">
+<span id="_CPPv3N7specfem7compute9receivers8cos_recsE"></span><span id="_CPPv2N7specfem7compute9receivers8cos_recsE"></span><span id="specfem::compute::receivers::cos_recs__specfem::kokkos::DeviceView1d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1receivers_1a10ed8201bacd62f406a8bf6cf6ad3b15"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12DeviceView1dE" title="specfem::kokkos::DeviceView1d"><span class="n"><span class="pre">DeviceView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cos_recs</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute9receivers8cos_recsE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>consine of angle used to rotate receiver components stored on device </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute9receivers10h_cos_recsE">
+<span id="_CPPv3N7specfem7compute9receivers10h_cos_recsE"></span><span id="_CPPv2N7specfem7compute9receivers10h_cos_recsE"></span><span id="specfem::compute::receivers::h_cos_recs__specfem::kokkos::HostMirror1d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1receivers_1a1f8f015fed6cbba7a2940bc6e0b6462b"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12HostMirror1dE" title="specfem::kokkos::HostMirror1d"><span class="n"><span class="pre">HostMirror1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">h_cos_recs</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute9receivers10h_cos_recsE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>consine of angle used to rotate receiver components stored on host </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute9receivers8sin_recsE">
+<span id="_CPPv3N7specfem7compute9receivers8sin_recsE"></span><span id="_CPPv2N7specfem7compute9receivers8sin_recsE"></span><span id="specfem::compute::receivers::sin_recs__specfem::kokkos::DeviceView1d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1receivers_1af32ebe66f4ad97ac11bd79f814061792"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12DeviceView1dE" title="specfem::kokkos::DeviceView1d"><span class="n"><span class="pre">DeviceView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sin_recs</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute9receivers8sin_recsE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>sine of angle used to rotate receiver components stored on device </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute9receivers10h_sin_recsE">
+<span id="_CPPv3N7specfem7compute9receivers10h_sin_recsE"></span><span id="_CPPv2N7specfem7compute9receivers10h_sin_recsE"></span><span id="specfem::compute::receivers::h_sin_recs__specfem::kokkos::HostMirror1d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1receivers_1ac6028cbd246c1dbddad0171d0f90c32c"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12HostMirror1dE" title="specfem::kokkos::HostMirror1d"><span class="n"><span class="pre">HostMirror1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">h_sin_recs</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute9receivers10h_sin_recsE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>sine of angle used to rotate receiver components stored on host </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute9receivers5fieldE">
+<span id="_CPPv3N7specfem7compute9receivers5fieldE"></span><span id="_CPPv2N7specfem7compute9receivers5fieldE"></span><span id="specfem::compute::receivers::field__specfem::kokkos::DeviceView5d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1receivers_1aa02c7e5f2eef1da9066c079d458d25d5"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12DeviceView5dE" title="specfem::kokkos::DeviceView5d"><span class="n"><span class="pre">DeviceView5d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">field</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute9receivers5fieldE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Container to store spectral element field used in computing seismograms stored on the device </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute9receivers10seismogramE">
+<span id="_CPPv3N7specfem7compute9receivers10seismogramE"></span><span id="_CPPv2N7specfem7compute9receivers10seismogramE"></span><span id="specfem::compute::receivers::seismogram__specfem::kokkos::DeviceView4d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1receivers_1a9f6ebf8381b787f00e0d92752e52fc43"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12DeviceView4dE" title="specfem::kokkos::DeviceView4d"><span class="n"><span class="pre">DeviceView4d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">seismogram</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute9receivers10seismogramE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Container to store computed seismograms stored on the device </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute9receivers12h_seismogramE">
+<span id="_CPPv3N7specfem7compute9receivers12h_seismogramE"></span><span id="_CPPv2N7specfem7compute9receivers12h_seismogramE"></span><span id="specfem::compute::receivers::h_seismogram__specfem::kokkos::HostMirror4d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1receivers_1a6bff3b2aeee2b8d0aa544fa1194ba29c"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12HostMirror4dE" title="specfem::kokkos::HostMirror4d"><span class="n"><span class="pre">HostMirror4d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">h_seismogram</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute9receivers12h_seismogramE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Container to store computed seismograms stored on the device </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute9receivers16seismogram_typesE">
+<span id="_CPPv3N7specfem7compute9receivers16seismogram_typesE"></span><span id="_CPPv2N7specfem7compute9receivers16seismogram_typesE"></span><span id="specfem::compute::receivers::seismogram_types__specfem::kokkos::DeviceView1d:specfem::seismogram::type:"></span><span class="target" id="structspecfem_1_1compute_1_1receivers_1aaa8640da6863407541f2380358ba3e3a"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12DeviceView1dE" title="specfem::kokkos::DeviceView1d"><span class="n"><span class="pre">DeviceView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">seismogram</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">seismogram_types</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute9receivers16seismogram_typesE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Types of seismograms to be calculated stored on the device </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute9receivers18h_seismogram_typesE">
+<span id="_CPPv3N7specfem7compute9receivers18h_seismogram_typesE"></span><span id="_CPPv2N7specfem7compute9receivers18h_seismogram_typesE"></span><span id="specfem::compute::receivers::h_seismogram_types__specfem::kokkos::HostMirror1d:specfem::seismogram::type:"></span><span class="target" id="structspecfem_1_1compute_1_1receivers_1a2bd00956f73e6518b5f5fe60ac054b64"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12HostMirror1dE" title="specfem::kokkos::HostMirror1d"><span class="n"><span class="pre">HostMirror1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">seismogram</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">type</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">h_seismogram_types</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute9receivers18h_seismogram_typesE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Types of seismograms to be calculated stored on the host </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute7sourcesE">
+<span id="_CPPv3N7specfem7compute7sourcesE"></span><span id="_CPPv2N7specfem7compute7sourcesE"></span><span id="specfem::compute::sources"></span><span class="target" id="structspecfem_1_1compute_1_1sources"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sources</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute7sourcesE" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;compute.h&gt;</em></div>
+<p>This struct is used to store arrays required to impose source interaction during the time loop. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Does not implement moving sources yet </p>
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute7sources7sourcesEv">
+<span id="_CPPv3N7specfem7compute7sources7sourcesEv"></span><span id="_CPPv2N7specfem7compute7sources7sourcesEv"></span><span id="specfem::compute::sources::sources"></span><span class="target" id="structspecfem_1_1compute_1_1sources_1a66e8a07fda47061afc1f9447e585890b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sources</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem7compute7sources7sourcesEv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Default constructor. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute7sources7sourcesERKNSt6vectorIPN7specfem7sources6sourceEEERKN7specfem10quadrature10quadratureERKN7specfem10quadrature10quadratureEK9type_realK9type_realK9type_realK9type_realPN7specfem3MPI3MPIE">
+<span id="_CPPv3N7specfem7compute7sources7sourcesERKNSt6vectorIPN7specfem7sources6sourceEEERKN7specfem10quadrature10quadratureERKN7specfem10quadrature10quadratureEK9type_realK9type_realK9type_realK9type_realPN7specfem3MPI3MPIE"></span><span id="_CPPv2N7specfem7compute7sources7sourcesERKNSt6vectorIPN7specfem7sources6sourceEEERKN7specfem10quadrature10quadratureERKN7specfem10quadrature10quadratureEK9type_realK9type_realK9type_realK9type_realPN7specfem3MPI3MPIE"></span><span id="specfem::compute::sources::sources__std::vector:specfem::sources::sourceP:CR.specfem::quadrature::quadratureCR.specfem::quadrature::quadratureCR.type_realC.type_realC.type_realC.type_realC.specfem::MPI::MPIP"></span><span class="target" id="structspecfem_1_1compute_1_1sources_1a1806161b7e06406c8763239ccd6671e5"></span><span class="sig-name descname"><span class="n"><span class="pre">sources</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="sources_recievers.html#_CPPv4N7specfem7sourcesE" title="specfem::sources"><span class="n"><span class="pre">sources</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="sources_recievers.html#_CPPv4N7specfem7sources6sourceE" title="specfem::sources::source"><span class="n"><span class="pre">source</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">sources</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="quadrature.html#_CPPv4N7specfem10quadratureE" title="specfem::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="quadrature.html#_CPPv4N7specfem10quadrature10quadratureE" title="specfem::quadrature::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">quadx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="quadrature.html#_CPPv4N7specfem10quadratureE" title="specfem::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="quadrature.html#_CPPv4N7specfem10quadrature10quadratureE" title="specfem::quadrature::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">quadz</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">xmax</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">xmin</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">zmax</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">zmin</span></span>, <a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="specfem_mpi.html#_CPPv4N7specfem3MPIE" title="specfem::MPI"><span class="n"><span class="pre">MPI</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="specfem_mpi.html#_CPPv4N7specfem3MPI3MPIE" title="specfem::MPI::MPI"><span class="n"><span class="pre">MPI</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">mpi</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem7compute7sources7sourcesERKNSt6vectorIPN7specfem7sources6sourceEEERKN7specfem10quadrature10quadratureERKN7specfem10quadrature10quadratureEK9type_realK9type_realK9type_realK9type_realPN7specfem3MPI3MPIE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Constructor to allocate and assign views. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sources</strong> – Pointer to sources objects read from sources file </p></li>
+<li><p><strong>quadx</strong> – Quarature object in x dimension </p></li>
+<li><p><strong>quadz</strong> – Quadrature object in z dimension </p></li>
+<li><p><strong>mpi</strong> – Pointer to the MPI object </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute7sources10sync_viewsEv">
+<span id="_CPPv3N7specfem7compute7sources10sync_viewsEv"></span><span id="_CPPv2N7specfem7compute7sources10sync_viewsEv"></span><span id="specfem::compute::sources::sync_views"></span><span class="target" id="structspecfem_1_1compute_1_1sources_1a87e7ca6c990cc2bce46fd4d8f8fbce03"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sync_views</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem7compute7sources10sync_viewsEv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Helper routine to sync views within this struct. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute7sources12source_arrayE">
+<span id="_CPPv3N7specfem7compute7sources12source_arrayE"></span><span id="_CPPv2N7specfem7compute7sources12source_arrayE"></span><span id="specfem::compute::sources::source_array__specfem::kokkos::DeviceView4d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1sources_1adcd172de6ea372b6943513059a6e7d00"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12DeviceView4dE" title="specfem::kokkos::DeviceView4d"><span class="n"><span class="pre">DeviceView4d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">source_array</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute7sources12source_arrayE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Array to store lagrange interpolants for sources stored on device </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute7sources14h_source_arrayE">
+<span id="_CPPv3N7specfem7compute7sources14h_source_arrayE"></span><span id="_CPPv2N7specfem7compute7sources14h_source_arrayE"></span><span id="specfem::compute::sources::h_source_array__specfem::kokkos::HostMirror4d:type_real:"></span><span class="target" id="structspecfem_1_1compute_1_1sources_1a145cc7eabc0484c212abf57bb36e4797"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12HostMirror4dE" title="specfem::kokkos::HostMirror4d"><span class="n"><span class="pre">HostMirror4d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">h_source_array</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute7sources14h_source_arrayE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Array to store lagrange interpolants for sources stored on host </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute7sources9stf_arrayE">
+<span id="_CPPv3N7specfem7compute7sources9stf_arrayE"></span><span id="_CPPv2N7specfem7compute7sources9stf_arrayE"></span><span id="specfem::compute::sources::stf_array__specfem::kokkos::DeviceView1d:specfem::forcing_function::stf_storage:"></span><span class="target" id="structspecfem_1_1compute_1_1sources_1a875cdd877206a6da1dffa229aa30a22f"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12DeviceView1dE" title="specfem::kokkos::DeviceView1d"><span class="n"><span class="pre">DeviceView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="sources_recievers.html#_CPPv4N7specfem16forcing_functionE" title="specfem::forcing_function"><span class="n"><span class="pre">forcing_function</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="sources_recievers.html#_CPPv4N7specfem16forcing_function11stf_storageE" title="specfem::forcing_function::stf_storage"><span class="n"><span class="pre">stf_storage</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">stf_array</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute7sources9stf_arrayE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Pointer to source time function for every source stored on device </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute7sources11h_stf_arrayE">
+<span id="_CPPv3N7specfem7compute7sources11h_stf_arrayE"></span><span id="_CPPv2N7specfem7compute7sources11h_stf_arrayE"></span><span id="specfem::compute::sources::h_stf_array__specfem::kokkos::HostMirror1d:specfem::forcing_function::stf_storage:"></span><span class="target" id="structspecfem_1_1compute_1_1sources_1aeec4efe9c980af6382d186e816fb24e3"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12HostMirror1dE" title="specfem::kokkos::HostMirror1d"><span class="n"><span class="pre">HostMirror1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="sources_recievers.html#_CPPv4N7specfem16forcing_functionE" title="specfem::forcing_function"><span class="n"><span class="pre">forcing_function</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="sources_recievers.html#_CPPv4N7specfem16forcing_function11stf_storageE" title="specfem::forcing_function::stf_storage"><span class="n"><span class="pre">stf_storage</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">h_stf_array</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute7sources11h_stf_arrayE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Pointer to source time function for every source stored on host </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute7sources11ispec_arrayE">
+<span id="_CPPv3N7specfem7compute7sources11ispec_arrayE"></span><span id="_CPPv2N7specfem7compute7sources11ispec_arrayE"></span><span id="specfem::compute::sources::ispec_array__specfem::kokkos::DeviceView1d:i:"></span><span class="target" id="structspecfem_1_1compute_1_1sources_1a48a89d343cbfb00871b80ccc31bdebd3"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12DeviceView1dE" title="specfem::kokkos::DeviceView1d"><span class="n"><span class="pre">DeviceView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ispec_array</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute7sources11ispec_arrayE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Spectral element number where the source lies stored on device </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7compute7sources13h_ispec_arrayE">
+<span id="_CPPv3N7specfem7compute7sources13h_ispec_arrayE"></span><span id="_CPPv2N7specfem7compute7sources13h_ispec_arrayE"></span><span id="specfem::compute::sources::h_ispec_array__specfem::kokkos::HostMirror1d:i:"></span><span class="target" id="structspecfem_1_1compute_1_1sources_1a8b71ae4c829c7efda55e40ffb8a17080"></span><a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos12HostMirror1dE" title="specfem::kokkos::HostMirror1d"><span class="n"><span class="pre">HostMirror1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">h_ispec_array</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7compute7sources13h_ispec_arrayE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Spectral element number where the source lies stored on host </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="IO.html" class="btn btn-neutral float-left" title="Input/Output module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="domain.html" class="btn btn-neutral float-right" title="Domain interface" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, Rohit Kakodkar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Input/Output module &mdash; SPECFEM KOKKOS IMPLEMENTATION  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/scrollable_code_blocks.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Data interface to compute forces" href="compute.html" />
+    <link rel="prev" title="API documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SPECFEM KOKKOS IMPLEMENTATION
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user_documentation/index.html">User documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parameter_documentation/index.html">Parameter documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source_description/index.html">Source Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cookbooks/index.html">Cookbooks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer_documentation/index.html">Developer documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Input/Output module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#fortranio">FortranIO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#fortran-binary-database-helper-routines">Fortran binary database helper routines</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="compute.html">Data interface to compute forces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="domain.html">Domain interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jacobian.html">Utilities to compute elemental Jacobian and shape functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kokkos_abstractions.html">SPECFEM abstractions for Kokkos interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="material.html">Material properties and helper routines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mesh.html">Mesh interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parameter.html">Simulation setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quadrature.html">Quadrature object and helper routines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solver.html">Solver interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sources_recievers.html">Sources and Recievers Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="specfem_mpi.html">SPECFEM abstractions for MPI interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timescheme.html">Time marching schemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writer.html">Writer interface</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SPECFEM KOKKOS IMPLEMENTATION</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">API documentation</a></li>
+      <li class="breadcrumb-item active">Input/Output module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/IO.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="input-output-module">
+<h1>Input/Output module<a class="headerlink" href="#input-output-module" title="Permalink to this heading"></a></h1>
+<p>This section contains IO modules used to read/write databases</p>
+<section id="fortranio">
+<h2>FortranIO<a class="headerlink" href="#fortranio" title="Permalink to this heading"></a></h2>
+<p>This module contains routines used to read unformatted fortran binary files</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv47specfem">
+<span id="_CPPv37specfem"></span><span id="_CPPv27specfem"></span><span id="specfem"></span><span class="target" id="namespacespecfem"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">specfem</span></span></span><a class="headerlink" href="#_CPPv47specfem" title="Permalink to this definition"></a><br /></dt>
+<dd><dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10fortran_IOE">
+<span id="_CPPv3N7specfem10fortran_IOE"></span><span id="_CPPv2N7specfem10fortran_IOE"></span><span id="specfem::fortran_IO"></span><span class="target" id="namespacespecfem_1_1fortran___i_o"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fortran_IO</span></span></span><a class="headerlink" href="#_CPPv4N7specfem10fortran_IOE" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10fortran_IO10fortran_IOERNSt8ifstreamERi">
+<span id="_CPPv3N7specfem10fortran_IO10fortran_IOERNSt8ifstreamERi"></span><span id="_CPPv2N7specfem10fortran_IO10fortran_IOERNSt8ifstreamERi"></span><span id="specfem::fortran_IO::fortran_IO__std::ifstreamR.iR"></span><span class="target" id="fortran___i_o_8h_1ab162d8110bcffe58718fcf98230fbe43"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fortran_IO</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ifstream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">stream</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">buffer_length</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem10fortran_IO10fortran_IOERNSt8ifstreamERi" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10fortran_IO18fortran_read_valueEPbRNSt8ifstreamERi">
+<span id="_CPPv3N7specfem10fortran_IO18fortran_read_valueEPbRNSt8ifstreamERi"></span><span id="_CPPv2N7specfem10fortran_IO18fortran_read_valueEPbRNSt8ifstreamERi"></span><span id="specfem::fortran_IO::fortran_read_value__bP.std::ifstreamR.iR"></span><span class="target" id="fortran___i_o_8h_1a4f9a723e5349cbdfa085e602e37c87ea"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fortran_read_value</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">value</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ifstream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">stream</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">buffer_length</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem10fortran_IO18fortran_read_valueEPbRNSt8ifstreamERi" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10fortran_IO18fortran_read_valueEPNSt6stringERNSt8ifstreamERi">
+<span id="_CPPv3N7specfem10fortran_IO18fortran_read_valueEPNSt6stringERNSt8ifstreamERi"></span><span id="_CPPv2N7specfem10fortran_IO18fortran_read_valueEPNSt6stringERNSt8ifstreamERi"></span><span id="specfem::fortran_IO::fortran_read_value__ssP.std::ifstreamR.iR"></span><span class="target" id="fortran___i_o_8h_1a2adc6f057b90f745b8fcd3000a5a9698"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fortran_read_value</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">value</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ifstream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">stream</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">buffer_length</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem10fortran_IO18fortran_read_valueEPNSt6stringERNSt8ifstreamERi" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10fortran_IO18fortran_read_valueEP9type_realRNSt8ifstreamERi">
+<span id="_CPPv3N7specfem10fortran_IO18fortran_read_valueEP9type_realRNSt8ifstreamERi"></span><span id="_CPPv2N7specfem10fortran_IO18fortran_read_valueEP9type_realRNSt8ifstreamERi"></span><span id="specfem::fortran_IO::fortran_read_value__type_realP.std::ifstreamR.iR"></span><span class="target" id="fortran___i_o_8h_1ae51fbc36bbfa58b09f7338364f72ec31"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fortran_read_value</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">value</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ifstream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">stream</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">buffer_length</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem10fortran_IO18fortran_read_valueEP9type_realRNSt8ifstreamERi" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10fortran_IO18fortran_read_valueEPiRNSt8ifstreamERi">
+<span id="_CPPv3N7specfem10fortran_IO18fortran_read_valueEPiRNSt8ifstreamERi"></span><span id="_CPPv2N7specfem10fortran_IO18fortran_read_valueEPiRNSt8ifstreamERi"></span><span id="specfem::fortran_IO::fortran_read_value__iP.std::ifstreamR.iR"></span><span class="target" id="fortran___i_o_8h_1a51708c4b1cf1ff6d175004e710b85ab1"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fortran_read_value</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">value</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ifstream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">stream</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">buffer_length</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem10fortran_IO18fortran_read_valueEPiRNSt8ifstreamERi" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0DpEN7specfem10fortran_IO10fortran_IOEvRNSt8ifstreamERiP1TDp4Args">
+<span id="_CPPv3I0DpEN7specfem10fortran_IO10fortran_IOERNSt8ifstreamERiP1TDp4Args"></span><span id="_CPPv2I0DpEN7specfem10fortran_IO10fortran_IOERNSt8ifstreamERiP1TDp4Args"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Args</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="fortran___i_o_8h_1a5b3091804ae6ab748d33d5ade9d2bb3f"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fortran_IO</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ifstream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">stream</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">buffer_length</span></span>, <a class="reference internal" href="#_CPPv4I0DpEN7specfem10fortran_IO10fortran_IOEvRNSt8ifstreamERiP1TDp4Args" title="specfem::fortran_IO::fortran_IO::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">value</span></span>, <a class="reference internal" href="#_CPPv4I0DpEN7specfem10fortran_IO10fortran_IOEvRNSt8ifstreamERiP1TDp4Args" title="specfem::fortran_IO::fortran_IO::Args"><span class="n"><span class="pre">Args</span></span></a><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">values</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0DpEN7specfem10fortran_IO10fortran_IOEvRNSt8ifstreamERiP1TDp4Args" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN7specfem10fortran_IO17fortran_read_lineEvRNSt8ifstreamEDp4Args">
+<span id="_CPPv3IDpEN7specfem10fortran_IO17fortran_read_lineERNSt8ifstreamEDp4Args"></span><span id="_CPPv2IDpEN7specfem10fortran_IO17fortran_read_lineERNSt8ifstreamEDp4Args"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">Args</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="fortran___i_o_8h_1ad606e1c935b4cbaba6006b87bb67da0e"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fortran_read_line</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ifstream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">stream</span></span>, <a class="reference internal" href="#_CPPv4IDpEN7specfem10fortran_IO17fortran_read_lineEvRNSt8ifstreamEDp4Args" title="specfem::fortran_IO::fortran_read_line::Args"><span class="n"><span class="pre">Args</span></span></a><span class="p"><span class="pre">...</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">values</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4IDpEN7specfem10fortran_IO17fortran_read_lineEvRNSt8ifstreamEDp4Args" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Read a line from fortran unformatted binary file. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Args</strong> – Argument can be of the type bool, int, type_real, string, vector&lt;T = bool, int, type_real, string&gt; </p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>stream</strong> – An open file stream. </p></li>
+<li><p><strong>values</strong> – Comma separated list of variable addresses to be read. </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+<section id="fortran-binary-database-helper-routines">
+<h2>Fortran binary database helper routines<a class="headerlink" href="#fortran-binary-database-helper-routines" title="Permalink to this heading"></a></h2>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv42IO">
+<span id="_CPPv32IO"></span><span id="_CPPv22IO"></span><span id="IO"></span><span class="target" id="namespace_i_o"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">IO</span></span></span><a class="headerlink" href="#_CPPv42IO" title="Permalink to this definition"></a><br /></dt>
+<dd><dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N2IO16fortran_databaseE">
+<span id="_CPPv3N2IO16fortran_databaseE"></span><span id="_CPPv2N2IO16fortran_databaseE"></span><span id="IO::fortran_database"></span><span class="target" id="namespace_i_o_1_1fortran__database"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">fortran_database</span></span></span><a class="headerlink" href="#_CPPv4N2IO16fortran_databaseE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Helper routines to read fortran binary database </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2IO16fortran_database25read_mesh_database_headerERNSt8ifstreamEPKN7specfem3MPI3MPIE">
+<span id="_CPPv3N2IO16fortran_database25read_mesh_database_headerERNSt8ifstreamEPKN7specfem3MPI3MPIE"></span><span id="_CPPv2N2IO16fortran_database25read_mesh_database_headerERNSt8ifstreamEPKN7specfem3MPI3MPIE"></span><span id="IO::fortran_database::read_mesh_database_header__std::ifstreamR.specfem::MPI::MPICP"></span><span class="target" id="namespace_i_o_1_1fortran__database_1a63829278b35330bf3425e22ded4cfcf0"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">tuple</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">read_mesh_database_header</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ifstream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">stream</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="specfem_mpi.html#_CPPv4N7specfem3MPIE" title="specfem::MPI"><span class="n"><span class="pre">MPI</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="specfem_mpi.html#_CPPv4N7specfem3MPI3MPIE" title="specfem::MPI::MPI"><span class="n"><span class="pre">MPI</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">mpi</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2IO16fortran_database25read_mesh_database_headerERNSt8ifstreamEPKN7specfem3MPI3MPIE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Read fortran bindary database header. </p>
+<p>This section populates nspec, npgeo, nproc in the mesh struct</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stream</strong> – Stream object for fortran binary file buffered to header section </p></li>
+<li><p><strong>mpi</strong> – Pointer to MPI object </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>std::tuple&lt;int, int, int&gt; nspec, npgeo, nproc values read from database file </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2IO16fortran_database19read_coorg_elementsERNSt8ifstreamEKiPKN7specfem3MPI3MPIE">
+<span id="_CPPv3N2IO16fortran_database19read_coorg_elementsERNSt8ifstreamEKiPKN7specfem3MPI3MPIE"></span><span id="_CPPv2N2IO16fortran_database19read_coorg_elementsERNSt8ifstreamEKiPKN7specfem3MPI3MPIE"></span><span id="IO::fortran_database::read_coorg_elements__std::ifstreamR.iC.specfem::MPI::MPICP"></span><span class="target" id="namespace_i_o_1_1fortran__database_1a5b945147aa4e68eef58b8c5df63740a3"></span><a class="reference internal" href="#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="kokkos_abstractions.html#_CPPv4I00EN7specfem6kokkos10HostView2dE" title="specfem::kokkos::HostView2d"><span class="n"><span class="pre">HostView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">read_coorg_elements</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ifstream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">stream</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">npgeo</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="specfem_mpi.html#_CPPv4N7specfem3MPIE" title="specfem::MPI"><span class="n"><span class="pre">MPI</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="specfem_mpi.html#_CPPv4N7specfem3MPI3MPIE" title="specfem::MPI::MPI"><span class="n"><span class="pre">MPI</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">mpi</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2IO16fortran_database19read_coorg_elementsERNSt8ifstreamEKiPKN7specfem3MPI3MPIE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Read coorg elements from fortran binary database file. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stream</strong> – Stream object for fortran binary file buffered to header section </p></li>
+<li><p><strong>npgeo</strong> – Total number of control nodes in simulation box </p></li>
+<li><p><strong>mpi</strong> – Pointer to MPI object </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>specfem::kokkos::HostView2d&lt;type_real&gt; coorg values as read from fortran binary database file </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2IO16fortran_database30read_mesh_database_attenuationERNSt8ifstreamEPKN7specfem3MPI3MPIE">
+<span id="_CPPv3N2IO16fortran_database30read_mesh_database_attenuationERNSt8ifstreamEPKN7specfem3MPI3MPIE"></span><span id="_CPPv2N2IO16fortran_database30read_mesh_database_attenuationERNSt8ifstreamEPKN7specfem3MPI3MPIE"></span><span id="IO::fortran_database::read_mesh_database_attenuation__std::ifstreamR.specfem::MPI::MPICP"></span><span class="target" id="namespace_i_o_1_1fortran__database_1a8e665c23ce267886a2574aa6f25ef3b0"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">tuple</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">read_mesh_database_attenuation</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ifstream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">stream</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="specfem_mpi.html#_CPPv4N7specfem3MPIE" title="specfem::MPI"><span class="n"><span class="pre">MPI</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="specfem_mpi.html#_CPPv4N7specfem3MPI3MPIE" title="specfem::MPI::MPI"><span class="n"><span class="pre">MPI</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">mpi</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2IO16fortran_database30read_mesh_database_attenuationERNSt8ifstreamEPKN7specfem3MPI3MPIE" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>These two routines need to be implemented </p>
+</div>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N2IO16fortran_database26read_mesh_database_coupledERNSt8ifstreamEKiKiKiPKN7specfem3MPI3MPIE">
+<span id="_CPPv3N2IO16fortran_database26read_mesh_database_coupledERNSt8ifstreamEKiKiKiPKN7specfem3MPI3MPIE"></span><span id="_CPPv2N2IO16fortran_database26read_mesh_database_coupledERNSt8ifstreamEKiKiKiPKN7specfem3MPI3MPIE"></span><span id="IO::fortran_database::read_mesh_database_coupled__std::ifstreamR.iC.iC.iC.specfem::MPI::MPICP"></span><span class="target" id="namespace_i_o_1_1fortran__database_1a6b290ed2fabaffb7ed0532e449bc09e0"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">read_mesh_database_coupled</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ifstream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">stream</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_fluid_solid_edges</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_fluid_poro_edges</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">num_solid_poro_edges</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="specfem_mpi.html#_CPPv4N7specfem3MPIE" title="specfem::MPI"><span class="n"><span class="pre">MPI</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="specfem_mpi.html#_CPPv4N7specfem3MPI3MPIE" title="specfem::MPI::MPI"><span class="n"><span class="pre">MPI</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">mpi</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N2IO16fortran_database26read_mesh_database_coupledERNSt8ifstreamEKiKiKiPKN7specfem3MPI3MPIE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="API documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="compute.html" class="btn btn-neutral float-right" title="Data interface to compute forces" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, Rohit Kakodkar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

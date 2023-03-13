@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Parameter documentation &mdash; SPECFEM KOKKOS IMPLEMENTATION  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/scrollable_code_blocks.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Header" href="header.html" />
+    <link rel="prev" title="Seismogram output" href="../user_documentation/seismogram.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SPECFEM KOKKOS IMPLEMENTATION
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user_documentation/index.html">User documentation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Parameter documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="header.html">Header</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simulation_setup.html">Simulation Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="seismogram_setup.html">Seismograms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="run_setup.html">Runtime Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="databases.html">Databases</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../source_description/index.html">Source Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cookbooks/index.html">Cookbooks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer_documentation/index.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SPECFEM KOKKOS IMPLEMENTATION</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Parameter documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/parameter_documentation/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="parameter-documentation">
+<span id="id1"></span><h1>Parameter documentation<a class="headerlink" href="#parameter-documentation" title="Permalink to this heading"></a></h1>
+<p>Overall run-time behaviour of simulation can be configured using a configuration file defined as YAML. The configuration file is splint into 3 separate <a class="reference external" href="https://yaml.org/spec/1.2.2/#3211-nodes">YAML nodes</a> within a <code class="docutils literal notranslate"><span class="pre">parameters</span></code> YAML node:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="header.html">Header</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="header.html#parameter-definitions">Parameter definitions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="header.html#parameter-name-header"><strong>Parameter name</strong> : <code class="docutils literal notranslate"><span class="pre">header</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="header.html#parameter-name-header-title"><strong>Parameter name</strong> : <code class="docutils literal notranslate"><span class="pre">header.title</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="header.html#parameter-name-header-description"><strong>Parameter name</strong> : <code class="docutils literal notranslate"><span class="pre">header.description</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="simulation_setup.html">Simulation Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="simulation_setup.html#parameter-definitions">Parameter definitions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="simulation_setup.html#parameter-name-quadrature"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">quadrature</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simulation_setup.html#parameter-name-quadrature-alpha"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">quadrature.alpha</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simulation_setup.html#parameter-name-quadrature-beta"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">quadrature.beta</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simulation_setup.html#parameter-name-quadrature-ngllx"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">quadrature.ngllx</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="simulation_setup.html#parameter-name-quadrature-ngllz"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">quadrature.ngllz</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="simulation_setup.html#parameter-name-solver"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="simulation_setup.html#parameter-name-solver-time-marching"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver.time-marching</span></code></a><ul>
+<li class="toctree-l5"><a class="reference internal" href="simulation_setup.html#parameter-name-solver-time-marching-type-of-simulation"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver.time-marching.type-of-simulation</span></code></a></li>
+<li class="toctree-l5"><a class="reference internal" href="simulation_setup.html#parameter-name-solver-time-marching-time-scheme"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver.time-marching.time-scheme</span></code></a><ul>
+<li class="toctree-l6"><a class="reference internal" href="simulation_setup.html#parameter-name-solver-time-marching-time-scheme-type"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver.time-marching.time-scheme.type</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="simulation_setup.html#parameter-name-solver-time-marching-time-scheme-dt"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver.time-marching.time-scheme.dt</span></code></a></li>
+<li class="toctree-l6"><a class="reference internal" href="simulation_setup.html#parameter-name-solver-time-marching-time-scheme-nstep"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver.time-marching.time-scheme.nstep</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="seismogram_setup.html">Seismograms</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="seismogram_setup.html#parameter-definitions">Parameter definitions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="seismogram_setup.html#parameter-name-seismogram"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">seismogram</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="seismogram_setup.html#parameter-name-seismogram-stations-file"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">seismogram.stations-file</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="seismogram_setup.html#parameter-name-seismogram-angle"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">seismogram.angle</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="seismogram_setup.html#parameter-name-seismogram-seismogram-type"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">seismogram.seismogram-type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="seismogram_setup.html#parameter-name-seismogram-nstep-between-samples"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">seismogram.nstep_between_samples</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="seismogram_setup.html#parameter-name-seismogram-seismogram-format"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">seismogram.seismogram-format</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="seismogram_setup.html#parameter-name-seismogram-output-folder"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">seismogram.output-folder</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="run_setup.html">Runtime Setup</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="run_setup.html#parameter-definitions">Parameter definitions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="run_setup.html#parameter-name-run-setup"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">run-setup</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="run_setup.html#parameter-name-run-setup-number-of-processors"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">run-setup.number-of-processors</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="run_setup.html#parameter-name-run-setup-number-of-runs"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">run-setup.number-of-runs</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="databases.html">Databases</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="databases.html#parameter-definitions">Parameter definitions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="databases.html#parameter-name-databases"><strong>Parameter name</strong> : <code class="docutils literal notranslate"><span class="pre">databases</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="databases.html#parameter-name-databases-mesh-database"><strong>Parameter name</strong> : <code class="docutils literal notranslate"><span class="pre">databases.mesh-database</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="databases.html#parameter-name-databases-source-file"><strong>Parameter name</strong> : <code class="docutils literal notranslate"><span class="pre">databases.source-file</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../user_documentation/seismogram.html" class="btn btn-neutral float-left" title="Seismogram output" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="header.html" class="btn btn-neutral float-right" title="Header" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, Rohit Kakodkar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

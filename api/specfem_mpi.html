@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SPECFEM abstractions for MPI interface &mdash; SPECFEM KOKKOS IMPLEMENTATION  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/scrollable_code_blocks.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Time marching schemes" href="timescheme.html" />
+    <link rel="prev" title="Sources and Recievers Interface" href="sources_recievers.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SPECFEM KOKKOS IMPLEMENTATION
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user_documentation/index.html">User documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parameter_documentation/index.html">Parameter documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source_description/index.html">Source Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cookbooks/index.html">Cookbooks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer_documentation/index.html">Developer documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="IO.html">Input/Output module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compute.html">Data interface to compute forces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="domain.html">Domain interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jacobian.html">Utilities to compute elemental Jacobian and shape functions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kokkos_abstractions.html">SPECFEM abstractions for Kokkos interfaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="material.html">Material properties and helper routines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mesh.html">Mesh interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="parameter.html">Simulation setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quadrature.html">Quadrature object and helper routines</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solver.html">Solver interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sources_recievers.html">Sources and Recievers Interface</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">SPECFEM abstractions for MPI interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timescheme.html">Time marching schemes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="writer.html">Writer interface</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SPECFEM KOKKOS IMPLEMENTATION</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">API documentation</a></li>
+      <li class="breadcrumb-item active">SPECFEM abstractions for MPI interface</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/specfem_mpi.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="specfem-abstractions-for-mpi-interface">
+<h1>SPECFEM abstractions for MPI interface<a class="headerlink" href="#specfem-abstractions-for-mpi-interface" title="Permalink to this heading"></a></h1>
+<p>Always manage MPI communication using a global instantiation of MPI class. Never call MPI routines directly.</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv47specfem">
+<span id="_CPPv37specfem"></span><span id="_CPPv27specfem"></span><span id="specfem"></span><span class="target" id="namespacespecfem"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">specfem</span></span></span><br /></dt>
+<dd><dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem3MPIE">
+<span id="_CPPv3N7specfem3MPIE"></span><span id="_CPPv2N7specfem3MPIE"></span><span id="specfem::MPI"></span><span class="target" id="namespacespecfem_1_1_m_p_i"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MPI</span></span></span><a class="headerlink" href="#_CPPv4N7specfem3MPIE" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-enums">Enums</p>
+<dl class="cpp enum">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem3MPI11reduce_typeE">
+<span id="_CPPv3N7specfem3MPI11reduce_typeE"></span><span id="_CPPv2N7specfem3MPI11reduce_typeE"></span><span class="target" id="specfem__mpi_8h_1adfab6230c63f6e97e5e0fc68a07ec9b0"></span><span class="k"><span class="pre">enum</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">reduce_type</span></span></span><a class="headerlink" href="#_CPPv4N7specfem3MPI11reduce_typeE" title="Permalink to this definition"></a><br /></dt>
+<dd><p><a class="reference internal" href="#classspecfem_1_1_m_p_i_1_1_m_p_i"><span class="std std-ref">MPI</span></a> reducer type. </p>
+<p><em>Values:</em></p>
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem3MPI11reduce_type3sumE">
+<span id="_CPPv3N7specfem3MPI11reduce_type3sumE"></span><span id="_CPPv2N7specfem3MPI11reduce_type3sumE"></span><span class="target" id="specfem__mpi_8h_1adfab6230c63f6e97e5e0fc68a07ec9b0a339d67db6c9d9b96199dbeb1cfd7cb2b"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sum</span></span></span><a class="headerlink" href="#_CPPv4N7specfem3MPI11reduce_type3sumE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem3MPI11reduce_type3minE">
+<span id="_CPPv3N7specfem3MPI11reduce_type3minE"></span><span id="_CPPv2N7specfem3MPI11reduce_type3minE"></span><span class="target" id="specfem__mpi_8h_1adfab6230c63f6e97e5e0fc68a07ec9b0a870b451f1f58b1b0c7dd74cd65e4e184"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">min</span></span></span><a class="headerlink" href="#_CPPv4N7specfem3MPI11reduce_type3minE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp enumerator">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem3MPI11reduce_type3maxE">
+<span id="_CPPv3N7specfem3MPI11reduce_type3maxE"></span><span id="_CPPv2N7specfem3MPI11reduce_type3maxE"></span><span class="target" id="specfem__mpi_8h_1adfab6230c63f6e97e5e0fc68a07ec9b0a5129d04c00a39256bf53d9edf8709f43"></span><span class="k"><span class="pre">enumerator</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">max</span></span></span><a class="headerlink" href="#_CPPv4N7specfem3MPI11reduce_type3maxE" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem3MPI3MPIE">
+<span id="_CPPv3N7specfem3MPI3MPIE"></span><span id="_CPPv2N7specfem3MPI3MPIE"></span><span id="specfem::MPI::MPI"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">MPI</span></span></span><a class="headerlink" href="#_CPPv4N7specfem3MPI3MPIE" title="Permalink to this definition"></a><br /></dt>
+<dd><div class="docutils container">
+<em>#include &lt;specfem_mpi.h&gt;</em></div>
+<p><a class="reference internal" href="#classspecfem_1_1_m_p_i_1_1_m_p_i"><span class="std std-ref">MPI</span></a> class instance to manage <a class="reference internal" href="#classspecfem_1_1_m_p_i_1_1_m_p_i"><span class="std std-ref">MPI</span></a> communication. </p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If specfem is compiled without <a class="reference internal" href="#classspecfem_1_1_m_p_i_1_1_m_p_i"><span class="std std-ref">MPI</span></a> then world_size = 1 and my_rank = 0 Additionally, many routines are just empty to optimize performance. </p>
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem3MPI3MPI3MPIEPiPPPc">
+<span id="_CPPv3N7specfem3MPI3MPI3MPIEPiPPPc"></span><span id="_CPPv2N7specfem3MPI3MPI3MPIEPiPPPc"></span><span id="specfem::MPI::MPI::MPI__iP.cPPP"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1ab68582903a18af30c1681a73d031eb5e"></span><span class="sig-name descname"><span class="n"><span class="pre">MPI</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">argc</span></span>, <span class="kt"><span class="pre">char</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">argv</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem3MPI3MPI3MPIEPiPPPc" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Initialize a <a class="reference internal" href="#classspecfem_1_1_m_p_i_1_1_m_p_i"><span class="std std-ref">MPI</span></a> object. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem3MPI3MPI8sync_allEv">
+<span id="_CPPv3NK7specfem3MPI3MPI8sync_allEv"></span><span id="_CPPv2NK7specfem3MPI3MPI8sync_allEv"></span><span id="specfem::MPI::MPI::sync_allC"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1a89490a2aab70307fef191b91b9aa3ab5"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sync_all</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem3MPI3MPI8sync_allEv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Sync all process. MPI_Barrier. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem3MPI3MPI8get_sizeEv">
+<span id="_CPPv3NK7specfem3MPI3MPI8get_sizeEv"></span><span id="_CPPv2NK7specfem3MPI3MPI8get_sizeEv"></span><span id="specfem::MPI::MPI::get_sizeC"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1a3502ca06681c1fd72c33bc4d8b86c536"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_size</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem3MPI3MPI8get_sizeEv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Get world_size. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int world size </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem3MPI3MPI8get_rankEv">
+<span id="_CPPv3NK7specfem3MPI3MPI8get_rankEv"></span><span id="_CPPv2NK7specfem3MPI3MPI8get_rankEv"></span><span id="specfem::MPI::MPI::get_rankC"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1a1175f1c6554890c14d54e41ab495fda4"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_rank</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem3MPI3MPI8get_rankEv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Get my_rank. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int my_rank </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem3MPI3MPI9main_procEv">
+<span id="_CPPv3NK7specfem3MPI3MPI9main_procEv"></span><span id="_CPPv2NK7specfem3MPI3MPI9main_procEv"></span><span id="specfem::MPI::MPI::main_procC"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1ab10ddf5aa6865e3311b8ab503ded1635"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">main_proc</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem3MPI3MPI9main_procEv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Checks if current proc is main proc. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>bool rank of the main proc </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem3MPI3MPI8get_mainEv">
+<span id="_CPPv3NK7specfem3MPI3MPI8get_mainEv"></span><span id="_CPPv2NK7specfem3MPI3MPI8get_mainEv"></span><span id="specfem::MPI::MPI::get_mainC"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1a34a26b3dab1872f78bc39dab14764f24"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_main</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem3MPI3MPI8get_mainEv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gets rank of main proc. </p>
+<p>For now rank = 0 is hard coded as the main proc</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int rank of the main proc </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem3MPI3MPI4exitEv">
+<span id="_CPPv3N7specfem3MPI3MPI4exitEv"></span><span id="_CPPv2N7specfem3MPI3MPI4exitEv"></span><span id="specfem::MPI::MPI::exit"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1a61ccd6daa741d77e1d7366f46abd30af"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">exit</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem3MPI3MPI4exitEv" title="Permalink to this definition"></a><br /></dt>
+<dd><p>MPI_Abort. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0ENK7specfem3MPI3MPI4coutEv1T">
+<span id="_CPPv3I0ENK7specfem3MPI3MPI4coutE1T"></span><span id="_CPPv2I0ENK7specfem3MPI3MPI4coutE1T"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1a0388df45089d9caeda427dfa84c88c5c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">cout</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0ENK7specfem3MPI3MPI4coutEv1T" title="specfem::MPI::MPI::cout::T"><span class="n"><span class="pre">T</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">s</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4I0ENK7specfem3MPI3MPI4coutEv1T" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Print string s from the head node. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem3MPI3MPID0Ev">
+<span id="_CPPv3N7specfem3MPI3MPID0Ev"></span><span id="_CPPv2N7specfem3MPI3MPID0Ev"></span><span id="specfem::MPI::MPI::~MPI"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1a6d980daa4f6818e8b742777ac063381f"></span><span class="sig-name descname"><span class="n"><span class="pre">~MPI</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem3MPI3MPID0Ev" title="Permalink to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem3MPI3MPI6reduceEiN7specfem3MPI11reduce_typeE">
+<span id="_CPPv3NK7specfem3MPI3MPI6reduceEiN7specfem3MPI11reduce_typeE"></span><span id="_CPPv2NK7specfem3MPI3MPI6reduceEiN7specfem3MPI11reduce_typeE"></span><span id="specfem::MPI::MPI::reduce__i.specfem::MPI::reduce_typeC"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1a0d39588a31e1dc432322c430536d3e6e"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">reduce</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">lvalue</span></span>, <a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N7specfem3MPIE" title="specfem::MPI"><span class="n"><span class="pre">MPI</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N7specfem3MPI11reduce_typeE" title="specfem::MPI::reduce_type"><span class="n"><span class="pre">reduce_type</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">reduce_type</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem3MPI3MPI6reduceEiN7specfem3MPI11reduce_typeE" title="Permalink to this definition"></a><br /></dt>
+<dd><p><a class="reference internal" href="#classspecfem_1_1_m_p_i_1_1_m_p_i"><span class="std std-ref">MPI</span></a> reduce implemetation. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lvalue</strong> – local value to reduce </p></li>
+<li><p><strong>reduce_type</strong> – specfem reducer type </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>int Reduced value. Should only be reduced on the root=0 process. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem3MPI3MPI6reduceEfN7specfem3MPI11reduce_typeE">
+<span id="_CPPv3NK7specfem3MPI3MPI6reduceEfN7specfem3MPI11reduce_typeE"></span><span id="_CPPv2NK7specfem3MPI3MPI6reduceEfN7specfem3MPI11reduce_typeE"></span><span id="specfem::MPI::MPI::reduce__float.specfem::MPI::reduce_typeC"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1a9c7468509c0111f5dedcb194cca94608"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">reduce</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">lvalue</span></span>, <a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N7specfem3MPIE" title="specfem::MPI"><span class="n"><span class="pre">MPI</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N7specfem3MPI11reduce_typeE" title="specfem::MPI::reduce_type"><span class="n"><span class="pre">reduce_type</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">reduce_type</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem3MPI3MPI6reduceEfN7specfem3MPI11reduce_typeE" title="Permalink to this definition"></a><br /></dt>
+<dd><p><a class="reference internal" href="#classspecfem_1_1_m_p_i_1_1_m_p_i"><span class="std std-ref">MPI</span></a> reduce implemetation. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lvalue</strong> – local value to reduce </p></li>
+<li><p><strong>reduce_type</strong> – specfem reducer type </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>int Reduced value. Should only be reduced on the root=0 process. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem3MPI3MPI6reduceEdN7specfem3MPI11reduce_typeE">
+<span id="_CPPv3NK7specfem3MPI3MPI6reduceEdN7specfem3MPI11reduce_typeE"></span><span id="_CPPv2NK7specfem3MPI3MPI6reduceEdN7specfem3MPI11reduce_typeE"></span><span id="specfem::MPI::MPI::reduce__double.specfem::MPI::reduce_typeC"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1a2f70cfb52f08006d1fb223d8376e7e05"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">reduce</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">lvalue</span></span>, <a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N7specfem3MPIE" title="specfem::MPI"><span class="n"><span class="pre">MPI</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N7specfem3MPI11reduce_typeE" title="specfem::MPI::reduce_type"><span class="n"><span class="pre">reduce_type</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">reduce_type</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem3MPI3MPI6reduceEdN7specfem3MPI11reduce_typeE" title="Permalink to this definition"></a><br /></dt>
+<dd><p><a class="reference internal" href="#classspecfem_1_1_m_p_i_1_1_m_p_i"><span class="std std-ref">MPI</span></a> reduce implemetation. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lvalue</strong> – local value to reduce </p></li>
+<li><p><strong>reduce_type</strong> – specfem reducer type </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>int Reduced value. Should only be reduced on the root=0 process. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem3MPI3MPI10all_reduceEiN7specfem3MPI11reduce_typeE">
+<span id="_CPPv3NK7specfem3MPI3MPI10all_reduceEiN7specfem3MPI11reduce_typeE"></span><span id="_CPPv2NK7specfem3MPI3MPI10all_reduceEiN7specfem3MPI11reduce_typeE"></span><span id="specfem::MPI::MPI::all_reduce__i.specfem::MPI::reduce_typeC"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1acc96c647e5903ee051ed01d29345c0f6"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">all_reduce</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">lvalue</span></span>, <a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N7specfem3MPIE" title="specfem::MPI"><span class="n"><span class="pre">MPI</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N7specfem3MPI11reduce_typeE" title="specfem::MPI::reduce_type"><span class="n"><span class="pre">reduce_type</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">reduce_type</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem3MPI3MPI10all_reduceEiN7specfem3MPI11reduce_typeE" title="Permalink to this definition"></a><br /></dt>
+<dd><p><a class="reference internal" href="#classspecfem_1_1_m_p_i_1_1_m_p_i"><span class="std std-ref">MPI</span></a> all reduce implementation. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lvalue</strong> – local value to reduce </p></li>
+<li><p><strong>reduce_type</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>int Reduced value. Should only be reduced on the root=0 process. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem3MPI3MPI10all_reduceEfN7specfem3MPI11reduce_typeE">
+<span id="_CPPv3NK7specfem3MPI3MPI10all_reduceEfN7specfem3MPI11reduce_typeE"></span><span id="_CPPv2NK7specfem3MPI3MPI10all_reduceEfN7specfem3MPI11reduce_typeE"></span><span id="specfem::MPI::MPI::all_reduce__float.specfem::MPI::reduce_typeC"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1aa4044f0059f0ceba848fad5410aba032"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">all_reduce</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">lvalue</span></span>, <a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N7specfem3MPIE" title="specfem::MPI"><span class="n"><span class="pre">MPI</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N7specfem3MPI11reduce_typeE" title="specfem::MPI::reduce_type"><span class="n"><span class="pre">reduce_type</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">reduce_type</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem3MPI3MPI10all_reduceEfN7specfem3MPI11reduce_typeE" title="Permalink to this definition"></a><br /></dt>
+<dd><p><a class="reference internal" href="#classspecfem_1_1_m_p_i_1_1_m_p_i"><span class="std std-ref">MPI</span></a> all reduce implementation. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lvalue</strong> – local value to reduce </p></li>
+<li><p><strong>reduce_type</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>int Reduced value. Should only be reduced on the root=0 process. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem3MPI3MPI10all_reduceEdN7specfem3MPI11reduce_typeE">
+<span id="_CPPv3NK7specfem3MPI3MPI10all_reduceEdN7specfem3MPI11reduce_typeE"></span><span id="_CPPv2NK7specfem3MPI3MPI10all_reduceEdN7specfem3MPI11reduce_typeE"></span><span id="specfem::MPI::MPI::all_reduce__double.specfem::MPI::reduce_typeC"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1a9be95c08d62e83d9e51f5c5274cad041"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">all_reduce</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">lvalue</span></span>, <a class="reference internal" href="IO.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N7specfem3MPIE" title="specfem::MPI"><span class="n"><span class="pre">MPI</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N7specfem3MPI11reduce_typeE" title="specfem::MPI::reduce_type"><span class="n"><span class="pre">reduce_type</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">reduce_type</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem3MPI3MPI10all_reduceEdN7specfem3MPI11reduce_typeE" title="Permalink to this definition"></a><br /></dt>
+<dd><p><a class="reference internal" href="#classspecfem_1_1_m_p_i_1_1_m_p_i"><span class="std std-ref">MPI</span></a> all reduce implementation. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>lvalue</strong> – local value to reduce </p></li>
+<li><p><strong>reduce_type</strong> – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>int Reduced value. Should only be reduced on the root=0 process. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem3MPI3MPI6gatherEi">
+<span id="_CPPv3NK7specfem3MPI3MPI6gatherEi"></span><span id="_CPPv2NK7specfem3MPI3MPI6gatherEi"></span><span id="specfem::MPI::MPI::gather__iC"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1a9f620be2ec367da32734cdb25bf3f0a3"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">gather</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">lelement</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem3MPI3MPI6gatherEi" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gathers elements from all procs in communicator in a vector on main. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>lelement</strong> – element to gather </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>std::vector&lt;int&gt; vector of gathered elements </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem3MPI3MPI6gatherEf">
+<span id="_CPPv3NK7specfem3MPI3MPI6gatherEf"></span><span id="_CPPv2NK7specfem3MPI3MPI6gatherEf"></span><span id="specfem::MPI::MPI::gather__floatC"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1a6ac667dcd183e767dfc7493bd915fbdd"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">float</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">gather</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">lelement</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem3MPI3MPI6gatherEf" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gathers elements from all procs in communicator in a vector on main. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>lelement</strong> – element to gather </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>std::vector&lt;float&gt; vector of gathered elements </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem3MPI3MPI6gatherEd">
+<span id="_CPPv3NK7specfem3MPI3MPI6gatherEd"></span><span id="_CPPv2NK7specfem3MPI3MPI6gatherEd"></span><span id="specfem::MPI::MPI::gather__doubleC"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1a07953cebca8114dcf7435c88f179ce6b"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">gather</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">lelement</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem3MPI3MPI6gatherEd" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Gathers elements from all procs in communicator in a vector on main. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>lelement</strong> – element to gather </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>std::vector&lt;double&gt; vector of gathered elements </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem3MPI3MPI7scatterENSt6vectorIiEE">
+<span id="_CPPv3NK7specfem3MPI3MPI7scatterENSt6vectorIiEE"></span><span id="_CPPv2NK7specfem3MPI3MPI7scatterENSt6vectorIiEE"></span><span id="specfem::MPI::MPI::scatter__std::vector:i:C"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1a8538a9e92b91dc37943ae7ed777960ef"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">scatter</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">gelement</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem3MPI3MPI7scatterENSt6vectorIiEE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>scatter elements on main proc to rest of the processors </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>gelement</strong> – vector of elements to scatter </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>int scattered element </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem3MPI3MPI7scatterENSt6vectorIfEE">
+<span id="_CPPv3NK7specfem3MPI3MPI7scatterENSt6vectorIfEE"></span><span id="_CPPv2NK7specfem3MPI3MPI7scatterENSt6vectorIfEE"></span><span id="specfem::MPI::MPI::scatter__std::vector:float:C"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1a41a58329bcbef947ceaa4ddac13b284e"></span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">scatter</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">float</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">gelement</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem3MPI3MPI7scatterENSt6vectorIfEE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>scatter elements on main proc to rest of the processors </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>gelement</strong> – vector of elements to scatter </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>float scattered element </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem3MPI3MPI7scatterENSt6vectorIdEE">
+<span id="_CPPv3NK7specfem3MPI3MPI7scatterENSt6vectorIdEE"></span><span id="_CPPv2NK7specfem3MPI3MPI7scatterENSt6vectorIdEE"></span><span id="specfem::MPI::MPI::scatter__std::vector:double:C"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1a558005feaeb1d72cad00d36911d01730"></span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">scatter</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">double</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">gelement</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem3MPI3MPI7scatterENSt6vectorIdEE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>scatter elements on main proc to rest of the processors </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>gelement</strong> – vector of elements to scatter </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>double scattered element </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem3MPI3MPI5bcastERi">
+<span id="_CPPv3NK7specfem3MPI3MPI5bcastERi"></span><span id="_CPPv2NK7specfem3MPI3MPI5bcastERi"></span><span id="specfem::MPI::MPI::bcast__iRC"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1a0c7ff20fe836a909cb8bc9fc7b6d884f"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bcast</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem3MPI3MPI5bcastERi" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Broadcast a value from main proc to the rest. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>val</strong> – value to broadcast </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem3MPI3MPI5bcastERf">
+<span id="_CPPv3NK7specfem3MPI3MPI5bcastERf"></span><span id="_CPPv2NK7specfem3MPI3MPI5bcastERf"></span><span id="specfem::MPI::MPI::bcast__floatRC"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1a02422deb25c44e4f1aa88edd772d0f33"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bcast</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem3MPI3MPI5bcastERf" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Broadcast a value from main proc to the rest. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>val</strong> – value to broadcast </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem3MPI3MPI5bcastERd">
+<span id="_CPPv3NK7specfem3MPI3MPI5bcastERd"></span><span id="_CPPv2NK7specfem3MPI3MPI5bcastERd"></span><span id="specfem::MPI::MPI::bcast__doubleRC"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1a35d1ec336eda17acda2c74acb8f4f7a4"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bcast</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">val</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem3MPI3MPI5bcastERd" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Broadcast a value from main proc to the rest. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>val</strong> – value to broadcast </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem3MPI3MPI5bcastERii">
+<span id="_CPPv3NK7specfem3MPI3MPI5bcastERii"></span><span id="_CPPv2NK7specfem3MPI3MPI5bcastERii"></span><span id="specfem::MPI::MPI::bcast__iR.iC"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1abe3916479e151f9c963a380de80a73b5"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bcast</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">val</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">root</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem3MPI3MPI5bcastERii" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Broadcast a value from root proc to the rest. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>val</strong> – value to broadcast </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem3MPI3MPI5bcastERfi">
+<span id="_CPPv3NK7specfem3MPI3MPI5bcastERfi"></span><span id="_CPPv2NK7specfem3MPI3MPI5bcastERfi"></span><span id="specfem::MPI::MPI::bcast__floatR.iC"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1adce3933345fb4faf67d8254ef4239a8a"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bcast</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">float</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">val</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">root</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem3MPI3MPI5bcastERfi" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Broadcast a value from root proc to the rest. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>val</strong> – value to broadcast </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem3MPI3MPI5bcastERdi">
+<span id="_CPPv3NK7specfem3MPI3MPI5bcastERdi"></span><span id="_CPPv2NK7specfem3MPI3MPI5bcastERdi"></span><span id="specfem::MPI::MPI::bcast__doubleR.iC"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1a48bf28bd45971c8529e872c210d08759"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">bcast</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">double</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">val</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">root</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem3MPI3MPI5bcastERdi" title="Permalink to this definition"></a><br /></dt>
+<dd><p>Broadcast a value from root proc to the rest. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>val</strong> – value to broadcast </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem3MPI3MPI10world_sizeE">
+<span id="_CPPv3N7specfem3MPI3MPI10world_sizeE"></span><span id="_CPPv2N7specfem3MPI3MPI10world_sizeE"></span><span id="specfem::MPI::MPI::world_size__i"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1a4d84bf3ef744f6e0e8928fdc51aa449e"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">world_size</span></span></span><a class="headerlink" href="#_CPPv4N7specfem3MPI3MPI10world_sizeE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>total number of <a class="reference internal" href="#classspecfem_1_1_m_p_i_1_1_m_p_i"><span class="std std-ref">MPI</span></a> processes </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem3MPI3MPI7my_rankE">
+<span id="_CPPv3N7specfem3MPI3MPI7my_rankE"></span><span id="_CPPv2N7specfem3MPI3MPI7my_rankE"></span><span id="specfem::MPI::MPI::my_rank__i"></span><span class="target" id="classspecfem_1_1_m_p_i_1_1_m_p_i_1acb87528835fc2ec1dd25e6cefd56b1c4"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">my_rank</span></span></span><a class="headerlink" href="#_CPPv4N7specfem3MPI3MPI7my_rankE" title="Permalink to this definition"></a><br /></dt>
+<dd><p>rank of my process </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="sources_recievers.html" class="btn btn-neutral float-left" title="Sources and Recievers Interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="timescheme.html" class="btn btn-neutral float-right" title="Time marching schemes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, Rohit Kakodkar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

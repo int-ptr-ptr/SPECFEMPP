@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Git development workflow &mdash; SPECFEM KOKKOS IMPLEMENTATION  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/scrollable_code_blocks.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Build system requirements" href="build_requirements.html" />
+    <link rel="prev" title="Developer documentation" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SPECFEM KOKKOS IMPLEMENTATION
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user_documentation/index.html">User documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parameter_documentation/index.html">Parameter documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source_description/index.html">Source Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cookbooks/index.html">Cookbooks</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Git development workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="build_requirements.html">Build system requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="style.html">Style</a></li>
+<li class="toctree-l2"><a class="reference internal" href="style.html#pre-commit">Pre-commit</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SPECFEM KOKKOS IMPLEMENTATION</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Developer documentation</a></li>
+      <li class="breadcrumb-item active">Git development workflow</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/developer_documentation/git_workflow.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="git-development-workflow">
+<h1>Git development workflow<a class="headerlink" href="#git-development-workflow" title="Permalink to this heading"></a></h1>
+<p>At SPECFEM we follow master-develop workflow. The master (main) branch is always a stable working code and is generally synced with the latest release of SPECFEM. The develop branch is a stable code with potentially new features which haven’t been released in the latest version of SPECFEM yet. If you are contributing to SPECFEM then issue your <a class="reference external" href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests">pull request</a> against the develop branch.</p>
+<p>To make a change to SPECFEM2D (This development workflow is similar to the one suggested by <a class="reference external" href="https://docs.github.com/en/get-started/quickstart/contributing-to-projects#making-a-pull-request">github</a>)</p>
+<ul class="simple">
+<li><p>Create a <a class="reference external" href="https://docs.github.com/en/get-started/quickstart/contributing-to-projects#fork">fork</a> of the SPECFEM2D repository. This will be your version of the package where you’d make changes which will stay local to your version until you make a pull request against original repository.</p></li>
+<li><p>Clone your fork locally and checkout to develop</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>&lt;git<span class="w"> </span>link<span class="w"> </span>to<span class="w"> </span>your<span class="w"> </span>fork&gt;
+git<span class="w"> </span>checkout<span class="w"> </span>develop
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It is also recommended that you run <code class="code docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">install</span></code> every time you pull the develop branch. Please check <a class="reference internal" href="style.html#style"><span class="std std-ref">style section</span></a> for more information on poetry.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Please also install pre-commit hooks after you’ve cloned repo. <code class="code docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">run</span> <span class="pre">pre-commit</span> <span class="pre">install</span></code></p>
+</div>
+<ul class="simple">
+<li><p>Next create a feature branch against develop branch called a feature branch. Please be explicit while naming the feature branch.</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>checkout<span class="w"> </span>-b<span class="w"> </span>&lt;name-of-the-feature-brach&gt;
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Make your contributions inside the feature branch and then commit push them upstream.</p></li>
+</ul>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>push<span class="w"> </span>origin<span class="w"> </span>&lt;name-of-the-feature-brach&gt;
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>Finally, head over to the main <a class="reference external" href="https://github.com/PrincetonUniversity/specfem2d_kokkos">SPECFEM2D repo</a> and issue a pull request against the develop branch. Once you’ve issued a pull request one of the maintainers will have a look at the changes, before approving a merge.</p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Developer documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="build_requirements.html" class="btn btn-neutral float-right" title="Build system requirements" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, Rohit Kakodkar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

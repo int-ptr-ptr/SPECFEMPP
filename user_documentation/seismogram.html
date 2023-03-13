@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seismogram output &mdash; SPECFEM KOKKOS IMPLEMENTATION  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/scrollable_code_blocks.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Parameter documentation" href="../parameter_documentation/index.html" />
+    <link rel="prev" title="Running the solver" href="running_the_solver.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SPECFEM KOKKOS IMPLEMENTATION
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">User documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="requirements.html">Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mesh_generation.html">Mesh Generation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simulation_setup.html">Setting up the solver</a></li>
+<li class="toctree-l2"><a class="reference internal" href="running_the_solver.html">Running the solver</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Seismogram output</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#stations-file">STATIONS file</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#seismogram-output-formats">Seismogram output formats</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#ascii-format">ASCII format</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../parameter_documentation/index.html">Parameter documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source_description/index.html">Source Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cookbooks/index.html">Cookbooks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer_documentation/index.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SPECFEM KOKKOS IMPLEMENTATION</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">User documentation</a></li>
+      <li class="breadcrumb-item active">Seismogram output</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/user_documentation/seismogram.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="seismogram-output">
+<h1>Seismogram output<a class="headerlink" href="#seismogram-output" title="Permalink to this heading"></a></h1>
+<p>On successful completion of the SPECFEM2D run a seismogram will be written to the output directory. Below are definitions output formats as defined in SPECFEM.</p>
+<section id="stations-file">
+<span id="id1"></span><h2>STATIONS file<a class="headerlink" href="#stations-file" title="Permalink to this heading"></a></h2>
+<p>STATIONS file is tab delimited text file, where every line describes the location of station. Every station location is defined using 6 tab delimited values. For example,</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1">#station_name #network_name #x-position #z-position #elevation #burial depth</span>
+AA<span class="w">            </span>S0001<span class="w">          </span><span class="m">2500</span>.0<span class="w">      </span><span class="m">2250</span>.0<span class="w">      </span><span class="m">0</span>.0<span class="w">        </span><span class="m">0</span>.0
+</pre></div>
+</div>
+</section>
+<section id="seismogram-output-formats">
+<h2>Seismogram output formats<a class="headerlink" href="#seismogram-output-formats" title="Permalink to this heading"></a></h2>
+<section id="ascii-format">
+<h3>ASCII format<a class="headerlink" href="#ascii-format" title="Permalink to this heading"></a></h3>
+<p>ASCII format is a simple human-readable format for storing seimograms. The seimogram files for statitons are named using the convention <code class="docutils literal notranslate"><span class="pre">&lt;network_name&gt;&lt;stations_name&gt;&lt;component&gt;.&lt;extension&gt;</span></code> , where <code class="docutils literal notranslate"><span class="pre">component</span></code> value can be either <code class="docutils literal notranslate"><span class="pre">BXX</span></code> (x-component) or <code class="docutils literal notranslate"><span class="pre">BXZ</span></code> (z-component) and <code class="docutils literal notranslate"><span class="pre">extension</span></code> can be either of <code class="docutils literal notranslate"><span class="pre">sema</span></code> (acceleration seismogram), <code class="docutils literal notranslate"><span class="pre">semv</span></code> (velocity seimogram) or <code class="docutils literal notranslate"><span class="pre">semd</span></code> (displacement seismogram). Every line within the seismogram file defines the seimogram value at a sampling time. An example is shown below:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># time(s)     #seismogram value</span>
+-1.320000e-04<span class="w"> </span><span class="m">0</span>.000000e+00
+-1.210000e-04<span class="w"> </span><span class="m">0</span>.000000e+00
+-1.100000e-04<span class="w"> </span><span class="m">0</span>.000000e+00
+-9.900000e-05<span class="w"> </span><span class="m">0</span>.000000e+00
+-8.800000e-05<span class="w"> </span><span class="m">0</span>.000000e+00
+-7.700000e-05<span class="w"> </span><span class="m">0</span>.000000e+00
+-6.600000e-05<span class="w"> </span><span class="m">0</span>.000000e+00
+-5.500000e-05<span class="w"> </span><span class="m">0</span>.000000e+00
+-4.400000e-05<span class="w"> </span><span class="m">0</span>.000000e+00
+-3.300000e-05<span class="w"> </span><span class="m">0</span>.000000e+00
+-2.200000e-05<span class="w"> </span><span class="m">0</span>.000000e+00
+-1.100000e-05<span class="w"> </span><span class="m">0</span>.000000e+00
+<span class="m">0</span>.000000e+00<span class="w"> </span><span class="m">2</span>.802597e-45
+<span class="m">1</span>.100000e-05<span class="w"> </span><span class="m">1</span>.961818e-44
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="running_the_solver.html" class="btn btn-neutral float-left" title="Running the solver" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../parameter_documentation/index.html" class="btn btn-neutral float-right" title="Parameter documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, Rohit Kakodkar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

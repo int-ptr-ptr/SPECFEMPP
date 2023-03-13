@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulation Setup &mdash; SPECFEM KOKKOS IMPLEMENTATION  documentation</title>
+      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
+      <link rel="stylesheet" href="../_static/css/scrollable_code_blocks.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/sphinx_highlight.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Seismograms" href="seismogram_setup.html" />
+    <link rel="prev" title="Header" href="header.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SPECFEM KOKKOS IMPLEMENTATION
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user_documentation/index.html">User documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Parameter documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="header.html">Header</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Simulation Setup</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#parameter-definitions">Parameter definitions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#parameter-name-quadrature"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">quadrature</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parameter-name-solver"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="seismogram_setup.html">Seismograms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="run_setup.html">Runtime Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="databases.html">Databases</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../source_description/index.html">Source Description</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cookbooks/index.html">Cookbooks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../developer_documentation/index.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SPECFEM KOKKOS IMPLEMENTATION</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Parameter documentation</a></li>
+      <li class="breadcrumb-item active">Simulation Setup</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/parameter_documentation/simulation_setup.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="simulation-setup">
+<h1>Simulation Setup<a class="headerlink" href="#simulation-setup" title="Permalink to this heading"></a></h1>
+<p>Simulation setup defines the run-time behaviour of the simulation</p>
+<section id="parameter-definitions">
+<h2>Parameter definitions<a class="headerlink" href="#parameter-definitions" title="Permalink to this heading"></a></h2>
+<section id="parameter-name-quadrature">
+<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">quadrature</span></code><a class="headerlink" href="#parameter-name-quadrature" title="Permalink to this heading"></a></h3>
+<p><strong>default value</strong> : None</p>
+<p><strong>possible values</strong>: [YAML Node]</p>
+<p><strong>documentation</strong> : quadrature parameter defines the type of quadrature used for the simulation (X and Z dimension). It is implemented as a YAML node.</p>
+<section id="parameter-name-quadrature-alpha">
+<h4><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">quadrature.alpha</span></code><a class="headerlink" href="#parameter-name-quadrature-alpha" title="Permalink to this heading"></a></h4>
+<p><strong>default value</strong> : 0.0</p>
+<p><strong>possible values</strong> : [float, double]</p>
+<p><strong>documentation</strong> : Alpha value of the Gauss-Jacobi quadrature. For GLL quadrature alpha = 0.0</p>
+</section>
+<section id="parameter-name-quadrature-beta">
+<h4><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">quadrature.beta</span></code><a class="headerlink" href="#parameter-name-quadrature-beta" title="Permalink to this heading"></a></h4>
+<p><strong>default value</strong> : 0.0</p>
+<p><strong>possible values</strong> : [float, double]</p>
+<p><strong>documentation</strong> : Beta value of the Gauss-Jacobi quadrature. For GLL quadrature beta = 0.0, and for GLJ quadrature beta = 1.0</p>
+</section>
+<section id="parameter-name-quadrature-ngllx">
+<h4><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">quadrature.ngllx</span></code><a class="headerlink" href="#parameter-name-quadrature-ngllx" title="Permalink to this heading"></a></h4>
+<p><strong>default value</strong> : 5</p>
+<p><strong>possible values</strong> : [int]</p>
+<p><strong>documentation</strong> : Number of GLL points in X-dimension</p>
+</section>
+<section id="parameter-name-quadrature-ngllz">
+<h4><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">quadrature.ngllz</span></code><a class="headerlink" href="#parameter-name-quadrature-ngllz" title="Permalink to this heading"></a></h4>
+<p><strong>default value</strong> : 5</p>
+<p><strong>possible values</strong> : [int]</p>
+<p><strong>documentation</strong> : Number of GLL points in Z-dimension</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Below is example of 4th order GLL quadrature:</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">quadrature</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">alpha</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="w">    </span><span class="nt">beta</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="w">    </span><span class="nt">ngllx</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span>
+<span class="w">    </span><span class="nt">ngllz</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+<section id="parameter-name-solver">
+<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver</span></code><a class="headerlink" href="#parameter-name-solver" title="Permalink to this heading"></a></h3>
+<p><strong>default value</strong> : None</p>
+<p><strong>possible values</strong> : [YAML Node]</p>
+<p><strong>documentation</strong> : Type of solver to use for the simulation.</p>
+<section id="parameter-name-solver-time-marching">
+<h4><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver.time-marching</span></code><a class="headerlink" href="#parameter-name-solver-time-marching" title="Permalink to this heading"></a></h4>
+<p><strong>default value</strong> : None</p>
+<p><strong>possible values</strong> : [YAML Node]</p>
+<p><strong>documentation</strong> : Select either a time-marching or an explicit solver. Only time-marching solver is implemented currently.</p>
+<section id="parameter-name-solver-time-marching-type-of-simulation">
+<h5><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver.time-marching.type-of-simulation</span></code><a class="headerlink" href="#parameter-name-solver-time-marching-type-of-simulation" title="Permalink to this heading"></a></h5>
+<p><strong>default value</strong> : forward</p>
+<p><strong>possible values</strong> : [forward]</p>
+<p><strong>documentation</strong> : Select the type of simulation. Forward, backward or adjoint.</p>
+</section>
+<section id="parameter-name-solver-time-marching-time-scheme">
+<h5><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver.time-marching.time-scheme</span></code><a class="headerlink" href="#parameter-name-solver-time-marching-time-scheme" title="Permalink to this heading"></a></h5>
+<p><strong>default value</strong> : None</p>
+<p><strong>possible values</strong> : [YAML Node]</p>
+<p><strong>documentation</strong> : Select the time-marching scheme.</p>
+<section id="parameter-name-solver-time-marching-time-scheme-type">
+<h6><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver.time-marching.time-scheme.type</span></code><a class="headerlink" href="#parameter-name-solver-time-marching-time-scheme-type" title="Permalink to this heading"></a></h6>
+<p><strong>default value</strong> : Newmark</p>
+<p><strong>possible values</strong> : [Newmark]</p>
+<p><strong>documentation</strong> : Select time scheme for the solver</p>
+</section>
+<section id="parameter-name-solver-time-marching-time-scheme-dt">
+<h6><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver.time-marching.time-scheme.dt</span></code><a class="headerlink" href="#parameter-name-solver-time-marching-time-scheme-dt" title="Permalink to this heading"></a></h6>
+<p><strong>default value</strong> : None</p>
+<p><strong>possible values</strong> : [float, double]</p>
+<p><strong>documentation</strong> : Value of time step in seconds</p>
+</section>
+<section id="parameter-name-solver-time-marching-time-scheme-nstep">
+<h6><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver.time-marching.time-scheme.nstep</span></code><a class="headerlink" href="#parameter-name-solver-time-marching-time-scheme-nstep" title="Permalink to this heading"></a></h6>
+<p><strong>default value</strong> : None</p>
+<p><strong>possible values</strong> : [int]</p>
+<p><strong>documentation</strong> : Total number of time steps in the simulation</p>
+</section>
+</section>
+</section>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="header.html" class="btn btn-neutral float-left" title="Header" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="seismogram_setup.html" class="btn btn-neutral float-right" title="Seismograms" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2020, Rohit Kakodkar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
