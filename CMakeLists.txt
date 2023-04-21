@@ -77,6 +77,7 @@ add_library(
 target_link_libraries(
         fortranio
         PUBLIC Boost::boost
+        Kokkos::kokkos
 )
 
 add_library(
@@ -182,6 +183,7 @@ add_library(
 target_link_libraries(
         mesh_properties
         specfem_mpi
+        Kokkos::kokkos
 )
 
 add_library(

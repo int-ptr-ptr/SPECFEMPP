@@ -6,7 +6,7 @@
 #include "../include/quadrature.h"
 #include <Kokkos_Core.hpp>
 
-// using simd_type = Kokkos::Experimental::native_simd<double>;
+// using specfem::kokkos::simd_type = Kokkos::Experimental::native_simd<double>;
 
 namespace specfem {
 namespace Domain {
@@ -299,7 +299,7 @@ public:
    *
    */
   void compute_stiffness_interaction() override;
-  template <int NGLL> void compute_gradients();
+  template <int NGLLZ, int NGLLX> void compute_gradients();
   void compute_stresses();
   // void compute_integrals();
   /**
@@ -415,10 +415,10 @@ private:
                                                      ///< this domain on the
                                                      ///< host
 
-  specfem::kokkos::DeviceView3d<simd_type> xix, xiz, gammax, gammaz, jacobian,
-      lambdaplus2mu, mu;
-  specfem::kokkos::HostMirror3d<simd_type> h_xix, h_xiz, h_gammax, h_gammaz,
-      h_jacobian, h_lambdaplus2mu, h_mu;
+  specfem::kokkos::DeviceView3d<specfem::kokkos::simd_type<> > xix, xiz, gammax,
+      gammaz, jacobian, lambdaplus2mu, mu;
+  specfem::kokkos::HostMirror3d<specfem::kokkos::simd_type<> > h_xix, h_xiz,
+      h_gammax, h_gammaz, h_jacobian, h_lambdaplus2mu, h_mu;
 };
 } // namespace Domain
 } // namespace specfem
