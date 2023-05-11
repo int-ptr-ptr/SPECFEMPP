@@ -454,7 +454,8 @@ using DeviceTeam = Kokkos::TeamPolicy<DevExecSpace>;
  * @endcode flag to CXX compiler
  */
 template <typename T = type_real,
-          typename simd_abi = Kokkos::Experimental::simd_abi::scalar>
+          typename simd_abi =
+              Kokkos::Experimental::simd_abi::native<type_real> >
 using simd_type = Kokkos::Experimental::simd<T, simd_abi>;
 
 } // namespace kokkos

@@ -257,7 +257,7 @@ void specfem::Domain::Elastic::compute_stiffness_interaction() {
   assert(mu.extent(1) == NGLL);
 
   int scratch_size =
-      10 * specfem::kokkos::StaticDeviceScratchView2d<type_real, NGLL,
+      12 * specfem::kokkos::StaticDeviceScratchView2d<type_real, NGLL,
                                                       NGLL>::shmem_size();
 
   scratch_size +=
@@ -291,6 +291,10 @@ void specfem::Domain::Elastic::compute_stiffness_interaction() {
         specfem::kokkos::StaticDeviceScratchView2d<type_real, NGLL, NGLL>
             s_fieldz(team_member.team_scratch(0));
         specfem::kokkos::StaticDeviceScratchView2d<type_real, NGLL, NGLL>
+            s_tfieldx(team_member.team_scratch(0));
+        specfem::kokkos::StaticDeviceScratchView2d<type_real, NGLL, NGLL>
+            s_tfieldz(team_member.team_scratch(0));
+        specfem::kokkos::StaticDeviceScratchView2d<type_real, NGLL, NGLL>
             s_temp1(team_member.team_scratch(0));
         specfem::kokkos::StaticDeviceScratchView2d<type_real, NGLL, NGLL>
             s_temp2(team_member.team_scratch(0));
@@ -306,12 +310,14 @@ void specfem::Domain::Elastic::compute_stiffness_interaction() {
               const int iglob = ibool(ispec, iz, ix);
               s_fieldx(iz, ix) = field(iglob, 0);
               s_fieldz(iz, ix) = field(iglob, 1);
+              s_tfieldx(ix, iz) = field(iglob, 0);
+              s_tfieldz(ix, iz) = field(iglob, 1);
               s_temp1(iz, ix) = 0.0;
               s_temp2(iz, ix) = 0.0;
               s_temp3(iz, ix) = 0.0;
               s_temp4(iz, ix) = 0.0;
-              s_hprime_xx(iz, ix) = hprime_xx(iz, ix);
-              s_hprime_zz(iz, ix) = hprime_zz(iz, ix);
+              s_hprime_xx(ix, iz) = hprime_xx(iz, ix);
+              s_hprime_zz(ix, iz) = hprime_zz(iz, ix);
               s_hprimewgll_xx(ix, iz) = wxgll(iz) * hprime_xx(iz, ix);
               s_hprimewgll_zz(ix, iz) = wzgll(iz) * hprime_zz(iz, ix);
               s_iglob(iz, ix) = iglob;
@@ -321,8 +327,8 @@ void specfem::Domain::Elastic::compute_stiffness_interaction() {
 
         specfem::mathematical_operators::compute_gradients_2D(
             team_member, ispec, xix, xiz, gammax, gammaz, s_hprime_xx,
-            s_hprime_zz, s_fieldx, s_fieldz, s_temp1, s_temp2, s_temp3,
-            s_temp4);
+            s_hprime_zz, s_fieldx, s_fieldz, s_tfieldx, s_tfieldz, s_temp1,
+            s_temp2, s_temp3, s_temp4);
 
         Kokkos::parallel_for(
             Kokkos::TeamThreadRange(team_member, NGLL2), [&](const int xz) {
