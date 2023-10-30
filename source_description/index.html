@@ -13,10 +13,11 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -89,111 +90,111 @@
            <div itemprop="articleBody">
              
   <section id="source-description">
-<span id="id1"></span><h1>Source Description<a class="headerlink" href="#source-description" title="Permalink to this heading"></a></h1>
+<span id="id1"></span><h1>Source Description<a class="headerlink" href="#source-description" title="Link to this heading"></a></h1>
 <p>Sources are defined using a YAML file.</p>
 <section id="parameter-description">
-<h2>Parameter Description<a class="headerlink" href="#parameter-description" title="Permalink to this heading"></a></h2>
+<h2>Parameter Description<a class="headerlink" href="#parameter-description" title="Link to this heading"></a></h2>
 <section id="parameter-name-number-of-sources">
-<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">number-of-sources</span></code><a class="headerlink" href="#parameter-name-number-of-sources" title="Permalink to this heading"></a></h3>
+<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">number-of-sources</span></code><a class="headerlink" href="#parameter-name-number-of-sources" title="Link to this heading"></a></h3>
 <p><strong>dafault value</strong> : None</p>
 <p><strong>possible values</strong> : [int]</p>
 <p><strong>Description</strong> : Total number of sources in the simulation box.</p>
 </section>
 <section id="parameter-name-sources">
-<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources</span></code><a class="headerlink" href="#parameter-name-sources" title="Permalink to this heading"></a></h3>
+<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources</span></code><a class="headerlink" href="#parameter-name-sources" title="Link to this heading"></a></h3>
 <p><strong>dafault value</strong> : None</p>
 <p><strong>possible values</strong> : [YAML Node]</p>
 <p><strong>Description</strong> : Definition of sources</p>
 </section>
 <section id="id2">
-<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources</span></code><a class="headerlink" href="#id2" title="Permalink to this heading"></a></h3>
+<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources</span></code><a class="headerlink" href="#id2" title="Link to this heading"></a></h3>
 <p><strong>dafault value</strong> : None</p>
 <p><strong>possible values</strong> : [List of YAML Nodes]</p>
 <p><strong>Description</strong> : Definition of sources. Each node within the list of YAML node defines a single source.</p>
 <section id="parameter-name-sources-force">
-<h4><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.force</span></code><a class="headerlink" href="#parameter-name-sources-force" title="Permalink to this heading"></a></h4>
+<h4><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.force</span></code><a class="headerlink" href="#parameter-name-sources-force" title="Link to this heading"></a></h4>
 <p><strong>dafault value</strong> : None</p>
 <p><strong>possible values</strong> : [YAML Node]</p>
 <p><strong>Description</strong> : Definition of force source</p>
 </section>
 <section id="parameter-name-sources-moment-tensor">
-<h4><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.moment_tensor</span></code><a class="headerlink" href="#parameter-name-sources-moment-tensor" title="Permalink to this heading"></a></h4>
+<h4><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.moment_tensor</span></code><a class="headerlink" href="#parameter-name-sources-moment-tensor" title="Link to this heading"></a></h4>
 <p><strong>dafault value</strong> : None</p>
 <p><strong>possible values</strong> : [YAML Node]</p>
 <p><strong>Description</strong> : Definition of moment tensor source</p>
 <section id="parameter-name-sources-source-type-x">
-<h5><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.&lt;source_type&gt;.x</span></code><a class="headerlink" href="#parameter-name-sources-source-type-x" title="Permalink to this heading"></a></h5>
+<h5><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.&lt;source_type&gt;.x</span></code><a class="headerlink" href="#parameter-name-sources-source-type-x" title="Link to this heading"></a></h5>
 <p><strong>dafault value</strong> : None</p>
 <p><strong>possible values</strong> : [float, double]</p>
 <p><strong>Description</strong> : X location of the source. <code class="docutils literal notranslate"><span class="pre">source_type</span></code> can be either <code class="docutils literal notranslate"><span class="pre">force</span></code> or <code class="docutils literal notranslate"><span class="pre">moment_tensor</span></code>.</p>
 </section>
 <section id="parameter-name-sources-source-type-z">
-<h5><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.&lt;source_type&gt;.z</span></code><a class="headerlink" href="#parameter-name-sources-source-type-z" title="Permalink to this heading"></a></h5>
+<h5><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.&lt;source_type&gt;.z</span></code><a class="headerlink" href="#parameter-name-sources-source-type-z" title="Link to this heading"></a></h5>
 <p><strong>dafault value</strong> : None</p>
 <p><strong>possible values</strong> : [float, double]</p>
 <p><strong>Description</strong> : Z location of the source. <code class="docutils literal notranslate"><span class="pre">source_type</span></code> can be either <code class="docutils literal notranslate"><span class="pre">force</span></code> or <code class="docutils literal notranslate"><span class="pre">moment_tensor</span></code>.</p>
 </section>
 <section id="parameter-name-sources-source-type-source-surf">
-<h5><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.&lt;source_type&gt;.source_surf</span></code><a class="headerlink" href="#parameter-name-sources-source-type-source-surf" title="Permalink to this heading"></a></h5>
+<h5><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.&lt;source_type&gt;.source_surf</span></code><a class="headerlink" href="#parameter-name-sources-source-type-source-surf" title="Link to this heading"></a></h5>
 <p><strong>dafault value</strong> : None</p>
 <p><strong>possible values</strong> : [bool]</p>
 <p><strong>Description</strong> : Defines if the source is on the surface. If <code class="docutils literal notranslate"><span class="pre">false</span></code> then source is inside the medium. <code class="docutils literal notranslate"><span class="pre">source_type</span></code> can be either <code class="docutils literal notranslate"><span class="pre">force</span></code> or <code class="docutils literal notranslate"><span class="pre">moment_tensor</span></code>. <em>source_surf has not been implemented in this version of the package</em></p>
 </section>
 <section id="parameter-name-sources-source-type-vx">
-<h5><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.&lt;source_type&gt;.vx</span></code><a class="headerlink" href="#parameter-name-sources-source-type-vx" title="Permalink to this heading"></a></h5>
+<h5><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.&lt;source_type&gt;.vx</span></code><a class="headerlink" href="#parameter-name-sources-source-type-vx" title="Link to this heading"></a></h5>
 <p><strong>dafault value</strong> : None</p>
 <p><strong>possible values</strong> : [float]</p>
 <p><strong>Description</strong> : Specify velocity in X-direction for a moving source. <code class="docutils literal notranslate"><span class="pre">source_type</span></code> can be either <code class="docutils literal notranslate"><span class="pre">force</span></code> or <code class="docutils literal notranslate"><span class="pre">moment_tensor</span></code>. <em>Moving sources are not implemented in this package</em></p>
 </section>
 <section id="parameter-name-sources-source-type-vz">
-<h5><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.&lt;source_type&gt;.vz</span></code><a class="headerlink" href="#parameter-name-sources-source-type-vz" title="Permalink to this heading"></a></h5>
+<h5><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.&lt;source_type&gt;.vz</span></code><a class="headerlink" href="#parameter-name-sources-source-type-vz" title="Link to this heading"></a></h5>
 <p><strong>dafault value</strong> : None</p>
 <p><strong>possible values</strong> : [float]</p>
 <p><strong>Description</strong> : Specify velocity in Z-direction for a moving source. <code class="docutils literal notranslate"><span class="pre">source_type</span></code> can be either <code class="docutils literal notranslate"><span class="pre">force</span></code> or <code class="docutils literal notranslate"><span class="pre">moment_tensor</span></code>. <em>Moving sources are not implemented in this package</em></p>
 </section>
 <section id="parameter-name-sources-force-angle">
-<h5><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.force.angle</span></code><a class="headerlink" href="#parameter-name-sources-force-angle" title="Permalink to this heading"></a></h5>
+<h5><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.force.angle</span></code><a class="headerlink" href="#parameter-name-sources-force-angle" title="Link to this heading"></a></h5>
 <p><strong>dafault value</strong> : None</p>
 <p><strong>possible values</strong> : [float]</p>
 <p><strong>Description</strong> : Specify angle of a force source</p>
 </section>
 <section id="parameter-name-sources-moment-tensor-mxx">
-<h5><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.moment_tensor.Mxx</span></code><a class="headerlink" href="#parameter-name-sources-moment-tensor-mxx" title="Permalink to this heading"></a></h5>
+<h5><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.moment_tensor.Mxx</span></code><a class="headerlink" href="#parameter-name-sources-moment-tensor-mxx" title="Link to this heading"></a></h5>
 <p><strong>dafault value</strong> : None</p>
 <p><strong>possible values</strong> : [float]</p>
 <p><strong>Description</strong> : Mxx component of moment tensor source</p>
 </section>
 <section id="parameter-name-sources-moment-tensor-mxz">
-<h5><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.moment_tensor.Mxz</span></code><a class="headerlink" href="#parameter-name-sources-moment-tensor-mxz" title="Permalink to this heading"></a></h5>
+<h5><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.moment_tensor.Mxz</span></code><a class="headerlink" href="#parameter-name-sources-moment-tensor-mxz" title="Link to this heading"></a></h5>
 <p><strong>dafault value</strong> : None</p>
 <p><strong>possible values</strong> : [float]</p>
 <p><strong>Description</strong> : Mxz component of moment tensor source</p>
 </section>
 <section id="parameter-name-sources-moment-tensor-mzz">
-<h5><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.moment_tensor.Mzz</span></code><a class="headerlink" href="#parameter-name-sources-moment-tensor-mzz" title="Permalink to this heading"></a></h5>
+<h5><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.moment_tensor.Mzz</span></code><a class="headerlink" href="#parameter-name-sources-moment-tensor-mzz" title="Link to this heading"></a></h5>
 <p><strong>dafault value</strong> : None</p>
 <p><strong>possible values</strong> : [float]</p>
 <p><strong>Description</strong> : Mzz component of moment tensor source</p>
 </section>
 <section id="parameter-name-sources-source-type-dirac">
-<h5><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.&lt;source_type&gt;.Dirac</span></code><a class="headerlink" href="#parameter-name-sources-source-type-dirac" title="Permalink to this heading"></a></h5>
+<h5><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.&lt;source_type&gt;.Dirac</span></code><a class="headerlink" href="#parameter-name-sources-source-type-dirac" title="Link to this heading"></a></h5>
 <p><strong>dafault value</strong> : None</p>
 <p><strong>possible values</strong> : [YAML node]</p>
 <p><strong>Description</strong> : Define a Dirac source time function for the source. <code class="docutils literal notranslate"><span class="pre">source_type</span></code> can be either <code class="docutils literal notranslate"><span class="pre">force</span></code> or <code class="docutils literal notranslate"><span class="pre">moment_tensor</span></code>. <em>Only Dirac source time funciton is implemented in this version of the package</em></p>
 <section id="parameter-name-sources-source-type-dirac-factor">
-<h6><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.&lt;source_type&gt;.Dirac.factor</span></code><a class="headerlink" href="#parameter-name-sources-source-type-dirac-factor" title="Permalink to this heading"></a></h6>
+<h6><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.&lt;source_type&gt;.Dirac.factor</span></code><a class="headerlink" href="#parameter-name-sources-source-type-dirac-factor" title="Link to this heading"></a></h6>
 <p><strong>dafault value</strong> : None</p>
 <p><strong>possible values</strong> : [float]</p>
 <p><strong>Description</strong> : Specify scaling factor for the source time function.</p>
 </section>
 <section id="id3">
-<h6><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.&lt;source_type&gt;.Dirac.factor</span></code><a class="headerlink" href="#id3" title="Permalink to this heading"></a></h6>
+<h6><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.&lt;source_type&gt;.Dirac.factor</span></code><a class="headerlink" href="#id3" title="Link to this heading"></a></h6>
 <p><strong>dafault value</strong> : None</p>
 <p><strong>possible values</strong> : [float]</p>
 <p><strong>Description</strong> : Specify scaling factor for the source time function.</p>
 </section>
 <section id="parameter-name-sources-source-type-dirac-tshift">
-<h6><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.&lt;source_type&gt;.Dirac.tshift</span></code><a class="headerlink" href="#parameter-name-sources-source-type-dirac-tshift" title="Permalink to this heading"></a></h6>
+<h6><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">sources.&lt;source_type&gt;.Dirac.tshift</span></code><a class="headerlink" href="#parameter-name-sources-source-type-dirac-tshift" title="Link to this heading"></a></h6>
 <p><strong>dafault value</strong> : None</p>
 <p><strong>possible values</strong> : [float]</p>
 <p><strong>Description</strong> : Specify the time shift for Dirac source time function. Must be 0 if there is only a single source in the simulation.</p>

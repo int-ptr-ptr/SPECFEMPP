@@ -3,7 +3,7 @@ var searchData=
   ['h_5fcos_5frecs_0',['h_cos_recs',['../structspecfem_1_1compute_1_1receivers.html#a1f8f015fed6cbba7a2940bc6e0b6462b',1,'specfem::compute::receivers']]],
   ['h_5fgammax_1',['h_gammax',['../structspecfem_1_1compute_1_1partial__derivatives.html#a53b4b5d119ff3f2015b5ef05815ca518',1,'specfem::compute::partial_derivatives']]],
   ['h_5fgammaz_2',['h_gammaz',['../structspecfem_1_1compute_1_1partial__derivatives.html#a4f263a3927decf3596e981f6f55c46cf',1,'specfem::compute::partial_derivatives']]],
-  ['h_5fispec_5farray_3',['h_ispec_array',['../structspecfem_1_1compute_1_1sources.html#a8b71ae4c829c7efda55e40ffb8a17080',1,'specfem::compute::sources::h_ispec_array()'],['../structspecfem_1_1compute_1_1receivers.html#aa2dee1f3b78dde16f709eb2127a980f9',1,'specfem::compute::receivers::h_ispec_array()']]],
+  ['h_5fispec_5farray_3',['h_ispec_array',['../structspecfem_1_1compute_1_1sources.html#a8b71ae4c829c7efda55e40ffb8a17080',1,'specfem::compute::sources::h_ispec_array'],['../structspecfem_1_1compute_1_1receivers.html#aa2dee1f3b78dde16f709eb2127a980f9',1,'specfem::compute::receivers::h_ispec_array']]],
   ['h_5fispec_5ftype_4',['h_ispec_type',['../structspecfem_1_1compute_1_1properties.html#a55493b5e73a685fda8720eb19fb045ea',1,'specfem::compute::properties']]],
   ['h_5fjacobian_5',['h_jacobian',['../structspecfem_1_1compute_1_1partial__derivatives.html#aac1b8fedccadb48305789d26d5070c12',1,'specfem::compute::partial_derivatives']]],
   ['h_5freceiver_5farray_6',['h_receiver_array',['../structspecfem_1_1compute_1_1receivers.html#ab6e4c5d702b9ddec43e75b48aa8c7f4a',1,'specfem::compute::receivers']]],

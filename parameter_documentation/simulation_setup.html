@@ -13,10 +13,11 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -92,35 +93,35 @@
            <div itemprop="articleBody">
              
   <section id="simulation-setup">
-<h1>Simulation Setup<a class="headerlink" href="#simulation-setup" title="Permalink to this heading"></a></h1>
+<h1>Simulation Setup<a class="headerlink" href="#simulation-setup" title="Link to this heading"></a></h1>
 <p>Simulation setup defines the run-time behaviour of the simulation</p>
 <section id="parameter-definitions">
-<h2>Parameter definitions<a class="headerlink" href="#parameter-definitions" title="Permalink to this heading"></a></h2>
+<h2>Parameter definitions<a class="headerlink" href="#parameter-definitions" title="Link to this heading"></a></h2>
 <section id="parameter-name-quadrature">
-<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">quadrature</span></code><a class="headerlink" href="#parameter-name-quadrature" title="Permalink to this heading"></a></h3>
+<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">quadrature</span></code><a class="headerlink" href="#parameter-name-quadrature" title="Link to this heading"></a></h3>
 <p><strong>default value</strong> : None</p>
 <p><strong>possible values</strong>: [YAML Node]</p>
 <p><strong>documentation</strong> : quadrature parameter defines the type of quadrature used for the simulation (X and Z dimension). It is implemented as a YAML node.</p>
 <section id="parameter-name-quadrature-alpha">
-<h4><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">quadrature.alpha</span></code><a class="headerlink" href="#parameter-name-quadrature-alpha" title="Permalink to this heading"></a></h4>
+<h4><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">quadrature.alpha</span></code><a class="headerlink" href="#parameter-name-quadrature-alpha" title="Link to this heading"></a></h4>
 <p><strong>default value</strong> : 0.0</p>
 <p><strong>possible values</strong> : [float, double]</p>
 <p><strong>documentation</strong> : Alpha value of the Gauss-Jacobi quadrature. For GLL quadrature alpha = 0.0</p>
 </section>
 <section id="parameter-name-quadrature-beta">
-<h4><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">quadrature.beta</span></code><a class="headerlink" href="#parameter-name-quadrature-beta" title="Permalink to this heading"></a></h4>
+<h4><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">quadrature.beta</span></code><a class="headerlink" href="#parameter-name-quadrature-beta" title="Link to this heading"></a></h4>
 <p><strong>default value</strong> : 0.0</p>
 <p><strong>possible values</strong> : [float, double]</p>
 <p><strong>documentation</strong> : Beta value of the Gauss-Jacobi quadrature. For GLL quadrature beta = 0.0, and for GLJ quadrature beta = 1.0</p>
 </section>
 <section id="parameter-name-quadrature-ngllx">
-<h4><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">quadrature.ngllx</span></code><a class="headerlink" href="#parameter-name-quadrature-ngllx" title="Permalink to this heading"></a></h4>
+<h4><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">quadrature.ngllx</span></code><a class="headerlink" href="#parameter-name-quadrature-ngllx" title="Link to this heading"></a></h4>
 <p><strong>default value</strong> : 5</p>
 <p><strong>possible values</strong> : [int]</p>
 <p><strong>documentation</strong> : Number of GLL points in X-dimension</p>
 </section>
 <section id="parameter-name-quadrature-ngllz">
-<h4><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">quadrature.ngllz</span></code><a class="headerlink" href="#parameter-name-quadrature-ngllz" title="Permalink to this heading"></a></h4>
+<h4><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">quadrature.ngllz</span></code><a class="headerlink" href="#parameter-name-quadrature-ngllz" title="Link to this heading"></a></h4>
 <p><strong>default value</strong> : 5</p>
 <p><strong>possible values</strong> : [int]</p>
 <p><strong>documentation</strong> : Number of GLL points in Z-dimension</p>
@@ -138,40 +139,40 @@
 </section>
 </section>
 <section id="parameter-name-solver">
-<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver</span></code><a class="headerlink" href="#parameter-name-solver" title="Permalink to this heading"></a></h3>
+<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver</span></code><a class="headerlink" href="#parameter-name-solver" title="Link to this heading"></a></h3>
 <p><strong>default value</strong> : None</p>
 <p><strong>possible values</strong> : [YAML Node]</p>
 <p><strong>documentation</strong> : Type of solver to use for the simulation.</p>
 <section id="parameter-name-solver-time-marching">
-<h4><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver.time-marching</span></code><a class="headerlink" href="#parameter-name-solver-time-marching" title="Permalink to this heading"></a></h4>
+<h4><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver.time-marching</span></code><a class="headerlink" href="#parameter-name-solver-time-marching" title="Link to this heading"></a></h4>
 <p><strong>default value</strong> : None</p>
 <p><strong>possible values</strong> : [YAML Node]</p>
 <p><strong>documentation</strong> : Select either a time-marching or an explicit solver. Only time-marching solver is implemented currently.</p>
 <section id="parameter-name-solver-time-marching-type-of-simulation">
-<h5><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver.time-marching.type-of-simulation</span></code><a class="headerlink" href="#parameter-name-solver-time-marching-type-of-simulation" title="Permalink to this heading"></a></h5>
+<h5><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver.time-marching.type-of-simulation</span></code><a class="headerlink" href="#parameter-name-solver-time-marching-type-of-simulation" title="Link to this heading"></a></h5>
 <p><strong>default value</strong> : forward</p>
 <p><strong>possible values</strong> : [forward]</p>
 <p><strong>documentation</strong> : Select the type of simulation. Forward, backward or adjoint.</p>
 </section>
 <section id="parameter-name-solver-time-marching-time-scheme">
-<h5><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver.time-marching.time-scheme</span></code><a class="headerlink" href="#parameter-name-solver-time-marching-time-scheme" title="Permalink to this heading"></a></h5>
+<h5><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver.time-marching.time-scheme</span></code><a class="headerlink" href="#parameter-name-solver-time-marching-time-scheme" title="Link to this heading"></a></h5>
 <p><strong>default value</strong> : None</p>
 <p><strong>possible values</strong> : [YAML Node]</p>
 <p><strong>documentation</strong> : Select the time-marching scheme.</p>
 <section id="parameter-name-solver-time-marching-time-scheme-type">
-<h6><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver.time-marching.time-scheme.type</span></code><a class="headerlink" href="#parameter-name-solver-time-marching-time-scheme-type" title="Permalink to this heading"></a></h6>
+<h6><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver.time-marching.time-scheme.type</span></code><a class="headerlink" href="#parameter-name-solver-time-marching-time-scheme-type" title="Link to this heading"></a></h6>
 <p><strong>default value</strong> : Newmark</p>
 <p><strong>possible values</strong> : [Newmark]</p>
 <p><strong>documentation</strong> : Select time scheme for the solver</p>
 </section>
 <section id="parameter-name-solver-time-marching-time-scheme-dt">
-<h6><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver.time-marching.time-scheme.dt</span></code><a class="headerlink" href="#parameter-name-solver-time-marching-time-scheme-dt" title="Permalink to this heading"></a></h6>
+<h6><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver.time-marching.time-scheme.dt</span></code><a class="headerlink" href="#parameter-name-solver-time-marching-time-scheme-dt" title="Link to this heading"></a></h6>
 <p><strong>default value</strong> : None</p>
 <p><strong>possible values</strong> : [float, double]</p>
 <p><strong>documentation</strong> : Value of time step in seconds</p>
 </section>
 <section id="parameter-name-solver-time-marching-time-scheme-nstep">
-<h6><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver.time-marching.time-scheme.nstep</span></code><a class="headerlink" href="#parameter-name-solver-time-marching-time-scheme-nstep" title="Permalink to this heading"></a></h6>
+<h6><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">solver.time-marching.time-scheme.nstep</span></code><a class="headerlink" href="#parameter-name-solver-time-marching-time-scheme-nstep" title="Link to this heading"></a></h6>
 <p><strong>default value</strong> : None</p>
 <p><strong>possible values</strong> : [int]</p>
 <p><strong>documentation</strong> : Total number of time steps in the simulation</p>

@@ -13,10 +13,11 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -93,10 +94,10 @@
            <div itemprop="articleBody">
              
   <section id="seismogram-output">
-<h1>Seismogram output<a class="headerlink" href="#seismogram-output" title="Permalink to this heading"></a></h1>
+<h1>Seismogram output<a class="headerlink" href="#seismogram-output" title="Link to this heading"></a></h1>
 <p>On successful completion of the SPECFEM2D run a seismogram will be written to the output directory. Below are definitions output formats as defined in SPECFEM.</p>
 <section id="stations-file">
-<span id="id1"></span><h2>STATIONS file<a class="headerlink" href="#stations-file" title="Permalink to this heading"></a></h2>
+<span id="id1"></span><h2>STATIONS file<a class="headerlink" href="#stations-file" title="Link to this heading"></a></h2>
 <p>STATIONS file is tab delimited text file, where every line describes the location of station. Every station location is defined using 6 tab delimited values. For example,</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1">#station_name #network_name #x-position #z-position #elevation #burial depth</span>
 AA<span class="w">            </span>S0001<span class="w">          </span><span class="m">2500</span>.0<span class="w">      </span><span class="m">2250</span>.0<span class="w">      </span><span class="m">0</span>.0<span class="w">        </span><span class="m">0</span>.0
@@ -104,9 +105,9 @@ AA<span class="w">            </span>S0001<span class="w">          </span><span
 </div>
 </section>
 <section id="seismogram-output-formats">
-<h2>Seismogram output formats<a class="headerlink" href="#seismogram-output-formats" title="Permalink to this heading"></a></h2>
+<h2>Seismogram output formats<a class="headerlink" href="#seismogram-output-formats" title="Link to this heading"></a></h2>
 <section id="ascii-format">
-<h3>ASCII format<a class="headerlink" href="#ascii-format" title="Permalink to this heading"></a></h3>
+<h3>ASCII format<a class="headerlink" href="#ascii-format" title="Link to this heading"></a></h3>
 <p>ASCII format is a simple human-readable format for storing seimograms. The seimogram files for statitons are named using the convention <code class="docutils literal notranslate"><span class="pre">&lt;network_name&gt;&lt;stations_name&gt;&lt;component&gt;.&lt;extension&gt;</span></code> , where <code class="docutils literal notranslate"><span class="pre">component</span></code> value can be either <code class="docutils literal notranslate"><span class="pre">BXX</span></code> (x-component) or <code class="docutils literal notranslate"><span class="pre">BXZ</span></code> (z-component) and <code class="docutils literal notranslate"><span class="pre">extension</span></code> can be either of <code class="docutils literal notranslate"><span class="pre">sema</span></code> (acceleration seismogram), <code class="docutils literal notranslate"><span class="pre">semv</span></code> (velocity seimogram) or <code class="docutils literal notranslate"><span class="pre">semd</span></code> (displacement seismogram). Every line within the seismogram file defines the seimogram value at a sampling time. An example is shown below:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># time(s)     #seismogram value</span>
 -1.320000e-04<span class="w"> </span><span class="m">0</span>.000000e+00

@@ -13,10 +13,11 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -86,7 +87,7 @@
            <div itemprop="articleBody">
              
   <section id="mesh-generation">
-<h1>Mesh Generation<a class="headerlink" href="#mesh-generation" title="Permalink to this heading"></a></h1>
+<h1>Mesh Generation<a class="headerlink" href="#mesh-generation" title="Link to this heading"></a></h1>
 <p>In this version of the package meshfem has not been implemented. However, the package can read internal meshes generated via <a class="reference external" href="https://specfem2d.readthedocs.io/en/latest/03_mesh_generation/">SPECFEM2D mesh generator</a> . Please refer to the documentation there to generate meshes. Thus for now, we require a <em>Par_file</em> for generation of mesh and a <em>configuration file</em> for setting up and running the solver.</p>
 <p>The recommended workflow for running the code would be to generate an internal mesh using <code class="docutils literal notranslate"><span class="pre">xmeshfem2D</span></code>. Make sure the domain is entirely elastic, this version does not support acoustic domains. Then define the path to the generated database file using <a class="reference internal" href="../parameter_documentation/databases.html#database-file-parameter"><span class="std std-ref">Parameter name : databases.mesh-database</span></a>.</p>
 <p>Please have a look at the <a class="reference internal" href="../cookbooks/index.html#cookbooks"><span class="std std-ref">Cookbooks</span></a> for examples on generating a mesh.</p>

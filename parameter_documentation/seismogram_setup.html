@@ -13,10 +13,11 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -97,34 +98,34 @@
            <div itemprop="articleBody">
              
   <section id="seismograms">
-<h1>Seismograms<a class="headerlink" href="#seismograms" title="Permalink to this heading"></a></h1>
+<h1>Seismograms<a class="headerlink" href="#seismograms" title="Link to this heading"></a></h1>
 <p>Seismograms section defines the output seismograms format at predefined stations.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Please note that the <a class="reference internal" href="../user_documentation/seismogram.html#stations-file"><span class="std std-ref">STATIONS file</span></a> is generated using SPECFEM meshgenerator i.e. xmeshfem2d</p>
 </div>
 <section id="parameter-definitions">
-<h2>Parameter definitions<a class="headerlink" href="#parameter-definitions" title="Permalink to this heading"></a></h2>
+<h2>Parameter definitions<a class="headerlink" href="#parameter-definitions" title="Link to this heading"></a></h2>
 <section id="parameter-name-seismogram">
-<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">seismogram</span></code><a class="headerlink" href="#parameter-name-seismogram" title="Permalink to this heading"></a></h3>
+<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">seismogram</span></code><a class="headerlink" href="#parameter-name-seismogram" title="Link to this heading"></a></h3>
 <p><strong>default value</strong> : None</p>
 <p><strong>possible values</strong> : [YAML Node]</p>
 <p><strong>documentation</strong> : Define seismogram output configuration and location of <a class="reference internal" href="../user_documentation/seismogram.html#stations-file"><span class="std std-ref">STATIONS file</span></a></p>
 </section>
 <section id="parameter-name-seismogram-stations-file">
-<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">seismogram.stations-file</span></code><a class="headerlink" href="#parameter-name-seismogram-stations-file" title="Permalink to this heading"></a></h3>
+<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">seismogram.stations-file</span></code><a class="headerlink" href="#parameter-name-seismogram-stations-file" title="Link to this heading"></a></h3>
 <p><strong>default value</strong> : None</p>
 <p><strong>possible values</strong> : [string]</p>
 <p><strong>documentation</strong> : Path to <a class="reference internal" href="../user_documentation/seismogram.html#stations-file"><span class="std std-ref">STATIONS file</span></a></p>
 </section>
 <section id="parameter-name-seismogram-angle">
-<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">seismogram.angle</span></code><a class="headerlink" href="#parameter-name-seismogram-angle" title="Permalink to this heading"></a></h3>
+<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">seismogram.angle</span></code><a class="headerlink" href="#parameter-name-seismogram-angle" title="Link to this heading"></a></h3>
 <p><strong>default value</strong> : None</p>
 <p><strong>possible values</strong> : [float]</p>
 <p><strong>documentation</strong> : Angle to rotate components at receivers</p>
 </section>
 <section id="parameter-name-seismogram-seismogram-type">
-<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">seismogram.seismogram-type</span></code><a class="headerlink" href="#parameter-name-seismogram-seismogram-type" title="Permalink to this heading"></a></h3>
+<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">seismogram.seismogram-type</span></code><a class="headerlink" href="#parameter-name-seismogram-seismogram-type" title="Link to this heading"></a></h3>
 <p><strong>default value</strong> : None</p>
 <p><strong>possible values</strong> : [List of string]</p>
 <p><strong>documentation</strong> : Type of seismograms to be written. The types can be any of displacement, velocity and acceleration. For example, the snippet below will instantiate a writer for to output displacement and velocity seismogram at every station.</p>
@@ -135,19 +136,19 @@
 </div>
 </section>
 <section id="parameter-name-seismogram-nstep-between-samples">
-<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">seismogram.nstep_between_samples</span></code><a class="headerlink" href="#parameter-name-seismogram-nstep-between-samples" title="Permalink to this heading"></a></h3>
+<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">seismogram.nstep_between_samples</span></code><a class="headerlink" href="#parameter-name-seismogram-nstep-between-samples" title="Link to this heading"></a></h3>
 <p><strong>default value</strong> : None</p>
 <p><strong>possible values</strong> : [int]</p>
 <p><strong>documentation</strong> : Number of time steps between sampling the wavefield at station locations for writing seismogram.</p>
 </section>
 <section id="parameter-name-seismogram-seismogram-format">
-<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">seismogram.seismogram-format</span></code><a class="headerlink" href="#parameter-name-seismogram-seismogram-format" title="Permalink to this heading"></a></h3>
+<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">seismogram.seismogram-format</span></code><a class="headerlink" href="#parameter-name-seismogram-seismogram-format" title="Link to this heading"></a></h3>
 <p><strong>default value</strong> : None</p>
 <p><strong>possible values</strong> : [string]</p>
 <p><strong>documentation</strong> : Type of seismogram format to be written. The possible formats are ascii.</p>
 </section>
 <section id="parameter-name-seismogram-output-folder">
-<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">seismogram.output-folder</span></code><a class="headerlink" href="#parameter-name-seismogram-output-folder" title="Permalink to this heading"></a></h3>
+<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">seismogram.output-folder</span></code><a class="headerlink" href="#parameter-name-seismogram-output-folder" title="Link to this heading"></a></h3>
 <p><strong>default value</strong> : Current working directory</p>
 <p><strong>possible values</strong> : [string]</p>
 <p><strong>documentation</strong> : Path to output folder where the seismograms will be saved.</p>

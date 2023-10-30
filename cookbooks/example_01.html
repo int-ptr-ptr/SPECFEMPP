@@ -13,10 +13,11 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -93,17 +94,17 @@
            <div itemprop="articleBody">
              
   <section id="wave-propagration-through-homogeneous-media">
-<h1>Wave propagration through homogeneous media<a class="headerlink" href="#wave-propagration-through-homogeneous-media" title="Permalink to this heading"></a></h1>
+<h1>Wave propagration through homogeneous media<a class="headerlink" href="#wave-propagration-through-homogeneous-media" title="Link to this heading"></a></h1>
 <p>In this example we simulate wave propagation through a 2-dimensional homogeneous medium.</p>
 <section id="generating-a-mesh">
-<h2>Generating a mesh<a class="headerlink" href="#generating-a-mesh" title="Permalink to this heading"></a></h2>
+<h2>Generating a mesh<a class="headerlink" href="#generating-a-mesh" title="Link to this heading"></a></h2>
 <p>To generate a mesh for homogeneous media we utilize <a class="reference external" href="https://specfem2d.readthedocs.io/en/latest/03_mesh_generation/">SPECFEM2D mesh generator</a> (xmeshfem2d). To run xmeshfem2d we need to define 2
 files: The <code class="docutils literal notranslate"><span class="pre">Par_file</span></code>, which defines the parameters used by <code class="docutils literal notranslate"><span class="pre">xmeshfem2D</span></code>, and <code class="docutils literal notranslate"><span class="pre">topography_file.dat</span></code>, which defines
 the topography of the domain. More information on generating the mesh can be found <a class="reference external" href="https://specfem2d.readthedocs.io/en/latest/03_mesh_generation/">here</a>.</p>
 <section id="parameter-file">
-<h3>Parameter File<a class="headerlink" href="#parameter-file" title="Permalink to this heading"></a></h3>
+<h3>Parameter File<a class="headerlink" href="#parameter-file" title="Link to this heading"></a></h3>
 <div class="literal-block-wrapper docutils container" id="id1">
-<div class="code-block-caption"><span class="caption-text">PAR_FILE</span><a class="headerlink" href="#id1" title="Permalink to this code"></a></div>
+<div class="code-block-caption"><span class="caption-text">PAR_FILE</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1">#-----------------------------------------------------------</span>
 <span class="c1">#</span>
 <span class="c1"># Simulation input parameters</span>
@@ -580,9 +581,9 @@ materials. Other material systems are not implemented in this version of the pac
 </div>
 </section>
 <section id="topography-file">
-<h3>Topography file<a class="headerlink" href="#topography-file" title="Permalink to this heading"></a></h3>
+<h3>Topography file<a class="headerlink" href="#topography-file" title="Link to this heading"></a></h3>
 <div class="literal-block-wrapper docutils container" id="id2">
-<div class="code-block-caption"><span class="caption-text">topography_file.dat</span><a class="headerlink" href="#id2" title="Permalink to this code"></a></div>
+<div class="code-block-caption"><span class="caption-text">topography_file.dat</span><a class="headerlink" href="#id2" title="Link to this code"></a></div>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="c1">#</span>
 <span class="linenos"> 2</span><span class="c1"># number of interfaces</span>
 <span class="linenos"> 3</span><span class="c1">#</span>
@@ -613,7 +614,7 @@ materials. Other material systems are not implemented in this version of the pac
 </div>
 </section>
 <section id="running-xmeshfem2d">
-<h3>Running <code class="docutils literal notranslate"><span class="pre">xmeshfem2D</span></code><a class="headerlink" href="#running-xmeshfem2d" title="Permalink to this heading"></a></h3>
+<h3>Running <code class="docutils literal notranslate"><span class="pre">xmeshfem2D</span></code><a class="headerlink" href="#running-xmeshfem2d" title="Link to this heading"></a></h3>
 <p>Copy the parameters file and topography file to the <code class="docutils literal notranslate"><span class="pre">DATA</span></code> folder within <code class="docutils literal notranslate"><span class="pre">SPECFEM2D</span></code> root directory. To execute the
 mesher from the root of <code class="docutils literal notranslate"><span class="pre">specfem2d</span></code> run</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./bin/xmeshfem2D
@@ -623,14 +624,14 @@ mesher from the root of <code class="docutils literal notranslate"><span class="
 </section>
 </section>
 <section id="defining-sources">
-<h2>Defining sources<a class="headerlink" href="#defining-sources" title="Permalink to this heading"></a></h2>
+<h2>Defining sources<a class="headerlink" href="#defining-sources" title="Link to this heading"></a></h2>
 <p>Next we define the sources using a YAML file. For full description on parameters used to define sources refer <a class="reference internal" href="../source_description/index.html#source-description"><span class="std std-ref">Source Description</span></a>. Here we define 2 sources file pertaining to a single single source and 2 sources inside the simulation box.</p>
 </section>
 <section id="configuring-the-solver">
-<h2>Configuring the solver<a class="headerlink" href="#configuring-the-solver" title="Permalink to this heading"></a></h2>
+<h2>Configuring the solver<a class="headerlink" href="#configuring-the-solver" title="Link to this heading"></a></h2>
 <p>Now that we have generated a mesh and defined the sources, we need to set up the solver. To do this we define another YAML file <code class="docutils literal notranslate"><span class="pre">specfem_config.yaml</span></code>. For full description on parameters used to define sources refer <a class="reference internal" href="../parameter_documentation/index.html#parameter-documentation"><span class="std std-ref">Parameter documentation</span></a>.</p>
 <div class="literal-block-wrapper docutils container" id="id3">
-<div class="code-block-caption"><span class="caption-text">specfem_config.yaml</span><a class="headerlink" href="#id3" title="Permalink to this code"></a></div>
+<div class="code-block-caption"><span class="caption-text">specfem_config.yaml</span><a class="headerlink" href="#id3" title="Link to this code"></a></div>
 <div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">parameters</span><span class="p">:</span>
 <span class="linenos"> 2</span>
 <span class="linenos"> 3</span><span class="w">  </span><span class="nt">header</span><span class="p">:</span>
@@ -715,7 +716,7 @@ mesher from the root of <code class="docutils literal notranslate"><span class="
 </div>
 </section>
 <section id="running-the-solver">
-<h2>Running the solver<a class="headerlink" href="#running-the-solver" title="Permalink to this heading"></a></h2>
+<h2>Running the solver<a class="headerlink" href="#running-the-solver" title="Link to this heading"></a></h2>
 <p>Finally, to run the SPECFEM2D kokkos solver</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./specfem2d<span class="w"> </span>-p<span class="w"> </span>&lt;PATH<span class="w"> </span>TO<span class="w"> </span>specfem_config.yaml&gt;
 </pre></div>
@@ -726,7 +727,7 @@ mesher from the root of <code class="docutils literal notranslate"><span class="
 </div>
 </section>
 <section id="visualizing-seimograms">
-<h2>Visualizing seimograms<a class="headerlink" href="#visualizing-seimograms" title="Permalink to this heading"></a></h2>
+<h2>Visualizing seimograms<a class="headerlink" href="#visualizing-seimograms" title="Link to this heading"></a></h2>
 <p>On successful completion of the simulation the seismograms are stored within the output folder. Which can be visualized using standard plotting tools.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>

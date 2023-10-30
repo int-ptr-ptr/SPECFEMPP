@@ -13,10 +13,11 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -91,14 +92,14 @@
            <div itemprop="articleBody">
              
   <section id="style">
-<h1>Style<a class="headerlink" href="#style" title="Permalink to this heading"></a></h1>
+<h1>Style<a class="headerlink" href="#style" title="Link to this heading"></a></h1>
 </section>
 <section id="pre-commit">
-<h1>Pre-commit<a class="headerlink" href="#pre-commit" title="Permalink to this heading"></a></h1>
+<h1>Pre-commit<a class="headerlink" href="#pre-commit" title="Link to this heading"></a></h1>
 <p>SPECFEM uses pre-commit to check style. Pre-commit can be installed inside python virtual environments. There are several methods for creating virtual environments, but I’ve found poetry tool is great at managing python environments. Especailly in collaborative environments poetry gives easy method for managing consistency of environments between all contributors via <code class="code docutils literal notranslate"><span class="pre">pyproject.toml</span></code> and <code class="code docutils literal notranslate"><span class="pre">poetry.lock</span></code> files. But more on this later.</p>
 <p>Here we give a short tutorial for using poetry specifically with intention of using pre-commit hooks, but the information provided here can be translated for managing any python environment. The official poetry documentation can be found at <a class="reference external" href="https://python-poetry.org/docs/">poetry docs</a></p>
 <section id="poetry-installation">
-<h2>Poetry Installation<a class="headerlink" href="#poetry-installation" title="Permalink to this heading"></a></h2>
+<h2>Poetry Installation<a class="headerlink" href="#poetry-installation" title="Link to this heading"></a></h2>
 <p>Make sure your python version is 3.7+ :</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>python3<span class="w"> </span>--version
 </pre></div>
@@ -113,7 +114,7 @@
 </div>
 </section>
 <section id="adding-python-packages">
-<h2>Adding python packages<a class="headerlink" href="#adding-python-packages" title="Permalink to this heading"></a></h2>
+<h2>Adding python packages<a class="headerlink" href="#adding-python-packages" title="Link to this heading"></a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This section is only for educational purposes since SPECFEM comes with a <code class="code docutils literal notranslate"><span class="pre">pyproject.toml</span></code></p>
@@ -139,7 +140,7 @@
 <p>As stated above we define our python, and pre-commit versions within <code class="code docutils literal notranslate"><span class="pre">pyproject.toml</span></code>.</p>
 </section>
 <section id="install-python-packages">
-<h2>Install python packages<a class="headerlink" href="#install-python-packages" title="Permalink to this heading"></a></h2>
+<h2>Install python packages<a class="headerlink" href="#install-python-packages" title="Link to this heading"></a></h2>
 <p>To install python packages run</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry<span class="w"> </span>install
 </pre></div>
@@ -159,7 +160,7 @@
 </div>
 </section>
 <section id="using-your-python-poetry-environment">
-<h2>Using your python/poetry environment<a class="headerlink" href="#using-your-python-poetry-environment" title="Permalink to this heading"></a></h2>
+<h2>Using your python/poetry environment<a class="headerlink" href="#using-your-python-poetry-environment" title="Link to this heading"></a></h2>
 <p>If you’re in the SPECFEM root directory you should have access to the poetry environment. To run a command within the environment either</p>
 <ol class="arabic simple">
 <li><p>Explicitly activate the environment using <code class="code docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">shell</span></code> as shown below</p></li>
@@ -177,7 +178,7 @@ python<span class="w"> </span>&lt;script_name&gt;.py
 </div>
 </section>
 <section id="pre-commit-hooks">
-<h2>Pre-commit hooks<a class="headerlink" href="#pre-commit-hooks" title="Permalink to this heading"></a></h2>
+<h2>Pre-commit hooks<a class="headerlink" href="#pre-commit-hooks" title="Link to this heading"></a></h2>
 <p>Next, we install pre-commit hooks to check style. Pre-commit hooks are defined in <code class="code docutils literal notranslate"><span class="pre">.pre-commit-config.yaml</span></code> within SPECFEM root directory. More documentation on pre-commit hooks can be found <a class="reference external" href="https://pre-commit.com/hooks.html">here</a>.</p>
 <p>To enable the hooks (This only needs to be done when you clone the repo or there is an update to <code class="code docutils literal notranslate"><span class="pre">.pre-commit-config.yaml</span></code>)</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry<span class="w"> </span>run<span class="w"> </span>pre-commit<span class="w"> </span>install

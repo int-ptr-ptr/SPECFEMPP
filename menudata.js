@@ -96,4 +96,4 @@ var menudata={children:[
 {text:"s",url:"functions_vars.html#index_s"},
 {text:"t",url:"functions_vars.html#index_t"},
 {text:"x",url:"functions_vars.html#index_x"}]},
-{text:"Related Functions",url:"functions_rela.html"}]}]}]}
+{text:"Related Symbols",url:"functions_rela.html"}]}]}]}

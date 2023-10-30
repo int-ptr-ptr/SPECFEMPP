@@ -13,10 +13,11 @@
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
   
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
-        <script src="../_static/doctools.js"></script>
-        <script src="../_static/sphinx_highlight.js"></script>
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -93,7 +94,7 @@
            <div itemprop="articleBody">
              
   <section id="api-documentation">
-<span id="api-funcs"></span><h1>API documentation<a class="headerlink" href="#api-documentation" title="Permalink to this heading"></a></h1>
+<span id="api-funcs"></span><h1>API documentation<a class="headerlink" href="#api-documentation" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="IO.html">Input/Output module</a><ul>
@@ -101,14 +102,23 @@
 <li class="toctree-l2"><a class="reference internal" href="IO.html#fortran-binary-database-helper-routines">Fortran binary database helper routines</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="compute.html">Data interface to compute forces</a></li>
-<li class="toctree-l1"><a class="reference internal" href="domain.html">Domain interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compute.html">Data interface to compute forces</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="compute.html#_CPPv47specfem"><code class="docutils literal notranslate"><span class="pre">specfem</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="domain.html">Domain interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="domain.html#_CPPv47specfem"><code class="docutils literal notranslate"><span class="pre">specfem</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="jacobian.html">Utilities to compute elemental Jacobian and shape functions</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="jacobian.html#shape-functions">Shape Functions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="jacobian.html#jacobian">Jacobian</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="kokkos_abstractions.html">SPECFEM abstractions for Kokkos interfaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kokkos_abstractions.html">SPECFEM abstractions for Kokkos interfaces</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="kokkos_abstractions.html#_CPPv47specfem"><code class="docutils literal notranslate"><span class="pre">specfem</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="material.html">Material properties and helper routines</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="material.html#material-class">Material Class</a></li>
 <li class="toctree-l2"><a class="reference internal" href="material.html#input-output-helper-routines">Input/Output helper routines</a></li>
@@ -134,7 +144,10 @@
 <li class="toctree-l2"><a class="reference internal" href="quadrature.html#lagrange-polynomial-helper-routines">Lagrange polynomial helper routines</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="solver.html">Solver interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="solver.html">Solver interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="solver.html#_CPPv47specfem"><code class="docutils literal notranslate"><span class="pre">specfem</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="sources_recievers.html">Sources and Recievers Interface</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="sources_recievers.html#source-interface">Source Interface</a></li>
 <li class="toctree-l2"><a class="reference internal" href="sources_recievers.html#reciever-interface">Reciever Interface</a></li>
@@ -142,9 +155,18 @@
 <li class="toctree-l2"><a class="reference internal" href="sources_recievers.html#source-time-function">Source Time Function</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="specfem_mpi.html">SPECFEM abstractions for MPI interface</a></li>
-<li class="toctree-l1"><a class="reference internal" href="timescheme.html">Time marching schemes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="writer.html">Writer interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="specfem_mpi.html">SPECFEM abstractions for MPI interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="specfem_mpi.html#_CPPv47specfem"><code class="docutils literal notranslate"><span class="pre">specfem</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="timescheme.html">Time marching schemes</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="timescheme.html#_CPPv47specfem"><code class="docutils literal notranslate"><span class="pre">specfem</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="writer.html">Writer interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="writer.html#_CPPv47specfem"><code class="docutils literal notranslate"><span class="pre">specfem</span></code></a></li>
+</ul>
+</li>
 </ul>
 </div>
 </section>
