@@ -9,17 +9,17 @@ const static int fint{ 4 }, fdouble{ 8 }, fbool{ 4 }, fchar{ 512 };
 const static bool use_best_location{ true };
 
 #if defined(KOKKOS_ENABLE_CUDA)
-constexpr int NTHREADS = 32;
-constexpr int NLANES = 1;
+constexpr int NTHREADS = 4;
+constexpr int NLANES = 32;
 #elif defined(KOKKOS_ENABLE_HIP)
-constexpr int NTHREADS = 32;
-constexpr int NLANES = 1;
+constexpr int NTHREADS = 4;
+constexpr int NLANES = 32;
 #elif defined(KOKKOS_ENABLE_SERIAL)
-constexpr Kokkos::AUTO_t NTHREADS = Kokkos::AUTO;
-constexpr int NLANES = 1;
+constexpr int NTHREADS = 4;
+constexpr int NLANES = 32;
 #elif defined(KOKKOS_ENABLE_OPENMP)
-constexpr Kokkos::AUTO_t NTHREADS = Kokkos::AUTO;
-constexpr int NLANES = 1;
+constexpr int NTHREADS = 4;
+constexpr int NLANES = 32;
 #endif
 
 KOKKOS_INLINE_FUNCTION void sub2ind(const int xz, const int ngllx, int &iz,
