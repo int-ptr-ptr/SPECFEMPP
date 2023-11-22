@@ -139,13 +139,15 @@ public:
    * @param dudzl Computed partial derivative of field \f$ \frac{\partial
    * \tilde{u}}{\partial z} \f$
    */
-  KOKKOS_INLINE_FUNCTION void
-  compute_gradient(const int &ispec, const int &ielement, const int &xz,
-                   const ScratchViewType<type_real, 1> s_hprime_xx,
-                   const ScratchViewType<type_real, 1> s_hprime_zz,
-                   const ScratchViewType<type_real, medium_type::components> u,
-                   specfem::kokkos::array_type<type_real, 2> &dudxl,
-                   specfem::kokkos::array_type<type_real, 2> &dudzl) const;
+  KOKKOS_INLINE_FUNCTION void compute_gradient(
+      const int &ispec, const int &ielement, const int &xz,
+      const ScratchViewType<type_real, 1> &s_hprime_xx,
+      const ScratchViewType<type_real, 1> &s_hprime_zz,
+      const Kokkos::View<type_real[medium_type::components][NGLL][NGLL],
+                         Kokkos::LayoutRight, specfem::kokkos::DevScratchSpace,
+                         Kokkos::MemoryTraits<Kokkos::Unmanaged> > &u,
+      specfem::kokkos::array_type<type_real, 2> &dudxl,
+      specfem::kokkos::array_type<type_real, 2> &dudzl) const;
 
   /**
    * @brief Compute the stress integrand at a particular Gauss-Lobatto-Legendre

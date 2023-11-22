@@ -135,19 +135,22 @@ KOKKOS_INLINE_FUNCTION void specfem::domain::impl::elements::element<
     specfem::enums::element::property::isotropic, BC>::
     compute_gradient(
         const int &ispec, const int &ielement, const int &xz,
-        const ScratchViewType<type_real, 1> s_hprime_xx,
-        const ScratchViewType<type_real, 1> s_hprime_zz,
-        const ScratchViewType<type_real, medium_type::components> field_chi,
+        const ScratchViewType<type_real, 1> &s_hprime_xx,
+        const ScratchViewType<type_real, 1> &s_hprime_zz,
+        const Kokkos::View<type_real[medium_type::components][NGLL][NGLL],
+                           Kokkos::LayoutRight,
+                           specfem::kokkos::DevScratchSpace,
+                           Kokkos::MemoryTraits<Kokkos::Unmanaged> > &field_chi,
         specfem::kokkos::array_type<type_real, 1> &dchidxl,
         specfem::kokkos::array_type<type_real, 1> &dchidzl) const {
 
   int ix, iz;
   sub2ind(xz, NGLL, iz, ix);
 
-  const specfem::compute::element_partial_derivatives partial_derivatives =
-      specfem::compute::element_partial_derivatives(
-          this->xix(ispec, iz, ix), this->gammax(ispec, iz, ix),
-          this->xiz(ispec, iz, ix), this->gammaz(ispec, iz, ix));
+//   const specfem::compute::element_partial_derivatives partial_derivatives =
+//       specfem::compute::element_partial_derivatives(
+//           this->xix(ispec, iz, ix), this->gammax(ispec, iz, ix),
+//           this->xiz(ispec, iz, ix), this->gammaz(ispec, iz, ix));
 
   type_real dchi_dxi = 0.0;
   type_real dchi_dgamma = 0.0;
@@ -156,20 +159,20 @@ KOKKOS_INLINE_FUNCTION void specfem::domain::impl::elements::element<
 #pragma unroll
 #endif
   for (int l = 0; l < NGLL; l++) {
-    dchi_dxi += s_hprime_xx(ix, l, 0) * field_chi(iz, l, 0);
-    dchi_dgamma += s_hprime_zz(iz, l, 0) * field_chi(l, ix, 0);
+    dchi_dxi += s_hprime_xx(ix, l, 0) * field_chi(0, iz, l);
+    dchi_dgamma += s_hprime_zz(iz, l, 0) * field_chi(0, l, ix);
   }
 
   // dchidx
-  dchidxl[0] = dchi_dxi * partial_derivatives.xix +
-               dchi_dgamma * partial_derivatives.gammax;
+  dchidxl[0] = dchi_dxi * this->xix(ispec, iz, ix) +
+               dchi_dgamma * this->gammax(ispec, iz, ix);
 
   // dchidz
-  dchidzl[0] = dchi_dxi * partial_derivatives.xiz +
-               dchi_dgamma * partial_derivatives.gammaz;
+  dchidzl[0] = dchi_dxi * this->xiz(ispec, iz, ix) +
+               dchi_dgamma * this->gammaz(ispec, iz, ix);
 
-  boundary_conditions.enforce_gradient(ielement, xz, partial_derivatives,
-                                       dchidxl, dchidzl);
+//   boundary_conditions.enforce_gradient(ielement, xz, partial_derivatives,
+//                                        dchidxl, dchidzl);
 
   return;
 }

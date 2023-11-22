@@ -130,9 +130,11 @@ public:
    */
   KOKKOS_INLINE_FUNCTION void compute_gradient(
       const int &ispec, const int &ielement, const int &xz,
-      const ScratchViewType<type_real, 1> s_hprime_xx,
-      const ScratchViewType<type_real, 1> s_hprime_zz,
-      const ScratchViewType<type_real, medium_type::components> field_chi,
+      const ScratchViewType<type_real, 1> &s_hprime_xx,
+      const ScratchViewType<type_real, 1> &s_hprime_zz,
+      const Kokkos::View<type_real[medium_type::components][NGLL][NGLL],
+                         Kokkos::LayoutRight, specfem::kokkos::DevScratchSpace,
+                         Kokkos::MemoryTraits<Kokkos::Unmanaged> > &field_chi,
       specfem::kokkos::array_type<type_real, 1> &dchidxl,
       specfem::kokkos::array_type<type_real, 1> &dchidzl) const;
 

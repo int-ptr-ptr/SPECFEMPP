@@ -140,9 +140,12 @@ KOKKOS_INLINE_FUNCTION void specfem::domain::impl::elements::element<
     specfem::enums::element::property::isotropic, BC>::
     compute_gradient(
         const int &ispec, const int &ielement, const int &xz,
-        const ScratchViewType<type_real, 1> s_hprime_xx,
-        const ScratchViewType<type_real, 1> s_hprime_zz,
-        const ScratchViewType<type_real, medium_type::components> u,
+        const ScratchViewType<type_real, 1> &s_hprime_xx,
+        const ScratchViewType<type_real, 1> &s_hprime_zz,
+        const Kokkos::View<type_real[medium_type::components][NGLL][NGLL],
+                           Kokkos::LayoutRight,
+                           specfem::kokkos::DevScratchSpace,
+                           Kokkos::MemoryTraits<Kokkos::Unmanaged> > &u,
         specfem::kokkos::array_type<type_real, 2> &dudxl,
         specfem::kokkos::array_type<type_real, 2> &dudzl) const {
 
@@ -160,11 +163,11 @@ KOKKOS_INLINE_FUNCTION void specfem::domain::impl::elements::element<
 #ifdef KOKKOS_ENABLE_CUDA
 #pragma unroll
 #endif
-  for (int l = 0; l < NGLL; l++) {
-    du_dxi[0] += s_hprime_xx(ix, l, 0) * u(iz, l, 0);
-    du_dxi[1] += s_hprime_xx(ix, l, 0) * u(iz, l, 1);
-    du_dgamma[0] += s_hprime_zz(iz, l, 0) * u(l, ix, 0);
-    du_dgamma[1] += s_hprime_zz(iz, l, 0) * u(l, ix, 1);
+  for (int l = 0; l < NGLL; ++l) {
+    du_dxi[0] += s_hprime_xx(ix, l, 0) * u(0, iz, l);
+    du_dxi[1] += s_hprime_xx(ix, l, 0) * u(1, iz, l);
+    du_dgamma[0] += s_hprime_zz(iz, l, 0) * u(0, l, ix);
+    du_dgamma[1] += s_hprime_zz(iz, l, 0) * u(1, l, ix);
   }
   // duxdx
   dudxl[0] = partial_derivatives.xix * du_dxi[0] +
@@ -182,8 +185,8 @@ KOKKOS_INLINE_FUNCTION void specfem::domain::impl::elements::element<
   dudzl[1] = partial_derivatives.gammax * du_dxi[1] +
              partial_derivatives.gammaz * du_dgamma[1];
 
-  boundary_conditions.enforce_gradient(ielement, xz, partial_derivatives, dudxl,
-                                       dudzl);
+//   boundary_conditions.enforce_gradient(ielement, xz, partial_derivatives, dudxl,
+//                                        dudzl);
 
   return;
 }
