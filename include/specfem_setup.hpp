@@ -9,7 +9,7 @@ const static int fint{ 4 }, fdouble{ 8 }, fbool{ 4 }, fchar{ 512 };
 const static bool use_best_location{ true };
 
 #if defined(KOKKOS_ENABLE_CUDA)
-constexpr int NTHREADS = 4;
+constexpr int NTHREADS = 8;
 constexpr int NLANES = 32;
 #elif defined(KOKKOS_ENABLE_HIP)
 constexpr int NTHREADS = 4;

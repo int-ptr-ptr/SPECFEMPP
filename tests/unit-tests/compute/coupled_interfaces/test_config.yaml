@@ -16,3 +16,37 @@ Tests:
       acoustic_poroelastic:
         acoustic_ispec: "NULL"
         poroelastic_ispec: "NULL"
+  - name: "SerialTest2 : Coupled elastic poroelastic interface"
+    description: |
+      Coupled elastic poroelastic interface. Test is run on a single MPI process.
+    config:
+      nproc: 1
+    databases:
+      mesh:
+        database: "../../../tests/unit-tests/compute/coupled_interfaces/serial/test2/mesh/database.bin"
+      elastic_acoustic:
+        elastic_ispec: "NULL"
+        acoustic_ispec: "NULL"
+      elastic_poroelastic:
+        elastic_ispec: "../../../tests/unit-tests/compute/coupled_interfaces/serial/test2/elastic_poroelastic/elastic_ispec.bin"
+        poroelastic_ispec: "../../../tests/unit-tests/compute/coupled_interfaces/serial/test2/elastic_poroelastic/poroelastic_ispec.bin"
+      acoustic_poroelastic:
+        acoustic_ispec: "NULL"
+        poroelastic_ispec: "NULL"
+  - name: "SerialTest3 : Coupled acoustic poroelastic interface"
+    description: |
+      Coupled acoustic poroelastic interface. Test is run on a single MPI process.
+    config:
+      nproc: 1
+    databases:
+      mesh:
+        database: "../../../tests/unit-tests/compute/coupled_interfaces/serial/test3/mesh/database.bin"
+      elastic_acoustic:
+        elastic_ispec: "NULL"
+        acoustic_ispec: "../../../tests/unit-tests/compute/coupled_interfaces/serial/test3/acoustic_poroelastic/acoustic_ispec.bin"
+      elastic_poroelastic:
+        elastic_ispec: "NULL"
+        poroelastic_ispec: "NULL"
+      acoustic_poroelastic:
+        acoustic_ispec: "../../../tests/unit-tests/compute/coupled_interfaces/serial/test3/acoustic_poroelastic/acoustic_ispec.bin"
+        poroelastic_ispec: "../../../tests/unit-tests/compute/coupled_interfaces/serial/test3/acoustic_poroelastic/poroelastic_ispec.bin"

@@ -51,25 +51,33 @@ private:
   specfem::kokkos::DeviceView3d<int> ibool;
   Kokkos::View<const type_real **, Kokkos::LayoutLeft,
                Kokkos::DefaultExecutionSpace,
-               Kokkos::MemoryTraits<Kokkos::RandomAccess, Kokkos::Restrict> >
+               Kokkos::MemoryTraits<Kokkos::RandomAccess> >
       field;
   Kokkos::View<const type_real **, Kokkos::LayoutLeft,
                Kokkos::DefaultExecutionSpace,
-               Kokkos::MemoryTraits<Kokkos::RandomAccess, Kokkos::Restrict> >
+               Kokkos::MemoryTraits<Kokkos::RandomAccess> >
       field_dot;
   specfem::kokkos::DeviceView2d<type_real, Kokkos::LayoutLeft> field_dot_dot;
   specfem::kokkos::DeviceView2d<type_real, Kokkos::LayoutLeft> mass_matrix;
   qp_type quadrature_points;
   specfem::quadrature::quadrature *quadx;
   specfem::quadrature::quadrature *quadz;
+
+  specfem::kokkos::DeviceView1d<type_real> xix;
+  specfem::kokkos::DeviceView1d<type_real> gammax;
+  specfem::kokkos::DeviceView1d<type_real> xiz;
+  specfem::kokkos::DeviceView1d<type_real> gammaz;
+
   specfem::domain::impl::elements::element<
       dimension, medium, qp_type, property_type, boundary_conditions_type>
       element;
 
-  specfem::kokkos::DeviceView2d<type_real> __du_dxi;
-  specfem::kokkos::DeviceView2d<type_real> __du_dgamma;
-  specfem::kokkos::DeviceView2d<type_real> __stress_integrand_xi;
-  specfem::kokkos::DeviceView2d<type_real> __stress_integrand_gamma;
+  Kokkos::DefaultExecutionSpace execution_space[medium_type::components];
+
+  specfem::kokkos::DeviceView1d<type_real> __du_dx;
+  specfem::kokkos::DeviceView1d<type_real> __du_dz;
+  specfem::kokkos::DeviceView1d<type_real> __stress_integrand_xi;
+  specfem::kokkos::DeviceView1d<type_real> __stress_integrand_gamma;
 };
 
 } // namespace kernels

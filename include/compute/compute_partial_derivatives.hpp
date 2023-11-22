@@ -91,12 +91,12 @@ struct element_partial_derivatives {
   KOKKOS_FUNCTION
   element_partial_derivatives() = default;
 
-  KOKKOS_FUNCTION
+  KOKKOS_INLINE_FUNCTION
   element_partial_derivatives(const type_real &xix, const type_real &gammax,
                               const type_real &xiz, const type_real &gammaz)
       : xix(xix), gammax(gammax), xiz(xiz), gammaz(gammaz) {}
 
-  KOKKOS_FUNCTION
+  KOKKOS_INLINE_FUNCTION
   element_partial_derivatives(const type_real &xix, const type_real &gammax,
                               const type_real &xiz, const type_real &gammaz,
                               const type_real &jacobian)
@@ -113,6 +113,39 @@ struct element_partial_derivatives {
     ASSERT(false, "Invalid boundary type");
     return specfem::kokkos::array_type<type_real, 2>();
   };
+
+  template <int NGLL>
+  KOKKOS_INLINE_FUNCTION specfem::kokkos::array_type<type_real, 2>
+  compute_gradient(
+      const int &ix, const int &iz,
+      const Kokkos::View<type_real[NGLL][NGLL], Kokkos::LayoutRight,
+                         specfem::kokkos::DevScratchSpace,
+                         Kokkos::MemoryTraits<Kokkos::Unmanaged> > &s_hprime,
+      const Kokkos::View<type_real[NGLL][NGLL], Kokkos::LayoutRight,
+                         specfem::kokkos::DevScratchSpace,
+                         Kokkos::MemoryTraits<Kokkos::Unmanaged> > &field_local)
+      const {
+    specfem::kokkos::array_type<type_real, 2> grad;
+
+    type_real dfield_dxi = 0.0;
+    type_real dfield_dgamma = 0.0;
+
+#ifdef KOKKOS_ENABLE_CUDA
+#pragma unroll
+#endif
+    for (int l = 0; l < NGLL; ++l) {
+      dfield_dxi += s_hprime(ix, l) * field_local(iz, l);
+      dfield_dgamma += s_hprime(iz, l) * field_local(l, ix);
+    }
+
+    // dfielddx
+    grad[0] = dfield_dxi * this->xix + dfield_dgamma * this->gammax;
+
+    // dfielddz
+    grad[1] = dfield_dxi * this->xiz + dfield_dgamma * this->gammaz;
+
+    return grad;
+  }
 };
 } // namespace compute
 } // namespace specfem
