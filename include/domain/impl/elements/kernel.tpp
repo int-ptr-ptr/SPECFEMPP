@@ -11,6 +11,8 @@
 #include "specfem_setup.hpp"
 #include <Kokkos_Core.hpp>
 
+namespace {
+
 // Do not pull velocity from global memory
 template <int components, specfem::enums::element::boundary_tag tag>
 KOKKOS_INLINE_FUNCTION specfem::kokkos::array_type<type_real, components>
@@ -48,6 +50,36 @@ get_velocity<2, specfem::enums::element::boundary_tag::stacey>(
 
   return velocity;
 };
+
+template <int NGLL, int components>
+KOKKOS_INLINE_FUNCTION void compute_gradient(
+    const int ix, const int iz,
+    const Kokkos::View<type_real[NGLL][NGLL], Kokkos::LayoutRight,
+                       specfem::kokkos::DevScratchSpace,
+                       Kokkos::MemoryTraits<Kokkos::Unmanaged> > &s_hprime,
+    const Kokkos::View<type_real[components][NGLL][NGLL], Kokkos::LayoutRight,
+                       specfem::kokkos::DevScratchSpace,
+                       Kokkos::MemoryTraits<Kokkos::Unmanaged> > &sv_field,
+    specfem::kokkos::array_type<type_real, components> &du_dxi,
+    specfem::kokkos::array_type<type_real, components> &du_dgamma) {
+
+#ifdef KOKKOS_ENABLE_CUDA
+#pragma unroll
+#endif
+  for (int l = 0; l < NGLL; ++l) {
+#ifdef KOKKOS_ENABLE_CUDA
+#pragma unroll
+#endif
+    for (int icomponent = 0; icomponent < components; ++icomponent) {
+      du_dxi[icomponent] += s_hprime(iz, l) * sv_field(icomponent, l, ix);
+      du_dgamma[icomponent] += s_hprime(l, ix) * sv_field(icomponent, iz, l);
+    }
+  }
+
+  return;
+}
+
+} // namespace
 
 template <class medium, class qp_type, class property, class BC>
 specfem::domain::impl::kernels::element_kernel<medium, qp_type, property, BC>::
@@ -262,101 +294,111 @@ void specfem::domain::impl::kernels::element_kernel<
 
   // s_field
   scratch_size_0 +=
-      Kokkos::View<type_real[NTHREADS][NGLL][NGLL], Kokkos::LayoutRight,
-                   specfem::kokkos::DevScratchSpace,
+      Kokkos::View<type_real[NTHREADS][components][NGLL][NGLL],
+                   Kokkos::LayoutRight, specfem::kokkos::DevScratchSpace,
                    Kokkos::MemoryTraits<Kokkos::Unmanaged> >::shmem_size();
 
   const int nteams = nelements / NTHREADS + (nelements % NTHREADS != 0);
 
   // Compute gradients
-  for (int icomponent = 0; icomponent < components; ++icomponent) {
 
-    Kokkos::parallel_for(
-        "specfem::domain::kernels::elements::compute_gradients_component",
-        Kokkos::TeamPolicy<Kokkos::DefaultExecutionSpace>(
-            execution_space[icomponent], nteams, NTHREADS, NLANES)
-            .set_scratch_size(0, Kokkos::PerTeam(scratch_size_0)),
+  Kokkos::parallel_for(
+      "specfem::domain::kernels::elements::compute_gradients_component",
+      Kokkos::TeamPolicy<Kokkos::DefaultExecutionSpace>(nteams, NTHREADS,
+                                                        NLANES)
+          .set_scratch_size(0, Kokkos::PerTeam(scratch_size_0)),
+      KOKKOS_CLASS_LAMBDA(
+          const Kokkos::TeamPolicy<Kokkos::DefaultExecutionSpace>::member_type
+              &team_member) {
+        const int ispec =
+            team_member.league_rank() * NTHREADS + team_member.team_rank();
+        const int i2 = ispec * NGLL * NGLL;
+        const int i3 = i2 * components;
 
-        KOKKOS_CLASS_LAMBDA(
-            const Kokkos::TeamPolicy<Kokkos::DefaultExecutionSpace>::member_type
-                &team_member) {
-          const int ispec =
-              team_member.league_rank() * NTHREADS + team_member.team_rank();
-          const int i2 = ispec * NGLL * NGLL;
-          const int i3 = i2 * components + icomponent * NGLL2;
+        Kokkos::View<type_real[NGLL][NGLL], Kokkos::LayoutRight,
+                     specfem::kokkos::DevScratchSpace,
+                     Kokkos::MemoryTraits<Kokkos::Unmanaged> >
+            s_hprime(team_member.team_scratch(0));
 
-          Kokkos::View<type_real[NGLL][NGLL], Kokkos::LayoutRight,
-                       specfem::kokkos::DevScratchSpace,
-                       Kokkos::MemoryTraits<Kokkos::Unmanaged> >
-              s_hprime(team_member.team_scratch(0));
+        Kokkos::View<type_real[NTHREADS][components][NGLL][NGLL],
+                     Kokkos::LayoutRight, specfem::kokkos::DevScratchSpace,
+                     Kokkos::MemoryTraits<Kokkos::Unmanaged> >
+            field_local(team_member.team_scratch(0));
 
-          Kokkos::View<type_real[NTHREADS][NGLL][NGLL], Kokkos::LayoutRight,
-                       specfem::kokkos::DevScratchSpace,
-                       Kokkos::MemoryTraits<Kokkos::Unmanaged> >
-              field_local(team_member.team_scratch(0));
+        // initialize the views
+        // ---------------------------------------------------------------------------
+        Kokkos::parallel_for(
+            Kokkos::TeamThreadRange(team_member, 1), [&](const int &) {
+              Kokkos::parallel_for(
+                  Kokkos::ThreadVectorRange(team_member, NGLL * NGLL),
+                  [&](const int &xz) {
+                    int ix, iz;
+                    sub2ind(xz, NGLL, iz, ix);
+                    s_hprime(iz, ix) = hprime_xx(iz, ix);
+                  });
+            });
 
-          // initialize the views
-          // ---------------------------------------------------------------------------
-          Kokkos::parallel_for(
-              Kokkos::TeamThreadRange(team_member, 1), [&](const int &) {
-                Kokkos::parallel_for(
-                    Kokkos::ThreadVectorRange(team_member, NGLL * NGLL),
-                    [&](const int &xz) {
-                      int ix, iz;
-                      sub2ind(xz, NGLL, iz, ix);
-                      s_hprime(iz, ix) = hprime_xx(iz, ix);
-                    });
-              });
+        Kokkos::parallel_for(
+            Kokkos::TeamThreadRange(team_member, NTHREADS),
+            [&](const int &ithread) {
+              Kokkos::parallel_for(
+                  Kokkos::ThreadVectorRange(team_member, NGLL * NGLL),
+                  [&](const int &xz) {
+                    int ix, iz;
+                    sub2ind(xz, NGLL, iz, ix);
+                    const int iglob = __ibool(i2 + xz);
 
-          Kokkos::parallel_for(
-              Kokkos::TeamThreadRange(team_member, NTHREADS),
-              [&](const int &ithread) {
-                Kokkos::parallel_for(
-                    Kokkos::ThreadVectorRange(team_member, NGLL * NGLL),
-                    [&](const int &xz) {
-                      int ix, iz;
-                      sub2ind(xz, NGLL, iz, ix);
-                      const int iglob = __ibool(i2 + xz);
+#ifdef KOKKOS_ENABLE_CUDA
+#pragma unroll
+#endif
+                    for (int icomponent = 0; icomponent < components;
+                         ++icomponent) {
+                      field_local(ithread, icomponent, iz, ix) =
+                          field(iglob, icomponent);
+                    }
+                  });
+            });
+        // ---------------------------------------------------------------------------
 
-                      field_local(ithread, iz, ix) = field(iglob, icomponent);
-                    });
-              });
-          // ---------------------------------------------------------------------------
+        team_member.team_barrier();
 
-          team_member.team_barrier();
+        // Compute gradients
+        // ---------------------------------------------------------------------------
+        Kokkos::parallel_for(
+            Kokkos::TeamThreadRange(team_member, NTHREADS),
+            [&](const int &ithread) {
+              const auto sv_field =
+                  Kokkos::subview(field_local, ithread, Kokkos::ALL(),
+                                  Kokkos::ALL(), Kokkos::ALL());
+              Kokkos::parallel_for(
+                  Kokkos::ThreadVectorRange(team_member, NGLL * NGLL),
+                  [&](const int &xz) {
+                    int ix, iz;
+                    sub2ind(xz, NGLL, iz, ix);
 
-          // Compute gradients
-          // ---------------------------------------------------------------------------
-          Kokkos::parallel_for(
-              Kokkos::TeamThreadRange(team_member, NTHREADS),
-              [&](const int &ithread) {
-                const auto sv_field = Kokkos::subview(
-                    field_local, ithread, Kokkos::ALL(), Kokkos::ALL());
-                Kokkos::parallel_for(
-                    Kokkos::ThreadVectorRange(team_member, NGLL * NGLL),
-                    [&](const int &xz) {
-                      int ix, iz;
-                      sub2ind(xz, NGLL, iz, ix);
+                    // compute gradient
+                    specfem::kokkos::array_type<type_real, components> du_dxi;
+                    specfem::kokkos::array_type<type_real, components>
+                        du_dgamma;
 
-                      const auto partial_derivatives =
-                          specfem::compute::element_partial_derivatives(
-                              this->xix(i2 + xz), this->gammax(i2 + xz),
-                              this->xiz(i2 + xz), this->gammaz(i2 + xz));
+                    compute_gradient<NGLL, components>(
+                        ix, iz, s_hprime, sv_field, du_dxi, du_dgamma);
 
-                      // compute gradient
-                      const specfem::kokkos::array_type<type_real,
-                                                        dimension::dim>
-                          gradient_x = partial_derivatives
-                                           .template compute_gradient<NGLL>(
-                                               ix, iz, s_hprime, sv_field);
+#ifdef KOKKOS_ENABLE_CUDA
+#pragma unroll
+#endif
+                    // store gradient
+                    for (int icomponent = 0; icomponent < components;
+                         ++icomponent) {
 
-                      // store gradient
-                      __du_dx(i3 + xz) = gradient_x[0];
-                      __du_dz(i3 + xz) = gradient_x[1];
-                    });
-              });
-        });
-  }
+                      __du_dx(i3 + icomponent * NGLL2 + xz) =
+                          du_dxi[icomponent];
+                      __du_dz(i3 + icomponent * NGLL2 + xz) =
+                          du_dgamma[icomponent];
+                    }
+                  });
+            });
+      });
 
   Kokkos::fence();
 
