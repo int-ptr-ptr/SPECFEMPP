@@ -160,9 +160,9 @@ public:
    * @return KOKKOS_FUNCTION
    */
   KOKKOS_INLINE_FUNCTION void compute_stress(
-      const int &ispec, const int &ielement, const int &xz,
-      const specfem::kokkos::array_type<type_real, 1> &dchidxl,
-      const specfem::kokkos::array_type<type_real, 1> &dchidzl,
+      const int &ispec, const int &ielement, const int &iz, const int &ix,
+      const specfem::kokkos::array_type<type_real, 1> &dchidxi,
+      const specfem::kokkos::array_type<type_real, 1> &dchidgamma,
       specfem::kokkos::array_type<type_real, 1> &stress_integrand_xi,
       specfem::kokkos::array_type<type_real, 1> &stress_integrand_gamma) const;
 

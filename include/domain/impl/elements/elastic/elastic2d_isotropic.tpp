@@ -197,22 +197,42 @@ KOKKOS_INLINE_FUNCTION void specfem::domain::impl::elements::element<
     specfem::enums::element::medium::elastic,
     specfem::enums::element::quadrature::static_quadrature_points<NGLL>,
     specfem::enums::element::property::isotropic,
-    BC>::compute_stress(const int &ispec, const int &ielement, const int &xz,
-                        const specfem::kokkos::array_type<type_real, 2> &dudxl,
-                        const specfem::kokkos::array_type<type_real, 2> &dudzl,
+    BC>::compute_stress(const int &ispec, const int &ielement, const int &iz, const int &ix,
+                        const specfem::kokkos::array_type<type_real, 2> &dudxi,
+                        const specfem::kokkos::array_type<type_real, 2> &dudgamma,
                         specfem::kokkos::array_type<type_real, 2>
                             &stress_integrand_xi,
                         specfem::kokkos::array_type<type_real, 2>
                             &stress_integrand_gamma) const {
 
-  int ix, iz;
-  sub2ind(xz, NGLL, iz, ix);
+//   int ix, iz;
+//   sub2ind(xz, NGLL, iz, ix);
 
   const specfem::compute::element_partial_derivatives partial_derivatives =
       specfem::compute::element_partial_derivatives(
           this->xix(ispec, iz, ix), this->gammax(ispec, iz, ix),
           this->xiz(ispec, iz, ix), this->gammaz(ispec, iz, ix),
           this->jacobian(ispec, iz, ix));
+
+  type_real dudxl[medium_type::components] = { 0.0, 0.0 };
+  type_real dudzl[medium_type::components] = { 0.0, 0.0 };
+
+  // duxdx
+  dudxl[0] = partial_derivatives.xix * dudxi[0] +
+             partial_derivatives.gammax * dudgamma[0];
+
+  // duxdz
+  dudzl[0] = partial_derivatives.xiz * dudxi[0] +
+             partial_derivatives.gammaz * dudgamma[0];
+
+  // duzdx
+  dudxl[1] = partial_derivatives.xix * dudxi[1] +
+             partial_derivatives.gammax * dudgamma[1];
+
+  // duzdz
+  dudzl[1] = partial_derivatives.gammax * dudxi[1] +
+             partial_derivatives.gammaz * dudgamma[1];
+
 
   const specfem::compute::element_properties<medium_type::value,
                                              property_type::value>
@@ -256,9 +276,9 @@ KOKKOS_INLINE_FUNCTION void specfem::domain::impl::elements::element<
       partial_derivatives.jacobian * (sigma_xz * partial_derivatives.gammax +
                                       sigma_zz * partial_derivatives.gammaz);
 
-  boundary_conditions.enforce_stress(ielement, xz, partial_derivatives,
-                                     properties, stress_integrand_xi,
-                                     stress_integrand_gamma);
+//   boundary_conditions.enforce_stress(ielement, xz, partial_derivatives,
+//                                      properties, stress_integrand_xi,
+//                                      stress_integrand_gamma);
 
   return;
 }

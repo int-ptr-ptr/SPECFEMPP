@@ -184,20 +184,31 @@ KOKKOS_INLINE_FUNCTION void specfem::domain::impl::elements::element<
     specfem::enums::element::quadrature::static_quadrature_points<NGLL>,
     specfem::enums::element::property::isotropic, BC>::
     compute_stress(
-        const int &ispec, const int &ielement, const int &xz,
-        const specfem::kokkos::array_type<type_real, 1> &dchidxl,
-        const specfem::kokkos::array_type<type_real, 1> &dchidzl,
+        const int &ispec, const int &ielement, const int &iz, const int &ix,
+        const specfem::kokkos::array_type<type_real, 1> &dchidxi,
+        const specfem::kokkos::array_type<type_real, 1> &dchidgamma,
         specfem::kokkos::array_type<type_real, 1> &stress_integrand_xi,
         specfem::kokkos::array_type<type_real, 1> &stress_integrand_gamma)
         const {
 
-  int ix, iz;
-  sub2ind(xz, NGLL, iz, ix);
+  // int ix, iz;
+  // sub2ind(xz, NGLL, iz, ix);
 
   const specfem::compute::element_partial_derivatives partial_derivatives(
       this->xix(ispec, iz, ix), this->gammax(ispec, iz, ix),
       this->xiz(ispec, iz, ix), this->gammaz(ispec, iz, ix),
       this->jacobian(ispec, iz, ix));
+
+  type_real dchidxl[medium_type::components];
+  type_real dchidzl[medium_type::components];
+
+  // dchidx
+  dchidxl[0] = dchidxi[0] * this->xix(ispec, iz, ix) +
+               dchidgamma[0] * this->gammax(ispec, iz, ix);
+
+  // dchidz
+  dchidzl[0] = dchidxi[0] * this->xiz(ispec, iz, ix) +
+               dchidgamma[0] * this->gammaz(ispec, iz, ix);
 
   const specfem::compute::element_properties<medium_type::value,
                                              property_type::value>
@@ -219,9 +230,9 @@ KOKKOS_INLINE_FUNCTION void specfem::domain::impl::elements::element<
   stress_integrand_gamma[0] = fac * (partial_derivatives.gammax * dchidxl[0] +
                                      partial_derivatives.gammaz * dchidzl[0]);
 
-  boundary_conditions.enforce_stress(ielement, xz, partial_derivatives,
-                                     properties, stress_integrand_xi,
-                                     stress_integrand_gamma);
+  // boundary_conditions.enforce_stress(ielement, xz, partial_derivatives,
+  //                                    properties, stress_integrand_xi,
+  //                                    stress_integrand_gamma);
 
   return;
 }

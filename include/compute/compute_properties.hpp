@@ -102,9 +102,6 @@ struct element_properties<specfem::enums::element::type::elastic,
   type_real rho;
   type_real lambda;
 
-  type_real rho_vp;
-  type_real rho_vs;
-
   KOKKOS_FUNCTION
   element_properties() = default;
 
@@ -112,8 +109,13 @@ struct element_properties<specfem::enums::element::type::elastic,
   element_properties(const type_real &lambdaplus2mu, const type_real &mu,
                      const type_real &rho)
       : lambdaplus2mu(lambdaplus2mu), mu(mu), rho(rho),
-        lambda(lambdaplus2mu - 2 * mu), rho_vp(sqrt(rho * lambdaplus2mu)),
-        rho_vs(sqrt(rho * mu)) {}
+        lambda(lambdaplus2mu - 2 * mu) {}
+
+  KOKKOS_INLINE_FUNCTION
+  void compute_sound_speeds(type_real &rho_vp, type_real &rho_vs) const {
+    rho_vp = sqrt(rho * lambdaplus2mu);
+    rho_vs = sqrt(rho * mu);
+  }
 };
 
 template <>
@@ -122,16 +124,19 @@ struct element_properties<specfem::enums::element::type::acoustic,
   type_real lambdaplus2mu_inverse;
   type_real rho_inverse;
 
-  type_real rho_vpinverse;
-
   KOKKOS_FUNCTION
   element_properties() = default;
 
   KOKKOS_FUNCTION
   element_properties(const type_real &lambdaplus2mu_inverse,
                      const type_real &rho_inverse)
-      : lambdaplus2mu_inverse(lambdaplus2mu_inverse), rho_inverse(rho_inverse),
-        rho_vpinverse(sqrt(rho_inverse * lambdaplus2mu_inverse)) {}
+      : lambdaplus2mu_inverse(lambdaplus2mu_inverse), rho_inverse(rho_inverse) {
+  }
+
+  KOKKOS_INLINE_FUNCTION
+  void compute_sound_speeds(type_real &rho_vpinverse) const {
+    rho_vpinverse = sqrt(rho_inverse * lambdaplus2mu_inverse);
+  }
 };
 
 } // namespace compute

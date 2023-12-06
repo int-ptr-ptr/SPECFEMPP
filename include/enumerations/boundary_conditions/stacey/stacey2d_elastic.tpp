@@ -22,6 +22,10 @@ KOKKOS_FUNCTION void enforce_traction_boundary(
 
   auto jacobian1d = dn.l2_norm();
 
+  type_real rho_vp, rho_vs;
+
+  properties.compute_sound_speeds(rho_vp, rho_vs);
+
   auto vn = specfem::kokkos::array_type<type_real, 2>::dot(dn, field_dot);
 
   specfem::kokkos::array_type<type_real, 2> traction;
@@ -30,9 +34,9 @@ KOKKOS_FUNCTION void enforce_traction_boundary(
 #pragma unroll
 #endif
   for (int icomp = 0; icomp < 2; ++icomp)
-    traction[icomp] = ((vn * dn[icomp] / (jacobian1d * jacobian1d)) *
-                       (properties.rho_vp - properties.rho_vs)) +
-                      field_dot[icomp] * properties.rho_vs;
+    traction[icomp] =
+        ((vn * dn[icomp] / (jacobian1d * jacobian1d)) * (rho_vp - rho_vs)) +
+        field_dot[icomp] * rho_vs;
 
   field_dot_dot[0] += -1.0 * traction[0] * jacobian1d * weight;
   field_dot_dot[1] += -1.0 * traction[1] * jacobian1d * weight;

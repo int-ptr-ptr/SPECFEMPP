@@ -167,9 +167,9 @@ public:
    * \partial_z \gamma \f$
    */
   KOKKOS_INLINE_FUNCTION void compute_stress(
-      const int &ispec, const int &ielement, const int &xz,
-      const specfem::kokkos::array_type<type_real, 2> &dudxl,
-      const specfem::kokkos::array_type<type_real, 2> &dudzl,
+      const int &ispec, const int &ielement, const int &iz, const int &ix,
+      const specfem::kokkos::array_type<type_real, 2> &dudxi,
+      const specfem::kokkos::array_type<type_real, 2> &dudgamma,
       specfem::kokkos::array_type<type_real, 2> &stress_integrand_xi,
       specfem::kokkos::array_type<type_real, 2> &stress_integrand_gamma) const;
 

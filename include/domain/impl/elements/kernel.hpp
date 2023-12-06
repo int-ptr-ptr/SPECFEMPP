@@ -74,10 +74,10 @@ private:
 
   Kokkos::DefaultExecutionSpace execution_space[medium_type::components];
 
-  specfem::kokkos::DeviceView1d<type_real> __du_dx;
-  specfem::kokkos::DeviceView1d<type_real> __du_dz;
-  specfem::kokkos::DeviceView1d<type_real> __stress_integrand_xi;
-  specfem::kokkos::DeviceView1d<type_real> __stress_integrand_gamma;
+  specfem::kokkos::DeviceView4d<type_real> __du_dxi;
+  specfem::kokkos::DeviceView4d<type_real> __du_dgamma;
+  specfem::kokkos::DeviceView4d<type_real> __stress_integrand_xi;
+  specfem::kokkos::DeviceView4d<type_real> __stress_integrand_gamma;
 };
 
 } // namespace kernels

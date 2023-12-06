@@ -22,9 +22,13 @@ KOKKOS_INLINE_FUNCTION void enforce_traction_boundary(
 
   auto jacobian1d = dn.l2_norm();
 
+  type_real rho_vp_inverse;
+
+  properties.compute_sound_speeds(rho_vp_inverse);
+
   field_dot_dot[0] +=
       // jacobian1d * weight * rho_vp_inverse * velocity
-      -1.0 * dn.l2_norm() * weight * properties.rho_vpinverse * field_dot[0];
+      -1.0 * dn.l2_norm() * weight * rho_vp_inverse * field_dot[0];
   return;
 }
 
