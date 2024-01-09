@@ -1,14 +1,17 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Git development workflow &mdash; SPECFEM KOKKOS IMPLEMENTATION  documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/scrollable_code_blocks.css" type="text/css" />
+  <title>Git development workflow &mdash; SPECFEM++  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/scrollable_code_blocks.css?v=ebc906c5" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/center_align_table.css?v=f0548739" />
+
+  
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -34,7 +37,7 @@
           
           
           <a href="../index.html" class="icon icon-home">
-            SPECFEM KOKKOS IMPLEMENTATION
+            SPECFEM++
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -44,18 +47,41 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul class="current">
+              <p class="caption" role="heading"><span class="caption-text">USER DOCUMENTATION</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../user_documentation/index.html">User documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../parameter_documentation/index.html">Parameter documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../meshfem2d/index.html">MESHFEM Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parameter_documentation/index.html">SPECFEM++ Parameter Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../source_description/index.html">Source Description</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COOKBOOKS</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../cookbooks/index.html">Cookbooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">CONTRIBUTION GUIDELINES</span></p>
+<ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer documentation</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Git development workflow</a></li>
 <li class="toctree-l2"><a class="reference internal" href="build_requirements.html">Build system requirements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="style.html">Style</a></li>
 <li class="toctree-l2"><a class="reference internal" href="style.html#pre-commit">Pre-commit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html">Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SPECFEM_architecture/architecture.html">SPECFEM++ Architecture</a></li>
 </ul>
 </li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COMMUNITY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=bug_report.md&amp;title=">Report bugs</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=feature_request.md&amp;title=">Request a new feature</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/orgs/SPECFEM/discussions">Join the discussion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">BENCHMARKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../benchmarks/benchmarks.html">Performance Benchmarks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API DOCUMENTATION</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../api/index.html">API documentation</a></li>
 </ul>
 
@@ -65,7 +91,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">SPECFEM KOKKOS IMPLEMENTATION</a>
+          <a href="../index.html">SPECFEM++</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -86,10 +112,10 @@
              
   <section id="git-development-workflow">
 <h1>Git development workflow<a class="headerlink" href="#git-development-workflow" title="Link to this heading"></a></h1>
-<p>At SPECFEM we follow master-develop workflow. The master (main) branch is always a stable working code and is generally synced with the latest release of SPECFEM. The develop branch is a stable code with potentially new features which haven’t been released in the latest version of SPECFEM yet. If you are contributing to SPECFEM then issue your <a class="reference external" href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests">pull request</a> against the develop branch.</p>
-<p>To make a change to SPECFEM2D (This development workflow is similar to the one suggested by <a class="reference external" href="https://docs.github.com/en/get-started/quickstart/contributing-to-projects#making-a-pull-request">github</a>)</p>
+<p>At SPECFEM++ we follow master-develop workflow. The master (main) branch is always a stable working code and is generally synced with the latest release of SPECFEM++. The develop branch is a stable code with potentially new features which haven’t been released in the latest version of SPECFEM++ yet. If you are contributing to SPECFEM++ then issue your <a class="reference external" href="https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/proposing-changes-to-your-work-with-pull-requests/about-pull-requests">pull request</a> against the develop branch.</p>
+<p>To make a change to SPECFEM++ (This development workflow is similar to the one suggested by <a class="reference external" href="https://docs.github.com/en/get-started/quickstart/contributing-to-projects#making-a-pull-request">github</a>)</p>
 <ul class="simple">
-<li><p>Create a <a class="reference external" href="https://docs.github.com/en/get-started/quickstart/contributing-to-projects#fork">fork</a> of the SPECFEM2D repository. This will be your version of the package where you’d make changes which will stay local to your version until you make a pull request against original repository.</p></li>
+<li><p>Create a <a class="reference external" href="https://docs.github.com/en/get-started/quickstart/contributing-to-projects#fork">fork</a> of the SPECFEM++ repository. This will be your version of the package where you’d make changes which will stay local to your version until you make a pull request against original repository.</p></li>
 <li><p>Clone your fork locally and checkout to develop</p></li>
 </ul>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>git<span class="w"> </span>clone<span class="w"> </span>&lt;git<span class="w"> </span>link<span class="w"> </span>to<span class="w"> </span>your<span class="w"> </span>fork&gt;
@@ -117,7 +143,7 @@ git<span class="w"> </span>checkout<span class="w"> </span>develop
 </pre></div>
 </div>
 <ul class="simple">
-<li><p>Finally, head over to the main <a class="reference external" href="https://github.com/PrincetonUniversity/specfem2d_kokkos">SPECFEM2D repo</a> and issue a pull request against the develop branch. Once you’ve issued a pull request one of the maintainers will have a look at the changes, before approving a merge.</p></li>
+<li><p>Finally, head over to the main <a class="reference external" href="https://github.com/PrincetonUniversity/specfempp">SPECFEM++ repo</a> and issue a pull request against the develop branch. Once you’ve issued a pull request one of the maintainers will have a look at the changes, before approving a merge.</p></li>
 </ul>
 </section>
 
@@ -132,7 +158,7 @@ git<span class="w"> </span>checkout<span class="w"> </span>develop
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020, Rohit Kakodkar.</p>
+    <p>&#169; Copyright 2023, Rohit Kakodkar.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

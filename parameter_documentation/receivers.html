@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>receivers &mdash; SPECFEM++  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/scrollable_code_blocks.css?v=ebc906c5" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/center_align_table.css?v=f0548739" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Seismograms" href="seismogram_setup.html" />
+    <link rel="prev" title="Simulation Setup" href="simulation_setup.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SPECFEM++
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">USER DOCUMENTATION</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user_documentation/index.html">User documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../meshfem2d/index.html">MESHFEM Parameter Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">SPECFEM++ Parameter Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="header.html">Header</a></li>
+<li class="toctree-l2"><a class="reference internal" href="simulation_setup.html">Simulation Setup</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">receivers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#parameter-name-receivers"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">receivers</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#parameter-name-receivers-stations-file"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">receivers.stations-file</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parameter-name-receivers-angle"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">receivers.angle</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parameter-name-receivers-seismogram-type"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">receivers.seismogram-type</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#parameter-name-receivers-nstep-between-samples"><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">receivers.nstep_between_samples</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="seismogram_setup.html">Seismograms</a></li>
+<li class="toctree-l2"><a class="reference internal" href="run_setup.html">Runtime Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="databases.html">Databases</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../source_description/index.html">Source Description</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COOKBOOKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cookbooks/index.html">Cookbooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">CONTRIBUTION GUIDELINES</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../developer_documentation/index.html">Developer documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COMMUNITY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=bug_report.md&amp;title=">Report bugs</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=feature_request.md&amp;title=">Request a new feature</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/orgs/SPECFEM/discussions">Join the discussion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">BENCHMARKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../benchmarks/benchmarks.html">Performance Benchmarks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API DOCUMENTATION</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SPECFEM++</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">SPECFEM++ Parameter Documentation</a></li>
+      <li class="breadcrumb-item active">receivers</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/parameter_documentation/receivers.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="receivers">
+<h1>receivers<a class="headerlink" href="#receivers" title="Link to this heading"></a></h1>
+<p>Receivers section defines receiver information required to calculate seismograms.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Please note that the <a class="reference internal" href="../user_documentation/seismogram.html#stations-file"><span class="std std-ref">STATIONS file</span></a> is generated using SPECFEM2D mesh generator i.e. xmeshfem2d</p>
+</div>
+<section id="parameter-name-receivers">
+<h2><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">receivers</span></code><a class="headerlink" href="#parameter-name-receivers" title="Link to this heading"></a></h2>
+<p><strong>default value</strong> : None</p>
+<p><strong>possible values</strong> : [YAML Node]</p>
+<p><strong>documentation</strong> : receiver information required to calculate seismograms.</p>
+<section id="parameter-name-receivers-stations-file">
+<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">receivers.stations-file</span></code><a class="headerlink" href="#parameter-name-receivers-stations-file" title="Link to this heading"></a></h3>
+<p><strong>default value</strong> : None</p>
+<p><strong>possible values</strong> : [string]</p>
+<p><strong>documentation</strong> : Path to <a class="reference internal" href="../user_documentation/seismogram.html#stations-file"><span class="std std-ref">STATIONS file</span></a></p>
+</section>
+<section id="parameter-name-receivers-angle">
+<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">receivers.angle</span></code><a class="headerlink" href="#parameter-name-receivers-angle" title="Link to this heading"></a></h3>
+<p><strong>default value</strong> : None</p>
+<p><strong>possible values</strong> : [float]</p>
+<p><strong>documentation</strong> : Angle to rotate components at receivers</p>
+</section>
+<section id="parameter-name-receivers-seismogram-type">
+<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">receivers.seismogram-type</span></code><a class="headerlink" href="#parameter-name-receivers-seismogram-type" title="Link to this heading"></a></h3>
+<p><strong>default value</strong> : None</p>
+<p><strong>possible values</strong> : [List of string]</p>
+<p><strong>documentation</strong> : Type of seismograms to be written. The types can be any of displacement, velocity and acceleration. For example, the snippet below will instantiate a writer for to output displacement and velocity seismogram at every station.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">seismogram-type</span><span class="p">:</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">velocity</span>
+<span class="w">    </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">displacement</span>
+</pre></div>
+</div>
+</section>
+<section id="parameter-name-receivers-nstep-between-samples">
+<h3><strong>Parameter Name</strong> : <code class="docutils literal notranslate"><span class="pre">receivers.nstep_between_samples</span></code><a class="headerlink" href="#parameter-name-receivers-nstep-between-samples" title="Link to this heading"></a></h3>
+<p><strong>default value</strong> : None</p>
+<p><strong>possible values</strong> : [int]</p>
+<p><strong>documentation</strong> : Number of time steps between sampling the wavefield at station locations for writing seismogram.</p>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="simulation_setup.html" class="btn btn-neutral float-left" title="Simulation Setup" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="seismogram_setup.html" class="btn btn-neutral float-right" title="Seismograms" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Rohit Kakodkar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

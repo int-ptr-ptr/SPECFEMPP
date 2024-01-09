@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Materials Class API &mdash; SPECFEM++  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/scrollable_code_blocks.css?v=ebc906c5" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/center_align_table.css?v=f0548739" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Acoustic Material" href="acoustic_material.html" />
+    <link rel="prev" title="GLL quadrature" href="../quadrature/gll.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            SPECFEM++
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">USER DOCUMENTATION</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user_documentation/index.html">User documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meshfem2d/index.html">MESHFEM Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parameter_documentation/index.html">SPECFEM++ Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source_description/index.html">Source Description</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COOKBOOKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cookbooks/index.html">Cookbooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">CONTRIBUTION GUIDELINES</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_documentation/index.html">Developer documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COMMUNITY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=bug_report.md&amp;title=">Report bugs</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=feature_request.md&amp;title=">Request a new feature</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/orgs/SPECFEM/discussions">Join the discussion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">BENCHMARKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../benchmarks/benchmarks.html">Performance Benchmarks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API DOCUMENTATION</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../kokkos_abstractions.html">Views and Execution Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quadrature/index.html">Quadrature API</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Materials Class API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv4N7specfem8material8materialE"><code class="docutils literal notranslate"><span class="pre">material</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N7specfem8material8material8materialEv"><code class="docutils literal notranslate"><span class="pre">material::material()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK7specfem8material8material14get_propertiesEv"><code class="docutils literal notranslate"><span class="pre">material::get_properties()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK7specfem8material8material14get_ispec_typeEv"><code class="docutils literal notranslate"><span class="pre">material::get_ispec_type()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK7specfem8material8material5printEv"><code class="docutils literal notranslate"><span class="pre">material::print()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#types-of-materials-implemented">Types of Materials Implemented</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="acoustic_material.html">Acoustic Material</a></li>
+<li class="toctree-l4"><a class="reference internal" href="elastic_material.html">Elastic Material</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../IO/index.html">Input/Output modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sources/index.html">Sources API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../receivers/index.html">Receiver API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compute/index.html">Compute Data Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../enumerations/index.html">Enumerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../domain/index.html">Domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../boundary_conditions/index.html">Boundary conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../coupling_physics/index.html">Coupled Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../timescheme/index.html">Time Scheme API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../solver/index.html">Solver API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup_parameters/index.html">Setup Parameters</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">SPECFEM++</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">API documentation</a></li>
+      <li class="breadcrumb-item active">Materials Class API</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/material/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="materials-class-api">
+<h1>Materials Class API<a class="headerlink" href="#materials-class-api" title="Link to this heading"></a></h1>
+<p>Materials Class is used to store material information for every material in the mesh.</p>
+<div class="toctree-wrapper compound">
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem8material8materialE">
+<span id="_CPPv3N7specfem8material8materialE"></span><span id="_CPPv2N7specfem8material8materialE"></span><span id="specfem::material::material"></span><span class="target" id="classspecfem_1_1material_1_1material"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">material</span></span></span><a class="headerlink" href="#_CPPv4N7specfem8material8materialE" title="Link to this definition"></a><br /></dt>
+<dd><p>Base material class. </p>
+<p>Subclassed by <a class="reference internal" href="acoustic_material.html#classspecfem_1_1material_1_1acoustic__material"><span class="std std-ref">specfem::material::acoustic_material</span></a>, <a class="reference internal" href="elastic_material.html#classspecfem_1_1material_1_1elastic__material"><span class="std std-ref">specfem::material::elastic_material</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem8material8material8materialEv">
+<span id="_CPPv3N7specfem8material8material8materialEv"></span><span id="_CPPv2N7specfem8material8material8materialEv"></span><span id="specfem::material::material::material"></span><span class="target" id="classspecfem_1_1material_1_1material_1a42fac0e348cc84b2b5d07a829946364a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">material</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem8material8material8materialEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct a new material object. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem8material8material14get_propertiesEv">
+<span id="_CPPv3NK7specfem8material8material14get_propertiesEv"></span><span id="_CPPv2NK7specfem8material8material14get_propertiesEv"></span><span id="specfem::material::material::get_propertiesC"></span><span class="target" id="classspecfem_1_1material_1_1material_1a470a019e75058452b68d4417c1a7f371"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">utilities</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">return_holder</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_properties</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem8material8material14get_propertiesEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the properties of the material. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>utilities::return_holder Struct containing the properties of the material </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem8material8material14get_ispec_typeEv">
+<span id="_CPPv3NK7specfem8material8material14get_ispec_typeEv"></span><span id="_CPPv2NK7specfem8material8material14get_ispec_typeEv"></span><span id="specfem::material::material::get_ispec_typeC"></span><span class="target" id="classspecfem_1_1material_1_1material_1a7d6d17297c9f0181b25f9e0a74645f9c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enums</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">element</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../enumerations/element/element_enumeration.html#_CPPv4N7specfem5enums7element4typeE" title="specfem::enums::element::type"><span class="n"><span class="pre">type</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_ispec_type</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem8material8material14get_ispec_typeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the type of the material. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>specfem::enums::element::type The type of the material </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem8material8material5printEv">
+<span id="_CPPv3NK7specfem8material8material5printEv"></span><span id="_CPPv2NK7specfem8material8material5printEv"></span><span id="specfem::material::material::printC"></span><span class="target" id="classspecfem_1_1material_1_1material_1a65890cecdca64c294f8c02cdda837447"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">print</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem8material8material5printEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Print material information to the console. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>std::string String containing the material information </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<section id="types-of-materials-implemented">
+<h2>Types of Materials Implemented<a class="headerlink" href="#types-of-materials-implemented" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="acoustic_material.html">Acoustic Material</a></li>
+<li class="toctree-l1"><a class="reference internal" href="elastic_material.html">Elastic Material</a></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../quadrature/gll.html" class="btn btn-neutral float-left" title="GLL quadrature" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="acoustic_material.html" class="btn btn-neutral float-right" title="Acoustic Material" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Rohit Kakodkar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

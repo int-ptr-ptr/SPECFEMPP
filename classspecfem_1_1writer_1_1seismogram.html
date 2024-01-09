@@ -83,7 +83,7 @@ $(function() {
 <p>Seismogram writer class to write seismogram to a file.  
  <a href="classspecfem_1_1writer_1_1seismogram.html#details">More...</a></p>
 
-<p><code>#include &lt;writer.h&gt;</code></p>
+<p><code>#include &lt;seismogram.hpp&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for specfem::writer::seismogram:</div>
 <div class="dyncontent">
@@ -96,9 +96,9 @@ Inheritance diagram for specfem::writer::seismogram:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a6f90000e10d7b1a6eed444f828e2e7a5" id="r_a6f90000e10d7b1a6eed444f828e2e7a5"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1writer_1_1seismogram.html#a6f90000e10d7b1a6eed444f828e2e7a5">seismogram</a> (std ::vector&lt; <a class="el" href="classspecfem_1_1receivers_1_1receiver.html">specfem::receivers::receiver</a> * &gt; &amp;receivers, <a class="el" href="structspecfem_1_1compute_1_1receivers.html">specfem::compute::receivers</a> *compute_receivers, const specfem::seismogram::format::type type, const std::string output_folder, const type_real dt, const type_real t0, const int nstep_between_samples)</td></tr>
-<tr class="memdesc:a6f90000e10d7b1a6eed444f828e2e7a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new seismogram writer object.  <br /></td></tr>
-<tr class="separator:a6f90000e10d7b1a6eed444f828e2e7a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace883f62b656b8663071fc0ee2b3f0cd" id="r_ace883f62b656b8663071fc0ee2b3f0cd"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1writer_1_1seismogram.html#ace883f62b656b8663071fc0ee2b3f0cd">seismogram</a> (std ::vector&lt; std::shared_ptr&lt; <a class="el" href="classspecfem_1_1receivers_1_1receiver.html">specfem::receivers::receiver</a> &gt; &gt; &amp;receivers, <a class="el" href="structspecfem_1_1compute_1_1receivers.html">specfem::compute::receivers</a> &amp;compute_receivers, const specfem::enums::seismogram::format type, const std::string output_folder, const type_real dt, const type_real t0, const int nstep_between_samples)</td></tr>
+<tr class="memdesc:ace883f62b656b8663071fc0ee2b3f0cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new seismogram writer object.  <br /></td></tr>
+<tr class="separator:ace883f62b656b8663071fc0ee2b3f0cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adb4bc489a2f3b6eacdeb6f3a36d7b36a" id="r_adb4bc489a2f3b6eacdeb6f3a36d7b36a"><td class="memItemLeft" align="right" valign="top"><a id="adb4bc489a2f3b6eacdeb6f3a36d7b36a" name="adb4bc489a2f3b6eacdeb6f3a36d7b36a"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>write</b> () override</td></tr>
 <tr class="memdesc:adb4bc489a2f3b6eacdeb6f3a36d7b36a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Write seismograms. <br /></td></tr>
@@ -107,8 +107,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>write</b> () override
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Seismogram writer class to write seismogram to a file. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a6f90000e10d7b1a6eed444f828e2e7a5" name="a6f90000e10d7b1a6eed444f828e2e7a5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a6f90000e10d7b1a6eed444f828e2e7a5">&#9670;&#160;</a></span>seismogram()</h2>
+<a id="ace883f62b656b8663071fc0ee2b3f0cd" name="ace883f62b656b8663071fc0ee2b3f0cd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ace883f62b656b8663071fc0ee2b3f0cd">&#9670;&#160;</a></span>seismogram()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -119,19 +119,19 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>write</b> () override
         <tr>
           <td class="memname">specfem::writer::seismogram::seismogram </td>
           <td>(</td>
-          <td class="paramtype">std ::vector&lt; <a class="el" href="classspecfem_1_1receivers_1_1receiver.html">specfem::receivers::receiver</a> * &gt; &amp;&#160;</td>
+          <td class="paramtype">std ::vector&lt; std::shared_ptr&lt; <a class="el" href="classspecfem_1_1receivers_1_1receiver.html">specfem::receivers::receiver</a> &gt; &gt; &amp;&#160;</td>
           <td class="paramname"><em>receivers</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structspecfem_1_1compute_1_1receivers.html">specfem::compute::receivers</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="structspecfem_1_1compute_1_1receivers.html">specfem::compute::receivers</a> &amp;&#160;</td>
           <td class="paramname"><em>compute_receivers</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const specfem::seismogram::format::type&#160;</td>
+          <td class="paramtype">const specfem::enums::seismogram::format&#160;</td>
           <td class="paramname"><em>type</em>, </td>
         </tr>
         <tr>
@@ -188,7 +188,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><b>write</b> () override
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>/Users/runner/work/specfem2d_kokkos/specfem2d_kokkos/include/<b>writer.h</b></li>
+<li>/Users/runner/work/SPECFEMPP/SPECFEMPP/include/writer/<b>seismogram.hpp</b></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

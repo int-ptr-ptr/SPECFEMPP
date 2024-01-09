@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Domain API &mdash; SPECFEM++  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/scrollable_code_blocks.css?v=ebc906c5" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/center_align_table.css?v=f0548739" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Kernels" href="kernels/index.html" />
+    <link rel="prev" title="Domain" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            SPECFEM++
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">USER DOCUMENTATION</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user_documentation/index.html">User documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meshfem2d/index.html">MESHFEM Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parameter_documentation/index.html">SPECFEM++ Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source_description/index.html">Source Description</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COOKBOOKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cookbooks/index.html">Cookbooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">CONTRIBUTION GUIDELINES</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_documentation/index.html">Developer documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COMMUNITY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=bug_report.md&amp;title=">Report bugs</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=feature_request.md&amp;title=">Request a new feature</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/orgs/SPECFEM/discussions">Join the discussion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">BENCHMARKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../benchmarks/benchmarks.html">Performance Benchmarks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API DOCUMENTATION</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../kokkos_abstractions.html">Views and Execution Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quadrature/index.html">Quadrature API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../material/index.html">Materials Class API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../IO/index.html">Input/Output modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sources/index.html">Sources API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../receivers/index.html">Receiver API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compute/index.html">Compute Data Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../enumerations/index.html">Enumerations</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Domain</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Domain API</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#definition">Definition</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#class-members">Class members</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="kernels/index.html">Kernels</a></li>
+<li class="toctree-l3"><a class="reference internal" href="element/elements.html">Element API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="receivers/receivers.html">Elemental Receivers API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="sources/sources.html">Elemental Sources API</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../boundary_conditions/index.html">Boundary conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../coupling_physics/index.html">Coupled Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../timescheme/index.html">Time Scheme API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../solver/index.html">Solver API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup_parameters/index.html">Setup Parameters</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">SPECFEM++</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">API documentation</a></li>
+          <li class="breadcrumb-item"><a href="index.html">Domain</a></li>
+      <li class="breadcrumb-item active">Domain API</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/domain/domain.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="domain-api">
+<span id="domain"></span><h1>Domain API<a class="headerlink" href="#domain-api" title="Link to this heading"></a></h1>
+<section id="definition">
+<h2>Definition<a class="headerlink" href="#definition" title="Link to this heading"></a></h2>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I00EN7specfem6domain6domainE">
+<span id="_CPPv3I00EN7specfem6domain6domainE"></span><span id="_CPPv2I00EN7specfem6domain6domainE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">medium</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qp_type</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classspecfem_1_1domain_1_1domain"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">domain</span></span></span><a class="headerlink" href="#_CPPv4I00EN7specfem6domain6domainE" title="Link to this definition"></a><br /></dt>
+<dd><p>domain class </p>
+<p>Domain class serves as the driver used to compute the elemental kernels. It describes the parallelism and updates the wavefield at each time step.</p>
+<p>
+Domain implementation details:<ul class="simple">
+<li><p>field -&gt; stores a 2 dimensional field along different components. The components may vary based of medium type. For example Acoustic domain have only 1 component i.e. potential, Elastic domain have 2 components i.e. X,Z </p></li>
+</ul>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>medium</strong> – class defining the domain medium. Separate implementations exist for elastic, acoustic or poroelastic media </p></li>
+<li><p><strong>quadrature_points</strong> – class used to define the quadrature points either at compile time or run time</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<section id="interface">
+<h3>Interface<a class="headerlink" href="#interface" title="Link to this heading"></a></h3>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">class</span><span class="w"> </span><span class="nc">medium</span><span class="p">,</span><span class="w"> </span><span class="k">class</span><span class="w"> </span><span class="nc">quadrature_points_type</span><span class="o">&gt;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">specfem</span><span class="o">::</span><span class="n">domain</span><span class="o">::</span><span class="n">domain</span>
+</pre></div>
+</div>
+</section>
+<section id="parameters">
+<h3>Parameters<a class="headerlink" href="#parameters" title="Link to this heading"></a></h3>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">medium</span></code>:</p>
+<p>The medium of the element.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="../enumerations/element/elastic.html">elastic()</a>: An elastic element.</p></li>
+<li><p><a class="reference external" href="../enumerations/element/acoustic.html">acoustic()</a>: An acoustic element.</p></li>
+</ul>
+</li>
+<li><p><code class="docutils literal notranslate"><span class="pre">quadrature_points_type</span></code>:</p>
+<p>The quadrature points of the element.</p>
+<ul class="simple">
+<li><p><a class="reference external" href="../enumerations/element/static_quadrature_points.html">static_quadrature_points&lt; NGLL &gt;()</a>: A static quadrature point set.</p></li>
+</ul>
+</li>
+</ul>
+</section>
+</section>
+<section id="class-members">
+<h2>Class members<a class="headerlink" href="#class-members" title="Link to this heading"></a></h2>
+<dl class="cpp class">
+<dt class="sig sig-object cpp">
+<span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">medium</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qp_type</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classspecfem_1_1domain_1_1domain"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">domain</span></span></span><br /></dt>
+<dd><p>domain class </p>
+<p>Domain class serves as the driver used to compute the elemental kernels. It describes the parallelism and updates the wavefield at each time step.</p>
+<p>
+Domain implementation details:<ul class="simple">
+<li><p>field -&gt; stores a 2 dimensional field along different components. The components may vary based of medium type. For example Acoustic domain have only 1 component i.e. potential, Elastic domain have 2 components i.e. X,Z </p></li>
+</ul>
+</p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>medium</strong> – class defining the domain medium. Separate implementations exist for elastic, acoustic or poroelastic media </p></li>
+<li><p><strong>quadrature_points</strong> – class used to define the quadrature points either at compile time or run time</p></li>
+</ul>
+</dd>
+</dl>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-types">Public Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6domain6domain9dimensionE">
+<span id="_CPPv3N7specfem6domain6domain9dimensionE"></span><span id="_CPPv2N7specfem6domain6domain9dimensionE"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1afbebc8bb3b72c3e3d7df72862184bb6c"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dimension</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enums</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">element</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">dimension</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../enumerations/element/dim2.html#_CPPv4N7specfem5enums7element9dimension4dim2E" title="specfem::enums::element::dimension::dim2"><span class="n"><span class="pre">dim2</span></span></a><a class="headerlink" href="#_CPPv4N7specfem6domain6domain9dimensionE" title="Link to this definition"></a><br /></dt>
+<dd><p>Dimension of the domain </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6domain6domain11medium_typeE">
+<span id="_CPPv3N7specfem6domain6domain11medium_typeE"></span><span id="_CPPv2N7specfem6domain6domain11medium_typeE"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1ab4dd4d67a0dd17a1014f2d1d2361484f"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">medium_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00EN7specfem6domain6domainE" title="specfem::domain::domain::medium"><span class="n"><span class="pre">medium</span></span></a><a class="headerlink" href="#_CPPv4N7specfem6domain6domain11medium_typeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Type of medium i.e. acoustic, elastic or poroelastic </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6domain6domain22quadrature_points_typeE">
+<span id="_CPPv3N7specfem6domain6domain22quadrature_points_typeE"></span><span id="_CPPv2N7specfem6domain6domain22quadrature_points_typeE"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1af8514458788cc957f9505871a10b80dc"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">quadrature_points_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00EN7specfem6domain6domainE" title="specfem::domain::domain::qp_type"><span class="n"><span class="pre">qp_type</span></span></a><a class="headerlink" href="#_CPPv4N7specfem6domain6domain22quadrature_points_typeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Type of quadrature points i.e. static or dynamic </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4I0_iEN7specfem6domain6domain15ScratchViewTypeE">
+<span id="_CPPv3I0_iEN7specfem6domain6domain15ScratchViewTypeE"></span><span id="_CPPv2I0_iEN7specfem6domain6domain15ScratchViewTypeE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">T</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">N</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classspecfem_1_1domain_1_1domain_1ad6ff4c346cc0e7b7c9c5d1e1c3bfe9dc"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ScratchViewType</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7specfem6domain6domain22quadrature_points_typeE" title="specfem::domain::domain::quadrature_points_type"><span class="n"><span class="pre">quadrature_points_type</span></span></a><span class="p"><span class="pre">::</span></span><span class="k"><span class="pre">template</span></span><span class="w"> </span><span class="n"><span class="pre">ScratchViewType</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0_iEN7specfem6domain6domain15ScratchViewTypeE" title="specfem::domain::domain::ScratchViewType::T"><span class="n"><span class="pre">T</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I0_iEN7specfem6domain6domain15ScratchViewTypeE" title="specfem::domain::domain::ScratchViewType::N"><span class="n"><span class="pre">N</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I0_iEN7specfem6domain6domain15ScratchViewTypeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Alias for scratch view type. </p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="w">   </span><span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">N</span><span class="o">&gt;</span>
+<span class="w">   </span><span class="k">using</span><span class="w"> </span><span class="n">ScratchViewType</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">View</span><span class="o">&lt;</span><span class="n">T</span><span class="w"> </span><span class="o">**</span><span class="p">[</span><span class="n">N</span><span class="p">],</span><span class="w"> </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">LayoutRight</span><span class="p">,</span>
+<span class="n">specfem</span><span class="o">::</span><span class="n">kokkos</span><span class="o">::</span><span class="n">DeviceScratchMemorySpace</span><span class="p">,</span>
+<span class="n">Kokkos</span><span class="o">::</span><span class="n">MemoryTraits</span><span class="o">&lt;</span><span class="n">Kokkos</span><span class="o">::</span><span class="n">Unmanaged</span><span class="o">&gt;&gt;</span><span class="p">;</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>T</strong> – type of scratch view </p></li>
+<li><p><strong>N</strong> – Extent of scratch view in 3rd dimension </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6domain6domain6domainEKiRK7qp_typePN7specfem7compute7computeEN7specfem7compute10propertiesEN7specfem7compute19partial_derivativesEN7specfem7compute10boundariesEN7specfem7compute7sourcesEN7specfem7compute9receiversEPN7specfem10quadrature10quadratureEPN7specfem10quadrature10quadratureE">
+<span id="_CPPv3N7specfem6domain6domain6domainEKiRK7qp_typePN7specfem7compute7computeEN7specfem7compute10propertiesEN7specfem7compute19partial_derivativesEN7specfem7compute10boundariesEN7specfem7compute7sourcesEN7specfem7compute9receiversEPN7specfem10quadrature10quadratureEPN7specfem10quadrature10quadratureE"></span><span id="_CPPv2N7specfem6domain6domain6domainEKiRK7qp_typePN7specfem7compute7computeEN7specfem7compute10propertiesEN7specfem7compute19partial_derivativesEN7specfem7compute10boundariesEN7specfem7compute7sourcesEN7specfem7compute9receiversEPN7specfem10quadrature10quadratureEPN7specfem10quadrature10quadratureE"></span><span id="specfem::domain::domain::domain__iC.qp_typeCR.specfem::compute::computeP.specfem::compute::properties.specfem::compute::partial_derivatives.specfem::compute::boundaries.specfem::compute::sources.specfem::compute::receivers.specfem::quadrature::quadratureP.specfem::quadrature::quadratureP"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1ae98b02dc84ffffc92b6580384861d528"></span><span class="sig-name descname"><span class="n"><span class="pre">domain</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nglob</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00EN7specfem6domain6domainE" title="specfem::domain::domain::qp_type"><span class="n"><span class="pre">qp_type</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">quadrature_points</span></span>, <a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv4N7specfem7computeE" title="specfem::compute"><span class="n"><span class="pre">compute</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../compute/compute.html#_CPPv4N7specfem7compute7computeE" title="specfem::compute::compute"><span class="n"><span class="pre">compute</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">compute</span></span>, <a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv4N7specfem7computeE" title="specfem::compute"><span class="n"><span class="pre">compute</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../compute/compute_properties.html#_CPPv4N7specfem7compute10propertiesE" title="specfem::compute::properties"><span class="n"><span class="pre">properties</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">material_properties</span></span>, <a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv4N7specfem7computeE" title="specfem::compute"><span class="n"><span class="pre">compute</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../compute/compute_partial_derivatives.html#_CPPv4N7specfem7compute19partial_derivativesE" title="specfem::compute::partial_derivatives"><span class="n"><span class="pre">partial_derivatives</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">partial_derivatives</span></span>, <a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv4N7specfem7computeE" title="specfem::compute"><span class="n"><span class="pre">compute</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">boundaries</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">boundary_conditions</span></span>, <a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv4N7specfem7computeE" title="specfem::compute"><span class="n"><span class="pre">compute</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../compute/compute_sources.html#_CPPv4N7specfem7compute7sourcesE" title="specfem::compute::sources"><span class="n"><span class="pre">sources</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">compute_sources</span></span>, <a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv4N7specfem7computeE" title="specfem::compute"><span class="n"><span class="pre">compute</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../compute/compute_receivers.html#_CPPv4N7specfem7compute9receiversE" title="specfem::compute::receivers"><span class="n"><span class="pre">receivers</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">compute_receivers</span></span>, <a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv4N7specfem10quadratureE" title="specfem::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../quadrature/index.html#_CPPv4N7specfem10quadrature10quadratureE" title="specfem::quadrature::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">quadx</span></span>, <a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv4N7specfem10quadratureE" title="specfem::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../quadrature/index.html#_CPPv4N7specfem10quadrature10quadratureE" title="specfem::quadrature::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">quadz</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem6domain6domain6domainEKiRK7qp_typePN7specfem7compute7computeEN7specfem7compute10propertiesEN7specfem7compute19partial_derivativesEN7specfem7compute10boundariesEN7specfem7compute7sourcesEN7specfem7compute9receiversEPN7specfem10quadrature10quadratureEPN7specfem10quadrature10quadratureE" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct a new domain object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nglob</strong> – Total number of distinct quadrature points </p></li>
+<li><p><strong>quadrature_points</strong> – Type of quadrature points - either static (number of quadrature points defined at compile time) or dynamic (number of quadrature points defined at runtime) </p></li>
+<li><p><strong>compute</strong> – Pointer to compute struct used to store spectral element numbering mapping (ibool) </p></li>
+<li><p><strong>material_properties</strong> – properties struct used to store material properties at each quadrature point </p></li>
+<li><p><strong>partial_derivatives</strong> – partial derivatives struct used to store partial derivatives of basis functions at each quadrature point </p></li>
+<li><p><strong>compute_sources</strong> – sources struct used to store source information </p></li>
+<li><p><strong>compute_receivers</strong> – receivers struct used to store receiver information </p></li>
+<li><p><strong>quadx</strong> – Quadrature object in x-dimension </p></li>
+<li><p><strong>quadz</strong> – Quadrature object in z-dimension </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6domain6domainD0Ev">
+<span id="_CPPv3N7specfem6domain6domainD0Ev"></span><span id="_CPPv2N7specfem6domain6domainD0Ev"></span><span id="specfem::domain::domain::~domain"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1ae464df3ef838fe24ead97f7962b16c73"></span><span class="sig-name descname"><span class="n"><span class="pre">~domain</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N7specfem6domain6domainD0Ev" title="Link to this definition"></a><br /></dt>
+<dd><p>Default destructor. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I_N7specfem5enums11time_scheme4typeEEN7specfem6domain6domain22mass_time_contributionEvK9type_real">
+<span id="_CPPv3I_N7specfem5enums11time_scheme4typeEEN7specfem6domain6domain22mass_time_contributionEK9type_real"></span><span id="_CPPv2I_N7specfem5enums11time_scheme4typeEEN7specfem6domain6domain22mass_time_contributionEK9type_real"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enums</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">time_scheme</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">type</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">time_scheme</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classspecfem_1_1domain_1_1domain_1a842f5f1ef36ab074d5e8e30391551669"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">mass_time_contribution</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">dt</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I_N7specfem5enums11time_scheme4typeEEN7specfem6domain6domain22mass_time_contributionEvK9type_real" title="Link to this definition"></a><br /></dt>
+<dd><p>Initialize the domain. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6domain6domain29compute_stiffness_interactionEv">
+<span id="_CPPv3N7specfem6domain6domain29compute_stiffness_interactionEv"></span><span id="_CPPv2N7specfem6domain6domain29compute_stiffness_interactionEv"></span><span id="specfem::domain::domain::compute_stiffness_interaction"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1a58b948dd544a9016d8047da6ac3094bc"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">compute_stiffness_interaction</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem6domain6domain29compute_stiffness_interactionEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Compute interaction of stiffness matrix on acceleration. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6domain6domain18invert_mass_matrixEv">
+<span id="_CPPv3N7specfem6domain6domain18invert_mass_matrixEv"></span><span id="_CPPv2N7specfem6domain6domain18invert_mass_matrixEv"></span><span id="specfem::domain::domain::invert_mass_matrix"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1ac1f7e50605d78d7194b84c61c271a409"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">invert_mass_matrix</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem6domain6domain18invert_mass_matrixEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Invert the mass matrix. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6domain6domain18divide_mass_matrixEv">
+<span id="_CPPv3N7specfem6domain6domain18divide_mass_matrixEv"></span><span id="_CPPv2N7specfem6domain6domain18divide_mass_matrixEv"></span><span id="specfem::domain::domain::divide_mass_matrix"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1a06bbd76f0ca8435b2d8e25488cdee29c"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">divide_mass_matrix</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem6domain6domain18divide_mass_matrixEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Divide the acceleration by the mass matrix. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6domain6domain26compute_source_interactionEK9type_real">
+<span id="_CPPv3N7specfem6domain6domain26compute_source_interactionEK9type_real"></span><span id="_CPPv2N7specfem6domain6domain26compute_source_interactionEK9type_real"></span><span id="specfem::domain::domain::compute_source_interaction__type_realC"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1abe91cccfbf3e711d1c4fffdaf80e9308"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">compute_source_interaction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">timeval</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem6domain6domain26compute_source_interactionEK9type_real" title="Link to this definition"></a><br /></dt>
+<dd><p>Compute interaction of sources on acceleration. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>timeval</strong> – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6domain6domain10sync_fieldEN7specfem4sync4kindE">
+<span id="_CPPv3N7specfem6domain6domain10sync_fieldEN7specfem4sync4kindE"></span><span id="_CPPv2N7specfem6domain6domain10sync_fieldEN7specfem4sync4kindE"></span><span id="specfem::domain::domain::sync_field__specfem::sync::kind"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1a8c93abc9437b80b680be7d7fefe94cf7"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sync_field</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">sync</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">kind</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">kind</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem6domain6domain10sync_fieldEN7specfem4sync4kindE" title="Link to this definition"></a><br /></dt>
+<dd><p>Sync displacements views between host and device. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kind</strong> – defines sync direction i.e. DeviceToHost or HostToDevice </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6domain6domain14sync_field_dotEN7specfem4sync4kindE">
+<span id="_CPPv3N7specfem6domain6domain14sync_field_dotEN7specfem4sync4kindE"></span><span id="_CPPv2N7specfem6domain6domain14sync_field_dotEN7specfem4sync4kindE"></span><span id="specfem::domain::domain::sync_field_dot__specfem::sync::kind"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1a0f8bf5b691c2d5dbb0f10ab3512fc5cf"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sync_field_dot</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">sync</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">kind</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">kind</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem6domain6domain14sync_field_dotEN7specfem4sync4kindE" title="Link to this definition"></a><br /></dt>
+<dd><p>Sync velocity views between host and device. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kind</strong> – defines sync direction i.e. DeviceToHost or HostToDevice </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6domain6domain18sync_field_dot_dotEN7specfem4sync4kindE">
+<span id="_CPPv3N7specfem6domain6domain18sync_field_dot_dotEN7specfem4sync4kindE"></span><span id="_CPPv2N7specfem6domain6domain18sync_field_dot_dotEN7specfem4sync4kindE"></span><span id="specfem::domain::domain::sync_field_dot_dot__specfem::sync::kind"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1a85db44a67abbf309199c71086a81ba52"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sync_field_dot_dot</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">sync</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">kind</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">kind</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem6domain6domain18sync_field_dot_dotEN7specfem4sync4kindE" title="Link to this definition"></a><br /></dt>
+<dd><p>Sync acceleration views between host and device. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kind</strong> – defines sync direction i.e. DeviceToHost or HostToDevice </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6domain6domain18sync_rmass_inverseEN7specfem4sync4kindE">
+<span id="_CPPv3N7specfem6domain6domain18sync_rmass_inverseEN7specfem4sync4kindE"></span><span id="_CPPv2N7specfem6domain6domain18sync_rmass_inverseEN7specfem4sync4kindE"></span><span id="specfem::domain::domain::sync_rmass_inverse__specfem::sync::kind"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1a3d13b706692ebf3eab201aa6185e0186"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sync_rmass_inverse</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">sync</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">kind</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">kind</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem6domain6domain18sync_rmass_inverseEN7specfem4sync4kindE" title="Link to this definition"></a><br /></dt>
+<dd><p>Sync inverse of mass matrix views between host and device. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kind</strong> – defines sync direction i.e. DeviceToHost or HostToDevice </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6domain6domain18compute_seismogramEKi">
+<span id="_CPPv3N7specfem6domain6domain18compute_seismogramEKi"></span><span id="_CPPv2N7specfem6domain6domain18compute_seismogramEKi"></span><span id="specfem::domain::domain::compute_seismogram__iC"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1a9c842d0f753898337f9d9a27cfcfa012"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">compute_seismogram</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">isig_step</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem6domain6domain18compute_seismogramEKi" title="Link to this definition"></a><br /></dt>
+<dd><p>Compute seismograms at for all receivers at isig_step. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>seismogram_types</strong> – DeviceView of types of seismograms to be calculated </p></li>
+<li><p><strong>isig_step</strong> – timestep for seismogram calculation </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem6domain6domain9get_fieldEv">
+<span id="_CPPv3NK7specfem6domain6domain9get_fieldEv"></span><span id="_CPPv2NK7specfem6domain6domain9get_fieldEv"></span><span id="specfem::domain::domain::get_fieldC"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1af8d1a12ad802748ee625ea38b3f22026"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12DeviceView2dE" title="specfem::kokkos::DeviceView2d"><span class="n"><span class="pre">DeviceView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_field</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem6domain6domain9get_fieldEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get a view of field stored on the device. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>specfem::kokkos::DeviceView2d&lt;type_real&gt; </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem6domain6domain14get_host_fieldEv">
+<span id="_CPPv3NK7specfem6domain6domain14get_host_fieldEv"></span><span id="_CPPv2NK7specfem6domain6domain14get_host_fieldEv"></span><span id="specfem::domain::domain::get_host_fieldC"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1a533e50f29d381276377cdd9d4e8cc9aa"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12HostMirror2dE" title="specfem::kokkos::HostMirror2d"><span class="n"><span class="pre">HostMirror2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_host_field</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem6domain6domain14get_host_fieldEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get a view of field stored on the host. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>specfem::kokkos::DeviceView2d&lt;type_real&gt; </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem6domain6domain13get_field_dotEv">
+<span id="_CPPv3NK7specfem6domain6domain13get_field_dotEv"></span><span id="_CPPv2NK7specfem6domain6domain13get_field_dotEv"></span><span id="specfem::domain::domain::get_field_dotC"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1afa130326d421afc22b508dd88e466380"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12DeviceView2dE" title="specfem::kokkos::DeviceView2d"><span class="n"><span class="pre">DeviceView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_field_dot</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem6domain6domain13get_field_dotEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get a view of derivate of field stored on device. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>specfem::kokkos::DeviceView2d&lt;type_real&gt; </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem6domain6domain18get_host_field_dotEv">
+<span id="_CPPv3NK7specfem6domain6domain18get_host_field_dotEv"></span><span id="_CPPv2NK7specfem6domain6domain18get_host_field_dotEv"></span><span id="specfem::domain::domain::get_host_field_dotC"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1af3824328e4d4b9dcaaca171c1d6c8f09"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12HostMirror2dE" title="specfem::kokkos::HostMirror2d"><span class="n"><span class="pre">HostMirror2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_host_field_dot</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem6domain6domain18get_host_field_dotEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get a view of derivative of field stored on host. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>specfem::kokkos::DeviceView2d&lt;type_real&gt; </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem6domain6domain17get_field_dot_dotEv">
+<span id="_CPPv3NK7specfem6domain6domain17get_field_dot_dotEv"></span><span id="_CPPv2NK7specfem6domain6domain17get_field_dot_dotEv"></span><span id="specfem::domain::domain::get_field_dot_dotC"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1a6aa6e6cbb78ff31aaff55c85828d8e10"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12DeviceView2dE" title="specfem::kokkos::DeviceView2d"><span class="n"><span class="pre">DeviceView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_field_dot_dot</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem6domain6domain17get_field_dot_dotEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get a view of double derivative of field stored on device. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>specfem::kokkos::DeviceView2d&lt;type_real&gt; </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem6domain6domain22get_host_field_dot_dotEv">
+<span id="_CPPv3NK7specfem6domain6domain22get_host_field_dot_dotEv"></span><span id="_CPPv2NK7specfem6domain6domain22get_host_field_dot_dotEv"></span><span id="specfem::domain::domain::get_host_field_dot_dotC"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1ad2d3da1802393ea00e351a4ea82d83ac"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12HostMirror2dE" title="specfem::kokkos::HostMirror2d"><span class="n"><span class="pre">HostMirror2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_host_field_dot_dot</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem6domain6domain22get_host_field_dot_dotEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get a view of double derivative of field stored on host. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>specfem::kokkos::DeviceView2d&lt;type_real&gt; </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem6domain6domain17get_rmass_inverseEv">
+<span id="_CPPv3NK7specfem6domain6domain17get_rmass_inverseEv"></span><span id="_CPPv2NK7specfem6domain6domain17get_rmass_inverseEv"></span><span id="specfem::domain::domain::get_rmass_inverseC"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1adcb067c89b3bbbd75107efef4a64beb3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12DeviceView2dE" title="specfem::kokkos::DeviceView2d"><span class="n"><span class="pre">DeviceView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_rmass_inverse</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem6domain6domain17get_rmass_inverseEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get a view of inverse of mass matrix stored on device. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>specfem::kokkos::DeviceView2d&lt;type_real&gt; </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem6domain6domain22get_host_rmass_inverseEv">
+<span id="_CPPv3NK7specfem6domain6domain22get_host_rmass_inverseEv"></span><span id="_CPPv2NK7specfem6domain6domain22get_host_rmass_inverseEv"></span><span id="specfem::domain::domain::get_host_rmass_inverseC"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1ad188c6234d736a5e8f5b60dc3374d29e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12HostMirror2dE" title="specfem::kokkos::HostMirror2d"><span class="n"><span class="pre">HostMirror2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_host_rmass_inverse</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem6domain6domain22get_host_rmass_inverseEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get a view of inverse of mass matrix stored on host. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>specfem::kokkos::DeviceView2d&lt;type_real&gt; </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6domain6domain5fieldE">
+<span id="_CPPv3N7specfem6domain6domain5fieldE"></span><span id="_CPPv2N7specfem6domain6domain5fieldE"></span><span id="specfem::domain::domain::field__specfem::kokkos::DeviceView2d:type_real.Kokkos::LayoutLeft:"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1a266f0d9792fc23b5a06d77bd6f11b341"></span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12DeviceView2dE" title="specfem::kokkos::DeviceView2d"><span class="n"><span class="pre">DeviceView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">field</span></span></span><a class="headerlink" href="#_CPPv4N7specfem6domain6domain5fieldE" title="Link to this definition"></a><br /></dt>
+<dd><p>View of field on Device. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6domain6domain7h_fieldE">
+<span id="_CPPv3N7specfem6domain6domain7h_fieldE"></span><span id="_CPPv2N7specfem6domain6domain7h_fieldE"></span><span id="specfem::domain::domain::h_field__specfem::kokkos::HostMirror2d:type_real.Kokkos::LayoutLeft:"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1a821a510812bded7236243b1b59f02db4"></span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12HostMirror2dE" title="specfem::kokkos::HostMirror2d"><span class="n"><span class="pre">HostMirror2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">h_field</span></span></span><a class="headerlink" href="#_CPPv4N7specfem6domain6domain7h_fieldE" title="Link to this definition"></a><br /></dt>
+<dd><p>View of field on host. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6domain6domain9field_dotE">
+<span id="_CPPv3N7specfem6domain6domain9field_dotE"></span><span id="_CPPv2N7specfem6domain6domain9field_dotE"></span><span id="specfem::domain::domain::field_dot__specfem::kokkos::DeviceView2d:type_real.Kokkos::LayoutLeft:"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1a531e4a4f8e3feb4a5212d362ba15d633"></span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12DeviceView2dE" title="specfem::kokkos::DeviceView2d"><span class="n"><span class="pre">DeviceView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">field_dot</span></span></span><a class="headerlink" href="#_CPPv4N7specfem6domain6domain9field_dotE" title="Link to this definition"></a><br /></dt>
+<dd><p>View of derivative of field on Device </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6domain6domain11h_field_dotE">
+<span id="_CPPv3N7specfem6domain6domain11h_field_dotE"></span><span id="_CPPv2N7specfem6domain6domain11h_field_dotE"></span><span id="specfem::domain::domain::h_field_dot__specfem::kokkos::HostMirror2d:type_real.Kokkos::LayoutLeft:"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1ae0e205b43a10915105caf063bd8e1480"></span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12HostMirror2dE" title="specfem::kokkos::HostMirror2d"><span class="n"><span class="pre">HostMirror2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">h_field_dot</span></span></span><a class="headerlink" href="#_CPPv4N7specfem6domain6domain11h_field_dotE" title="Link to this definition"></a><br /></dt>
+<dd><p>View of derivative of field on host </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6domain6domain13field_dot_dotE">
+<span id="_CPPv3N7specfem6domain6domain13field_dot_dotE"></span><span id="_CPPv2N7specfem6domain6domain13field_dot_dotE"></span><span id="specfem::domain::domain::field_dot_dot__specfem::kokkos::DeviceView2d:type_real.Kokkos::LayoutLeft:"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1a4e555880d516c44b8711b8b986629dab"></span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12DeviceView2dE" title="specfem::kokkos::DeviceView2d"><span class="n"><span class="pre">DeviceView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">field_dot_dot</span></span></span><a class="headerlink" href="#_CPPv4N7specfem6domain6domain13field_dot_dotE" title="Link to this definition"></a><br /></dt>
+<dd><p>View of second derivative of field on Device </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6domain6domain15h_field_dot_dotE">
+<span id="_CPPv3N7specfem6domain6domain15h_field_dot_dotE"></span><span id="_CPPv2N7specfem6domain6domain15h_field_dot_dotE"></span><span id="specfem::domain::domain::h_field_dot_dot__specfem::kokkos::HostMirror2d:type_real.Kokkos::LayoutLeft:"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1ae9fd707ea353fba1980c97a2f0959724"></span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12HostMirror2dE" title="specfem::kokkos::HostMirror2d"><span class="n"><span class="pre">HostMirror2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">h_field_dot_dot</span></span></span><a class="headerlink" href="#_CPPv4N7specfem6domain6domain15h_field_dot_dotE" title="Link to this definition"></a><br /></dt>
+<dd><p>View of second derivative of field on host </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6domain6domain13rmass_inverseE">
+<span id="_CPPv3N7specfem6domain6domain13rmass_inverseE"></span><span id="_CPPv2N7specfem6domain6domain13rmass_inverseE"></span><span id="specfem::domain::domain::rmass_inverse__specfem::kokkos::DeviceView2d:type_real.Kokkos::LayoutLeft:"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1af5cba22ba08214222f815f3db948d39d"></span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12DeviceView2dE" title="specfem::kokkos::DeviceView2d"><span class="n"><span class="pre">DeviceView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">rmass_inverse</span></span></span><a class="headerlink" href="#_CPPv4N7specfem6domain6domain13rmass_inverseE" title="Link to this definition"></a><br /></dt>
+<dd><p>View of inverse of mass matrix on device </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6domain6domain15h_rmass_inverseE">
+<span id="_CPPv3N7specfem6domain6domain15h_rmass_inverseE"></span><span id="_CPPv2N7specfem6domain6domain15h_rmass_inverseE"></span><span id="specfem::domain::domain::h_rmass_inverse__specfem::kokkos::HostMirror2d:type_real.Kokkos::LayoutLeft:"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1ae9c3349a92ac101c0eb6a9eb289e7ffe"></span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12HostMirror2dE" title="specfem::kokkos::HostMirror2d"><span class="n"><span class="pre">HostMirror2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">h_rmass_inverse</span></span></span><a class="headerlink" href="#_CPPv4N7specfem6domain6domain15h_rmass_inverseE" title="Link to this definition"></a><br /></dt>
+<dd><p>View of inverse of mass matrix on host </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6domain6domain12nelem_domainE">
+<span id="_CPPv3N7specfem6domain6domain12nelem_domainE"></span><span id="_CPPv2N7specfem6domain6domain12nelem_domainE"></span><span id="specfem::domain::domain::nelem_domain__i"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1ac02aede7f4a19272a73b246f7350c2f4"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nelem_domain</span></span></span><a class="headerlink" href="#_CPPv4N7specfem6domain6domain12nelem_domainE" title="Link to this definition"></a><br /></dt>
+<dd><p>Total number of elements in this domain. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6domain6domain7kernelsE">
+<span id="_CPPv3N7specfem6domain6domain7kernelsE"></span><span id="_CPPv2N7specfem6domain6domain7kernelsE"></span><span id="specfem::domain::domain::kernels__specfem::domain::impl::kernels::kernels:medium_type.quadrature_points_type:"></span><span class="target" id="classspecfem_1_1domain_1_1domain_1ac0ba871dba00e27229d252f38dbb9a88"></span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv4N7specfem6domainE" title="specfem::domain"><span class="n"><span class="pre">domain</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv4N7specfem6domain4implE" title="specfem::domain::impl"><span class="n"><span class="pre">impl</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">kernels</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">kernels</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4N7specfem6domain6domain11medium_typeE" title="specfem::domain::domain::medium_type"><span class="n"><span class="pre">medium_type</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7specfem6domain6domain22quadrature_points_typeE" title="specfem::domain::domain::quadrature_points_type"><span class="n"><span class="pre">quadrature_points_type</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kernels</span></span></span><a class="headerlink" href="#_CPPv4N7specfem6domain6domain7kernelsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Kernels object used to compute elemental kernels. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Domain" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="kernels/index.html" class="btn btn-neutral float-right" title="Kernels" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Rohit Kakodkar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

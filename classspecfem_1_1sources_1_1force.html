@@ -83,7 +83,7 @@ $(function() {
 <p>Collocated force source.  
  <a href="classspecfem_1_1sources_1_1force.html#details">More...</a></p>
 
-<p><code>#include &lt;source.h&gt;</code></p>
+<p><code>#include &lt;force_source.hpp&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for specfem::sources::force:</div>
 <div class="dyncontent">
@@ -99,12 +99,12 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a6367fd549a26e998247b93b9ccdaed37" id="r_a6367fd549a26e998247b93b9ccdaed37"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1sources_1_1force.html#a6367fd549a26e998247b93b9ccdaed37">force</a> (YAML::Node &amp;Node, const type_real dt)</td></tr>
 <tr class="memdesc:a6367fd549a26e998247b93b9ccdaed37"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new collocated force object.  <br /></td></tr>
 <tr class="separator:a6367fd549a26e998247b93b9ccdaed37"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3bf774ba267bbc1c4b92a7c01136fa2b" id="r_a3bf774ba267bbc1c4b92a7c01136fa2b"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1sources_1_1force.html#a3bf774ba267bbc1c4b92a7c01136fa2b">locate</a> (const specfem::kokkos::HostView2d&lt; type_real &gt; coord, const specfem::kokkos::HostMirror3d&lt; int &gt; h_ibool, const specfem::kokkos::HostMirror1d&lt; type_real &gt; xigll, const specfem::kokkos::HostMirror1d&lt; type_real &gt; zigll, const int nproc, const specfem::kokkos::HostView2d&lt; type_real &gt; coorg, const specfem::kokkos::HostView2d&lt; int &gt; knods, const int npgeo, const specfem::kokkos::HostMirror1d&lt; <a class="el" href="namespacespecfem_1_1elements.html#a88c727adceb8da1c70cf615e864470b3">specfem::elements::type</a> &gt; ispec_type, const <a class="el" href="classspecfem_1_1_m_p_i_1_1_m_p_i.html">specfem::MPI::MPI</a> *mpi) override</td></tr>
-<tr class="memdesc:a3bf774ba267bbc1c4b92a7c01136fa2b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Locate source within the mesh.  <br /></td></tr>
-<tr class="separator:a3bf774ba267bbc1c4b92a7c01136fa2b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af2b6b83f9a84b749629d8e2bf4d27f47" id="r_af2b6b83f9a84b749629d8e2bf4d27f47"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1sources_1_1force.html#af2b6b83f9a84b749629d8e2bf4d27f47">compute_source_array</a> (const specfem::quadrature::quadrature &amp;quadx, const specfem::quadrature::quadrature &amp;quadz, specfem::kokkos::HostView3d&lt; type_real &gt; source_array) override</td></tr>
-<tr class="memdesc:af2b6b83f9a84b749629d8e2bf4d27f47"><td class="mdescLeft">&#160;</td><td class="mdescRight">Precompute and store lagrangian values used to compute integrals for sources.  <br /></td></tr>
-<tr class="separator:af2b6b83f9a84b749629d8e2bf4d27f47"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9eafe5d5ac555e10474ebdb19d9ecf33" id="r_a9eafe5d5ac555e10474ebdb19d9ecf33"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1sources_1_1force.html#a9eafe5d5ac555e10474ebdb19d9ecf33">locate</a> (const specfem::kokkos::HostView2d&lt; type_real &gt; coord, const specfem::kokkos::HostMirror3d&lt; int &gt; h_ibool, const specfem::kokkos::HostMirror1d&lt; type_real &gt; xigll, const specfem::kokkos::HostMirror1d&lt; type_real &gt; zigll, const int nproc, const specfem::kokkos::HostView2d&lt; type_real &gt; coorg, const specfem::kokkos::HostView2d&lt; int &gt; knods, const int npgeo, const specfem::kokkos::HostMirror1d&lt; specfem::enums::element::type &gt; ispec_type, const <a class="el" href="classspecfem_1_1_m_p_i_1_1_m_p_i.html">specfem::MPI::MPI</a> *mpi) override</td></tr>
+<tr class="memdesc:a9eafe5d5ac555e10474ebdb19d9ecf33"><td class="mdescLeft">&#160;</td><td class="mdescRight">Locate source within the mesh.  <br /></td></tr>
+<tr class="separator:a9eafe5d5ac555e10474ebdb19d9ecf33"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ab88392a67826ece1860d2220b1d4fe" id="r_a3ab88392a67826ece1860d2220b1d4fe"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1sources_1_1force.html#a3ab88392a67826ece1860d2220b1d4fe">compute_source_array</a> (const <a class="el" href="classspecfem_1_1quadrature_1_1quadrature.html">specfem::quadrature::quadrature</a> *quadx, const <a class="el" href="classspecfem_1_1quadrature_1_1quadrature.html">specfem::quadrature::quadrature</a> *quadz, specfem::kokkos::HostView3d&lt; type_real &gt; source_array) override</td></tr>
+<tr class="memdesc:a3ab88392a67826ece1860d2220b1d4fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Precompute and store lagrangian values used to compute integrals for sources.  <br /></td></tr>
+<tr class="separator:a3ab88392a67826ece1860d2220b1d4fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a62f575f3ee9828ae64221f1fd170f065" id="r_a62f575f3ee9828ae64221f1fd170f065"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1sources_1_1force.html#a62f575f3ee9828ae64221f1fd170f065">check_locations</a> (const type_real xmin, const type_real xmax, const type_real zmin, const type_real zmax, const <a class="el" href="classspecfem_1_1_m_p_i_1_1_m_p_i.html">specfem::MPI::MPI</a> *mpi) override</td></tr>
 <tr class="memdesc:a62f575f3ee9828ae64221f1fd170f065"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the source is within the domain.  <br /></td></tr>
 <tr class="separator:a62f575f3ee9828ae64221f1fd170f065"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -121,10 +121,10 @@ Public Member Functions</h2></td></tr>
 <tr class="memdesc:a559a46d6e330b40afbf70b348d066360"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the z coordinate of the source.  <br /></td></tr>
 <tr class="separator:a559a46d6e330b40afbf70b348d066360"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adc7c59092c99b6772b5d5fa00787e4dc" id="r_adc7c59092c99b6772b5d5fa00787e4dc"><td class="memItemLeft" align="right" valign="top">type_real&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1sources_1_1force.html#adc7c59092c99b6772b5d5fa00787e4dc">get_xi</a> () const override</td></tr>
-<tr class="memdesc:adc7c59092c99b6772b5d5fa00787e4dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the <picture><source srcset="form_7_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \xi $" src="form_7.png"/></picture> value of the source within the element.  <br /></td></tr>
+<tr class="memdesc:adc7c59092c99b6772b5d5fa00787e4dc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the <picture><source srcset="form_9_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \xi $" src="form_9.png"/></picture> value of the source within the element.  <br /></td></tr>
 <tr class="separator:adc7c59092c99b6772b5d5fa00787e4dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a15f46d1916b8c7b787a068131760b24b" id="r_a15f46d1916b8c7b787a068131760b24b"><td class="memItemLeft" align="right" valign="top">type_real&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1sources_1_1force.html#a15f46d1916b8c7b787a068131760b24b">get_gamma</a> () const override</td></tr>
-<tr class="memdesc:a15f46d1916b8c7b787a068131760b24b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the <picture><source srcset="form_8_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \gamma $" src="form_8.png"/></picture> value of the source within the element.  <br /></td></tr>
+<tr class="memdesc:a15f46d1916b8c7b787a068131760b24b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the <picture><source srcset="form_22_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \gamma $" src="form_22.png"/></picture> value of the source within the element.  <br /></td></tr>
 <tr class="separator:a15f46d1916b8c7b787a068131760b24b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa011f3f22ede5756e977b4db8cec5557" id="r_aa011f3f22ede5756e977b4db8cec5557"><td class="memItemLeft" align="right" valign="top"><a id="aa011f3f22ede5756e977b4db8cec5557" name="aa011f3f22ede5756e977b4db8cec5557"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>~force</b> ()</td></tr>
@@ -262,8 +262,8 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>print</b> () c
 
 </div>
 </div>
-<a id="af2b6b83f9a84b749629d8e2bf4d27f47" name="af2b6b83f9a84b749629d8e2bf4d27f47"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af2b6b83f9a84b749629d8e2bf4d27f47">&#9670;&#160;</a></span>compute_source_array()</h2>
+<a id="a3ab88392a67826ece1860d2220b1d4fe" name="a3ab88392a67826ece1860d2220b1d4fe"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3ab88392a67826ece1860d2220b1d4fe">&#9670;&#160;</a></span>compute_source_array()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -274,13 +274,13 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>print</b> () c
         <tr>
           <td class="memname">void specfem::sources::force::compute_source_array </td>
           <td>(</td>
-          <td class="paramtype">const specfem::quadrature::quadrature &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classspecfem_1_1quadrature_1_1quadrature.html">specfem::quadrature::quadrature</a> *&#160;</td>
           <td class="paramname"><em>quadx</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const specfem::quadrature::quadrature &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classspecfem_1_1quadrature_1_1quadrature.html">specfem::quadrature::quadrature</a> *&#160;</td>
           <td class="paramname"><em>quadz</em>, </td>
         </tr>
         <tr>
@@ -312,7 +312,7 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>print</b> () c
   </dd>
 </dl>
 
-<p>Reimplemented from <a class="el" href="classspecfem_1_1sources_1_1source.html#a6a4bda4e6a75ba6fadb21da3a0456520">specfem::sources::source</a>.</p>
+<p>Reimplemented from <a class="el" href="classspecfem_1_1sources_1_1source.html#a630f8a3593486f66f92916d35cd50aa3">specfem::sources::source</a>.</p>
 
 </div>
 </div>
@@ -339,8 +339,8 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>print</b> () c
 </table>
 </div><div class="memdoc">
 
-<p>Get the <picture><source srcset="form_8_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \gamma $" src="form_8.png"/></picture> value of the source within the element. </p>
-<dl class="section return"><dt>Returns</dt><dd>type_real <picture><source srcset="form_8_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \gamma $" src="form_8.png"/></picture> value </dd></dl>
+<p>Get the <picture><source srcset="form_22_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \gamma $" src="form_22.png"/></picture> value of the source within the element. </p>
+<dl class="section return"><dt>Returns</dt><dd>type_real <picture><source srcset="form_22_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \gamma $" src="form_22.png"/></picture> value </dd></dl>
 
 <p>Reimplemented from <a class="el" href="classspecfem_1_1sources_1_1source.html#a4d213b0d608965ce15873d7494fdc94c">specfem::sources::source</a>.</p>
 
@@ -432,7 +432,7 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>print</b> () c
 <p>Get the device pointer to stf object. </p>
 <dl class="section return"><dt>Returns</dt><dd><a class="el" href="classspecfem_1_1forcing__function_1_1stf.html" title="Source time function base class.">specfem::forcing_function::stf</a>* </dd></dl>
 
-<p>Reimplemented from <a class="el" href="classspecfem_1_1sources_1_1source.html#afb1a1de7dffc3d20d965ea3c5a6dd25a">specfem::sources::source</a>.</p>
+<p>Implements <a class="el" href="classspecfem_1_1sources_1_1source.html#a33d96d5626ab216906a1945738402684">specfem::sources::source</a>.</p>
 
 </div>
 </div>
@@ -519,8 +519,8 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>print</b> () c
 </table>
 </div><div class="memdoc">
 
-<p>Get the <picture><source srcset="form_7_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \xi $" src="form_7.png"/></picture> value of the source within the element. </p>
-<dl class="section return"><dt>Returns</dt><dd>type_real <picture><source srcset="form_7_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \xi $" src="form_7.png"/></picture> value </dd></dl>
+<p>Get the <picture><source srcset="form_9_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \xi $" src="form_9.png"/></picture> value of the source within the element. </p>
+<dl class="section return"><dt>Returns</dt><dd>type_real <picture><source srcset="form_9_dark.png" media="(prefers-color-scheme: dark)"/><img class="formulaInl" alt="$ \xi $" src="form_9.png"/></picture> value </dd></dl>
 
 <p>Reimplemented from <a class="el" href="classspecfem_1_1sources_1_1source.html#afd9a4d77d5d859d788e40255af8205bb">specfem::sources::source</a>.</p>
 
@@ -556,8 +556,8 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>print</b> () c
 
 </div>
 </div>
-<a id="a3bf774ba267bbc1c4b92a7c01136fa2b" name="a3bf774ba267bbc1c4b92a7c01136fa2b"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3bf774ba267bbc1c4b92a7c01136fa2b">&#9670;&#160;</a></span>locate()</h2>
+<a id="a9eafe5d5ac555e10474ebdb19d9ecf33" name="a9eafe5d5ac555e10474ebdb19d9ecf33"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9eafe5d5ac555e10474ebdb19d9ecf33">&#9670;&#160;</a></span>locate()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -616,7 +616,7 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>print</b> () c
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const specfem::kokkos::HostMirror1d&lt; <a class="el" href="namespacespecfem_1_1elements.html#a88c727adceb8da1c70cf615e864470b3">specfem::elements::type</a> &gt;&#160;</td>
+          <td class="paramtype">const specfem::kokkos::HostMirror1d&lt; specfem::enums::element::type &gt;&#160;</td>
           <td class="paramname"><em>ispec_type</em>, </td>
         </tr>
         <tr>
@@ -656,7 +656,7 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>print</b> () c
   </dd>
 </dl>
 
-<p>Reimplemented from <a class="el" href="classspecfem_1_1sources_1_1source.html#a89864a6f02c954f8f0c388f91b51f1fa">specfem::sources::source</a>.</p>
+<p>Reimplemented from <a class="el" href="classspecfem_1_1sources_1_1source.html#aab3e21c6202a956765c3450ca6627e65">specfem::sources::source</a>.</p>
 
 </div>
 </div>
@@ -692,7 +692,7 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>print</b> () c
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>/Users/runner/work/specfem2d_kokkos/specfem2d_kokkos/include/<b>source.h</b></li>
+<li>/Users/runner/work/SPECFEMPP/SPECFEMPP/include/source/<b>force_source.hpp</b></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

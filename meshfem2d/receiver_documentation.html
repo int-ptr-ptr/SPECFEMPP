@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Receiver Parameters &mdash; SPECFEM++  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/scrollable_code_blocks.css?v=ebc906c5" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/center_align_table.css?v=f0548739" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SPECFEM++
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">USER DOCUMENTATION</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user_documentation/index.html">User documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">MESHFEM Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parameter_documentation/index.html">SPECFEM++ Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source_description/index.html">Source Description</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COOKBOOKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cookbooks/index.html">Cookbooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">CONTRIBUTION GUIDELINES</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../developer_documentation/index.html">Developer documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COMMUNITY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=bug_report.md&amp;title=">Report bugs</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=feature_request.md&amp;title=">Request a new feature</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/orgs/SPECFEM/discussions">Join the discussion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">BENCHMARKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../benchmarks/benchmarks.html">Performance Benchmarks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API DOCUMENTATION</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SPECFEM++</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Receiver Parameters</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/meshfem2d/receiver_documentation.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="receiver-parameters">
+<h1>Receiver Parameters<a class="headerlink" href="#receiver-parameters" title="Link to this heading"></a></h1>
+<section id="parameter-name-use-existing-stations">
+<h2><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">use_existing_STATIONS</span></code><a class="headerlink" href="#parameter-name-use-existing-stations" title="Link to this heading"></a></h2>
+<p><strong>Description</strong>: If set to <code class="docutils literal notranslate"><span class="pre">.true.</span></code>, the receivers will be places based on an existing STATIONS file.</p>
+<p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">logical</span></code></p>
+</section>
+<section id="paramter-name-nreceiversets">
+<h2><strong>Paramter Name</strong>: <code class="docutils literal notranslate"><span class="pre">nreceiversets</span></code><a class="headerlink" href="#paramter-name-nreceiversets" title="Link to this heading"></a></h2>
+<p><strong>Description</strong>: Number of receiver sets.</p>
+<p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">int</span></code></p>
+</section>
+<section id="parameter-name-anglerec">
+<h2><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">anglerec</span></code><a class="headerlink" href="#parameter-name-anglerec" title="Link to this heading"></a></h2>
+<p><strong>Description</strong>: Angle to rotate components at receivers</p>
+<p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">real</span></code></p>
+</section>
+<section id="parameter-name-rec-normal-to-surface">
+<h2><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">rec_normal_to_surface</span></code><a class="headerlink" href="#parameter-name-rec-normal-to-surface" title="Link to this heading"></a></h2>
+<p><strong>Description</strong>: If set to <code class="docutils literal notranslate"><span class="pre">.true.</span></code>, the receiver base angle will be set normal to the surface. Requires external mesh and tangential curve file.</p>
+<p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">logical</span></code></p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This paramter is not supported yet in the solver.</p>
+</div>
+<section id="define-receiver-sets">
+<h3>Define receiver sets:<a class="headerlink" href="#define-receiver-sets" title="Link to this heading"></a></h3>
+<p>Next we define each receiver sets using the following parameters:</p>
+<section id="parameter-name-nrec">
+<h4><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">nrec</span></code><a class="headerlink" href="#parameter-name-nrec" title="Link to this heading"></a></h4>
+<p><strong>Description</strong>: Number of receivers in this set. The receivers will be placed at equal distances.</p>
+<p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">int</span></code></p>
+</section>
+<section id="parameter-name-xdeb">
+<h4><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">xdeb</span></code><a class="headerlink" href="#parameter-name-xdeb" title="Link to this heading"></a></h4>
+<p><strong>Description</strong>: X coordinate of the first receiver in this set.</p>
+<p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">real</span></code></p>
+</section>
+<section id="parameter-name-zdeb">
+<h4><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">zdeb</span></code><a class="headerlink" href="#parameter-name-zdeb" title="Link to this heading"></a></h4>
+<p><strong>Description</strong>: Y coordinate of the first receiver in this set.</p>
+<p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">real</span></code></p>
+</section>
+<section id="parameter-name-xfin">
+<h4><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">xfin</span></code><a class="headerlink" href="#parameter-name-xfin" title="Link to this heading"></a></h4>
+<p><strong>Description</strong>: X coordinate of the last receiver in this set.</p>
+<p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">real</span></code></p>
+</section>
+<section id="parameter-name-zfin">
+<h4><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">zfin</span></code><a class="headerlink" href="#parameter-name-zfin" title="Link to this heading"></a></h4>
+<p><strong>Description</strong>: Y coordinate of the last receiver in this set.</p>
+<p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">real</span></code></p>
+</section>
+<section id="parameter-name-record-at-surface-same-vertical">
+<h4><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">record_at_surface_same_vertical</span></code><a class="headerlink" href="#parameter-name-record-at-surface-same-vertical" title="Link to this heading"></a></h4>
+<p><strong>Description</strong>: If set to <code class="docutils literal notranslate"><span class="pre">.true.</span></code>, the receivers will be placed at the surface of the medium. The vertical position of the receivers will be replaces with topography height.</p>
+<p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">logical</span></code></p>
+</section>
+</section>
+</section>
+<section id="parameter-name-stations-filename">
+<h2><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">stations_filename</span></code><a class="headerlink" href="#parameter-name-stations-filename" title="Link to this heading"></a></h2>
+<p><strong>Description</strong>: Name of the STATIONS file to use. if <code class="docutils literal notranslate"><span class="pre">use_existing_STATIONS</span></code> is set to <code class="docutils literal notranslate"><span class="pre">.true.</span></code>, this defines a file to read receiver locations from. If <code class="docutils literal notranslate"><span class="pre">use_existing_STATIONS</span></code> is set to <code class="docutils literal notranslate"><span class="pre">.false.</span></code>, this defines a file to write receiver locations to.</p>
+<p><strong>Type</strong>: <code class="docutils literal notranslate"><span class="pre">string</span></code></p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Rohit Kakodkar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

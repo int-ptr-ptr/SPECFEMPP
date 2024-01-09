@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['partial_5fderivatives_0',['partial_derivatives',['../structspecfem_1_1compute_1_1partial__derivatives.html',1,'specfem::compute']]],
-  ['properties_1',['properties',['../structspecfem_1_1compute_1_1properties.html',1,'specfem::compute::properties'],['../structspecfem_1_1properties.html',1,'specfem::properties']]]
+  ['isotropic_0',['isotropic',['../classspecfem_1_1enums_1_1element_1_1property_1_1isotropic.html',1,'specfem::enums::element::property']]]
 ];

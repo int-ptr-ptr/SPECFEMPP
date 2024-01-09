@@ -1,14 +1,17 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Developer documentation &mdash; SPECFEM KOKKOS IMPLEMENTATION  documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/scrollable_code_blocks.css" type="text/css" />
+  <title>Developer documentation &mdash; SPECFEM++  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/scrollable_code_blocks.css?v=ebc906c5" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/center_align_table.css?v=f0548739" />
+
+  
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -22,7 +25,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Git development workflow" href="git_workflow.html" />
-    <link rel="prev" title="Wave propagration through homogeneous media" href="../cookbooks/example_01.html" /> 
+    <link rel="prev" title="Wave propagration through fluid-solid interface" href="../cookbooks/example_02.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -34,7 +37,7 @@
           
           
           <a href="../index.html" class="icon icon-home">
-            SPECFEM KOKKOS IMPLEMENTATION
+            SPECFEM++
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -44,18 +47,41 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul class="current">
+              <p class="caption" role="heading"><span class="caption-text">USER DOCUMENTATION</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../user_documentation/index.html">User documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../parameter_documentation/index.html">Parameter documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../meshfem2d/index.html">MESHFEM Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parameter_documentation/index.html">SPECFEM++ Parameter Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../source_description/index.html">Source Description</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COOKBOOKS</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../cookbooks/index.html">Cookbooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">CONTRIBUTION GUIDELINES</span></p>
+<ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Developer documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="git_workflow.html">Git development workflow</a></li>
 <li class="toctree-l2"><a class="reference internal" href="build_requirements.html">Build system requirements</a></li>
 <li class="toctree-l2"><a class="reference internal" href="style.html">Style</a></li>
 <li class="toctree-l2"><a class="reference internal" href="style.html#pre-commit">Pre-commit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html">Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SPECFEM_architecture/architecture.html">SPECFEM++ Architecture</a></li>
 </ul>
 </li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COMMUNITY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=bug_report.md&amp;title=">Report bugs</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=feature_request.md&amp;title=">Request a new feature</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/orgs/SPECFEM/discussions">Join the discussion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">BENCHMARKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../benchmarks/benchmarks.html">Performance Benchmarks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API DOCUMENTATION</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../api/index.html">API documentation</a></li>
 </ul>
 
@@ -65,7 +91,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">SPECFEM KOKKOS IMPLEMENTATION</a>
+          <a href="../index.html">SPECFEM++</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -85,7 +111,7 @@
              
   <section id="developer-documentation">
 <span id="id1"></span><h1>Developer documentation<a class="headerlink" href="#developer-documentation" title="Link to this heading"></a></h1>
-<p>SPECFEM tries to follow best practices to keep the code readable, maintainable and reproducable. This section outlines several best practices we follow in the development process. If you contribute to this project we expect you to follow these practices.</p>
+<p>SPECFEM++ tries to follow best practices to keep the code readable, maintainable and reproducable. This section outlines several best practices we follow in the development process. If you contribute to this project we expect you to follow these practices.</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="git_workflow.html">Git development workflow</a></li>
@@ -99,6 +125,14 @@
 <li class="toctree-l2"><a class="reference internal" href="style.html#pre-commit-hooks">Pre-commit hooks</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="tests.html">Tests</a></li>
+<li class="toctree-l1"><a class="reference internal" href="SPECFEM_architecture/architecture.html">SPECFEM++ Architecture</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="SPECFEM_architecture/quadrature.html">Quadrature developer guide:</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SPECFEM_architecture/mesh.html">Mesh developer guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SPECFEM_architecture/compute.html">Compute namespace developer guide</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SPECFEM_architecture/domain.html">Domain and Coupled Interface Developer Guide</a></li>
+</ul>
+</li>
 </ul>
 </div>
 </section>
@@ -107,14 +141,14 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../cookbooks/example_01.html" class="btn btn-neutral float-left" title="Wave propagration through homogeneous media" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../cookbooks/example_02.html" class="btn btn-neutral float-left" title="Wave propagration through fluid-solid interface" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="git_workflow.html" class="btn btn-neutral float-right" title="Git development workflow" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020, Rohit Kakodkar.</p>
+    <p>&#169; Copyright 2023, Rohit Kakodkar.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

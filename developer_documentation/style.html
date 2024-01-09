@@ -1,14 +1,17 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Style &mdash; SPECFEM KOKKOS IMPLEMENTATION  documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/scrollable_code_blocks.css" type="text/css" />
+  <title>Style &mdash; SPECFEM++  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/scrollable_code_blocks.css?v=ebc906c5" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/center_align_table.css?v=f0548739" />
+
+  
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -21,7 +24,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="API documentation" href="../api/index.html" />
+    <link rel="next" title="Tests" href="tests.html" />
     <link rel="prev" title="Build system requirements" href="build_requirements.html" /> 
 </head>
 
@@ -34,7 +37,7 @@
           
           
           <a href="../index.html" class="icon icon-home">
-            SPECFEM KOKKOS IMPLEMENTATION
+            SPECFEM++
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -44,11 +47,19 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul class="current">
+              <p class="caption" role="heading"><span class="caption-text">USER DOCUMENTATION</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../user_documentation/index.html">User documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../parameter_documentation/index.html">Parameter documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../meshfem2d/index.html">MESHFEM Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parameter_documentation/index.html">SPECFEM++ Parameter Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../source_description/index.html">Source Description</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COOKBOOKS</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../cookbooks/index.html">Cookbooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">CONTRIBUTION GUIDELINES</span></p>
+<ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Developer documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="git_workflow.html">Git development workflow</a></li>
 <li class="toctree-l2"><a class="reference internal" href="build_requirements.html">Build system requirements</a></li>
@@ -61,8 +72,23 @@
 <li class="toctree-l3"><a class="reference internal" href="#pre-commit-hooks">Pre-commit hooks</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="tests.html">Tests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="SPECFEM_architecture/architecture.html">SPECFEM++ Architecture</a></li>
 </ul>
 </li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COMMUNITY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=bug_report.md&amp;title=">Report bugs</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=feature_request.md&amp;title=">Request a new feature</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/orgs/SPECFEM/discussions">Join the discussion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">BENCHMARKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../benchmarks/benchmarks.html">Performance Benchmarks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API DOCUMENTATION</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../api/index.html">API documentation</a></li>
 </ul>
 
@@ -72,7 +98,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">SPECFEM KOKKOS IMPLEMENTATION</a>
+          <a href="../index.html">SPECFEM++</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -96,7 +122,7 @@
 </section>
 <section id="pre-commit">
 <h1>Pre-commit<a class="headerlink" href="#pre-commit" title="Link to this heading"></a></h1>
-<p>SPECFEM uses pre-commit to check style. Pre-commit can be installed inside python virtual environments. There are several methods for creating virtual environments, but I’ve found poetry tool is great at managing python environments. Especailly in collaborative environments poetry gives easy method for managing consistency of environments between all contributors via <code class="code docutils literal notranslate"><span class="pre">pyproject.toml</span></code> and <code class="code docutils literal notranslate"><span class="pre">poetry.lock</span></code> files. But more on this later.</p>
+<p>SPECFEM++ uses pre-commit to check style. Pre-commit can be installed inside python virtual environments. There are several methods for creating virtual environments, but I’ve found poetry tool is great at managing python environments. Especailly in collaborative environments poetry gives easy method for managing consistency of environments between all contributors via <code class="code docutils literal notranslate"><span class="pre">pyproject.toml</span></code> and <code class="code docutils literal notranslate"><span class="pre">poetry.lock</span></code> files. But more on this later.</p>
 <p>Here we give a short tutorial for using poetry specifically with intention of using pre-commit hooks, but the information provided here can be translated for managing any python environment. The official poetry documentation can be found at <a class="reference external" href="https://python-poetry.org/docs/">poetry docs</a></p>
 <section id="poetry-installation">
 <h2>Poetry Installation<a class="headerlink" href="#poetry-installation" title="Link to this heading"></a></h2>
@@ -117,24 +143,24 @@
 <h2>Adding python packages<a class="headerlink" href="#adding-python-packages" title="Link to this heading"></a></h2>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>This section is only for educational purposes since SPECFEM comes with a <code class="code docutils literal notranslate"><span class="pre">pyproject.toml</span></code></p>
+<p>This section is only for educational purposes since SPECFEM++ comes with a <code class="code docutils literal notranslate"><span class="pre">pyproject.toml</span></code></p>
 </div>
 <p>We define all the packages required within our environment using the <cite>pyproject.toml</cite> file. For example, if we needed to add pre-commit to our environment we would define it within <code class="code docutils literal notranslate"><span class="pre">pyproject.toml</span></code> as</p>
 <div class="highlight-toml notranslate"><div class="highlight"><pre><span></span><span class="k">[tool.poetry]</span>
-<span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;specfem2d_kokkos&quot;</span>
-<span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;0.1.0&quot;</span>
-<span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;Kokkos implementation of SpecFEM2D code&quot;</span>
-<span class="n">authors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s">&quot;Your Name &lt;you@example.com&gt;&quot;</span><span class="p">]</span>
+<span class="n">name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;specfempp&quot;</span>
+<span class="n">version</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;0.1.0&quot;</span>
+<span class="n">description</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;Kokkos implementation of SpecFEM2D code&quot;</span>
+<span class="n">authors</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Your Name &lt;you@example.com&gt;&quot;</span><span class="p">]</span>
 
 <span class="k">[tool.poetry.dependencies]</span>
-<span class="n">python</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;&gt;=3.7,&lt;4.0&quot;</span>
-<span class="n">pre-commit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;^=2.19.0&quot;</span>
+<span class="n">python</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;&gt;=3.7,&lt;4.0&quot;</span>
+<span class="n">pre-commit</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;^=2.19.0&quot;</span>
 
 <span class="k">[tool.poetry.dev-dependencies]</span>
 
 <span class="k">[build-system]</span>
-<span class="n">requires</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s">&quot;poetry-core&gt;=1.0.0&quot;</span><span class="p">]</span>
-<span class="n">build-backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;poetry.core.masonry.api&quot;</span>
+<span class="n">requires</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;poetry-core&gt;=1.0.0&quot;</span><span class="p">]</span>
+<span class="n">build-backend</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s2">&quot;poetry.core.masonry.api&quot;</span>
 </pre></div>
 </div>
 <p>As stated above we define our python, and pre-commit versions within <code class="code docutils literal notranslate"><span class="pre">pyproject.toml</span></code>.</p>
@@ -147,7 +173,7 @@
 </div>
 <p>When you run this command one of two things happen,</p>
 <ol class="arabic simple">
-<li><p>If a correct version of a package already exists within <code class="code docutils literal notranslate"><span class="pre">poetry.lock</span></code> file then poetry installs that version. Here the assumption is that a <cite>poetry.lock</cite> already exists, if not then one is created for you (within SPECFEM <cite>poetry.lock</cite> should already exist). <cite>poetry.lock</cite> ensures that all developers have consistent environments.</p></li>
+<li><p>If a correct version of a package already exists within <code class="code docutils literal notranslate"><span class="pre">poetry.lock</span></code> file then poetry installs that version. Here the assumption is that a <cite>poetry.lock</cite> already exists, if not then one is created for you (within SPECFEM++ <cite>poetry.lock</cite> should already exist). <cite>poetry.lock</cite> ensures that all developers have consistent environments.</p></li>
 <li><p>If a correct version of a package doesn’t exist within <code class="code docutils literal notranslate"><span class="pre">poetry.lock</span></code> then poetry will install a correct version and update <cite>poetry.lock</cite> file.</p></li>
 </ol>
 <div class="admonition note">
@@ -161,7 +187,7 @@
 </section>
 <section id="using-your-python-poetry-environment">
 <h2>Using your python/poetry environment<a class="headerlink" href="#using-your-python-poetry-environment" title="Link to this heading"></a></h2>
-<p>If you’re in the SPECFEM root directory you should have access to the poetry environment. To run a command within the environment either</p>
+<p>If you’re in the SPECFEM++ root directory you should have access to the poetry environment. To run a command within the environment either</p>
 <ol class="arabic simple">
 <li><p>Explicitly activate the environment using <code class="code docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">shell</span></code> as shown below</p></li>
 </ol>
@@ -179,7 +205,7 @@ python<span class="w"> </span>&lt;script_name&gt;.py
 </section>
 <section id="pre-commit-hooks">
 <h2>Pre-commit hooks<a class="headerlink" href="#pre-commit-hooks" title="Link to this heading"></a></h2>
-<p>Next, we install pre-commit hooks to check style. Pre-commit hooks are defined in <code class="code docutils literal notranslate"><span class="pre">.pre-commit-config.yaml</span></code> within SPECFEM root directory. More documentation on pre-commit hooks can be found <a class="reference external" href="https://pre-commit.com/hooks.html">here</a>.</p>
+<p>Next, we install pre-commit hooks to check style. Pre-commit hooks are defined in <code class="code docutils literal notranslate"><span class="pre">.pre-commit-config.yaml</span></code> within SPECFEM++ root directory. More documentation on pre-commit hooks can be found <a class="reference external" href="https://pre-commit.com/hooks.html">here</a>.</p>
 <p>To enable the hooks (This only needs to be done when you clone the repo or there is an update to <code class="code docutils literal notranslate"><span class="pre">.pre-commit-config.yaml</span></code>)</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>poetry<span class="w"> </span>run<span class="w"> </span>pre-commit<span class="w"> </span>install
 </pre></div>
@@ -197,13 +223,13 @@ python<span class="w"> </span>&lt;script_name&gt;.py
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="build_requirements.html" class="btn btn-neutral float-left" title="Build system requirements" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="../api/index.html" class="btn btn-neutral float-right" title="API documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="tests.html" class="btn btn-neutral float-right" title="Tests" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020, Rohit Kakodkar.</p>
+    <p>&#169; Copyright 2023, Rohit Kakodkar.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

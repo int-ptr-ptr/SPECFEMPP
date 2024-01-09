@@ -1,14 +1,17 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Header &mdash; SPECFEM KOKKOS IMPLEMENTATION  documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/scrollable_code_blocks.css" type="text/css" />
+  <title>Header &mdash; SPECFEM++  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/scrollable_code_blocks.css?v=ebc906c5" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/center_align_table.css?v=f0548739" />
+
+  
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -22,7 +25,7 @@
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="Simulation Setup" href="simulation_setup.html" />
-    <link rel="prev" title="Parameter documentation" href="index.html" /> 
+    <link rel="prev" title="SPECFEM++ Parameter Documentation" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -34,7 +37,7 @@
           
           
           <a href="../index.html" class="icon icon-home">
-            SPECFEM KOKKOS IMPLEMENTATION
+            SPECFEM++
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -44,27 +47,47 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul class="current">
+              <p class="caption" role="heading"><span class="caption-text">USER DOCUMENTATION</span></p>
+<ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../user_documentation/index.html">User documentation</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">Parameter documentation</a><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../meshfem2d/index.html">MESHFEM Parameter Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">SPECFEM++ Parameter Documentation</a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Header</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#parameter-definitions">Parameter definitions</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#parameter-name-header"><strong>Parameter name</strong> : <code class="docutils literal notranslate"><span class="pre">header</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#parameter-name-header-title"><strong>Parameter name</strong> : <code class="docutils literal notranslate"><span class="pre">header.title</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="#parameter-name-header-description"><strong>Parameter name</strong> : <code class="docutils literal notranslate"><span class="pre">header.description</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="simulation_setup.html">Simulation Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="receivers.html">receivers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="seismogram_setup.html">Seismograms</a></li>
 <li class="toctree-l2"><a class="reference internal" href="run_setup.html">Runtime Setup</a></li>
 <li class="toctree-l2"><a class="reference internal" href="databases.html">Databases</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../source_description/index.html">Source Description</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COOKBOOKS</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../cookbooks/index.html">Cookbooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">CONTRIBUTION GUIDELINES</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../developer_documentation/index.html">Developer documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COMMUNITY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=bug_report.md&amp;title=">Report bugs</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=feature_request.md&amp;title=">Request a new feature</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/orgs/SPECFEM/discussions">Join the discussion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">BENCHMARKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../benchmarks/benchmarks.html">Performance Benchmarks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API DOCUMENTATION</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../api/index.html">API documentation</a></li>
 </ul>
 
@@ -74,7 +97,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">SPECFEM KOKKOS IMPLEMENTATION</a>
+          <a href="../index.html">SPECFEM++</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -82,7 +105,7 @@
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
       <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
-          <li class="breadcrumb-item"><a href="index.html">Parameter documentation</a></li>
+          <li class="breadcrumb-item"><a href="index.html">SPECFEM++ Parameter Documentation</a></li>
       <li class="breadcrumb-item active">Header</li>
       <li class="wy-breadcrumbs-aside">
             <a href="../_sources/parameter_documentation/header.rst.txt" rel="nofollow"> View page source</a>
@@ -103,18 +126,18 @@
 <p><strong>default value</strong> : None</p>
 <p><strong>possible values</strong> : [YAML Node]</p>
 <p><strong>documentation</strong> : Define header section</p>
-</section>
 <section id="parameter-name-header-title">
-<h3><strong>Parameter name</strong> : <code class="docutils literal notranslate"><span class="pre">header.title</span></code><a class="headerlink" href="#parameter-name-header-title" title="Link to this heading"></a></h3>
+<h4><strong>Parameter name</strong> : <code class="docutils literal notranslate"><span class="pre">header.title</span></code><a class="headerlink" href="#parameter-name-header-title" title="Link to this heading"></a></h4>
 <p><strong>default value</strong>: None</p>
 <p><strong>possible values</strong>: [string]</p>
 <p><strong>documentation</strong>: Brief name for this simulation</p>
 </section>
 <section id="parameter-name-header-description">
-<h3><strong>Parameter name</strong> : <code class="docutils literal notranslate"><span class="pre">header.description</span></code><a class="headerlink" href="#parameter-name-header-description" title="Link to this heading"></a></h3>
+<h4><strong>Parameter name</strong> : <code class="docutils literal notranslate"><span class="pre">header.description</span></code><a class="headerlink" href="#parameter-name-header-description" title="Link to this heading"></a></h4>
 <p><strong>default value</strong>: None</p>
 <p><strong>possible values</strong>: [string]</p>
 <p><strong>documentation</strong>: Detailed description for this run.</p>
+</section>
 </section>
 </section>
 </section>
@@ -123,14 +146,14 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="index.html" class="btn btn-neutral float-left" title="Parameter documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="SPECFEM++ Parameter Documentation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
         <a href="simulation_setup.html" class="btn btn-neutral float-right" title="Simulation Setup" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020, Rohit Kakodkar.</p>
+    <p>&#169; Copyright 2023, Rohit Kakodkar.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

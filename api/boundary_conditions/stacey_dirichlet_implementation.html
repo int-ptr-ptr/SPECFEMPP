@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>&lt;no title&gt; &mdash; SPECFEM++  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/scrollable_code_blocks.css?v=ebc906c5" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/center_align_table.css?v=f0548739" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            SPECFEM++
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">USER DOCUMENTATION</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user_documentation/index.html">User documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meshfem2d/index.html">MESHFEM Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parameter_documentation/index.html">SPECFEM++ Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source_description/index.html">Source Description</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COOKBOOKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cookbooks/index.html">Cookbooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">CONTRIBUTION GUIDELINES</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_documentation/index.html">Developer documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COMMUNITY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=bug_report.md&amp;title=">Report bugs</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=feature_request.md&amp;title=">Request a new feature</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/orgs/SPECFEM/discussions">Join the discussion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">BENCHMARKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../benchmarks/benchmarks.html">Performance Benchmarks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API DOCUMENTATION</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">SPECFEM++</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">&lt;no title&gt;</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/boundary_conditions/stacey_dirichlet_implementation.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4IDpEN7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEEE">
+<span id="_CPPv3IDpEN7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEEE"></span><span id="_CPPv2IDpEN7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="p"><span class="pre">...</span></span><span class="sig-name descname"><span class="n"><span class="pre">properties</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1composite__boundary_3_01specfem_1_1enums_1_1bou21c7c6860395a681480f522141a715e0"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">composite_boundary</span></span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enums</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">boundary_conditions</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="none.html#_CPPv4I0000EN7specfem5enums19boundary_conditions6staceyE" title="specfem::enums::boundary_conditions::stacey"><span class="n"><span class="pre">stacey</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpEN7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEEE" title="specfem::enums::boundary_conditions::composite_boundary&lt;specfem::enums::boundary_conditions::stacey&lt;properties...&gt;, specfem::enums::boundary_conditions::dirichlet&lt;properties...&gt;&gt;::properties"><span class="n"><span class="pre">properties</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enums</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">boundary_conditions</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="dirichlet.html#_CPPv4I0000EN7specfem5enums19boundary_conditions9dirichletE" title="specfem::enums::boundary_conditions::dirichlet"><span class="n"><span class="pre">dirichlet</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpEN7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEEE" title="specfem::enums::boundary_conditions::composite_boundary&lt;specfem::enums::boundary_conditions::stacey&lt;properties...&gt;, specfem::enums::boundary_conditions::dirichlet&lt;properties...&gt;&gt;::properties"><span class="n"><span class="pre">properties</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4IDpEN7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Composite boundary conditions for Stacey BC and Dirichlet BC. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>properties</strong> – Properties of the Boundary conditions </p>
+</dd>
+</dl>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE11medium_typeE">
+<span id="_CPPv3N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE11medium_typeE"></span><span id="_CPPv2N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE11medium_typeE"></span><span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1composite__boundary_3_01specfem_1_1enums_1_1bou21c7c6860395a681480f522141a715e0_1ac72e5d36dba6ef12f62304f04078eeed"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">medium_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE11stacey_typeE" title="specfem::enums::boundary_conditions::composite_boundary&lt;specfem::enums::boundary_conditions::stacey&lt;properties...&gt;, specfem::enums::boundary_conditions::dirichlet&lt;properties...&gt;&gt;::stacey_type"><span class="n"><span class="pre">stacey_type</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">medium_type</span></span><a class="headerlink" href="#_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE11medium_typeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Medium type of the boundary. </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE9dimensionE">
+<span id="_CPPv3N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE9dimensionE"></span><span id="_CPPv2N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE9dimensionE"></span><span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1composite__boundary_3_01specfem_1_1enums_1_1bou21c7c6860395a681480f522141a715e0_1ad12ccffefebaad14af823a5627b53c72"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dimension</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE11stacey_typeE" title="specfem::enums::boundary_conditions::composite_boundary&lt;specfem::enums::boundary_conditions::stacey&lt;properties...&gt;, specfem::enums::boundary_conditions::dirichlet&lt;properties...&gt;&gt;::stacey_type"><span class="n"><span class="pre">stacey_type</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">dimension</span></span><a class="headerlink" href="#_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE9dimensionE" title="Link to this definition"></a><br /></dt>
+<dd><p>Dimension of the boundary. </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE22quadrature_points_typeE">
+<span id="_CPPv3N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE22quadrature_points_typeE"></span><span id="_CPPv2N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE22quadrature_points_typeE"></span><span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1composite__boundary_3_01specfem_1_1enums_1_1bou21c7c6860395a681480f522141a715e0_1a5db708d0a061f83381a4cdd7569d8d30"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">quadrature_points_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE11stacey_typeE" title="specfem::enums::boundary_conditions::composite_boundary&lt;specfem::enums::boundary_conditions::stacey&lt;properties...&gt;, specfem::enums::boundary_conditions::dirichlet&lt;properties...&gt;&gt;::stacey_type"><span class="n"><span class="pre">stacey_type</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">quadrature_points_type</span></span><a class="headerlink" href="#_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE22quadrature_points_typeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Quadrature points object to define the quadrature points either at compile time or run time. </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE13property_typeE">
+<span id="_CPPv3N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE13property_typeE"></span><span id="_CPPv2N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE13property_typeE"></span><span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1composite__boundary_3_01specfem_1_1enums_1_1bou21c7c6860395a681480f522141a715e0_1a2a78526b90a6eba20917d154558ace78"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">property_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE11stacey_typeE" title="specfem::enums::boundary_conditions::composite_boundary&lt;specfem::enums::boundary_conditions::stacey&lt;properties...&gt;, specfem::enums::boundary_conditions::dirichlet&lt;properties...&gt;&gt;::stacey_type"><span class="n"><span class="pre">stacey_type</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">property_type</span></span><a class="headerlink" href="#_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE13property_typeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Property type of the boundary. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE18composite_boundaryEv">
+<span id="_CPPv3N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE18composite_boundaryEv"></span><span id="_CPPv2N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE18composite_boundaryEv"></span><span id="specfem::enums::boundary_conditions::composite_boundary:specfem::enums::boundary_conditions::stacey:propertiesDp:.specfem::enums::boundary_conditions::dirichlet:propertiesDp::::composite_boundary"></span><span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1composite__boundary_3_01specfem_1_1enums_1_1bou21c7c6860395a681480f522141a715e0_1aff09201ddd9b9f865aef4eb13c3aa5b4"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">composite_boundary</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE18composite_boundaryEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct a new composite boundary object. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE18composite_boundaryERKN7specfem7compute10boundariesERK22quadrature_points_type">
+<span id="_CPPv3N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE18composite_boundaryERKN7specfem7compute10boundariesERK22quadrature_points_type"></span><span id="_CPPv2N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE18composite_boundaryERKN7specfem7compute10boundariesERK22quadrature_points_type"></span><span id="specfem::enums::boundary_conditions::composite_boundary:specfem::enums::boundary_conditions::stacey:propertiesDp:.specfem::enums::boundary_conditions::dirichlet:propertiesDp::::composite_boundary__specfem::compute::boundariesCR.quadrature_points_typeCR"></span><span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1composite__boundary_3_01specfem_1_1enums_1_1bou21c7c6860395a681480f522141a715e0_1ae02a6a3f5473db9d3160c61c4a7ef54a"></span><span class="sig-name descname"><span class="n"><span class="pre">composite_boundary</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv4N7specfem7computeE" title="specfem::compute"><span class="n"><span class="pre">compute</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">boundaries</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">boundary_conditions</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE22quadrature_points_typeE" title="specfem::enums::boundary_conditions::composite_boundary&lt;specfem::enums::boundary_conditions::stacey&lt;properties...&gt;, specfem::enums::boundary_conditions::dirichlet&lt;properties...&gt;&gt;::quadrature_points_type"><span class="n"><span class="pre">quadrature_points_type</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">quadrature_points</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE18composite_boundaryERKN7specfem7compute10boundariesERK22quadrature_points_type" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct a new stacey object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>boundary_conditions</strong> – boundary conditions object specifying the boundary conditions </p></li>
+<li><p><strong>quadrature_points</strong> – Quadrature points object </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1composite__boundary_3_01specfem_1_1enums_1_1bou21c7c6860395a681480f522141a715e0_1aae50ad9156a9a6d344a9e73007ac56c3"></span><span class="sig-name descname"><span class="pre">template&lt;specfem::enums::time_scheme::type</span> <span class="pre">time_scheme,</span> <span class="pre">typename...</span> <span class="pre">Args&gt;</span> <span class="pre">inline</span> <span class="pre">KOKKOS_INLINE_FUNCTION</span> <span class="pre">void</span> <span class="pre">mass_time_contribution</span> <span class="pre">(Args</span> <span class="pre">&amp;&amp;...args)</span> <span class="pre">const</span></span></dt>
+<dd><p>Compute the contribution of composite boundaries to the mass term. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>time_scheme</strong> – Time scheme to be used </p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>Args</strong> – Arguments to be passed to the function. The underlying BCs are called with the same arguments </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1composite__boundary_3_01specfem_1_1enums_1_1bou21c7c6860395a681480f522141a715e0_1aa7349cd6c70fff2710552e7149d8cb50"></span><span class="sig-name descname"><span class="pre">template&lt;typename...</span> <span class="pre">Args&gt;</span> <span class="pre">inline</span> <span class="pre">KOKKOS_INLINE_FUNCTION</span> <span class="pre">void</span> <span class="pre">enforce_gradient</span> <span class="pre">(Args</span> <span class="pre">&amp;&amp;...args)</span> <span class="pre">const</span></span></dt>
+<dd><p>Compute the contribution of composite boundaries to the gradient term. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Args</strong> – Arguments to be passed to the function. The underlying BCs are called with the same arguments </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1composite__boundary_3_01specfem_1_1enums_1_1bou21c7c6860395a681480f522141a715e0_1a5875f68982a17961dde28dd20fba847c"></span><span class="sig-name descname"><span class="pre">template&lt;typename...</span> <span class="pre">Args&gt;</span> <span class="pre">inline</span> <span class="pre">KOKKOS_INLINE_FUNCTION</span> <span class="pre">void</span> <span class="pre">enforce_stress</span> <span class="pre">(Args</span> <span class="pre">&amp;&amp;...args)</span> <span class="pre">const</span></span></dt>
+<dd><p>Compute the contribution of composite boundaries to the stress term. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Args</strong> – Arguments to be passed to the function. The underlying BCs are called with the same arguments </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1composite__boundary_3_01specfem_1_1enums_1_1bou21c7c6860395a681480f522141a715e0_1a2732e96c2c3c601504ef43b533b9451a"></span><span class="sig-name descname"><span class="pre">template&lt;typename...</span> <span class="pre">Args&gt;</span> <span class="pre">inline</span> <span class="pre">KOKKOS_INLINE_FUNCTION</span> <span class="pre">void</span> <span class="pre">enforce_traction</span> <span class="pre">(Args</span> <span class="pre">&amp;&amp;...args)</span> <span class="pre">const</span></span></dt>
+<dd><p>Compute the contribution of composite boundaries to the traction term. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Args</strong> – Arguments to be passed to the function. The underlying BCs are called with the same arguments </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE9to_stringEv">
+<span id="_CPPv3N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE9to_stringEv"></span><span id="_CPPv2N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE9to_stringEv"></span><span id="specfem::enums::boundary_conditions::composite_boundary:specfem::enums::boundary_conditions::stacey:propertiesDp:.specfem::enums::boundary_conditions::dirichlet:propertiesDp::::to_string"></span><span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1composite__boundary_3_01specfem_1_1enums_1_1bou21c7c6860395a681480f522141a715e0_1a5e24d800cac578b06c40bdf241d2abc8"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">to_string</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE9to_stringEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Convert Stacey BC to string. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-attributes">Public Static Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE5valueE">
+<span id="_CPPv3N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE5valueE"></span><span id="_CPPv2N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE5valueE"></span><span id="specfem::enums::boundary_conditions::composite_boundary:specfem::enums::boundary_conditions::stacey:propertiesDp:.specfem::enums::boundary_conditions::dirichlet:propertiesDp::::value__specfem::enums::element::boundary_tag"></span><span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1composite__boundary_3_01specfem_1_1enums_1_1bou21c7c6860395a681480f522141a715e0_1a8729cdfc7d788ac3e6ec7c62645fc1ec"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enums</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">element</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../enumerations/element/element_enumeration.html#_CPPv4N7specfem5enums7element12boundary_tagE" title="specfem::enums::element::boundary_tag"><span class="n"><span class="pre">boundary_tag</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">value</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enums</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">element</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../enumerations/element/element_enumeration.html#_CPPv4N7specfem5enums7element12boundary_tagE" title="specfem::enums::element::boundary_tag"><span class="n"><span class="pre">boundary_tag</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../enumerations/element/element_enumeration.html#_CPPv4N7specfem5enums7element12boundary_tag26composite_stacey_dirichletE" title="specfem::enums::element::boundary_tag::composite_stacey_dirichlet"><span class="n"><span class="pre">composite_stacey_dirichlet</span></span></a><a class="headerlink" href="#_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE5valueE" title="Link to this definition"></a><br /></dt>
+<dd><p>boundary tag </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-types">Private Types</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE11stacey_typeE">
+<span id="_CPPv3N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE11stacey_typeE"></span><span id="_CPPv2N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE11stacey_typeE"></span><span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1composite__boundary_3_01specfem_1_1enums_1_1bou21c7c6860395a681480f522141a715e0_1a31fa9ce7d0130411bdbd5e531c8347b0"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">stacey_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enums</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">boundary_conditions</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="none.html#_CPPv4I0000EN7specfem5enums19boundary_conditions6staceyE" title="specfem::enums::boundary_conditions::stacey"><span class="n"><span class="pre">stacey</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpEN7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEEE" title="specfem::enums::boundary_conditions::composite_boundary&lt;specfem::enums::boundary_conditions::stacey&lt;properties...&gt;, specfem::enums::boundary_conditions::dirichlet&lt;properties...&gt;&gt;::properties"><span class="n"><span class="pre">properties</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE11stacey_typeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Stacey boundary conditions. </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE14dirichlet_typeE">
+<span id="_CPPv3N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE14dirichlet_typeE"></span><span id="_CPPv2N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE14dirichlet_typeE"></span><span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1composite__boundary_3_01specfem_1_1enums_1_1bou21c7c6860395a681480f522141a715e0_1af30b9ec9526ae82a40b249e5611d9486"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dirichlet_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enums</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">boundary_conditions</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="dirichlet.html#_CPPv4I0000EN7specfem5enums19boundary_conditions9dirichletE" title="specfem::enums::boundary_conditions::dirichlet"><span class="n"><span class="pre">dirichlet</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4IDpEN7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEEE" title="specfem::enums::boundary_conditions::composite_boundary&lt;specfem::enums::boundary_conditions::stacey&lt;properties...&gt;, specfem::enums::boundary_conditions::dirichlet&lt;properties...&gt;&gt;::properties"><span class="n"><span class="pre">properties</span></span></a><span class="p"><span class="pre">...</span></span><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE14dirichlet_typeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Dirichlet boundary conditions. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE6staceyE">
+<span id="_CPPv3N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE6staceyE"></span><span id="_CPPv2N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE6staceyE"></span><span id="specfem::enums::boundary_conditions::composite_boundary:specfem::enums::boundary_conditions::stacey:propertiesDp:.specfem::enums::boundary_conditions::dirichlet:propertiesDp::::stacey__stacey_type"></span><span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1composite__boundary_3_01specfem_1_1enums_1_1bou21c7c6860395a681480f522141a715e0_1a95cc05907e359d0635be191afcc7aacd"></span><a class="reference internal" href="#_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE11stacey_typeE" title="specfem::enums::boundary_conditions::composite_boundary&lt;specfem::enums::boundary_conditions::stacey&lt;properties...&gt;, specfem::enums::boundary_conditions::dirichlet&lt;properties...&gt;&gt;::stacey_type"><span class="n"><span class="pre">stacey_type</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">stacey</span></span></span><a class="headerlink" href="#_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE6staceyE" title="Link to this definition"></a><br /></dt>
+<dd><p>Stacey boundary conditions. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE9dirichletE">
+<span id="_CPPv3N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE9dirichletE"></span><span id="_CPPv2N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE9dirichletE"></span><span id="specfem::enums::boundary_conditions::composite_boundary:specfem::enums::boundary_conditions::stacey:propertiesDp:.specfem::enums::boundary_conditions::dirichlet:propertiesDp::::dirichlet__dirichlet_type"></span><span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1composite__boundary_3_01specfem_1_1enums_1_1bou21c7c6860395a681480f522141a715e0_1a2c811bb8f767255bc7bd36820df7d561"></span><a class="reference internal" href="#_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE14dirichlet_typeE" title="specfem::enums::boundary_conditions::composite_boundary&lt;specfem::enums::boundary_conditions::stacey&lt;properties...&gt;, specfem::enums::boundary_conditions::dirichlet&lt;properties...&gt;&gt;::dirichlet_type"><span class="n"><span class="pre">dirichlet_type</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dirichlet</span></span></span><a class="headerlink" href="#_CPPv4N7specfem5enums19boundary_conditions18composite_boundaryIN7specfem5enums19boundary_conditions6staceyIDp10propertiesEEN7specfem5enums19boundary_conditions9dirichletIDp10propertiesEEE9dirichletE" title="Link to this definition"></a><br /></dt>
+<dd><p>Dirichlet boundary conditions. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Rohit Kakodkar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

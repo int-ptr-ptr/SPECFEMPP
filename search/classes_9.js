@@ -1,6 +1,7 @@
 var searchData=
 [
-  ['receiver_0',['receiver',['../classspecfem_1_1receivers_1_1receiver.html',1,'specfem::receivers']]],
-  ['receivers_1',['receivers',['../structspecfem_1_1compute_1_1receivers.html',1,'specfem::compute']]],
-  ['run_5fsetup_2',['run_setup',['../classspecfem_1_1runtime__configuration_1_1run__setup.html',1,'specfem::runtime_configuration']]]
+  ['material_0',['material',['../classspecfem_1_1material_1_1material.html',1,'specfem::material']]],
+  ['mesh_1',['mesh',['../structspecfem_1_1mesh_1_1mesh.html',1,'specfem::mesh']]],
+  ['moment_5ftensor_2',['moment_tensor',['../classspecfem_1_1sources_1_1moment__tensor.html',1,'specfem::sources']]],
+  ['mpi_3',['MPI',['../classspecfem_1_1_m_p_i_1_1_m_p_i.html',1,'specfem::MPI']]]
 ];

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Acoustic Forcing Boundaries &mdash; SPECFEM++  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/graphviz.css?v=eafc0fe6" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/scrollable_code_blocks.css?v=ebc906c5" />
+      <link rel="stylesheet" type="text/css" href="../../../../_static/css/center_align_table.css?v=f0548739" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../../index.html" class="icon icon-home">
+            SPECFEM++
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">USER DOCUMENTATION</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../user_documentation/index.html">User documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../meshfem2d/index.html">MESHFEM Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../parameter_documentation/index.html">SPECFEM++ Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../source_description/index.html">Source Description</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COOKBOOKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cookbooks/index.html">Cookbooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">CONTRIBUTION GUIDELINES</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../developer_documentation/index.html">Developer documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COMMUNITY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=bug_report.md&amp;title=">Report bugs</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=feature_request.md&amp;title=">Request a new feature</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/orgs/SPECFEM/discussions">Join the discussion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">BENCHMARKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../benchmarks/benchmarks.html">Performance Benchmarks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API DOCUMENTATION</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">SPECFEM++</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Acoustic Forcing Boundaries</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../../_sources/api/IO/mesh/boundaries/acoustic_forcing.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="acoustic-forcing-boundaries">
+<h1>Acoustic Forcing Boundaries<a class="headerlink" href="#acoustic-forcing-boundaries" title="Link to this heading"></a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">forcing_boundary</span></code> struct is used to store element information for elments on the acoustic forcing boundary.</p>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh10boundaries16forcing_boundaryE">
+<span id="_CPPv3N7specfem4mesh10boundaries16forcing_boundaryE"></span><span id="_CPPv2N7specfem4mesh10boundaries16forcing_boundaryE"></span><span id="specfem::mesh::boundaries::forcing_boundary"></span><span class="target" id="structspecfem_1_1mesh_1_1boundaries_1_1forcing__boundary"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">forcing_boundary</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh10boundaries16forcing_boundaryE" title="Link to this definition"></a><br /></dt>
+<dd><p>Acoustic forcing boundary</p>
+<p>TODO : Document on how is this struct used in the code. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-bottom-boundary">Bottom boundary</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh10boundaries16forcing_boundary12ibegin_edge1E">
+<span id="_CPPv3N7specfem4mesh10boundaries16forcing_boundary12ibegin_edge1E"></span><span id="_CPPv2N7specfem4mesh10boundaries16forcing_boundary12ibegin_edge1E"></span><span id="specfem::mesh::boundaries::forcing_boundary::ibegin_edge1__specfem::kokkos::HostView1d:i:"></span><span class="target" id="structspecfem_1_1mesh_1_1boundaries_1_1forcing__boundary_1ab110512b756ce957fba308c13b40d8d2"></span><a class="reference internal" href="../../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos10HostView1dE" title="specfem::kokkos::HostView1d"><span class="n"><span class="pre">HostView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ibegin_edge1</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh10boundaries16forcing_boundary12ibegin_edge1E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh10boundaries16forcing_boundary10iend_edge1E">
+<span id="_CPPv3N7specfem4mesh10boundaries16forcing_boundary10iend_edge1E"></span><span id="_CPPv2N7specfem4mesh10boundaries16forcing_boundary10iend_edge1E"></span><span id="specfem::mesh::boundaries::forcing_boundary::iend_edge1__specfem::kokkos::HostView1d:i:"></span><span class="target" id="structspecfem_1_1mesh_1_1boundaries_1_1forcing__boundary_1aedb0d06b01014630795a6a2ade71a183"></span><a class="reference internal" href="../../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos10HostView1dE" title="specfem::kokkos::HostView1d"><span class="n"><span class="pre">HostView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">iend_edge1</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh10boundaries16forcing_boundary10iend_edge1E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-right-boundary">Right boundary</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh10boundaries16forcing_boundary12ibegin_edge2E">
+<span id="_CPPv3N7specfem4mesh10boundaries16forcing_boundary12ibegin_edge2E"></span><span id="_CPPv2N7specfem4mesh10boundaries16forcing_boundary12ibegin_edge2E"></span><span id="specfem::mesh::boundaries::forcing_boundary::ibegin_edge2__specfem::kokkos::HostView1d:i:"></span><span class="target" id="structspecfem_1_1mesh_1_1boundaries_1_1forcing__boundary_1a19a28a45091a5f407075a69374986fb3"></span><a class="reference internal" href="../../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos10HostView1dE" title="specfem::kokkos::HostView1d"><span class="n"><span class="pre">HostView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ibegin_edge2</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh10boundaries16forcing_boundary12ibegin_edge2E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh10boundaries16forcing_boundary10iend_edge2E">
+<span id="_CPPv3N7specfem4mesh10boundaries16forcing_boundary10iend_edge2E"></span><span id="_CPPv2N7specfem4mesh10boundaries16forcing_boundary10iend_edge2E"></span><span id="specfem::mesh::boundaries::forcing_boundary::iend_edge2__specfem::kokkos::HostView1d:i:"></span><span class="target" id="structspecfem_1_1mesh_1_1boundaries_1_1forcing__boundary_1ad700b874ec124130320884d33bd904fb"></span><a class="reference internal" href="../../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos10HostView1dE" title="specfem::kokkos::HostView1d"><span class="n"><span class="pre">HostView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">iend_edge2</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh10boundaries16forcing_boundary10iend_edge2E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-top-boundary">Top boundary</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh10boundaries16forcing_boundary12ibegin_edge3E">
+<span id="_CPPv3N7specfem4mesh10boundaries16forcing_boundary12ibegin_edge3E"></span><span id="_CPPv2N7specfem4mesh10boundaries16forcing_boundary12ibegin_edge3E"></span><span id="specfem::mesh::boundaries::forcing_boundary::ibegin_edge3__specfem::kokkos::HostView1d:i:"></span><span class="target" id="structspecfem_1_1mesh_1_1boundaries_1_1forcing__boundary_1a455daedeb706134db360559779f0e4ac"></span><a class="reference internal" href="../../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos10HostView1dE" title="specfem::kokkos::HostView1d"><span class="n"><span class="pre">HostView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ibegin_edge3</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh10boundaries16forcing_boundary12ibegin_edge3E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh10boundaries16forcing_boundary10iend_edge3E">
+<span id="_CPPv3N7specfem4mesh10boundaries16forcing_boundary10iend_edge3E"></span><span id="_CPPv2N7specfem4mesh10boundaries16forcing_boundary10iend_edge3E"></span><span id="specfem::mesh::boundaries::forcing_boundary::iend_edge3__specfem::kokkos::HostView1d:i:"></span><span class="target" id="structspecfem_1_1mesh_1_1boundaries_1_1forcing__boundary_1ab79c51366dc47d5f7e0b46b7d9fa2c35"></span><a class="reference internal" href="../../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos10HostView1dE" title="specfem::kokkos::HostView1d"><span class="n"><span class="pre">HostView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">iend_edge3</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh10boundaries16forcing_boundary10iend_edge3E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-left-boundary">Left boundary</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh10boundaries16forcing_boundary12ibegin_edge4E">
+<span id="_CPPv3N7specfem4mesh10boundaries16forcing_boundary12ibegin_edge4E"></span><span id="_CPPv2N7specfem4mesh10boundaries16forcing_boundary12ibegin_edge4E"></span><span id="specfem::mesh::boundaries::forcing_boundary::ibegin_edge4__specfem::kokkos::HostView1d:i:"></span><span class="target" id="structspecfem_1_1mesh_1_1boundaries_1_1forcing__boundary_1ad37c705b3c49ddd7b1a840b6040d13f3"></span><a class="reference internal" href="../../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos10HostView1dE" title="specfem::kokkos::HostView1d"><span class="n"><span class="pre">HostView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ibegin_edge4</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh10boundaries16forcing_boundary12ibegin_edge4E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh10boundaries16forcing_boundary10iend_edge4E">
+<span id="_CPPv3N7specfem4mesh10boundaries16forcing_boundary10iend_edge4E"></span><span id="_CPPv2N7specfem4mesh10boundaries16forcing_boundary10iend_edge4E"></span><span id="specfem::mesh::boundaries::forcing_boundary::iend_edge4__specfem::kokkos::HostView1d:i:"></span><span class="target" id="structspecfem_1_1mesh_1_1boundaries_1_1forcing__boundary_1aae4b0190196388ae5393db59260cb62f"></span><a class="reference internal" href="../../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos10HostView1dE" title="specfem::kokkos::HostView1d"><span class="n"><span class="pre">HostView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">iend_edge4</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh10boundaries16forcing_boundary10iend_edge4E" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-elements-on-boundary">Elements on boundary</p>
+<p>number of top/left/right/bottom elements on ith acoustic forcing boundary </p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh10boundaries16forcing_boundary9ib_bottomE">
+<span id="_CPPv3N7specfem4mesh10boundaries16forcing_boundary9ib_bottomE"></span><span id="_CPPv2N7specfem4mesh10boundaries16forcing_boundary9ib_bottomE"></span><span id="specfem::mesh::boundaries::forcing_boundary::ib_bottom__specfem::kokkos::HostView1d:i:"></span><span class="target" id="structspecfem_1_1mesh_1_1boundaries_1_1forcing__boundary_1a4fc0d8a794df5c5ed017b341bea9e71c"></span><a class="reference internal" href="../../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos10HostView1dE" title="specfem::kokkos::HostView1d"><span class="n"><span class="pre">HostView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ib_bottom</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh10boundaries16forcing_boundary9ib_bottomE" title="Link to this definition"></a><br /></dt>
+<dd><p>Number of bottom elements on ith acoustic forcing boundary </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh10boundaries16forcing_boundary6ib_topE">
+<span id="_CPPv3N7specfem4mesh10boundaries16forcing_boundary6ib_topE"></span><span id="_CPPv2N7specfem4mesh10boundaries16forcing_boundary6ib_topE"></span><span id="specfem::mesh::boundaries::forcing_boundary::ib_top__specfem::kokkos::HostView1d:i:"></span><span class="target" id="structspecfem_1_1mesh_1_1boundaries_1_1forcing__boundary_1aeb2ce830a572dec86c602db287056686"></span><a class="reference internal" href="../../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos10HostView1dE" title="specfem::kokkos::HostView1d"><span class="n"><span class="pre">HostView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ib_top</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh10boundaries16forcing_boundary6ib_topE" title="Link to this definition"></a><br /></dt>
+<dd><p>Number of top elemetns on the ith acoustic forcing boundary </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh10boundaries16forcing_boundary8ib_rightE">
+<span id="_CPPv3N7specfem4mesh10boundaries16forcing_boundary8ib_rightE"></span><span id="_CPPv2N7specfem4mesh10boundaries16forcing_boundary8ib_rightE"></span><span id="specfem::mesh::boundaries::forcing_boundary::ib_right__specfem::kokkos::HostView1d:i:"></span><span class="target" id="structspecfem_1_1mesh_1_1boundaries_1_1forcing__boundary_1a87c632ca6cbcf7d600c606850d118a1d"></span><a class="reference internal" href="../../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos10HostView1dE" title="specfem::kokkos::HostView1d"><span class="n"><span class="pre">HostView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ib_right</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh10boundaries16forcing_boundary8ib_rightE" title="Link to this definition"></a><br /></dt>
+<dd><p>Number of right elemetns on the ith acoustic forcing boundary </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh10boundaries16forcing_boundary7ib_leftE">
+<span id="_CPPv3N7specfem4mesh10boundaries16forcing_boundary7ib_leftE"></span><span id="_CPPv2N7specfem4mesh10boundaries16forcing_boundary7ib_leftE"></span><span id="specfem::mesh::boundaries::forcing_boundary::ib_left__specfem::kokkos::HostView1d:i:"></span><span class="target" id="structspecfem_1_1mesh_1_1boundaries_1_1forcing__boundary_1ab892bc51f3bca18175473d707658e6a2"></span><a class="reference internal" href="../../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos10HostView1dE" title="specfem::kokkos::HostView1d"><span class="n"><span class="pre">HostView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ib_left</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh10boundaries16forcing_boundary7ib_leftE" title="Link to this definition"></a><br /></dt>
+<dd><p>Number of left elemetns on the ith acoustic forcing boundary </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh10boundaries16forcing_boundary16forcing_boundaryEv">
+<span id="_CPPv3N7specfem4mesh10boundaries16forcing_boundary16forcing_boundaryEv"></span><span id="_CPPv2N7specfem4mesh10boundaries16forcing_boundary16forcing_boundaryEv"></span><span id="specfem::mesh::boundaries::forcing_boundary::forcing_boundary"></span><span class="target" id="structspecfem_1_1mesh_1_1boundaries_1_1forcing__boundary_1a6d7954c0f2c3a57cd209e98f0f715680"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">forcing_boundary</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem4mesh10boundaries16forcing_boundary16forcing_boundaryEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Default constructor. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh10boundaries16forcing_boundary16forcing_boundaryEKi">
+<span id="_CPPv3N7specfem4mesh10boundaries16forcing_boundary16forcing_boundaryEKi"></span><span id="_CPPv2N7specfem4mesh10boundaries16forcing_boundary16forcing_boundaryEKi"></span><span id="specfem::mesh::boundaries::forcing_boundary::forcing_boundary__iC"></span><span class="target" id="structspecfem_1_1mesh_1_1boundaries_1_1forcing__boundary_1ae6494f3aa9389296ea9a9f4c4a0ee946"></span><span class="sig-name descname"><span class="n"><span class="pre">forcing_boundary</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nelement_acforcing</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem4mesh10boundaries16forcing_boundary16forcing_boundaryEKi" title="Link to this definition"></a><br /></dt>
+<dd><p>Constructor to allocate views. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>nelement_acforcing</strong> – number of elements on acoustic forcing boundary face </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh10boundaries16forcing_boundary16forcing_boundaryERNSt8ifstreamEKiKiPKN7specfem3MPI3MPIE">
+<span id="_CPPv3N7specfem4mesh10boundaries16forcing_boundary16forcing_boundaryERNSt8ifstreamEKiKiPKN7specfem3MPI3MPIE"></span><span id="_CPPv2N7specfem4mesh10boundaries16forcing_boundary16forcing_boundaryERNSt8ifstreamEKiKiPKN7specfem3MPI3MPIE"></span><span id="specfem::mesh::boundaries::forcing_boundary::forcing_boundary__std::ifstreamR.iC.iC.specfem::MPI::MPICP"></span><span class="target" id="structspecfem_1_1mesh_1_1boundaries_1_1forcing__boundary_1af2644354de8b24a07802d373b9ab8c7c"></span><span class="sig-name descname"><span class="n"><span class="pre">forcing_boundary</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ifstream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">stream</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nelement_acforcing</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nspec</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MPI</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MPI</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">mpi</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem4mesh10boundaries16forcing_boundary16forcing_boundaryERNSt8ifstreamEKiKiPKN7specfem3MPI3MPIE" title="Link to this definition"></a><br /></dt>
+<dd><p>Constructor to read fortran binary database. </p>
+<p>This constructor allocates views and assigns values to them read from the database.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stream</strong> – Stream object for fortran binary file buffered to absorbing boundaries section </p></li>
+<li><p><strong>nelement_acforcing</strong> – number of elements on absorbing boundary face </p></li>
+<li><p><strong>nspec</strong> – Number of spectral elements </p></li>
+<li><p><strong>mpi</strong> – Pointer to MPI object </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh10boundaries16forcing_boundary12numacforcingE">
+<span id="_CPPv3N7specfem4mesh10boundaries16forcing_boundary12numacforcingE"></span><span id="_CPPv2N7specfem4mesh10boundaries16forcing_boundary12numacforcingE"></span><span id="specfem::mesh::boundaries::forcing_boundary::numacforcing__specfem::kokkos::HostView1d:i:"></span><span class="target" id="structspecfem_1_1mesh_1_1boundaries_1_1forcing__boundary_1ac9ca5ab2aaebcf95fa36c5dea6ce32db"></span><a class="reference internal" href="../../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos10HostView1dE" title="specfem::kokkos::HostView1d"><span class="n"><span class="pre">HostView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">numacforcing</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh10boundaries16forcing_boundary12numacforcingE" title="Link to this definition"></a><br /></dt>
+<dd><p>ispec value for the the element on the boundary </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh10boundaries16forcing_boundary13typeacforcingE">
+<span id="_CPPv3N7specfem4mesh10boundaries16forcing_boundary13typeacforcingE"></span><span id="_CPPv2N7specfem4mesh10boundaries16forcing_boundary13typeacforcingE"></span><span id="specfem::mesh::boundaries::forcing_boundary::typeacforcing__specfem::kokkos::HostView1d:i:"></span><span class="target" id="structspecfem_1_1mesh_1_1boundaries_1_1forcing__boundary_1ad849e125139b5664fc2bc5bd6538c27a"></span><a class="reference internal" href="../../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos10HostView1dE" title="specfem::kokkos::HostView1d"><span class="n"><span class="pre">HostView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">typeacforcing</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh10boundaries16forcing_boundary13typeacforcingE" title="Link to this definition"></a><br /></dt>
+<dd><p>Defines if the acoustic forcing boundary type is top, left, right or bottom. This is only used during plotting </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh10boundaries16forcing_boundary13codeacforcingE">
+<span id="_CPPv3N7specfem4mesh10boundaries16forcing_boundary13codeacforcingE"></span><span id="_CPPv2N7specfem4mesh10boundaries16forcing_boundary13codeacforcingE"></span><span id="specfem::mesh::boundaries::forcing_boundary::codeacforcing__specfem::kokkos::HostView2d:b:"></span><span class="target" id="structspecfem_1_1mesh_1_1boundaries_1_1forcing__boundary_1abc46a3b1e5fa0e389342728e1f45211e"></span><a class="reference internal" href="../../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos10HostView2dE" title="specfem::kokkos::HostView2d"><span class="n"><span class="pre">HostView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">bool</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">codeacforcing</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh10boundaries16forcing_boundary13codeacforcingE" title="Link to this definition"></a><br /></dt>
+<dd><p>Specifies if an element is bottom, right, top or left absorbing boundary</p>
+<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="k">for</span><span class="w"> </span><span class="n">elements</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="n">bottom</span><span class="w"> </span><span class="n">boundary</span>
+<span class="w">   </span><span class="n">codeacforcing</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">true</span>
+<span class="k">for</span><span class="w"> </span><span class="n">elements</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="n">right</span><span class="w"> </span><span class="n">boundary</span>
+<span class="w">   </span><span class="n">codeacforcing</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">true</span>
+<span class="k">for</span><span class="w"> </span><span class="n">elements</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="n">top</span><span class="w"> </span><span class="n">boundary</span>
+<span class="w">   </span><span class="n">codeacforcing</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="mi">2</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">true</span>
+<span class="k">for</span><span class="w"> </span><span class="n">elements</span><span class="w"> </span><span class="n">on</span><span class="w"> </span><span class="n">left</span><span class="w"> </span><span class="n">boundary</span>
+<span class="w">   </span><span class="n">codeacforcing</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="mi">3</span><span class="p">)</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="nb">true</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Rohit Kakodkar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

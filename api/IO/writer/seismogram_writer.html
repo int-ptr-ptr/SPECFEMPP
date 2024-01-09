@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Seismogram Writer &mdash; SPECFEM++  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=eafc0fe6" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/scrollable_code_blocks.css?v=ebc906c5" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/center_align_table.css?v=f0548739" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Sources API" href="../../sources/index.html" />
+    <link rel="prev" title="Writer API" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SPECFEM++
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">USER DOCUMENTATION</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_documentation/index.html">User documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../meshfem2d/index.html">MESHFEM Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parameter_documentation/index.html">SPECFEM++ Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source_description/index.html">Source Description</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COOKBOOKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cookbooks/index.html">Cookbooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">CONTRIBUTION GUIDELINES</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer_documentation/index.html">Developer documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COMMUNITY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=bug_report.md&amp;title=">Report bugs</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=feature_request.md&amp;title=">Request a new feature</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/orgs/SPECFEM/discussions">Join the discussion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">BENCHMARKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../benchmarks/benchmarks.html">Performance Benchmarks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API DOCUMENTATION</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">API documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../kokkos_abstractions.html">Views and Execution Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../quadrature/index.html">Quadrature API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../material/index.html">Materials Class API</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html">Input/Output modules</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../fortran_io.html">Fortran IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../mesh/index.html">Mesh Input Module</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="index.html">Writer API</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="index.html#_CPPv4N7specfem6writer6writerE"><code class="docutils literal notranslate"><span class="pre">writer</span></code></a></li>
+<li class="toctree-l4 current"><a class="reference internal" href="index.html#types-of-writers">Types of writers</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../sources/index.html">Sources API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../receivers/index.html">Receiver API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../compute/index.html">Compute Data Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../enumerations/index.html">Enumerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../domain/index.html">Domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../boundary_conditions/index.html">Boundary conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coupling_physics/index.html">Coupled Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../timescheme/index.html">Time Scheme API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../solver/index.html">Solver API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup_parameters/index.html">Setup Parameters</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SPECFEM++</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">API documentation</a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Input/Output modules</a></li>
+          <li class="breadcrumb-item"><a href="index.html">Writer API</a></li>
+      <li class="breadcrumb-item active">Seismogram Writer</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/api/IO/writer/seismogram_writer.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="seismogram-writer">
+<h1>Seismogram Writer<a class="headerlink" href="#seismogram-writer" title="Link to this heading"></a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">seismogram</span></code> provides methods to write seismograms to a file.</p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6writer10seismogramE">
+<span id="_CPPv3N7specfem6writer10seismogramE"></span><span id="_CPPv2N7specfem6writer10seismogramE"></span><span id="specfem::writer::seismogram"></span><span class="target" id="classspecfem_1_1writer_1_1seismogram"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">seismogram</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem6writerE" title="specfem::writer"><span class="n"><span class="pre">writer</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="index.html#_CPPv4N7specfem6writer6writerE" title="specfem::writer::writer"><span class="n"><span class="pre">writer</span></span></a><a class="headerlink" href="#_CPPv4N7specfem6writer10seismogramE" title="Link to this definition"></a><br /></dt>
+<dd><p>Seismogram writer class to write seismogram to a file. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6writer10seismogram10seismogramERNSt6vectorINSt10shared_ptrIN7specfem9receivers8receiverEEEEERN7specfem7compute9receiversEKN7specfem5enums10seismogram6formatEKNSt6stringEK9type_realK9type_realKi">
+<span id="_CPPv3N7specfem6writer10seismogram10seismogramERNSt6vectorINSt10shared_ptrIN7specfem9receivers8receiverEEEEERN7specfem7compute9receiversEKN7specfem5enums10seismogram6formatEKNSt6stringEK9type_realK9type_realKi"></span><span id="_CPPv2N7specfem6writer10seismogram10seismogramERNSt6vectorINSt10shared_ptrIN7specfem9receivers8receiverEEEEERN7specfem7compute9receiversEKN7specfem5enums10seismogram6formatEKNSt6stringEK9type_realK9type_realKi"></span><span id="specfem::writer::seismogram::seismogram__std::vector:std::shared_ptr:specfem::receivers::receiver::R.specfem::compute::receiversR.specfem::enums::seismogram::formatC.ssC.type_realC.type_realC.iC"></span><span class="target" id="classspecfem_1_1writer_1_1seismogram_1ace883f62b656b8663071fc0ee2b3f0cd"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">seismogram</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem9receiversE" title="specfem::receivers"><span class="n"><span class="pre">receivers</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../receivers/index.html#_CPPv4N7specfem9receivers8receiverE" title="specfem::receivers::receiver"><span class="n"><span class="pre">receiver</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">receivers</span></span>, <a class="reference internal" href="../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem7computeE" title="specfem::compute"><span class="n"><span class="pre">compute</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../compute/compute_receivers.html#_CPPv4N7specfem7compute9receiversE" title="specfem::compute::receivers"><span class="n"><span class="pre">receivers</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">compute_receivers</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enums</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">seismogram</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">format</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">type</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">output_folder</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">dt</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">t0</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nstep_between_samples</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem6writer10seismogram10seismogramERNSt6vectorINSt10shared_ptrIN7specfem9receivers8receiverEEEEERN7specfem7compute9receiversEKN7specfem5enums10seismogram6formatEKNSt6stringEK9type_realK9type_realKi" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct a new seismogram writer object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>receivers</strong> – Vector of pointers to <a class="reference internal" href="../../receivers/index.html#classspecfem_1_1receivers_1_1receiver"><span class="std std-ref">specfem::receivers::receiver</span></a> objects </p></li>
+<li><p><strong>compute_receivers</strong> – Pointer to <a class="reference internal" href="../../compute/compute_receivers.html#structspecfem_1_1compute_1_1receivers"><span class="std std-ref">specfem::compute::receivers</span></a> object </p></li>
+<li><p><strong>type</strong> – Format of the output file </p></li>
+<li><p><strong>output_folder</strong> – path to output folder where results will be stored </p></li>
+<li><p><strong>dt</strong> – Time interval between subsequent timesteps </p></li>
+<li><p><strong>t0</strong> – Solver start time </p></li>
+<li><p><strong>nstep_between_samples</strong> – number of timesteps between seismogram sampling (seismogram sampling frequency) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6writer10seismogram5writeEv">
+<span id="_CPPv3N7specfem6writer10seismogram5writeEv"></span><span id="_CPPv2N7specfem6writer10seismogram5writeEv"></span><span id="specfem::writer::seismogram::write"></span><span class="target" id="classspecfem_1_1writer_1_1seismogram_1adb4bc489a2f3b6eacdeb6f3a36d7b36a"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">write</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N7specfem6writer10seismogram5writeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Write seismograms. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6writer10seismogram4typeE">
+<span id="_CPPv3N7specfem6writer10seismogram4typeE"></span><span id="_CPPv2N7specfem6writer10seismogram4typeE"></span><span id="specfem::writer::seismogram::type__specfem::enums::seismogram::format"></span><span class="target" id="classspecfem_1_1writer_1_1seismogram_1a8378e7330c56fc283f81d10ec4209668"></span><a class="reference internal" href="../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enums</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">seismogram</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">format</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">type</span></span></span><a class="headerlink" href="#_CPPv4N7specfem6writer10seismogram4typeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Output format of the seismogram file </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6writer10seismogram13output_folderE">
+<span id="_CPPv3N7specfem6writer10seismogram13output_folderE"></span><span id="_CPPv2N7specfem6writer10seismogram13output_folderE"></span><span id="specfem::writer::seismogram::output_folder__ss"></span><span class="target" id="classspecfem_1_1writer_1_1seismogram_1a5574233f35dd7376ab424f622d5916b8"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">output_folder</span></span></span><a class="headerlink" href="#_CPPv4N7specfem6writer10seismogram13output_folderE" title="Link to this definition"></a><br /></dt>
+<dd><p>Path to output folder where results will be stored </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6writer10seismogram17compute_receiversE">
+<span id="_CPPv3N7specfem6writer10seismogram17compute_receiversE"></span><span id="_CPPv2N7specfem6writer10seismogram17compute_receiversE"></span><span id="specfem::writer::seismogram::compute_receivers__specfem::compute::receivers"></span><span class="target" id="classspecfem_1_1writer_1_1seismogram_1a7edc56599006ab8ffb60efafa8e7949d"></span><a class="reference internal" href="../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem7computeE" title="specfem::compute"><span class="n"><span class="pre">compute</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../compute/compute_receivers.html#_CPPv4N7specfem7compute9receiversE" title="specfem::compute::receivers"><span class="n"><span class="pre">receivers</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">compute_receivers</span></span></span><a class="headerlink" href="#_CPPv4N7specfem6writer10seismogram17compute_receiversE" title="Link to this definition"></a><br /></dt>
+<dd><p>Pointer to <a class="reference internal" href="../../compute/compute_receivers.html#structspecfem_1_1compute_1_1receivers"><span class="std std-ref">specfem::compute::receivers</span></a> object. This object containes the view used to store calculated seismograms </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6writer10seismogram9receiversE">
+<span id="_CPPv3N7specfem6writer10seismogram9receiversE"></span><span id="_CPPv2N7specfem6writer10seismogram9receiversE"></span><span id="specfem::writer::seismogram::receivers__std::vector:std::shared_ptr:specfem::receivers::receiver::"></span><span class="target" id="classspecfem_1_1writer_1_1seismogram_1afcb0214a19cf9c0593dec79dee923778"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem9receiversE" title="specfem::receivers"><span class="n"><span class="pre">receivers</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../receivers/index.html#_CPPv4N7specfem9receivers8receiverE" title="specfem::receivers::receiver"><span class="n"><span class="pre">receiver</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">receivers</span></span></span><a class="headerlink" href="#_CPPv4N7specfem6writer10seismogram9receiversE" title="Link to this definition"></a><br /></dt>
+<dd><p>Vector of pointers to <a class="reference internal" href="../../receivers/index.html#classspecfem_1_1receivers_1_1receiver"><span class="std std-ref">specfem::receivers::receiver</span></a> objects. These are used to get station and network name where saving the seismogram </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6writer10seismogram2dtE">
+<span id="_CPPv3N7specfem6writer10seismogram2dtE"></span><span id="_CPPv2N7specfem6writer10seismogram2dtE"></span><span id="specfem::writer::seismogram::dt__type_real"></span><span class="target" id="classspecfem_1_1writer_1_1seismogram_1a68e47f1a5296b94f5994d33f12a2c734"></span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dt</span></span></span><a class="headerlink" href="#_CPPv4N7specfem6writer10seismogram2dtE" title="Link to this definition"></a><br /></dt>
+<dd><p>Time interval between subsequent timesteps. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6writer10seismogram2t0E">
+<span id="_CPPv3N7specfem6writer10seismogram2t0E"></span><span id="_CPPv2N7specfem6writer10seismogram2t0E"></span><span id="specfem::writer::seismogram::t0__type_real"></span><span class="target" id="classspecfem_1_1writer_1_1seismogram_1aaba84ecd11535a066f85f7a34bd53cee"></span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">t0</span></span></span><a class="headerlink" href="#_CPPv4N7specfem6writer10seismogram2t0E" title="Link to this definition"></a><br /></dt>
+<dd><p>Solver start time. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem6writer10seismogram21nstep_between_samplesE">
+<span id="_CPPv3N7specfem6writer10seismogram21nstep_between_samplesE"></span><span id="_CPPv2N7specfem6writer10seismogram21nstep_between_samplesE"></span><span id="specfem::writer::seismogram::nstep_between_samples__i"></span><span class="target" id="classspecfem_1_1writer_1_1seismogram_1a68f1bfee16a38581f7452048edac513a"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nstep_between_samples</span></span></span><a class="headerlink" href="#_CPPv4N7specfem6writer10seismogram21nstep_between_samplesE" title="Link to this definition"></a><br /></dt>
+<dd><p>number of timesteps between seismogram sampling (seismogram sampling frequency) </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Writer API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../sources/index.html" class="btn btn-neutral float-right" title="Sources API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Rohit Kakodkar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

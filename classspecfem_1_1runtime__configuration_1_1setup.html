@@ -69,7 +69,7 @@ $(function() {
 
 <div id="nav-path" class="navpath">
   <ul>
-<li class="navelem"><b>specfem</b></li><li class="navelem"><a class="el" href="namespacespecfem_1_1runtime__configuration.html">runtime_configuration</a></li><li class="navelem"><a class="el" href="classspecfem_1_1runtime__configuration_1_1setup.html">setup</a></li>  </ul>
+<li class="navelem"><b>specfem</b></li><li class="navelem"><b>runtime_configuration</b></li><li class="navelem"><a class="el" href="classspecfem_1_1runtime__configuration_1_1setup.html">setup</a></li>  </ul>
 </div>
 </div><!-- top -->
 <div class="header">
@@ -80,19 +80,19 @@ $(function() {
 </div><!--header-->
 <div class="contents">
 
-<p><code>#include &lt;parameter_parser.h&gt;</code></p>
+<p><code>#include &lt;setup.hpp&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a27163aeb72fe18559449b39fbf2db0b3" id="r_a27163aeb72fe18559449b39fbf2db0b3"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1runtime__configuration_1_1setup.html#a27163aeb72fe18559449b39fbf2db0b3">setup</a> (std::string parameter_file)</td></tr>
-<tr class="memdesc:a27163aeb72fe18559449b39fbf2db0b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new setup object.  <br /></td></tr>
-<tr class="separator:a27163aeb72fe18559449b39fbf2db0b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a37f67a403c6f5d4f89c2a78f7aeb9a9c" id="r_a37f67a403c6f5d4f89c2a78f7aeb9a9c"><td class="memItemLeft" align="right" valign="top">std::tuple&lt; specfem::quadrature::quadrature, specfem::quadrature::quadrature &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1runtime__configuration_1_1setup.html#a37f67a403c6f5d4f89c2a78f7aeb9a9c">instantiate_quadrature</a> ()</td></tr>
-<tr class="memdesc:a37f67a403c6f5d4f89c2a78f7aeb9a9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiate quadrature objects in x and z dimensions.  <br /></td></tr>
-<tr class="separator:a37f67a403c6f5d4f89c2a78f7aeb9a9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad8f27268ad1da660307d76dce52f94e0" id="r_ad8f27268ad1da660307d76dce52f94e0"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classspecfem_1_1_time_scheme_1_1_time_scheme.html">specfem::TimeScheme::TimeScheme</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1runtime__configuration_1_1setup.html#ad8f27268ad1da660307d76dce52f94e0">instantiate_solver</a> ()</td></tr>
-<tr class="memdesc:ad8f27268ad1da660307d76dce52f94e0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiate the Timescheme.  <br /></td></tr>
-<tr class="separator:ad8f27268ad1da660307d76dce52f94e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7767d3b4da737f15804798989f212434" id="r_a7767d3b4da737f15804798989f212434"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1runtime__configuration_1_1setup.html#a7767d3b4da737f15804798989f212434">setup</a> (const std::string &amp;parameter_file, const std::string &amp;default_file)</td></tr>
+<tr class="memdesc:a7767d3b4da737f15804798989f212434"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new setup object.  <br /></td></tr>
+<tr class="separator:a7767d3b4da737f15804798989f212434"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5101a86c8f8250f5d38dd644f9d4a7c2" id="r_a5101a86c8f8250f5d38dd644f9d4a7c2"><td class="memItemLeft" align="right" valign="top">std::tuple&lt; <a class="el" href="classspecfem_1_1quadrature_1_1quadrature.html">specfem::quadrature::quadrature</a> *, <a class="el" href="classspecfem_1_1quadrature_1_1quadrature.html">specfem::quadrature::quadrature</a> * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1runtime__configuration_1_1setup.html#a5101a86c8f8250f5d38dd644f9d4a7c2">instantiate_quadrature</a> ()</td></tr>
+<tr class="memdesc:a5101a86c8f8250f5d38dd644f9d4a7c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiate quadrature objects in x and z dimensions.  <br /></td></tr>
+<tr class="separator:a5101a86c8f8250f5d38dd644f9d4a7c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4a64eb5a899b2c712e02e28e54a5da1f" id="r_a4a64eb5a899b2c712e02e28e54a5da1f"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classspecfem_1_1_time_scheme_1_1_time_scheme.html">specfem::TimeScheme::TimeScheme</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1runtime__configuration_1_1setup.html#a4a64eb5a899b2c712e02e28e54a5da1f">instantiate_solver</a> ()</td></tr>
+<tr class="memdesc:a4a64eb5a899b2c712e02e28e54a5da1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiate the Timescheme.  <br /></td></tr>
+<tr class="separator:a4a64eb5a899b2c712e02e28e54a5da1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0b0ce691c3a03813d680619902d548c9" id="r_a0b0ce691c3a03813d680619902d548c9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1runtime__configuration_1_1setup.html#a0b0ce691c3a03813d680619902d548c9">update_t0</a> (type_real t0)</td></tr>
 <tr class="memdesc:a0b0ce691c3a03813d680619902d548c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update simulation start time.  <br /></td></tr>
 <tr class="separator:a0b0ce691c3a03813d680619902d548c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -112,19 +112,19 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>print_header</
 <tr class="memitem:ad42e1108aa7bd7849fc9d255a0dc3b5f" id="r_ad42e1108aa7bd7849fc9d255a0dc3b5f"><td class="memItemLeft" align="right" valign="top">type_real&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1runtime__configuration_1_1setup.html#ad42e1108aa7bd7849fc9d255a0dc3b5f">get_receiver_angle</a> () const</td></tr>
 <tr class="memdesc:ad42e1108aa7bd7849fc9d255a0dc3b5f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the angle of receivers.  <br /></td></tr>
 <tr class="separator:ad42e1108aa7bd7849fc9d255a0dc3b5f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1af9306bf8c7a5620c52cdeb448dbd01" id="r_a1af9306bf8c7a5620c52cdeb448dbd01"><td class="memItemLeft" align="right" valign="top">std::vector&lt; specfem::seismogram::type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1runtime__configuration_1_1setup.html#a1af9306bf8c7a5620c52cdeb448dbd01">get_seismogram_types</a> () const</td></tr>
-<tr class="memdesc:a1af9306bf8c7a5620c52cdeb448dbd01"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the types of siesmograms to be calculated.  <br /></td></tr>
-<tr class="separator:a1af9306bf8c7a5620c52cdeb448dbd01"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a60eb234d55ede5713f356fac4a276d40" id="r_a60eb234d55ede5713f356fac4a276d40"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classspecfem_1_1writer_1_1writer.html">specfem::writer::writer</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1runtime__configuration_1_1setup.html#a60eb234d55ede5713f356fac4a276d40">instantiate_seismogram_writer</a> (std::vector&lt; <a class="el" href="classspecfem_1_1receivers_1_1receiver.html">specfem::receivers::receiver</a> * &gt; &amp;receivers, <a class="el" href="structspecfem_1_1compute_1_1receivers.html">specfem::compute::receivers</a> *compute_receivers) const</td></tr>
-<tr class="memdesc:a60eb234d55ede5713f356fac4a276d40"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiate a seismogram writer object.  <br /></td></tr>
-<tr class="separator:a60eb234d55ede5713f356fac4a276d40"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9f9109c233a4b97f4aaa89931a61a119" id="r_a9f9109c233a4b97f4aaa89931a61a119"><td class="memItemLeft" align="right" valign="top">std::vector&lt; specfem::enums::seismogram::type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1runtime__configuration_1_1setup.html#a9f9109c233a4b97f4aaa89931a61a119">get_seismogram_types</a> () const</td></tr>
+<tr class="memdesc:a9f9109c233a4b97f4aaa89931a61a119"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the types of siesmograms to be calculated.  <br /></td></tr>
+<tr class="separator:a9f9109c233a4b97f4aaa89931a61a119"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adbfdcf56f59330eb5799c0317e1fbe94" id="r_adbfdcf56f59330eb5799c0317e1fbe94"><td class="memItemLeft" align="right" valign="top">std::shared_ptr&lt; <a class="el" href="classspecfem_1_1writer_1_1writer.html">specfem::writer::writer</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1runtime__configuration_1_1setup.html#adbfdcf56f59330eb5799c0317e1fbe94">instantiate_seismogram_writer</a> (std::vector&lt; std::shared_ptr&lt; <a class="el" href="classspecfem_1_1receivers_1_1receiver.html">specfem::receivers::receiver</a> &gt; &gt; &amp;<a class="el" href="classspecfem_1_1runtime__configuration_1_1receivers.html">receivers</a>, <a class="el" href="structspecfem_1_1compute_1_1receivers.html">specfem::compute::receivers</a> &amp;compute_receivers) const</td></tr>
+<tr class="memdesc:adbfdcf56f59330eb5799c0317e1fbe94"><td class="mdescLeft">&#160;</td><td class="mdescRight">Instantiate a seismogram writer object.  <br /></td></tr>
+<tr class="separator:adbfdcf56f59330eb5799c0317e1fbe94"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Setup class is used to read the YAML file parameter file.</p>
 <p>Setup class is also used to instantiate the simulation i.e. instantiate quadrature objects, instantiate solver objects. </p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a27163aeb72fe18559449b39fbf2db0b3" name="a27163aeb72fe18559449b39fbf2db0b3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a27163aeb72fe18559449b39fbf2db0b3">&#9670;&#160;</a></span>setup()</h2>
+<a id="a7767d3b4da737f15804798989f212434" name="a7767d3b4da737f15804798989f212434"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a7767d3b4da737f15804798989f212434">&#9670;&#160;</a></span>setup()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -132,9 +132,19 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>print_header</
         <tr>
           <td class="memname">specfem::runtime_configuration::setup::setup </td>
           <td>(</td>
-          <td class="paramtype">std::string&#160;</td>
-          <td class="paramname"><em>parameter_file</em></td><td>)</td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>parameter_file</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">const std::string &amp;&#160;</td>
+          <td class="paramname"><em>default_file</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -143,6 +153,7 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>print_header</
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">parameter_file</td><td>Path to a configuration YAML file </td></tr>
+    <tr><td class="paramname">default_file</td><td>Path to a YAML file to be used to instantiate default parameters </td></tr>
   </table>
   </dd>
 </dl>
@@ -234,8 +245,8 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>print_header</
 
 </div>
 </div>
-<a id="a1af9306bf8c7a5620c52cdeb448dbd01" name="a1af9306bf8c7a5620c52cdeb448dbd01"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a1af9306bf8c7a5620c52cdeb448dbd01">&#9670;&#160;</a></span>get_seismogram_types()</h2>
+<a id="a9f9109c233a4b97f4aaa89931a61a119" name="a9f9109c233a4b97f4aaa89931a61a119"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9f9109c233a4b97f4aaa89931a61a119">&#9670;&#160;</a></span>get_seismogram_types()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -244,7 +255,7 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>print_header</
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::vector&lt; specfem::seismogram::type &gt; specfem::runtime_configuration::setup::get_seismogram_types </td>
+          <td class="memname">std::vector&lt; specfem::enums::seismogram::type &gt; specfem::runtime_configuration::setup::get_seismogram_types </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -290,8 +301,8 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>print_header</
 
 </div>
 </div>
-<a id="a37f67a403c6f5d4f89c2a78f7aeb9a9c" name="a37f67a403c6f5d4f89c2a78f7aeb9a9c"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a37f67a403c6f5d4f89c2a78f7aeb9a9c">&#9670;&#160;</a></span>instantiate_quadrature()</h2>
+<a id="a5101a86c8f8250f5d38dd644f9d4a7c2" name="a5101a86c8f8250f5d38dd644f9d4a7c2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a5101a86c8f8250f5d38dd644f9d4a7c2">&#9670;&#160;</a></span>instantiate_quadrature()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -300,7 +311,7 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>print_header</
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname">std::tuple&lt; specfem::quadrature::quadrature, specfem::quadrature::quadrature &gt; specfem::runtime_configuration::setup::instantiate_quadrature </td>
+          <td class="memname">std::tuple&lt; <a class="el" href="classspecfem_1_1quadrature_1_1quadrature.html">specfem::quadrature::quadrature</a> *, <a class="el" href="classspecfem_1_1quadrature_1_1quadrature.html">specfem::quadrature::quadrature</a> * &gt; specfem::runtime_configuration::setup::instantiate_quadrature </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -314,12 +325,12 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>print_header</
 </div><div class="memdoc">
 
 <p>Instantiate quadrature objects in x and z dimensions. </p>
-<dl class="section return"><dt>Returns</dt><dd>std::tuple&lt;specfem::quadrature::quadrature, specfem::quadrature::quadrature&gt; Quadrature objects in x and z dimensions </dd></dl>
+<dl class="section return"><dt>Returns</dt><dd>std::tuple&lt;<a class="el" href="classspecfem_1_1quadrature_1_1quadrature.html" title="Base quadrature class.">specfem::quadrature::quadrature</a>, <a class="el" href="classspecfem_1_1quadrature_1_1quadrature.html" title="Base quadrature class.">specfem::quadrature::quadrature</a>&gt; Quadrature objects in x and z dimensions </dd></dl>
 
 </div>
 </div>
-<a id="a60eb234d55ede5713f356fac4a276d40" name="a60eb234d55ede5713f356fac4a276d40"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a60eb234d55ede5713f356fac4a276d40">&#9670;&#160;</a></span>instantiate_seismogram_writer()</h2>
+<a id="adbfdcf56f59330eb5799c0317e1fbe94" name="adbfdcf56f59330eb5799c0317e1fbe94"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adbfdcf56f59330eb5799c0317e1fbe94">&#9670;&#160;</a></span>instantiate_seismogram_writer()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -328,15 +339,15 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>print_header</
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classspecfem_1_1writer_1_1writer.html">specfem::writer::writer</a> * specfem::runtime_configuration::setup::instantiate_seismogram_writer </td>
+          <td class="memname">std::shared_ptr&lt; <a class="el" href="classspecfem_1_1writer_1_1writer.html">specfem::writer::writer</a> &gt; specfem::runtime_configuration::setup::instantiate_seismogram_writer </td>
           <td>(</td>
-          <td class="paramtype">std::vector&lt; <a class="el" href="classspecfem_1_1receivers_1_1receiver.html">specfem::receivers::receiver</a> * &gt; &amp;&#160;</td>
+          <td class="paramtype">std::vector&lt; std::shared_ptr&lt; <a class="el" href="classspecfem_1_1receivers_1_1receiver.html">specfem::receivers::receiver</a> &gt; &gt; &amp;&#160;</td>
           <td class="paramname"><em>receivers</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype"><a class="el" href="structspecfem_1_1compute_1_1receivers.html">specfem::compute::receivers</a> *&#160;</td>
+          <td class="paramtype"><a class="el" href="structspecfem_1_1compute_1_1receivers.html">specfem::compute::receivers</a> &amp;&#160;</td>
           <td class="paramname"><em>compute_receivers</em>&#160;</td>
         </tr>
         <tr>
@@ -364,8 +375,8 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>print_header</
 
 </div>
 </div>
-<a id="ad8f27268ad1da660307d76dce52f94e0" name="ad8f27268ad1da660307d76dce52f94e0"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad8f27268ad1da660307d76dce52f94e0">&#9670;&#160;</a></span>instantiate_solver()</h2>
+<a id="a4a64eb5a899b2c712e02e28e54a5da1f" name="a4a64eb5a899b2c712e02e28e54a5da1f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4a64eb5a899b2c712e02e28e54a5da1f">&#9670;&#160;</a></span>instantiate_solver()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -374,7 +385,7 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>print_header</
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classspecfem_1_1_time_scheme_1_1_time_scheme.html">specfem::TimeScheme::TimeScheme</a> * specfem::runtime_configuration::setup::instantiate_solver </td>
+          <td class="memname">std::shared_ptr&lt; <a class="el" href="classspecfem_1_1_time_scheme_1_1_time_scheme.html">specfem::TimeScheme::TimeScheme</a> &gt; specfem::runtime_configuration::setup::instantiate_solver </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td></td>
@@ -429,7 +440,7 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>print_header</
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>/Users/runner/work/specfem2d_kokkos/specfem2d_kokkos/include/<b>parameter_parser.h</b></li>
+<li>/Users/runner/work/SPECFEMPP/SPECFEMPP/include/parameter_parser/<b>setup.hpp</b></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

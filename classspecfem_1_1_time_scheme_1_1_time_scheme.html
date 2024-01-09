@@ -76,14 +76,14 @@ $(function() {
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classspecfem_1_1_time_scheme_1_1_time_scheme-members.html">List of all members</a>  </div>
-  <div class="headertitle"><div class="title">specfem::TimeScheme::TimeScheme Class Reference</div></div>
+  <div class="headertitle"><div class="title">specfem::TimeScheme::TimeScheme Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div></div>
 </div><!--header-->
 <div class="contents">
 
 <p>Base time scheme class.  
  <a href="classspecfem_1_1_time_scheme_1_1_time_scheme.html#details">More...</a></p>
 
-<p><code>#include &lt;timescheme.h&gt;</code></p>
+<p><code>#include &lt;timescheme.hpp&gt;</code></p>
 <div class="dynheader">
 Inheritance diagram for specfem::TimeScheme::TimeScheme:</div>
 <div class="dyncontent">
@@ -96,6 +96,10 @@ Inheritance diagram for specfem::TimeScheme::TimeScheme:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a4a192f27d8fc05e5edea7abaf5b80615" id="r_a4a192f27d8fc05e5edea7abaf5b80615"><td class="memItemLeft" align="right" valign="top"><a id="a4a192f27d8fc05e5edea7abaf5b80615" name="a4a192f27d8fc05e5edea7abaf5b80615"></a>
+virtual specfem::enums::time_scheme::type&#160;</td><td class="memItemRight" valign="bottom"><b>timescheme</b> () const =0</td></tr>
+<tr class="memdesc:a4a192f27d8fc05e5edea7abaf5b80615"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the timescheme type. <br /></td></tr>
+<tr class="separator:a4a192f27d8fc05e5edea7abaf5b80615"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5ac62484d5aadd671c8ebf4c105e585f" id="r_a5ac62484d5aadd671c8ebf4c105e585f"><td class="memItemLeft" align="right" valign="top">virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1_time_scheme_1_1_time_scheme.html#a5ac62484d5aadd671c8ebf4c105e585f">status</a> () const</td></tr>
 <tr class="memdesc:a5ac62484d5aadd671c8ebf4c105e585f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the status of simulation.  <br /></td></tr>
 <tr class="separator:a5ac62484d5aadd671c8ebf4c105e585f"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -116,12 +120,12 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>reset_time</b
 <tr class="memitem:a8954c7b77da4011fb865f68cbe96c636" id="r_a8954c7b77da4011fb865f68cbe96c636"><td class="memItemLeft" align="right" valign="top">virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1_time_scheme_1_1_time_scheme.html#a8954c7b77da4011fb865f68cbe96c636">get_max_timestep</a> ()</td></tr>
 <tr class="memdesc:a8954c7b77da4011fb865f68cbe96c636"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the max timestep (nstep) of the simuation.  <br /></td></tr>
 <tr class="separator:a8954c7b77da4011fb865f68cbe96c636"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2cf1f44cab4f674cd5999d94c18776d7" id="r_a2cf1f44cab4f674cd5999d94c18776d7"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1_time_scheme_1_1_time_scheme.html#a2cf1f44cab4f674cd5999d94c18776d7">apply_predictor_phase</a> (const <a class="el" href="classspecfem_1_1_domain_1_1_domain.html">specfem::Domain::Domain</a> *domain_class)</td></tr>
-<tr class="memdesc:a2cf1f44cab4f674cd5999d94c18776d7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apply predictor phase of the timescheme.  <br /></td></tr>
-<tr class="separator:a2cf1f44cab4f674cd5999d94c18776d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a94d5ae35d471b5cba0076fba7d2d2971" id="r_a94d5ae35d471b5cba0076fba7d2d2971"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1_time_scheme_1_1_time_scheme.html#a94d5ae35d471b5cba0076fba7d2d2971">apply_corrector_phase</a> (const <a class="el" href="classspecfem_1_1_domain_1_1_domain.html">specfem::Domain::Domain</a> *domain_class)</td></tr>
-<tr class="memdesc:a94d5ae35d471b5cba0076fba7d2d2971"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apply corrector phase of the timescheme.  <br /></td></tr>
-<tr class="separator:a94d5ae35d471b5cba0076fba7d2d2971"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a919e8315619c7cc8063e3a0457a23bc0" id="r_a919e8315619c7cc8063e3a0457a23bc0"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1_time_scheme_1_1_time_scheme.html#a919e8315619c7cc8063e3a0457a23bc0">apply_predictor_phase</a> (specfem::kokkos::DeviceView2d&lt; type_real, Kokkos::LayoutLeft &gt; field, specfem::kokkos::DeviceView2d&lt; type_real, Kokkos::LayoutLeft &gt; field_dot, specfem::kokkos::DeviceView2d&lt; type_real, Kokkos::LayoutLeft &gt; field_dot_dot)</td></tr>
+<tr class="memdesc:a919e8315619c7cc8063e3a0457a23bc0"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apply predictor phase of the timescheme.  <br /></td></tr>
+<tr class="separator:a919e8315619c7cc8063e3a0457a23bc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab7cce59f9c7984106d8b7a63a5353693" id="r_ab7cce59f9c7984106d8b7a63a5353693"><td class="memItemLeft" align="right" valign="top">virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1_time_scheme_1_1_time_scheme.html#ab7cce59f9c7984106d8b7a63a5353693">apply_corrector_phase</a> (specfem::kokkos::DeviceView2d&lt; type_real, Kokkos::LayoutLeft &gt; field, specfem::kokkos::DeviceView2d&lt; type_real, Kokkos::LayoutLeft &gt; field_dot, specfem::kokkos::DeviceView2d&lt; type_real, Kokkos::LayoutLeft &gt; field_dot_dot)</td></tr>
+<tr class="memdesc:ab7cce59f9c7984106d8b7a63a5353693"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apply corrector phase of the timescheme.  <br /></td></tr>
+<tr class="separator:ab7cce59f9c7984106d8b7a63a5353693"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aed57aefcf10de13ebf1f8d178132d308" id="r_aed57aefcf10de13ebf1f8d178132d308"><td class="memItemLeft" align="right" valign="top"><a id="aed57aefcf10de13ebf1f8d178132d308" name="aed57aefcf10de13ebf1f8d178132d308"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>print</b> (std::ostream &amp;out) const</td></tr>
 <tr class="memdesc:aed57aefcf10de13ebf1f8d178132d308"><td class="mdescLeft">&#160;</td><td class="mdescRight">Log timescheme information to console. <br /></td></tr>
@@ -140,12 +144,20 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><b>compute_seism
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>increment_seismogram_step</b> ()</td></tr>
 <tr class="memdesc:a1ab9c1526250b40be4420952ddaed56d"><td class="mdescLeft">&#160;</td><td class="mdescRight">increment seismogram step <br /></td></tr>
 <tr class="separator:a1ab9c1526250b40be4420952ddaed56d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a483a558c1ea8023458a7212202d598ed" id="r_a483a558c1ea8023458a7212202d598ed"><td class="memItemLeft" align="right" valign="top"><a id="a483a558c1ea8023458a7212202d598ed" name="a483a558c1ea8023458a7212202d598ed"></a>
+virtual type_real&#160;</td><td class="memItemRight" valign="bottom"><b>get_time_increment</b> () const</td></tr>
+<tr class="memdesc:a483a558c1ea8023458a7212202d598ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get time increment. <br /></td></tr>
+<tr class="separator:a483a558c1ea8023458a7212202d598ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a658800accbaf9969849b990405e008da" id="r_a658800accbaf9969849b990405e008da"><td class="memItemLeft" align="right" valign="top"><a id="a658800accbaf9969849b990405e008da" name="a658800accbaf9969849b990405e008da"></a>
+virtual&#160;</td><td class="memItemRight" valign="bottom"><b>~TimeScheme</b> ()=default</td></tr>
+<tr class="memdesc:a658800accbaf9969849b990405e008da"><td class="mdescLeft">&#160;</td><td class="mdescRight">Default destructor. <br /></td></tr>
+<tr class="separator:a658800accbaf9969849b990405e008da"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Base time scheme class. </p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a94d5ae35d471b5cba0076fba7d2d2971" name="a94d5ae35d471b5cba0076fba7d2d2971"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a94d5ae35d471b5cba0076fba7d2d2971">&#9670;&#160;</a></span>apply_corrector_phase()</h2>
+<a id="ab7cce59f9c7984106d8b7a63a5353693" name="ab7cce59f9c7984106d8b7a63a5353693"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab7cce59f9c7984106d8b7a63a5353693">&#9670;&#160;</a></span>apply_corrector_phase()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -156,9 +168,25 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>increment_sei
         <tr>
           <td class="memname">virtual void specfem::TimeScheme::TimeScheme::apply_corrector_phase </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classspecfem_1_1_domain_1_1_domain.html">specfem::Domain::Domain</a> *&#160;</td>
-          <td class="paramname"><em>domain_class</em></td><td>)</td>
+          <td class="paramtype">specfem::kokkos::DeviceView2d&lt; type_real, Kokkos::LayoutLeft &gt;&#160;</td>
+          <td class="paramname"><em>field</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">specfem::kokkos::DeviceView2d&lt; type_real, Kokkos::LayoutLeft &gt;&#160;</td>
+          <td class="paramname"><em>field_dot</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">specfem::kokkos::DeviceView2d&lt; type_real, Kokkos::LayoutLeft &gt;&#160;</td>
+          <td class="paramname"><em>field_dot_dot</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -176,12 +204,12 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>increment_sei
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="classspecfem_1_1_time_scheme_1_1_newmark.html#adbb60f2df07e1959079322047d51f606">specfem::TimeScheme::Newmark</a>.</p>
+<p>Reimplemented in <a class="el" href="classspecfem_1_1_time_scheme_1_1_newmark.html#a45fd8a4cb8bc08e071d62f59965303b5">specfem::TimeScheme::Newmark</a>.</p>
 
 </div>
 </div>
-<a id="a2cf1f44cab4f674cd5999d94c18776d7" name="a2cf1f44cab4f674cd5999d94c18776d7"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a2cf1f44cab4f674cd5999d94c18776d7">&#9670;&#160;</a></span>apply_predictor_phase()</h2>
+<a id="a919e8315619c7cc8063e3a0457a23bc0" name="a919e8315619c7cc8063e3a0457a23bc0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a919e8315619c7cc8063e3a0457a23bc0">&#9670;&#160;</a></span>apply_predictor_phase()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -192,9 +220,25 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>increment_sei
         <tr>
           <td class="memname">virtual void specfem::TimeScheme::TimeScheme::apply_predictor_phase </td>
           <td>(</td>
-          <td class="paramtype">const <a class="el" href="classspecfem_1_1_domain_1_1_domain.html">specfem::Domain::Domain</a> *&#160;</td>
-          <td class="paramname"><em>domain_class</em></td><td>)</td>
+          <td class="paramtype">specfem::kokkos::DeviceView2d&lt; type_real, Kokkos::LayoutLeft &gt;&#160;</td>
+          <td class="paramname"><em>field</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">specfem::kokkos::DeviceView2d&lt; type_real, Kokkos::LayoutLeft &gt;&#160;</td>
+          <td class="paramname"><em>field_dot</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">specfem::kokkos::DeviceView2d&lt; type_real, Kokkos::LayoutLeft &gt;&#160;</td>
+          <td class="paramname"><em>field_dot_dot</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
   </td>
@@ -212,7 +256,7 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>increment_sei
   </dd>
 </dl>
 
-<p>Reimplemented in <a class="el" href="classspecfem_1_1_time_scheme_1_1_newmark.html#a3fb77f98bb9ff966c6d0d362207e5729">specfem::TimeScheme::Newmark</a>.</p>
+<p>Reimplemented in <a class="el" href="classspecfem_1_1_time_scheme_1_1_newmark.html#ae8b5a8f7551a95851fa074328ba95916">specfem::TimeScheme::Newmark</a>.</p>
 
 </div>
 </div>
@@ -399,7 +443,7 @@ true if current step &lt; number of steps </dd></dl>
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>/Users/runner/work/specfem2d_kokkos/specfem2d_kokkos/include/<b>timescheme.h</b></li>
+<li>/Users/runner/work/SPECFEMPP/SPECFEMPP/include/timescheme/<b>timescheme.hpp</b></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

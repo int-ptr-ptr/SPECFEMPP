@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MESHFEM Parameter Documentation &mdash; SPECFEM++  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/scrollable_code_blocks.css?v=ebc906c5" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/center_align_table.css?v=f0548739" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Simulation input parameters" href="header.html" />
+    <link rel="prev" title="Seismogram output" href="../user_documentation/seismogram.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SPECFEM++
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">USER DOCUMENTATION</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../user_documentation/index.html">User documentation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">MESHFEM Parameter Documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#parameter-description">Parameter Description</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="header.html">Simulation input parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="meshing_parameters.html">Meshing Parameters</a></li>
+<li class="toctree-l3"><a class="reference internal" href="velocity_models.html">Velocity Models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="internal_mesher.html">Internal Meshing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="external_mesher.html">External Meshing</a></li>
+<li class="toctree-l3"><a class="reference internal" href="display_parameter.html">Display parameters</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#topography-file">Topography File</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../parameter_documentation/index.html">SPECFEM++ Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source_description/index.html">Source Description</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COOKBOOKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cookbooks/index.html">Cookbooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">CONTRIBUTION GUIDELINES</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../developer_documentation/index.html">Developer documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COMMUNITY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=bug_report.md&amp;title=">Report bugs</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=feature_request.md&amp;title=">Request a new feature</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/orgs/SPECFEM/discussions">Join the discussion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">BENCHMARKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../benchmarks/benchmarks.html">Performance Benchmarks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API DOCUMENTATION</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SPECFEM++</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">MESHFEM Parameter Documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/meshfem2d/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="meshfem-parameter-documentation">
+<span id="id1"></span><h1>MESHFEM Parameter Documentation<a class="headerlink" href="#meshfem-parameter-documentation" title="Link to this heading"></a></h1>
+<p>SPECFEM++ uses a modified version of the mesher provided by the original <a class="reference external" href="https://specfem2d.readthedocs.io/en/latest/03_mesh_generation/">SPECFEM2D</a> code. The modifications isolate only the nacessary parameters for the meshing process and remove those needed by the solver from the original <code class="docutils literal notranslate"><span class="pre">Par_File</span></code>. Here I will document the parameters that are used by the meshing process. However you should also refer to the <a class="reference external" href="https://specfem2d.readthedocs.io/en/latest/03_mesh_generation/">SPECFEM2D documentation</a> for a more in-depth description of the mesher.</p>
+<p>To define the meshing parameters, you will need to create a <code class="docutils literal notranslate"><span class="pre">Par_File</span></code>. This is a simple text file that contains the parameters you wish to use. The parameters are defined in the following format:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">parameter_name</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>parameter_value
+</pre></div>
+</div>
+<section id="parameter-description">
+<h2>Parameter Description<a class="headerlink" href="#parameter-description" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="header.html">Simulation input parameters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="header.html#parameter-name-title"><strong>Parameter name</strong>: <code class="docutils literal notranslate"><span class="pre">title</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="header.html#parameter-name-nproc"><strong>Parameter name</strong>: <code class="docutils literal notranslate"><span class="pre">NPROC</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="header.html#parameter-name-output-files"><strong>Parameter name</strong>: <code class="docutils literal notranslate"><span class="pre">OUTPUT_FILES</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="meshing_parameters.html">Meshing Parameters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="meshing_parameters.html#parameter-name-partitioning-type"><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">PARTITIONING_TYPE</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing_parameters.html#parameter-name-ngnod"><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">NGNOD</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="meshing_parameters.html#parameter-name-database-filename"><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">database_filename</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="velocity_models.html">Velocity Models</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="velocity_models.html#parameter-name-nbmodels"><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">nbmodels</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="velocity_models.html#paramter-name-topography-file"><strong>Paramter Name</strong>: <code class="docutils literal notranslate"><span class="pre">TOPOGRAPHY_FILE</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="velocity_models.html#parameter-name-read-external-mesh"><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">read_external_mesh</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="velocity_models.html#description-of-material-system">Description of material system</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="velocity_models.html#elastic-material-system">Elastic material system</a></li>
+<li class="toctree-l4"><a class="reference internal" href="velocity_models.html#acoustic-material-system">Acoustic material system</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="internal_mesher.html">Internal Meshing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="internal_mesher.html#parameter-name-interfacesfile"><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">interfacesfile</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="internal_mesher.html#parameter-name-xmin"><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">xmin</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="internal_mesher.html#parameter-name-xmax"><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">xmax</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="internal_mesher.html#parameter-name-nx"><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">nx</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="internal_mesher.html#parameter-name-absorbbottom"><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">absorbbottom</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="internal_mesher.html#parameter-name-absorbtop"><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">absorbtop</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="internal_mesher.html#parameter-name-absorbleft"><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">absorbleft</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="internal_mesher.html#parameter-name-absorbright"><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">absorbright</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="internal_mesher.html#parameter-name-nbregions"><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">nbregions</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="internal_mesher.html#describing-a-region">Describing a region</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="external_mesher.html">External Meshing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="external_mesher.html#parameter-name-mesh-file"><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">mesh_file</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="external_mesher.html#parameter-name-nodes-coords-file"><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">nodes_coords_file</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="external_mesher.html#parameter-name-materials-file"><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">materials_file</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="external_mesher.html#parameter-name-free-surface-file"><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">free_surface_file</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="external_mesher.html#parameter-name-axial-elements-file"><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">axial_elements_file</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="external_mesher.html#parameter-name-absorbing-surface-file"><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">absorbing_surface_file</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="external_mesher.html#parameter-name-acoustic-forcing-surface-file"><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">acoustic_forcing_surface_file</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="external_mesher.html#parameter-name-absorbing-cpml-file"><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">absorbing_cpml_file</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="external_mesher.html#parameter-name-tangential-detection-curve-file"><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">tangential_detection_curve_file</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="display_parameter.html">Display parameters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="display_parameter.html#parameter-name-output-grid-gnuplot"><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">output_grid_Gnuplot</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="display_parameter.html#parameter-name-output-grid-ascii"><strong>Parameter Name</strong>: <code class="docutils literal notranslate"><span class="pre">output_grid_ASCII</span></code></a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="topography-file">
+<span id="id2"></span><h2>Topography File<a class="headerlink" href="#topography-file" title="Link to this heading"></a></h2>
+<p>Topography files are used to define the surface topography of the mesh. The topography file is a simple text file that describes the topography of every interface in the simulation domain.  For example the following topography file describes a simple 2 layer model with a flat surface and a flat interface between the two layers:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1">#</span>
+<span class="c1"># number of interfaces</span>
+<span class="c1">#</span>
+<span class="m">3</span>
+<span class="c1">#</span>
+<span class="c1"># for each interface below, we give the number of points and then x,z for each point</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># interface number 1 (bottom of the mesh)</span>
+<span class="c1">#</span>
+<span class="m">2</span>
+<span class="m">0</span><span class="w"> </span><span class="m">0</span>
+<span class="m">6400</span><span class="w"> </span><span class="m">0</span>
+<span class="c1">#</span>
+<span class="c1"># interface number 2 (ocean bottom)</span>
+<span class="c1">#</span>
+<span class="m">2</span>
+<span class="m">0</span><span class="w"> </span><span class="m">2400</span>
+<span class="m">6400</span><span class="w"> </span><span class="m">2400</span>
+<span class="c1">#</span>
+<span class="c1"># interface number 3 (topography, top of the mesh)</span>
+<span class="c1">#</span>
+<span class="m">2</span>
+<span class="m">0</span><span class="w"> </span><span class="m">4800</span>
+<span class="m">6400</span><span class="w"> </span><span class="m">4800</span>
+<span class="c1">#</span>
+<span class="c1"># for each layer, we give the number of spectral elements in the vertical direction</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># layer number 1 (bottom layer)</span>
+<span class="c1">#</span>
+<span class="m">54</span>
+<span class="c1">#</span>
+<span class="c1"># layer number 2 (top layer)</span>
+<span class="c1">#</span>
+<span class="m">54</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../user_documentation/seismogram.html" class="btn btn-neutral float-left" title="Seismogram output" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="header.html" class="btn btn-neutral float-right" title="Simulation input parameters" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Rohit Kakodkar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

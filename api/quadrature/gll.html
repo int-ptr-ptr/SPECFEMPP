@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GLL quadrature &mdash; SPECFEM++  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/scrollable_code_blocks.css?v=ebc906c5" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/center_align_table.css?v=f0548739" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Materials Class API" href="../material/index.html" />
+    <link rel="prev" title="Quadrature API" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            SPECFEM++
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">USER DOCUMENTATION</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user_documentation/index.html">User documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meshfem2d/index.html">MESHFEM Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parameter_documentation/index.html">SPECFEM++ Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source_description/index.html">Source Description</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COOKBOOKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cookbooks/index.html">Cookbooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">CONTRIBUTION GUIDELINES</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_documentation/index.html">Developer documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COMMUNITY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=bug_report.md&amp;title=">Report bugs</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=feature_request.md&amp;title=">Request a new feature</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/orgs/SPECFEM/discussions">Join the discussion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">BENCHMARKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../benchmarks/benchmarks.html">Performance Benchmarks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API DOCUMENTATION</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../kokkos_abstractions.html">Views and Execution Policies</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Quadrature API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="index.html#_CPPv4N7specfem10quadrature10quadratureE"><code class="docutils literal notranslate"><span class="pre">quadrature</span></code></a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="index.html#types-of-quadratures-implemented">Types of quadratures implemented</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">GLL quadrature</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../material/index.html">Materials Class API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../IO/index.html">Input/Output modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sources/index.html">Sources API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../receivers/index.html">Receiver API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compute/index.html">Compute Data Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../enumerations/index.html">Enumerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../domain/index.html">Domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../boundary_conditions/index.html">Boundary conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../coupling_physics/index.html">Coupled Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../timescheme/index.html">Time Scheme API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../solver/index.html">Solver API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup_parameters/index.html">Setup Parameters</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">SPECFEM++</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">API documentation</a></li>
+          <li class="breadcrumb-item"><a href="index.html">Quadrature API</a></li>
+      <li class="breadcrumb-item active">GLL quadrature</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/quadrature/gll.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="gll-quadrature">
+<h1>GLL quadrature<a class="headerlink" href="#gll-quadrature" title="Link to this heading"></a></h1>
+<p>Gauss-Legendre-Lobatto quadrature rule.</p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10quadrature3gll3gllE">
+<span id="_CPPv3N7specfem10quadrature3gll3gllE"></span><span id="_CPPv2N7specfem10quadrature3gll3gllE"></span><span id="specfem::quadrature::gll::gll"></span><span class="target" id="classspecfem_1_1quadrature_1_1gll_1_1gll"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">gll</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv4N7specfem10quadratureE" title="specfem::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="index.html#_CPPv4N7specfem10quadrature10quadratureE" title="specfem::quadrature::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><a class="headerlink" href="#_CPPv4N7specfem10quadrature3gll3gllE" title="Link to this definition"></a><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10quadrature3gll3gll3gllEv">
+<span id="_CPPv3N7specfem10quadrature3gll3gll3gllEv"></span><span id="_CPPv2N7specfem10quadrature3gll3gll3gllEv"></span><span id="specfem::quadrature::gll::gll::gll"></span><span class="target" id="classspecfem_1_1quadrature_1_1gll_1_1gll_1aaae28cf385ab94eb12d73eef89e78e13"></span><span class="sig-name descname"><span class="n"><span class="pre">gll</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem10quadrature3gll3gll3gllEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Defines the GLL/GLJ quadrature and related matrices required for quadrature integration. </p>
+<p>Construct a quadrature object with default values</p>
+<p>Default values: alpha = 0, beta = 0, N = 5 </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10quadrature3gll3gll3gllEK9type_realK9type_real">
+<span id="_CPPv3N7specfem10quadrature3gll3gll3gllEK9type_realK9type_real"></span><span id="_CPPv2N7specfem10quadrature3gll3gll3gllEK9type_realK9type_real"></span><span id="specfem::quadrature::gll::gll::gll__type_realC.type_realC"></span><span class="target" id="classspecfem_1_1quadrature_1_1gll_1_1gll_1a3863b6d5b9739e42063f9c54829a780a"></span><span class="sig-name descname"><span class="n"><span class="pre">gll</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">alpha</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">beta</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem10quadrature3gll3gll3gllEK9type_realK9type_real" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct a new quadrature object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>alpha</strong> – alpha value of the quadrature </p></li>
+<li><p><strong>beta</strong> – beta value of the quadrature </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10quadrature3gll3gll3gllEK9type_realK9type_realKi">
+<span id="_CPPv3N7specfem10quadrature3gll3gll3gllEK9type_realK9type_realKi"></span><span id="_CPPv2N7specfem10quadrature3gll3gll3gllEK9type_realK9type_realKi"></span><span id="specfem::quadrature::gll::gll::gll__type_realC.type_realC.iC"></span><span class="target" id="classspecfem_1_1quadrature_1_1gll_1_1gll_1a0a5c61469dc0e5e8d94a4c3a9a50e30f"></span><span class="sig-name descname"><span class="n"><span class="pre">gll</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">alpha</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">beta</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">N</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem10quadrature3gll3gll3gllEK9type_realK9type_realKi" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct a new quadrature object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>alpha</strong> – alpha value of the quadrature </p></li>
+<li><p><strong>beta</strong> – beta value of quadrature </p></li>
+<li><p><strong>N</strong> – Number of quadrature points </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10quadrature3gll3gll23set_derivation_matricesEv">
+<span id="_CPPv3N7specfem10quadrature3gll3gll23set_derivation_matricesEv"></span><span id="_CPPv2N7specfem10quadrature3gll3gll23set_derivation_matricesEv"></span><span id="specfem::quadrature::gll::gll::set_derivation_matrices"></span><span class="target" id="classspecfem_1_1quadrature_1_1gll_1_1gll_1a333f2ae25ab3f9f69802e59a8152ea52"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">set_derivation_matrices</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem10quadrature3gll3gll23set_derivation_matricesEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Set the derivation matrices. </p>
+<p>Set the matrices required for compute integrals </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem10quadrature3gll3gll6get_xiEv">
+<span id="_CPPv3NK7specfem10quadrature3gll3gll6get_xiEv"></span><span id="_CPPv2NK7specfem10quadrature3gll3gll6get_xiEv"></span><span id="specfem::quadrature::gll::gll::get_xiC"></span><span class="target" id="classspecfem_1_1quadrature_1_1gll_1_1gll_1a02f22bb2132df18b0ac7e56de93954fa"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12DeviceView1dE" title="specfem::kokkos::DeviceView1d"><span class="n"><span class="pre">DeviceView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_xi</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK7specfem10quadrature3gll3gll6get_xiEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get quadrature points on device </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem10quadrature3gll3gll5get_wEv">
+<span id="_CPPv3NK7specfem10quadrature3gll3gll5get_wEv"></span><span id="_CPPv2NK7specfem10quadrature3gll3gll5get_wEv"></span><span id="specfem::quadrature::gll::gll::get_wC"></span><span class="target" id="classspecfem_1_1quadrature_1_1gll_1_1gll_1a8e020275b714785a547986ba3cf94f59"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12DeviceView1dE" title="specfem::kokkos::DeviceView1d"><span class="n"><span class="pre">DeviceView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_w</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK7specfem10quadrature3gll3gll5get_wEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get quadrature weights on device </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem10quadrature3gll3gll10get_hprimeEv">
+<span id="_CPPv3NK7specfem10quadrature3gll3gll10get_hprimeEv"></span><span id="_CPPv2NK7specfem10quadrature3gll3gll10get_hprimeEv"></span><span id="specfem::quadrature::gll::gll::get_hprimeC"></span><span class="target" id="classspecfem_1_1quadrature_1_1gll_1_1gll_1ace52742082de9908d35dd56fe43d2d78"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12DeviceView2dE" title="specfem::kokkos::DeviceView2d"><span class="n"><span class="pre">DeviceView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_hprime</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK7specfem10quadrature3gll3gll10get_hprimeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get derivatives of quadrature polynomials at quadrature points on device </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem10quadrature3gll3gll7get_hxiEv">
+<span id="_CPPv3NK7specfem10quadrature3gll3gll7get_hxiEv"></span><span id="_CPPv2NK7specfem10quadrature3gll3gll7get_hxiEv"></span><span id="specfem::quadrature::gll::gll::get_hxiC"></span><span class="target" id="classspecfem_1_1quadrature_1_1gll_1_1gll_1a6a473652d4e063a6a5321c9d586b2654"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12HostMirror1dE" title="specfem::kokkos::HostMirror1d"><span class="n"><span class="pre">HostMirror1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_hxi</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK7specfem10quadrature3gll3gll7get_hxiEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get quadrature points on host </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem10quadrature3gll3gll6get_hwEv">
+<span id="_CPPv3NK7specfem10quadrature3gll3gll6get_hwEv"></span><span id="_CPPv2NK7specfem10quadrature3gll3gll6get_hwEv"></span><span id="specfem::quadrature::gll::gll::get_hwC"></span><span class="target" id="classspecfem_1_1quadrature_1_1gll_1_1gll_1a316d3017d67b74ccbdd6d79a62a124a6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12HostMirror1dE" title="specfem::kokkos::HostMirror1d"><span class="n"><span class="pre">HostMirror1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_hw</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK7specfem10quadrature3gll3gll6get_hwEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get quadrature weights on host </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem10quadrature3gll3gll11get_hhprimeEv">
+<span id="_CPPv3NK7specfem10quadrature3gll3gll11get_hhprimeEv"></span><span id="_CPPv2NK7specfem10quadrature3gll3gll11get_hhprimeEv"></span><span id="specfem::quadrature::gll::gll::get_hhprimeC"></span><span class="target" id="classspecfem_1_1quadrature_1_1gll_1_1gll_1a7c6aa328f5c616821a1c258a71564d80"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12HostMirror2dE" title="specfem::kokkos::HostMirror2d"><span class="n"><span class="pre">HostMirror2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_hhprime</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK7specfem10quadrature3gll3gll11get_hhprimeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get derivatives of quadrature polynomials at quadrature points on host </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem10quadrature3gll3gll5get_NEv">
+<span id="_CPPv3NK7specfem10quadrature3gll3gll5get_NEv"></span><span id="_CPPv2NK7specfem10quadrature3gll3gll5get_NEv"></span><span id="specfem::quadrature::gll::gll::get_NC"></span><span class="target" id="classspecfem_1_1quadrature_1_1gll_1_1gll_1a19f62a91d280224a1aa5128893781f13"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_N</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK7specfem10quadrature3gll3gll5get_NEv" title="Link to this definition"></a><br /></dt>
+<dd><p>get number of quadrture points </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem10quadrature3gll3gll5printERNSt7ostreamE">
+<span id="_CPPv3NK7specfem10quadrature3gll3gll5printERNSt7ostreamE"></span><span id="_CPPv2NK7specfem10quadrature3gll3gll5printERNSt7ostreamE"></span><span id="specfem::quadrature::gll::gll::print__osRC"></span><span class="target" id="classspecfem_1_1quadrature_1_1gll_1_1gll_1a224a640d60d820faa33e1abc0eb71b79"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">print</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK7specfem10quadrature3gll3gll5printERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd><p>Log GLL quadrature information to console. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-functions">Private Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10quadrature3gll3gll15set_allocationsEv">
+<span id="_CPPv3N7specfem10quadrature3gll3gll15set_allocationsEv"></span><span id="_CPPv2N7specfem10quadrature3gll3gll15set_allocationsEv"></span><span id="specfem::quadrature::gll::gll::set_allocations"></span><span class="target" id="classspecfem_1_1quadrature_1_1gll_1_1gll_1a82ca3c3bbcfa9f40b5949f26e4f47024"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">set_allocations</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem10quadrature3gll3gll15set_allocationsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Set View allocations for all derivative matrices </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10quadrature3gll3gll10sync_viewsEv">
+<span id="_CPPv3N7specfem10quadrature3gll3gll10sync_viewsEv"></span><span id="_CPPv2N7specfem10quadrature3gll3gll10sync_viewsEv"></span><span id="specfem::quadrature::gll::gll::sync_views"></span><span class="target" id="classspecfem_1_1quadrature_1_1gll_1_1gll_1a25443d01be7fa2401fb1ed5c07051abe"></span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">sync_views</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem10quadrature3gll3gll10sync_viewsEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Sync views between device and host </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10quadrature3gll3gll5alphaE">
+<span id="_CPPv3N7specfem10quadrature3gll3gll5alphaE"></span><span id="_CPPv2N7specfem10quadrature3gll3gll5alphaE"></span><span id="specfem::quadrature::gll::gll::alpha__type_real"></span><span class="target" id="classspecfem_1_1quadrature_1_1gll_1_1gll_1afefdced89779e547795e69cd2adaad48"></span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">alpha</span></span></span><a class="headerlink" href="#_CPPv4N7specfem10quadrature3gll3gll5alphaE" title="Link to this definition"></a><br /></dt>
+<dd><p>alpha value of the quadrature </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10quadrature3gll3gll4betaE">
+<span id="_CPPv3N7specfem10quadrature3gll3gll4betaE"></span><span id="_CPPv2N7specfem10quadrature3gll3gll4betaE"></span><span id="specfem::quadrature::gll::gll::beta__type_real"></span><span class="target" id="classspecfem_1_1quadrature_1_1gll_1_1gll_1a32052f71e3003dfe703eda3dc11502b8"></span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">beta</span></span></span><a class="headerlink" href="#_CPPv4N7specfem10quadrature3gll3gll4betaE" title="Link to this definition"></a><br /></dt>
+<dd><p>beta value of the quadrature </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10quadrature3gll3gll1NE">
+<span id="_CPPv3N7specfem10quadrature3gll3gll1NE"></span><span id="_CPPv2N7specfem10quadrature3gll3gll1NE"></span><span id="specfem::quadrature::gll::gll::N__i"></span><span class="target" id="classspecfem_1_1quadrature_1_1gll_1_1gll_1a1d0ce267e62484191925f2ac75e94d42"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">N</span></span></span><a class="headerlink" href="#_CPPv4N7specfem10quadrature3gll3gll1NE" title="Link to this definition"></a><br /></dt>
+<dd><p>Number of qudrature points. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10quadrature3gll3gll2xiE">
+<span id="_CPPv3N7specfem10quadrature3gll3gll2xiE"></span><span id="_CPPv2N7specfem10quadrature3gll3gll2xiE"></span><span id="specfem::quadrature::gll::gll::xi__specfem::kokkos::DeviceView1d:type_real:"></span><span class="target" id="classspecfem_1_1quadrature_1_1gll_1_1gll_1a50b0704925d3c7f502ddde97450d1a59"></span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12DeviceView1dE" title="specfem::kokkos::DeviceView1d"><span class="n"><span class="pre">DeviceView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">xi</span></span></span><a class="headerlink" href="#_CPPv4N7specfem10quadrature3gll3gll2xiE" title="Link to this definition"></a><br /></dt>
+<dd><p>qudrature points stored on device </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10quadrature3gll3gll4h_xiE">
+<span id="_CPPv3N7specfem10quadrature3gll3gll4h_xiE"></span><span id="_CPPv2N7specfem10quadrature3gll3gll4h_xiE"></span><span id="specfem::quadrature::gll::gll::h_xi__specfem::kokkos::HostMirror1d:type_real:"></span><span class="target" id="classspecfem_1_1quadrature_1_1gll_1_1gll_1ae3f9f871d9de7efa46745e3c88bed42b"></span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12HostMirror1dE" title="specfem::kokkos::HostMirror1d"><span class="n"><span class="pre">HostMirror1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">h_xi</span></span></span><a class="headerlink" href="#_CPPv4N7specfem10quadrature3gll3gll4h_xiE" title="Link to this definition"></a><br /></dt>
+<dd><p>quadrature points stored on host </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10quadrature3gll3gll1wE">
+<span id="_CPPv3N7specfem10quadrature3gll3gll1wE"></span><span id="_CPPv2N7specfem10quadrature3gll3gll1wE"></span><span id="specfem::quadrature::gll::gll::w__specfem::kokkos::DeviceView1d:type_real:"></span><span class="target" id="classspecfem_1_1quadrature_1_1gll_1_1gll_1a2dfd624059869d57dabe09e338275610"></span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12DeviceView1dE" title="specfem::kokkos::DeviceView1d"><span class="n"><span class="pre">DeviceView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">w</span></span></span><a class="headerlink" href="#_CPPv4N7specfem10quadrature3gll3gll1wE" title="Link to this definition"></a><br /></dt>
+<dd><p>qudrature weights stored on device </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10quadrature3gll3gll3h_wE">
+<span id="_CPPv3N7specfem10quadrature3gll3gll3h_wE"></span><span id="_CPPv2N7specfem10quadrature3gll3gll3h_wE"></span><span id="specfem::quadrature::gll::gll::h_w__specfem::kokkos::HostView1d:type_real:"></span><span class="target" id="classspecfem_1_1quadrature_1_1gll_1_1gll_1af9134e7237cebf0564cdd3002339afc6"></span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos10HostView1dE" title="specfem::kokkos::HostView1d"><span class="n"><span class="pre">HostView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">h_w</span></span></span><a class="headerlink" href="#_CPPv4N7specfem10quadrature3gll3gll3h_wE" title="Link to this definition"></a><br /></dt>
+<dd><p>quadrature weights stored on host </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10quadrature3gll3gll6hprimeE">
+<span id="_CPPv3N7specfem10quadrature3gll3gll6hprimeE"></span><span id="_CPPv2N7specfem10quadrature3gll3gll6hprimeE"></span><span id="specfem::quadrature::gll::gll::hprime__specfem::kokkos::DeviceView2d:type_real:"></span><span class="target" id="classspecfem_1_1quadrature_1_1gll_1_1gll_1aee5a482121a4df256359d6906b306e41"></span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12DeviceView2dE" title="specfem::kokkos::DeviceView2d"><span class="n"><span class="pre">DeviceView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">hprime</span></span></span><a class="headerlink" href="#_CPPv4N7specfem10quadrature3gll3gll6hprimeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Polynomial derivatives stored on device </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10quadrature3gll3gll8h_hprimeE">
+<span id="_CPPv3N7specfem10quadrature3gll3gll8h_hprimeE"></span><span id="_CPPv2N7specfem10quadrature3gll3gll8h_hprimeE"></span><span id="specfem::quadrature::gll::gll::h_hprime__specfem::kokkos::HostView2d:type_real:"></span><span class="target" id="classspecfem_1_1quadrature_1_1gll_1_1gll_1afa5c31dc6f6ac29793d41c6490d6415d"></span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos10HostView2dE" title="specfem::kokkos::HostView2d"><span class="n"><span class="pre">HostView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">h_hprime</span></span></span><a class="headerlink" href="#_CPPv4N7specfem10quadrature3gll3gll8h_hprimeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Polynomial derivatives store on host </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Quadrature API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../material/index.html" class="btn btn-neutral float-right" title="Materials Class API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Rohit Kakodkar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['tangential_5felements_0',['tangential_elements',['../structspecfem_1_1elements_1_1tangential__elements.html',1,'specfem::elements']]],
-  ['time_5fmarching_1',['time_marching',['../classspecfem_1_1runtime__configuration_1_1time__marching.html',1,'specfem::runtime_configuration']]],
-  ['timescheme_2',['TimeScheme',['../classspecfem_1_1_time_scheme_1_1_time_scheme.html',1,'specfem::TimeScheme']]]
+  ['partial_5fderivatives_0',['partial_derivatives',['../structspecfem_1_1compute_1_1partial__derivatives.html',1,'specfem::compute']]],
+  ['properties_1',['properties',['../structspecfem_1_1compute_1_1properties.html',1,'specfem::compute::properties'],['../structspecfem_1_1mesh_1_1properties.html',1,'specfem::mesh::properties']]]
 ];

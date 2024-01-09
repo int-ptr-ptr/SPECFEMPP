@@ -84,7 +84,7 @@ $(function() {
 <p>Material properties stored at every quadrature point.  
  <a href="structspecfem_1_1compute_1_1properties.html#details">More...</a></p>
 
-<p><code>#include &lt;compute.h&gt;</code></p>
+<p><code>#include &lt;compute_properties.hpp&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -95,20 +95,20 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a8b17abfe34cf6463760d0e69fddccf5e" id="r_a8b17abfe34cf6463760d0e69fddccf5e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structspecfem_1_1compute_1_1properties.html#a8b17abfe34cf6463760d0e69fddccf5e">properties</a> (const int nspec, const int ngllz, const int ngllx)</td></tr>
 <tr class="memdesc:a8b17abfe34cf6463760d0e69fddccf5e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor to allocate views.  <br /></td></tr>
 <tr class="separator:a8b17abfe34cf6463760d0e69fddccf5e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad6ec625c7c2dcaff7c6f2fca1440d7ab" id="r_ad6ec625c7c2dcaff7c6f2fca1440d7ab"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structspecfem_1_1compute_1_1properties.html#ad6ec625c7c2dcaff7c6f2fca1440d7ab">properties</a> (const specfem::kokkos::HostView1d&lt; int &gt; kmato, const std::vector&lt; <a class="el" href="classspecfem_1_1material.html">specfem::material</a> * &gt; &amp;materials, const int nspec, const int ngllx, const int ngllz)</td></tr>
-<tr class="memdesc:ad6ec625c7c2dcaff7c6f2fca1440d7ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor to allocate and assign views.  <br /></td></tr>
-<tr class="separator:ad6ec625c7c2dcaff7c6f2fca1440d7ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9974c9aa20db1b99e0e93d30d75c4c15" id="r_a9974c9aa20db1b99e0e93d30d75c4c15"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structspecfem_1_1compute_1_1properties.html#a9974c9aa20db1b99e0e93d30d75c4c15">properties</a> (const specfem::kokkos::HostView1d&lt; int &gt; kmato, const std::vector&lt; std::shared_ptr&lt; <a class="el" href="classspecfem_1_1material_1_1material.html">specfem::material::material</a> &gt; &gt; &amp;materials, const int nspec, const int ngllx, const int ngllz)</td></tr>
+<tr class="memdesc:a9974c9aa20db1b99e0e93d30d75c4c15"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor to allocate and assign views.  <br /></td></tr>
+<tr class="separator:a9974c9aa20db1b99e0e93d30d75c4c15"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:abf7118843a5186d0f15be8390942fbd1" id="r_abf7118843a5186d0f15be8390942fbd1"><td class="memItemLeft" align="right" valign="top"><a id="abf7118843a5186d0f15be8390942fbd1" name="abf7118843a5186d0f15be8390942fbd1"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>sync_views</b> ()</td></tr>
-<tr class="memdesc:abf7118843a5186d0f15be8390942fbd1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper routine to sync views within this struct. <br /></td></tr>
+<tr class="memdesc:abf7118843a5186d0f15be8390942fbd1"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="namespace_helper.html">Helper</a> routine to sync views within this struct. <br /></td></tr>
 <tr class="separator:abf7118843a5186d0f15be8390942fbd1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-attribs" name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:a44f8d33671d99c2c6a7364c003bbc6d4" id="r_a44f8d33671d99c2c6a7364c003bbc6d4"><td class="memItemLeft" align="right" valign="top">specfem::kokkos::DeviceView1d&lt; <a class="el" href="namespacespecfem_1_1elements.html#a88c727adceb8da1c70cf615e864470b3">specfem::elements::type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structspecfem_1_1compute_1_1properties.html#a44f8d33671d99c2c6a7364c003bbc6d4">ispec_type</a></td></tr>
-<tr class="separator:a44f8d33671d99c2c6a7364c003bbc6d4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a55493b5e73a685fda8720eb19fb045ea" id="r_a55493b5e73a685fda8720eb19fb045ea"><td class="memItemLeft" align="right" valign="top">specfem::kokkos::HostMirror1d&lt; <a class="el" href="namespacespecfem_1_1elements.html#a88c727adceb8da1c70cf615e864470b3">specfem::elements::type</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structspecfem_1_1compute_1_1properties.html#a55493b5e73a685fda8720eb19fb045ea">h_ispec_type</a></td></tr>
-<tr class="separator:a55493b5e73a685fda8720eb19fb045ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a791c0fc8644d7847de241dd03e075a0f" id="r_a791c0fc8644d7847de241dd03e075a0f"><td class="memItemLeft" align="right" valign="top">specfem::kokkos::DeviceView1d&lt; specfem::enums::element::type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structspecfem_1_1compute_1_1properties.html#a791c0fc8644d7847de241dd03e075a0f">ispec_type</a></td></tr>
+<tr class="separator:a791c0fc8644d7847de241dd03e075a0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab5e6399c0bef2375075c70b11d3183e0" id="r_ab5e6399c0bef2375075c70b11d3183e0"><td class="memItemLeft" align="right" valign="top">specfem::kokkos::HostMirror1d&lt; specfem::enums::element::type &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structspecfem_1_1compute_1_1properties.html#ab5e6399c0bef2375075c70b11d3183e0">h_ispec_type</a></td></tr>
+<tr class="separator:ab5e6399c0bef2375075c70b11d3183e0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr><td colspan="2"><div class="groupHeader">Material properties</div></td></tr>
 <tr><td colspan="2"><div class="groupText"><p>h_ prefixes denote views stored on host </p>
 </div></td></tr>
@@ -160,8 +160,8 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="ad6ec625c7c2dcaff7c6f2fca1440d7ab" name="ad6ec625c7c2dcaff7c6f2fca1440d7ab"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ad6ec625c7c2dcaff7c6f2fca1440d7ab">&#9670;&#160;</a></span>properties() <span class="overload">[2/2]</span></h2>
+<a id="a9974c9aa20db1b99e0e93d30d75c4c15" name="a9974c9aa20db1b99e0e93d30d75c4c15"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9974c9aa20db1b99e0e93d30d75c4c15">&#9670;&#160;</a></span>properties() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -175,7 +175,7 @@ Public Attributes</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::vector&lt; <a class="el" href="classspecfem_1_1material.html">specfem::material</a> * &gt; &amp;&#160;</td>
+          <td class="paramtype">const std::vector&lt; std::shared_ptr&lt; <a class="el" href="classspecfem_1_1material_1_1material.html">specfem::material::material</a> &gt; &gt; &amp;&#160;</td>
           <td class="paramname"><em>materials</em>, </td>
         </tr>
         <tr>
@@ -219,14 +219,14 @@ Public Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a id="a55493b5e73a685fda8720eb19fb045ea" name="a55493b5e73a685fda8720eb19fb045ea"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a55493b5e73a685fda8720eb19fb045ea">&#9670;&#160;</a></span>h_ispec_type</h2>
+<a id="ab5e6399c0bef2375075c70b11d3183e0" name="ab5e6399c0bef2375075c70b11d3183e0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab5e6399c0bef2375075c70b11d3183e0">&#9670;&#160;</a></span>h_ispec_type</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">specfem::kokkos::HostMirror1d&lt;<a class="el" href="namespacespecfem_1_1elements.html#a88c727adceb8da1c70cf615e864470b3">specfem::elements::type</a>&gt; specfem::compute::properties::h_ispec_type</td>
+          <td class="memname">specfem::kokkos::HostMirror1d&lt;specfem::enums::element::type&gt; specfem::compute::properties::h_ispec_type</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -234,14 +234,14 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a44f8d33671d99c2c6a7364c003bbc6d4" name="a44f8d33671d99c2c6a7364c003bbc6d4"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a44f8d33671d99c2c6a7364c003bbc6d4">&#9670;&#160;</a></span>ispec_type</h2>
+<a id="a791c0fc8644d7847de241dd03e075a0f" name="a791c0fc8644d7847de241dd03e075a0f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a791c0fc8644d7847de241dd03e075a0f">&#9670;&#160;</a></span>ispec_type</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">specfem::kokkos::DeviceView1d&lt;<a class="el" href="namespacespecfem_1_1elements.html#a88c727adceb8da1c70cf615e864470b3">specfem::elements::type</a>&gt; specfem::compute::properties::ispec_type</td>
+          <td class="memname">specfem::kokkos::DeviceView1d&lt;specfem::enums::element::type&gt; specfem::compute::properties::ispec_type</td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -250,7 +250,7 @@ Public Attributes</h2></td></tr>
 </div>
 </div>
 <hr/>The documentation for this struct was generated from the following file:<ul>
-<li>/Users/runner/work/specfem2d_kokkos/specfem2d_kokkos/include/<b>compute.h</b></li>
+<li>/Users/runner/work/SPECFEMPP/SPECFEMPP/include/compute/<b>compute_properties.hpp</b></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

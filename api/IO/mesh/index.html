@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mesh Input Module &mdash; SPECFEM++  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/graphviz.css?v=eafc0fe6" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/scrollable_code_blocks.css?v=ebc906c5" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/center_align_table.css?v=f0548739" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+    <link rel="next" title="Mesh properties struct" href="mesh_properties.html" />
+    <link rel="prev" title="Fortran IO" href="../fortran_io.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            SPECFEM++
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">USER DOCUMENTATION</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../user_documentation/index.html">User documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../meshfem2d/index.html">MESHFEM Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../parameter_documentation/index.html">SPECFEM++ Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../source_description/index.html">Source Description</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COOKBOOKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cookbooks/index.html">Cookbooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">CONTRIBUTION GUIDELINES</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../developer_documentation/index.html">Developer documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COMMUNITY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=bug_report.md&amp;title=">Report bugs</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=feature_request.md&amp;title=">Request a new feature</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/orgs/SPECFEM/discussions">Join the discussion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">BENCHMARKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../benchmarks/benchmarks.html">Performance Benchmarks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API DOCUMENTATION</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../../index.html">API documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../../kokkos_abstractions.html">Views and Execution Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../quadrature/index.html">Quadrature API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../material/index.html">Materials Class API</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="../index.html">Input/Output modules</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="../fortran_io.html">Fortran IO</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Mesh Input Module</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#mesh-struct-api">Mesh Struct API</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#supporting-struct-api">Supporting Struct API</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#supporting-functions">Supporting functions</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../writer/index.html">Writer API</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../sources/index.html">Sources API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../receivers/index.html">Receiver API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../compute/index.html">Compute Data Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../enumerations/index.html">Enumerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../domain/index.html">Domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../boundary_conditions/index.html">Boundary conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../coupling_physics/index.html">Coupled Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../timescheme/index.html">Time Scheme API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../solver/index.html">Solver API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../setup_parameters/index.html">Setup Parameters</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">SPECFEM++</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">API documentation</a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Input/Output modules</a></li>
+      <li class="breadcrumb-item active">Mesh Input Module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../../_sources/api/IO/mesh/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mesh-input-module">
+<h1>Mesh Input Module<a class="headerlink" href="#mesh-input-module" title="Link to this heading"></a></h1>
+<p>The mesh module provides set of structs and functions to read and store mesh database files generated by <code class="docutils literal notranslate"><span class="pre">MESHFEM2D</span></code>. The mesh database files need to be stored in fortran binary format.</p>
+<section id="mesh-struct-api">
+<h2>Mesh Struct API<a class="headerlink" href="#mesh-struct-api" title="Link to this heading"></a></h2>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh4meshE">
+<span id="_CPPv3N7specfem4mesh4meshE"></span><span id="_CPPv2N7specfem4mesh4meshE"></span><span id="specfem::mesh::mesh"></span><span class="target" id="structspecfem_1_1mesh_1_1mesh"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">mesh</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh4meshE" title="Link to this definition"></a><br /></dt>
+<dd><p>Mesh Interface. </p>
+<p>The mesh is implemented as a C++ struct. The mesh struct defines all the variables nacessary to populate structs within specfem::compute namespace </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh4mesh4meshEv">
+<span id="_CPPv3N7specfem4mesh4mesh4meshEv"></span><span id="_CPPv2N7specfem4mesh4mesh4meshEv"></span><span id="specfem::mesh::mesh::mesh"></span><span class="target" id="structspecfem_1_1mesh_1_1mesh_1a369ffc461810bb6324b620624fc6e2e6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">mesh</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem4mesh4mesh4meshEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Default mesh constructor. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh4mesh4meshEKNSt6stringERNSt6vectorINSt10shared_ptrIN7specfem8material8materialEEEEEPKN7specfem3MPI3MPIE">
+<span id="_CPPv3N7specfem4mesh4mesh4meshEKNSt6stringERNSt6vectorINSt10shared_ptrIN7specfem8material8materialEEEEEPKN7specfem3MPI3MPIE"></span><span id="_CPPv2N7specfem4mesh4mesh4meshEKNSt6stringERNSt6vectorINSt10shared_ptrIN7specfem8material8materialEEEEEPKN7specfem3MPI3MPIE"></span><span id="specfem::mesh::mesh::mesh__ssC.std::vector:std::shared_ptr:specfem::material::material::R.specfem::MPI::MPICP"></span><span class="target" id="structspecfem_1_1mesh_1_1mesh_1a647fea6f759733eb70becb2fe78b63db"></span><span class="sig-name descname"><span class="n"><span class="pre">mesh</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">filename</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem8materialE" title="specfem::material"><span class="n"><span class="pre">material</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../material/index.html#_CPPv4N7specfem8material8materialE" title="specfem::material::material"><span class="n"><span class="pre">material</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">materials</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MPI</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MPI</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">mpi</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem4mesh4mesh4meshEKNSt6stringERNSt6vectorINSt10shared_ptrIN7specfem8material8materialEEEEEPKN7specfem3MPI3MPIE" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct mesh from a fortran binary database file. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> – Fortran binary database filename </p></li>
+<li><p><strong>mpi</strong> – pointer to MPI object to manage communication </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem4mesh4mesh5printERNSt6vectorINSt10shared_ptrIN7specfem8material8materialEEEEE">
+<span id="_CPPv3NK7specfem4mesh4mesh5printERNSt6vectorINSt10shared_ptrIN7specfem8material8materialEEEEE"></span><span id="_CPPv2NK7specfem4mesh4mesh5printERNSt6vectorINSt10shared_ptrIN7specfem8material8materialEEEEE"></span><span id="specfem::mesh::mesh::print__std::vector:std::shared_ptr:specfem::material::material::RC"></span><span class="target" id="structspecfem_1_1mesh_1_1mesh_1ae51bdbe17a8e568938010d879992f08e"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">print</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem8materialE" title="specfem::material"><span class="n"><span class="pre">material</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../material/index.html#_CPPv4N7specfem8material8materialE" title="specfem::material::material"><span class="n"><span class="pre">material</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">materials</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem4mesh4mesh5printERNSt6vectorINSt10shared_ptrIN7specfem8material8materialEEEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>User output. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh4mesh5npgeoE">
+<span id="_CPPv3N7specfem4mesh4mesh5npgeoE"></span><span id="_CPPv2N7specfem4mesh4mesh5npgeoE"></span><span id="specfem::mesh::mesh::npgeo__i"></span><span class="target" id="structspecfem_1_1mesh_1_1mesh_1a9ec33bb54fe60a744d067b9c9f84116b"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">npgeo</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh4mesh5npgeoE" title="Link to this definition"></a><br /></dt>
+<dd><p>Total number of spectral element control nodes. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh4mesh5nspecE">
+<span id="_CPPv3N7specfem4mesh4mesh5nspecE"></span><span id="_CPPv2N7specfem4mesh4mesh5nspecE"></span><span id="specfem::mesh::mesh::nspec__i"></span><span class="target" id="structspecfem_1_1mesh_1_1mesh_1a31a262f9934b514d6c6f37f3678a4051"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nspec</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh4mesh5nspecE" title="Link to this definition"></a><br /></dt>
+<dd><p>Total number of spectral elements. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh4mesh5nprocE">
+<span id="_CPPv3N7specfem4mesh4mesh5nprocE"></span><span id="_CPPv2N7specfem4mesh4mesh5nprocE"></span><span id="specfem::mesh::mesh::nproc__i"></span><span class="target" id="structspecfem_1_1mesh_1_1mesh_1a5d71aa486cdf4ac98a6d2635dd48862c"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nproc</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh4mesh5nprocE" title="Link to this definition"></a><br /></dt>
+<dd><p>Total number of processors. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh4mesh5coorgE">
+<span id="_CPPv3N7specfem4mesh4mesh5coorgE"></span><span id="_CPPv2N7specfem4mesh4mesh5coorgE"></span><span id="specfem::mesh::mesh::coorg__specfem::kokkos::HostView2d:type_real:"></span><span class="target" id="structspecfem_1_1mesh_1_1mesh_1a0c5fd695b03be1cb4ff07bcf9790861f"></span><a class="reference internal" href="../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos10HostView2dE" title="specfem::kokkos::HostView2d"><span class="n"><span class="pre">HostView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">coorg</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh4mesh5coorgE" title="Link to this definition"></a><br /></dt>
+<dd><p>(x_a,z_a) for every spectral element control node </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh4mesh12material_indE">
+<span id="_CPPv3N7specfem4mesh4mesh12material_indE"></span><span id="_CPPv2N7specfem4mesh4mesh12material_indE"></span><span id="specfem::mesh::mesh::material_ind__specfem::mesh::material_ind"></span><span class="target" id="structspecfem_1_1mesh_1_1mesh_1a4830b59236d6f99685afd0e61c432dc0"></span><a class="reference internal" href="../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem4meshE" title="specfem::mesh"><span class="n"><span class="pre">mesh</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="material_information.html#_CPPv4N7specfem4mesh12material_indE" title="specfem::mesh::material_ind"><span class="n"><span class="pre">material_ind</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">material_ind</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh4mesh12material_indE" title="Link to this definition"></a><br /></dt>
+<dd><p>Struct used to store material information for every spectral element </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh4mesh12abs_boundaryE">
+<span id="_CPPv3N7specfem4mesh4mesh12abs_boundaryE"></span><span id="_CPPv2N7specfem4mesh4mesh12abs_boundaryE"></span><span id="specfem::mesh::mesh::abs_boundary__specfem::mesh::boundaries::absorbing_boundary"></span><span class="target" id="structspecfem_1_1mesh_1_1mesh_1a355e48dfe7ec0eb8b186ca5566b49418"></span><a class="reference internal" href="../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem4meshE" title="specfem::mesh"><span class="n"><span class="pre">mesh</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem4mesh10boundariesE" title="specfem::mesh::boundaries"><span class="n"><span class="pre">boundaries</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="boundaries/absorbing_boundaries.html#_CPPv4N7specfem4mesh10boundaries18absorbing_boundaryE" title="specfem::mesh::boundaries::absorbing_boundary"><span class="n"><span class="pre">absorbing_boundary</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">abs_boundary</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh4mesh12abs_boundaryE" title="Link to this definition"></a><br /></dt>
+<dd><p>Struct used to store data required to implement absorbing boundary </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh4mesh10parametersE">
+<span id="_CPPv3N7specfem4mesh4mesh10parametersE"></span><span id="_CPPv2N7specfem4mesh4mesh10parametersE"></span><span id="specfem::mesh::mesh::parameters__specfem::mesh::properties"></span><span class="target" id="structspecfem_1_1mesh_1_1mesh_1a2b550f9f621cdb98d397b43dd8f478bc"></span><a class="reference internal" href="../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem4meshE" title="specfem::mesh"><span class="n"><span class="pre">mesh</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="mesh_properties.html#_CPPv4N7specfem4mesh10propertiesE" title="specfem::mesh::properties"><span class="n"><span class="pre">properties</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">parameters</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh4mesh10parametersE" title="Link to this definition"></a><br /></dt>
+<dd><p>Struct to store simulation launch parameters </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh4mesh18coupled_interfacesE">
+<span id="_CPPv3N7specfem4mesh4mesh18coupled_interfacesE"></span><span id="_CPPv2N7specfem4mesh4mesh18coupled_interfacesE"></span><span id="specfem::mesh::mesh::coupled_interfaces__specfem::mesh::coupled_interfaces::coupled_interfaces"></span><span class="target" id="structspecfem_1_1mesh_1_1mesh_1ad2a648175999e1eb6bb6e8cab5232123"></span><a class="reference internal" href="../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem4meshE" title="specfem::mesh"><span class="n"><span class="pre">mesh</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem4mesh18coupled_interfacesE" title="specfem::mesh::coupled_interfaces"><span class="n"><span class="pre">coupled_interfaces</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem4mesh18coupled_interfacesE" title="specfem::mesh::coupled_interfaces"><span class="n"><span class="pre">coupled_interfaces</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">coupled_interfaces</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh4mesh18coupled_interfacesE" title="Link to this definition"></a><br /></dt>
+<dd><p>Struct to store coupled interfaces </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh4mesh14acfree_surfaceE">
+<span id="_CPPv3N7specfem4mesh4mesh14acfree_surfaceE"></span><span id="_CPPv2N7specfem4mesh4mesh14acfree_surfaceE"></span><span id="specfem::mesh::mesh::acfree_surface__specfem::mesh::boundaries::acoustic_free_surface"></span><span class="target" id="structspecfem_1_1mesh_1_1mesh_1af2ead0a0f352bf0a40b18557f91d65ae"></span><a class="reference internal" href="../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem4meshE" title="specfem::mesh"><span class="n"><span class="pre">mesh</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem4mesh10boundariesE" title="specfem::mesh::boundaries"><span class="n"><span class="pre">boundaries</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="boundaries/acoustic_free_surface.html#_CPPv4N7specfem4mesh10boundaries21acoustic_free_surfaceE" title="specfem::mesh::boundaries::acoustic_free_surface"><span class="n"><span class="pre">acoustic_free_surface</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">acfree_surface</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh4mesh14acfree_surfaceE" title="Link to this definition"></a><br /></dt>
+<dd><p>Struct used to store data required to implement acoustic free surface </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh4mesh18acforcing_boundaryE">
+<span id="_CPPv3N7specfem4mesh4mesh18acforcing_boundaryE"></span><span id="_CPPv2N7specfem4mesh4mesh18acforcing_boundaryE"></span><span id="specfem::mesh::mesh::acforcing_boundary__specfem::mesh::boundaries::forcing_boundary"></span><span class="target" id="structspecfem_1_1mesh_1_1mesh_1a101544c9667ca650eaa801fbede620ea"></span><a class="reference internal" href="../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem4meshE" title="specfem::mesh"><span class="n"><span class="pre">mesh</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem4mesh10boundariesE" title="specfem::mesh::boundaries"><span class="n"><span class="pre">boundaries</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="boundaries/acoustic_forcing.html#_CPPv4N7specfem4mesh10boundaries16forcing_boundaryE" title="specfem::mesh::boundaries::forcing_boundary"><span class="n"><span class="pre">forcing_boundary</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">acforcing_boundary</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh4mesh18acforcing_boundaryE" title="Link to this definition"></a><br /></dt>
+<dd><p>Struct used to store data required to implement acoustic forcing boundary </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh4mesh16tangential_nodesE">
+<span id="_CPPv3N7specfem4mesh4mesh16tangential_nodesE"></span><span id="_CPPv2N7specfem4mesh4mesh16tangential_nodesE"></span><span id="specfem::mesh::mesh::tangential_nodes__specfem::mesh::elements::tangential_elements"></span><span class="target" id="structspecfem_1_1mesh_1_1mesh_1a0bcaf556a870b92461633486c9e0ccb2"></span><a class="reference internal" href="../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem4meshE" title="specfem::mesh"><span class="n"><span class="pre">mesh</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem4mesh8elementsE" title="specfem::mesh::elements"><span class="n"><span class="pre">elements</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="elements/tangential_elements.html#_CPPv4N7specfem4mesh8elements19tangential_elementsE" title="specfem::mesh::elements::tangential_elements"><span class="n"><span class="pre">tangential_elements</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">tangential_nodes</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh4mesh16tangential_nodesE" title="Link to this definition"></a><br /></dt>
+<dd><p>Defines tangential nodes </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh4mesh11axial_nodesE">
+<span id="_CPPv3N7specfem4mesh4mesh11axial_nodesE"></span><span id="_CPPv2N7specfem4mesh4mesh11axial_nodesE"></span><span id="specfem::mesh::mesh::axial_nodes__specfem::mesh::elements::axial_elements"></span><span class="target" id="structspecfem_1_1mesh_1_1mesh_1a0f5ef0d600791e1c514d9a3c921849c7"></span><a class="reference internal" href="../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem4meshE" title="specfem::mesh"><span class="n"><span class="pre">mesh</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem4mesh8elementsE" title="specfem::mesh::elements"><span class="n"><span class="pre">elements</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="elements/axial_elements.html#_CPPv4N7specfem4mesh8elements14axial_elementsE" title="specfem::mesh::elements::axial_elements"><span class="n"><span class="pre">axial_elements</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">axial_nodes</span></span></span><a class="headerlink" href="#_CPPv4N7specfem4mesh4mesh11axial_nodesE" title="Link to this definition"></a><br /></dt>
+<dd><p>Defines axial nodes. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+<section id="supporting-struct-api">
+<h2>Supporting Struct API<a class="headerlink" href="#supporting-struct-api" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="mesh_properties.html">Mesh properties struct</a></li>
+<li class="toctree-l1"><a class="reference internal" href="material_information.html">Mesh Material Information</a></li>
+<li class="toctree-l1"><a class="reference internal" href="boundaries/index.html">Boundaries</a></li>
+<li class="toctree-l1"><a class="reference internal" href="elements/index.html">Special Elements</a></li>
+</ul>
+</div>
+</section>
+<section id="supporting-functions">
+<h2>Supporting functions<a class="headerlink" href="#supporting-functions" title="Link to this heading"></a></h2>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh2IO7fortran25read_mesh_database_headerERNSt8ifstreamEPKN7specfem3MPI3MPIE">
+<span id="_CPPv3N7specfem4mesh2IO7fortran25read_mesh_database_headerERNSt8ifstreamEPKN7specfem3MPI3MPIE"></span><span id="_CPPv2N7specfem4mesh2IO7fortran25read_mesh_database_headerERNSt8ifstreamEPKN7specfem3MPI3MPIE"></span><span id="specfem::mesh::IO::fortran::read_mesh_database_header__std::ifstreamR.specfem::MPI::MPICP"></span><span class="target" id="read__mesh__database_8hpp_1ab04bc3e405a557383ccc3d477be90a0f"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">tuple</span></span><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-prename descclassname"><a class="reference internal" href="../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem4meshE" title="specfem::mesh"><span class="n"><span class="pre">mesh</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem4mesh2IOE" title="specfem::mesh::IO"><span class="n"><span class="pre">IO</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem4mesh2IO7fortranE" title="specfem::mesh::IO::fortran"><span class="n"><span class="pre">fortran</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">read_mesh_database_header</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ifstream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">stream</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MPI</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MPI</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">mpi</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem4mesh2IO7fortran25read_mesh_database_headerERNSt8ifstreamEPKN7specfem3MPI3MPIE" title="Link to this definition"></a><br /></dt>
+<dd><p>Read fortran bindary database header. </p>
+<p>This section populates nspec, npgeo, nproc in the mesh struct</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stream</strong> – Stream object for fortran binary file buffered to header section </p></li>
+<li><p><strong>mpi</strong> – Pointer to MPI object </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>std::tuple&lt;int, int, int&gt; nspec, npgeo, nproc values read from database file </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem4mesh2IO7fortran24read_material_propertiesERNSt8ifstreamEKiPKN7specfem3MPI3MPIE">
+<span id="_CPPv3N7specfem4mesh2IO7fortran24read_material_propertiesERNSt8ifstreamEKiPKN7specfem3MPI3MPIE"></span><span id="_CPPv2N7specfem4mesh2IO7fortran24read_material_propertiesERNSt8ifstreamEKiPKN7specfem3MPI3MPIE"></span><span id="specfem::mesh::IO::fortran::read_material_properties__std::ifstreamR.iC.specfem::MPI::MPICP"></span><span class="target" id="read__material__properties_8hpp_1aa50fc857bfe5fcc2e5ded71628da3054"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem8materialE" title="specfem::material"><span class="n"><span class="pre">material</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../material/index.html#_CPPv4N7specfem8material8materialE" title="specfem::material::material"><span class="n"><span class="pre">material</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-prename descclassname"><a class="reference internal" href="../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem4meshE" title="specfem::mesh"><span class="n"><span class="pre">mesh</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem4mesh2IOE" title="specfem::mesh::IO"><span class="n"><span class="pre">IO</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../namespaces/index.html#_CPPv4N7specfem4mesh2IO7fortranE" title="specfem::mesh::IO::fortran"><span class="n"><span class="pre">fortran</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">read_material_properties</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ifstream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">stream</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">numat</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MPI</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MPI</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">mpi</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem4mesh2IO7fortran24read_material_propertiesERNSt8ifstreamEKiPKN7specfem3MPI3MPIE" title="Link to this definition"></a><br /></dt>
+<dd><p>Read material properties from a fotran binary database</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>stream</strong> – Stream object for fortran binary file buffered to materials section </p></li>
+<li><p><strong>numat</strong> – Number of materials to be read </p></li>
+<li><p><strong>mpi</strong> – Pointer to MPI object </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>std::vector&lt;specfem::material *&gt; Pointer to material objects read from the database file </p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../fortran_io.html" class="btn btn-neutral float-left" title="Fortran IO" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="mesh_properties.html" class="btn btn-neutral float-right" title="Mesh properties struct" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Rohit Kakodkar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

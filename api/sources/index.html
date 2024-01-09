@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sources API &mdash; SPECFEM++  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/scrollable_code_blocks.css?v=ebc906c5" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/center_align_table.css?v=f0548739" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Force Source" href="force_source.html" />
+    <link rel="prev" title="Seismogram Writer" href="../IO/writer/seismogram_writer.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            SPECFEM++
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">USER DOCUMENTATION</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user_documentation/index.html">User documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meshfem2d/index.html">MESHFEM Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parameter_documentation/index.html">SPECFEM++ Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source_description/index.html">Source Description</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COOKBOOKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cookbooks/index.html">Cookbooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">CONTRIBUTION GUIDELINES</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_documentation/index.html">Developer documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COMMUNITY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=bug_report.md&amp;title=">Report bugs</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=feature_request.md&amp;title=">Request a new feature</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/orgs/SPECFEM/discussions">Join the discussion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">BENCHMARKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../benchmarks/benchmarks.html">Performance Benchmarks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API DOCUMENTATION</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../kokkos_abstractions.html">Views and Execution Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quadrature/index.html">Quadrature API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../material/index.html">Materials Class API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../IO/index.html">Input/Output modules</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Sources API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv4N7specfem7sources6sourceE"><code class="docutils literal notranslate"><span class="pre">source</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N7specfem7sources6source6sourceEv"><code class="docutils literal notranslate"><span class="pre">source::source()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N7specfem7sources6source6locateEKN7specfem6kokkos10HostView2dI9type_realEEKN7specfem6kokkos12HostMirror3dIiEEKN7specfem6kokkos12HostMirror1dI9type_realEEKN7specfem6kokkos12HostMirror1dI9type_realEEKiKN7specfem6kokkos10HostView2dI9type_realEEKN7specfem6kokkos10HostView2dIiEEKiKN7specfem6kokkos12HostMirror1dIN7specfem5enums7element4typeEEEPKN7specfem3MPI3MPIE"><code class="docutils literal notranslate"><span class="pre">source::locate()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N7specfem7sources6source20compute_source_arrayEPKN7specfem10quadrature10quadratureEPKN7specfem10quadrature10quadratureEN7specfem6kokkos10HostView3dI9type_realEE"><code class="docutils literal notranslate"><span class="pre">source::compute_source_array()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N7specfem7sources6source15check_locationsEK9type_realK9type_realK9type_realK9type_realPKN7specfem3MPI3MPIE"><code class="docutils literal notranslate"><span class="pre">source::check_locations()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK7specfem7sources6source10get_isliceEv"><code class="docutils literal notranslate"><span class="pre">source::get_islice()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK7specfem7sources6source9get_ispecEv"><code class="docutils literal notranslate"><span class="pre">source::get_ispec()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK7specfem7sources6source5get_xEv"><code class="docutils literal notranslate"><span class="pre">source::get_x()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK7specfem7sources6source5get_zEv"><code class="docutils literal notranslate"><span class="pre">source::get_z()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK7specfem7sources6source6get_xiEv"><code class="docutils literal notranslate"><span class="pre">source::get_xi()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK7specfem7sources6source9get_gammaEv"><code class="docutils literal notranslate"><span class="pre">source::get_gamma()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N7specfem7sources6source13update_tshiftE9type_real"><code class="docutils literal notranslate"><span class="pre">source::update_tshift()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK7specfem7sources6source5printERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">source::print()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK7specfem7sources6source5printEv"><code class="docutils literal notranslate"><span class="pre">source::print()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK7specfem7sources6source7get_stfEv"><code class="docutils literal notranslate"><span class="pre">source::get_stf()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N7specfem7sources6sourceD0Ev"><code class="docutils literal notranslate"><span class="pre">source::~source()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#types-of-sources">Types of sources</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="force_source.html">Force Source</a></li>
+<li class="toctree-l4"><a class="reference internal" href="moment_tensor_source.html">Moment-Tensor Source</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#auxiliary-functions">Auxiliary functions</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N7specfem7sources12read_sourcesEKNSt6stringEK9type_realPKN7specfem3MPI3MPIE"><code class="docutils literal notranslate"><span class="pre">read_sources()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../receivers/index.html">Receiver API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compute/index.html">Compute Data Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../enumerations/index.html">Enumerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../domain/index.html">Domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../boundary_conditions/index.html">Boundary conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../coupling_physics/index.html">Coupled Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../timescheme/index.html">Time Scheme API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../solver/index.html">Solver API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup_parameters/index.html">Setup Parameters</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">SPECFEM++</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">API documentation</a></li>
+      <li class="breadcrumb-item active">Sources API</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/sources/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="sources-api">
+<h1>Sources API<a class="headerlink" href="#sources-api" title="Link to this heading"></a></h1>
+<p>Sources module provides methods and classes used to read, store and process data for various sources.</p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7sources6sourceE">
+<span id="_CPPv3N7specfem7sources6sourceE"></span><span id="_CPPv2N7specfem7sources6sourceE"></span><span id="specfem::sources::source"></span><span class="target" id="classspecfem_1_1sources_1_1source"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">source</span></span></span><a class="headerlink" href="#_CPPv4N7specfem7sources6sourceE" title="Link to this definition"></a><br /></dt>
+<dd><p>Base source class. </p>
+<p>Subclassed by <a class="reference internal" href="force_source.html#classspecfem_1_1sources_1_1force"><span class="std std-ref">specfem::sources::force</span></a>, <a class="reference internal" href="moment_tensor_source.html#classspecfem_1_1sources_1_1moment__tensor"><span class="std std-ref">specfem::sources::moment_tensor</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7sources6source6sourceEv">
+<span id="_CPPv3N7specfem7sources6source6sourceEv"></span><span id="_CPPv2N7specfem7sources6source6sourceEv"></span><span id="specfem::sources::source::source"></span><span class="target" id="classspecfem_1_1sources_1_1source_1ab2f8aaebb9f369e837f312a591ff327e"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">source</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem7sources6source6sourceEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Default source constructor. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7sources6source6locateEKN7specfem6kokkos10HostView2dI9type_realEEKN7specfem6kokkos12HostMirror3dIiEEKN7specfem6kokkos12HostMirror1dI9type_realEEKN7specfem6kokkos12HostMirror1dI9type_realEEKiKN7specfem6kokkos10HostView2dI9type_realEEKN7specfem6kokkos10HostView2dIiEEKiKN7specfem6kokkos12HostMirror1dIN7specfem5enums7element4typeEEEPKN7specfem3MPI3MPIE">
+<span id="_CPPv3N7specfem7sources6source6locateEKN7specfem6kokkos10HostView2dI9type_realEEKN7specfem6kokkos12HostMirror3dIiEEKN7specfem6kokkos12HostMirror1dI9type_realEEKN7specfem6kokkos12HostMirror1dI9type_realEEKiKN7specfem6kokkos10HostView2dI9type_realEEKN7specfem6kokkos10HostView2dIiEEKiKN7specfem6kokkos12HostMirror1dIN7specfem5enums7element4typeEEEPKN7specfem3MPI3MPIE"></span><span id="_CPPv2N7specfem7sources6source6locateEKN7specfem6kokkos10HostView2dI9type_realEEKN7specfem6kokkos12HostMirror3dIiEEKN7specfem6kokkos12HostMirror1dI9type_realEEKN7specfem6kokkos12HostMirror1dI9type_realEEKiKN7specfem6kokkos10HostView2dI9type_realEEKN7specfem6kokkos10HostView2dIiEEKiKN7specfem6kokkos12HostMirror1dIN7specfem5enums7element4typeEEEPKN7specfem3MPI3MPIE"></span><span id="specfem::sources::source::locate__specfem::kokkos::HostView2d:type_real:C.specfem::kokkos::HostMirror3d:i:C.specfem::kokkos::HostMirror1d:type_real:C.specfem::kokkos::HostMirror1d:type_real:C.iC.specfem::kokkos::HostView2d:type_real:C.specfem::kokkos::HostView2d:i:C.iC.specfem::kokkos::HostMirror1d:specfem::enums::element::type:C.specfem::MPI::MPICP"></span><span class="target" id="classspecfem_1_1sources_1_1source_1aab3e21c6202a956765c3450ca6627e65"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">locate</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos10HostView2dE" title="specfem::kokkos::HostView2d"><span class="n"><span class="pre">HostView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">coord</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12HostMirror3dE" title="specfem::kokkos::HostMirror3d"><span class="n"><span class="pre">HostMirror3d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">h_ibool</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12HostMirror1dE" title="specfem::kokkos::HostMirror1d"><span class="n"><span class="pre">HostMirror1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">xigll</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12HostMirror1dE" title="specfem::kokkos::HostMirror1d"><span class="n"><span class="pre">HostMirror1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">zigll</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nproc</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos10HostView2dE" title="specfem::kokkos::HostView2d"><span class="n"><span class="pre">HostView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">coorg</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos10HostView2dE" title="specfem::kokkos::HostView2d"><span class="n"><span class="pre">HostView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="kt"><span class="pre">int</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">knods</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">npgeo</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12HostMirror1dE" title="specfem::kokkos::HostMirror1d"><span class="n"><span class="pre">HostMirror1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enums</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">element</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../enumerations/element/element_enumeration.html#_CPPv4N7specfem5enums7element4typeE" title="specfem::enums::element::type"><span class="n"><span class="pre">type</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ispec_type</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MPI</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MPI</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">mpi</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem7sources6source6locateEKN7specfem6kokkos10HostView2dI9type_realEEKN7specfem6kokkos12HostMirror3dIiEEKN7specfem6kokkos12HostMirror1dI9type_realEEKN7specfem6kokkos12HostMirror1dI9type_realEEKiKN7specfem6kokkos10HostView2dI9type_realEEKN7specfem6kokkos10HostView2dIiEEKiKN7specfem6kokkos12HostMirror1dIN7specfem5enums7element4typeEEEPKN7specfem3MPI3MPIE" title="Link to this definition"></a><br /></dt>
+<dd><p>Locate source within the mesh. </p>
+<p>Given the global cartesian coordinates of a source, locate the spectral element and xi, gamma value of the source</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>h_ibool</strong> – Global number for every quadrature point </p></li>
+<li><p><strong>coord</strong> – (x, z) for every distinct control node </p></li>
+<li><p><strong>xigll</strong> – Quadrature points in x-dimension </p></li>
+<li><p><strong>zigll</strong> – Quadrature points in z-dimension </p></li>
+<li><p><strong>nproc</strong> – Number of processors in the simulation </p></li>
+<li><p><strong>coorg</strong> – Value of every spectral element control nodes </p></li>
+<li><p><strong>knods</strong> – Global control element number for every control node </p></li>
+<li><p><strong>npgeo</strong> – Total number of distinct control nodes </p></li>
+<li><p><strong>ispec_type</strong> – material type for every spectral element </p></li>
+<li><p><strong>mpi</strong> – Pointer to specfem MPI object </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7sources6source20compute_source_arrayEPKN7specfem10quadrature10quadratureEPKN7specfem10quadrature10quadratureEN7specfem6kokkos10HostView3dI9type_realEE">
+<span id="_CPPv3N7specfem7sources6source20compute_source_arrayEPKN7specfem10quadrature10quadratureEPKN7specfem10quadrature10quadratureEN7specfem6kokkos10HostView3dI9type_realEE"></span><span id="_CPPv2N7specfem7sources6source20compute_source_arrayEPKN7specfem10quadrature10quadratureEPKN7specfem10quadrature10quadratureEN7specfem6kokkos10HostView3dI9type_realEE"></span><span id="specfem::sources::source::compute_source_array__specfem::quadrature::quadratureCP.specfem::quadrature::quadratureCP.specfem::kokkos::HostView3d:type_real:"></span><span class="target" id="classspecfem_1_1sources_1_1source_1a630f8a3593486f66f92916d35cd50aa3"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">compute_source_array</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv4N7specfem10quadratureE" title="specfem::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../quadrature/index.html#_CPPv4N7specfem10quadrature10quadratureE" title="specfem::quadrature::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">quadx</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv4N7specfem10quadratureE" title="specfem::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../quadrature/index.html#_CPPv4N7specfem10quadrature10quadratureE" title="specfem::quadrature::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">quadz</span></span>, <a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos10HostView3dE" title="specfem::kokkos::HostView3d"><span class="n"><span class="pre">HostView3d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">source_array</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem7sources6source20compute_source_arrayEPKN7specfem10quadrature10quadratureEPKN7specfem10quadrature10quadratureEN7specfem6kokkos10HostView3dI9type_realEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Precompute and store lagrangian values used to compute integrals for sources. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>quadx</strong> – Quadrature object in x-dimension </p></li>
+<li><p><strong>quadz</strong> – Quadrature object in z-dimension </p></li>
+<li><p><strong>source_array</strong> – view to store the source array </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7sources6source15check_locationsEK9type_realK9type_realK9type_realK9type_realPKN7specfem3MPI3MPIE">
+<span id="_CPPv3N7specfem7sources6source15check_locationsEK9type_realK9type_realK9type_realK9type_realPKN7specfem3MPI3MPIE"></span><span id="_CPPv2N7specfem7sources6source15check_locationsEK9type_realK9type_realK9type_realK9type_realPKN7specfem3MPI3MPIE"></span><span id="specfem::sources::source::check_locations__type_realC.type_realC.type_realC.type_realC.specfem::MPI::MPICP"></span><span class="target" id="classspecfem_1_1sources_1_1source_1a044a25e354676001c7ce6cadf6673de6"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">check_locations</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">xmin</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">xmax</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">zmin</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">zmax</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MPI</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MPI</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">mpi</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem7sources6source15check_locationsEK9type_realK9type_realK9type_realK9type_realPKN7specfem3MPI3MPIE" title="Link to this definition"></a><br /></dt>
+<dd><p>Check if the source is within the domain. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xmin</strong> – minimum x-coordinate on my processor </p></li>
+<li><p><strong>xmax</strong> – maximum x-coordinate on my processor </p></li>
+<li><p><strong>zmin</strong> – minimum z-coordinate on my processor </p></li>
+<li><p><strong>zmax</strong> – maximum z-coordinate on my processor </p></li>
+<li><p><strong>mpi</strong> – Pointer to specfem MPI object </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem7sources6source10get_isliceEv">
+<span id="_CPPv3NK7specfem7sources6source10get_isliceEv"></span><span id="_CPPv2NK7specfem7sources6source10get_isliceEv"></span><span id="specfem::sources::source::get_isliceC"></span><span class="target" id="classspecfem_1_1sources_1_1source_1aa1aefc5f4215804b2133211ff6f9fd3c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_islice</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem7sources6source10get_isliceEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the processor on which this source lies. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int value of processor </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem7sources6source9get_ispecEv">
+<span id="_CPPv3NK7specfem7sources6source9get_ispecEv"></span><span id="_CPPv2NK7specfem7sources6source9get_ispecEv"></span><span id="specfem::sources::source::get_ispecC"></span><span class="target" id="classspecfem_1_1sources_1_1source_1aa8c2f8d740c309945391bfdafd661a87"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_ispec</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem7sources6source9get_ispecEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the element inside which this source lies. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int value of element </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem7sources6source5get_xEv">
+<span id="_CPPv3NK7specfem7sources6source5get_xEv"></span><span id="_CPPv2NK7specfem7sources6source5get_xEv"></span><span id="specfem::sources::source::get_xC"></span><span class="target" id="classspecfem_1_1sources_1_1source_1a388be0e54c20e99635224947d77912c2"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_x</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem7sources6source5get_xEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the x coordinate of the source. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>type_real x-coordinate </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem7sources6source5get_zEv">
+<span id="_CPPv3NK7specfem7sources6source5get_zEv"></span><span id="_CPPv2NK7specfem7sources6source5get_zEv"></span><span id="specfem::sources::source::get_zC"></span><span class="target" id="classspecfem_1_1sources_1_1source_1a35aaa046988fb6a552e12b9da4a1161f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_z</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem7sources6source5get_zEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the z coordinate of the source. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>type_real z-coordinate </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem7sources6source6get_xiEv">
+<span id="_CPPv3NK7specfem7sources6source6get_xiEv"></span><span id="_CPPv2NK7specfem7sources6source6get_xiEv"></span><span id="specfem::sources::source::get_xiC"></span><span class="target" id="classspecfem_1_1sources_1_1source_1afd9a4d77d5d859d788e40255af8205bb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_xi</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem7sources6source6get_xiEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the <span class="math notranslate nohighlight">\( \xi \)</span> value of the source within the element. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>type_real <span class="math notranslate nohighlight">\( \xi \)</span> value </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem7sources6source9get_gammaEv">
+<span id="_CPPv3NK7specfem7sources6source9get_gammaEv"></span><span id="_CPPv2NK7specfem7sources6source9get_gammaEv"></span><span id="specfem::sources::source::get_gammaC"></span><span class="target" id="classspecfem_1_1sources_1_1source_1a4d213b0d608965ce15873d7494fdc94c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_gamma</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem7sources6source9get_gammaEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the <span class="math notranslate nohighlight">\( \gamma \)</span> value of the source within the element. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>type_real <span class="math notranslate nohighlight">\( \gamma \)</span> value </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classspecfem_1_1sources_1_1source_1a7f29df6b6773505b8f1ca1fe50181db8"></span><span class="sig-name descname"><span class="pre">inline</span> <span class="pre">virtual</span> <span class="pre">KOKKOS_IMPL_HOST_FUNCTION</span> <span class="pre">type_real</span> <span class="pre">get_t0</span> <span class="pre">()</span> <span class="pre">const</span></span></dt>
+<dd><p>Get the value of t0 from the specfem::stf::stf object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>value of t0 </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7sources6source13update_tshiftE9type_real">
+<span id="_CPPv3N7specfem7sources6source13update_tshiftE9type_real"></span><span id="_CPPv2N7specfem7sources6source13update_tshiftE9type_real"></span><span id="specfem::sources::source::update_tshift__type_real"></span><span class="target" id="classspecfem_1_1sources_1_1source_1a52f67a2f05b928971e79690d20263dec"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">update_tshift</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">tshift</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem7sources6source13update_tshiftE9type_real" title="Link to this definition"></a><br /></dt>
+<dd><p>Update the value of tshift for specfem::stf::stf object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>new value of tshift </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem7sources6source5printERNSt7ostreamE">
+<span id="_CPPv3NK7specfem7sources6source5printERNSt7ostreamE"></span><span id="_CPPv2NK7specfem7sources6source5printERNSt7ostreamE"></span><span id="specfem::sources::source::print__osRC"></span><span class="target" id="classspecfem_1_1sources_1_1source_1a397f1277abcf2c64c3374ef55908009f"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">print</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem7sources6source5printERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd><p>User output. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem7sources6source5printEv">
+<span id="_CPPv3NK7specfem7sources6source5printEv"></span><span id="_CPPv2NK7specfem7sources6source5printEv"></span><span id="specfem::sources::source::printC"></span><span class="target" id="classspecfem_1_1sources_1_1source_1a6d2fa9fcd0210a1b7cac5e8a52cb7d3d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">print</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem7sources6source5printEv" title="Link to this definition"></a><br /></dt>
+<dd><p>User output. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem7sources6source7get_stfEv">
+<span id="_CPPv3NK7specfem7sources6source7get_stfEv"></span><span id="_CPPv2NK7specfem7sources6source7get_stfEv"></span><span id="specfem::sources::source::get_stfC"></span><span class="target" id="classspecfem_1_1sources_1_1source_1a33d96d5626ab216906a1945738402684"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">forcing_function</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">stf</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="sig-name descname"><span class="n"><span class="pre">get_stf</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK7specfem7sources6source7get_stfEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the device pointer to stf object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>specfem::forcing_function::stf* </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7sources6sourceD0Ev">
+<span id="_CPPv3N7specfem7sources6sourceD0Ev"></span><span id="_CPPv2N7specfem7sources6sourceD0Ev"></span><span id="specfem::sources::source::~source"></span><span class="target" id="classspecfem_1_1sources_1_1source_1a37fbc1af411566eb2b5f2aa6ecb2f311"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~source</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N7specfem7sources6sourceD0Ev" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<section id="types-of-sources">
+<h2>Types of sources<a class="headerlink" href="#types-of-sources" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="force_source.html">Force Source</a></li>
+<li class="toctree-l1"><a class="reference internal" href="moment_tensor_source.html">Moment-Tensor Source</a></li>
+</ul>
+</div>
+</section>
+<section id="auxiliary-functions">
+<h2>Auxiliary functions<a class="headerlink" href="#auxiliary-functions" title="Link to this heading"></a></h2>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem7sources12read_sourcesEKNSt6stringEK9type_realPKN7specfem3MPI3MPIE">
+<span id="_CPPv3N7specfem7sources12read_sourcesEKNSt6stringEK9type_realPKN7specfem3MPI3MPIE"></span><span id="_CPPv2N7specfem7sources12read_sourcesEKNSt6stringEK9type_realPKN7specfem3MPI3MPIE"></span><span id="specfem::sources::read_sources__ssC.type_realC.specfem::MPI::MPICP"></span><span class="target" id="read__sources_8hpp_1a0344ab460c4c576e03a2f575835f6956"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">tuple</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">shared_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv4N7specfem7sourcesE" title="specfem::sources"><span class="n"><span class="pre">sources</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="#_CPPv4N7specfem7sources6sourceE" title="specfem::sources::source"><span class="n"><span class="pre">source</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">&gt;</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-prename descclassname"><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv4N7specfem7sourcesE" title="specfem::sources"><span class="n"><span class="pre">sources</span></span></a><span class="p"><span class="pre">::</span></span></span><span class="sig-name descname"><span class="n"><span class="pre">read_sources</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">sources_file</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">dt</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MPI</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">MPI</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">mpi</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem7sources12read_sourcesEKNSt6stringEK9type_realPKN7specfem3MPI3MPIE" title="Link to this definition"></a><br /></dt>
+<dd><p>Read sources file written in .yml format. </p>
+<p>Parse source specification file written in yaml format and create a vector of specfem::source::source * object</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sources_file</strong> – Name of the yml file </p></li>
+<li><p><strong>mpi</strong> – Pointer to specfem MPI object </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>std::vector&lt;specfem::sources::source *&gt; vector of instantiated source objects </p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../IO/writer/seismogram_writer.html" class="btn btn-neutral float-left" title="Seismogram Writer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="force_source.html" class="btn btn-neutral float-right" title="Force Source" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Rohit Kakodkar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

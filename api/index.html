@@ -1,14 +1,17 @@
 <!DOCTYPE html>
-<html class="writer-html5" lang="en" >
+<html class="writer-html5" lang="en" data-content_root="../">
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>API documentation &mdash; SPECFEM KOKKOS IMPLEMENTATION  documentation</title>
-      <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/graphviz.css" type="text/css" />
-      <link rel="stylesheet" href="../_static/css/scrollable_code_blocks.css" type="text/css" />
+  <title>API documentation &mdash; SPECFEM++  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/scrollable_code_blocks.css?v=ebc906c5" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/center_align_table.css?v=f0548739" />
+
+  
   <!--[if lt IE 9]>
     <script src="../_static/js/html5shiv.min.js"></script>
   <![endif]-->
@@ -21,8 +24,8 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Input/Output module" href="IO.html" />
-    <link rel="prev" title="Style" href="../developer_documentation/style.html" /> 
+    <link rel="next" title="Views and Execution Policies" href="kokkos_abstractions.html" />
+    <link rel="prev" title="Performance Benchmarks" href="../benchmarks/benchmarks.html" /> 
 </head>
 
 <body class="wy-body-for-nav"> 
@@ -34,7 +37,7 @@
           
           
           <a href="../index.html" class="icon icon-home">
-            SPECFEM KOKKOS IMPLEMENTATION
+            SPECFEM++
           </a>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
@@ -44,27 +47,48 @@
   </form>
 </div>
         </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
-              <ul class="current">
+              <p class="caption" role="heading"><span class="caption-text">USER DOCUMENTATION</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../user_documentation/index.html">User documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../parameter_documentation/index.html">Parameter documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../meshfem2d/index.html">MESHFEM Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parameter_documentation/index.html">SPECFEM++ Parameter Documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../source_description/index.html">Source Description</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COOKBOOKS</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../cookbooks/index.html">Cookbooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">CONTRIBUTION GUIDELINES</span></p>
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../developer_documentation/index.html">Developer documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COMMUNITY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=bug_report.md&amp;title=">Report bugs</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=feature_request.md&amp;title=">Request a new feature</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/orgs/SPECFEM/discussions">Join the discussion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">BENCHMARKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../benchmarks/benchmarks.html">Performance Benchmarks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API DOCUMENTATION</span></p>
+<ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API documentation</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="IO.html">Input/Output module</a></li>
-<li class="toctree-l2"><a class="reference internal" href="compute.html">Data interface to compute forces</a></li>
-<li class="toctree-l2"><a class="reference internal" href="domain.html">Domain interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="jacobian.html">Utilities to compute elemental Jacobian and shape functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="kokkos_abstractions.html">SPECFEM abstractions for Kokkos interfaces</a></li>
-<li class="toctree-l2"><a class="reference internal" href="material.html">Material properties and helper routines</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mesh.html">Mesh interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="parameter.html">Simulation setup</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quadrature.html">Quadrature object and helper routines</a></li>
-<li class="toctree-l2"><a class="reference internal" href="solver.html">Solver interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sources_recievers.html">Sources and Recievers Interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="specfem_mpi.html">SPECFEM abstractions for MPI interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="timescheme.html">Time marching schemes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="writer.html">Writer interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="kokkos_abstractions.html">Views and Execution Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="quadrature/index.html">Quadrature API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="material/index.html">Materials Class API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="IO/index.html">Input/Output modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sources/index.html">Sources API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="receivers/index.html">Receiver API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compute/index.html">Compute Data Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enumerations/index.html">Enumerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="domain/index.html">Domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="boundary_conditions/index.html">Boundary conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coupling_physics/index.html">Coupled Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="timescheme/index.html">Time Scheme API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="solver/index.html">Solver API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup_parameters/index.html">Setup Parameters</a></li>
 </ul>
 </li>
 </ul>
@@ -75,7 +99,7 @@
 
     <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="../index.html">SPECFEM KOKKOS IMPLEMENTATION</a>
+          <a href="../index.html">SPECFEM++</a>
       </nav>
 
       <div class="wy-nav-content">
@@ -97,74 +121,90 @@
 <span id="api-funcs"></span><h1>API documentation<a class="headerlink" href="#api-documentation" title="Link to this heading"></a></h1>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="IO.html">Input/Output module</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="IO.html#fortranio">FortranIO</a></li>
-<li class="toctree-l2"><a class="reference internal" href="IO.html#fortran-binary-database-helper-routines">Fortran binary database helper routines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="kokkos_abstractions.html">Views and Execution Policies</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="kokkos_abstractions.html#_CPPv4N7specfem6kokkosE"><code class="docutils literal notranslate"><span class="pre">kokkos</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="compute.html">Data interface to compute forces</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="compute.html#_CPPv47specfem"><code class="docutils literal notranslate"><span class="pre">specfem</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="quadrature/index.html">Quadrature API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="quadrature/index.html#_CPPv4N7specfem10quadrature10quadratureE"><code class="docutils literal notranslate"><span class="pre">quadrature</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="quadrature/index.html#types-of-quadratures-implemented">Types of quadratures implemented</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="domain.html">Domain interface</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="domain.html#_CPPv47specfem"><code class="docutils literal notranslate"><span class="pre">specfem</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="material/index.html">Materials Class API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="material/index.html#_CPPv4N7specfem8material8materialE"><code class="docutils literal notranslate"><span class="pre">material</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="material/index.html#types-of-materials-implemented">Types of Materials Implemented</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="jacobian.html">Utilities to compute elemental Jacobian and shape functions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="jacobian.html#shape-functions">Shape Functions</a></li>
-<li class="toctree-l2"><a class="reference internal" href="jacobian.html#jacobian">Jacobian</a></li>
+<li class="toctree-l1"><a class="reference internal" href="IO/index.html">Input/Output modules</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="IO/fortran_io.html">Fortran IO</a></li>
+<li class="toctree-l2"><a class="reference internal" href="IO/mesh/index.html">Mesh Input Module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="IO/writer/index.html">Writer API</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="kokkos_abstractions.html">SPECFEM abstractions for Kokkos interfaces</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="kokkos_abstractions.html#_CPPv47specfem"><code class="docutils literal notranslate"><span class="pre">specfem</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="sources/index.html">Sources API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="sources/index.html#_CPPv4N7specfem7sources6sourceE"><code class="docutils literal notranslate"><span class="pre">source</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="sources/index.html#types-of-sources">Types of sources</a></li>
+<li class="toctree-l2"><a class="reference internal" href="sources/index.html#auxiliary-functions">Auxiliary functions</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="material.html">Material properties and helper routines</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="material.html#material-class">Material Class</a></li>
-<li class="toctree-l2"><a class="reference internal" href="material.html#input-output-helper-routines">Input/Output helper routines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="receivers/index.html">Receiver API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="receivers/index.html#_CPPv4N7specfem9receivers8receiverE"><code class="docutils literal notranslate"><span class="pre">receiver</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="receivers/index.html#auxiliary-functions">Auxiliary functions</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="mesh.html">Mesh interface</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="mesh.html#id2">Mesh interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mesh.html#mesh-properties">Mesh properties</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mesh.html#material-definition">Material Definition</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mesh.html#boundaries-interface">Boundaries Interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mesh.html#elements-interface">Elements Interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mesh.html#surface-interface">Surface Interface</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compute/index.html">Compute Data Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="compute/compute.html">Compute Struct</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compute/compute_partial_derivatives.html">Partial Derivatives Struct</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compute/compute_properties.html">Properties Struct</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compute/compute_sources.html">Sources Struct</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compute/compute_receivers.html">Receivers Struct</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compute/compute_coupled_interfaces.html">Coupled Interfaces Struct</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="parameter.html">Simulation setup</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="parameter.html#specfem-configuration-file">Specfem configuration file</a></li>
-<li class="toctree-l2"><a class="reference internal" href="parameter.html#setup-object-used-to-instantiate-a-simulation">Setup object used to instantiate a simulation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="enumerations/index.html">Enumerations</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="enumerations/element/element_enumeration.html">Element</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enumerations/axes/axes_enumeration.html">Axes Enumeration</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enumerations/coupling/coupling_enumerations.html">Coupling Enumerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="enumerations/seismogram/seismogram_enumeration.html">Seismogram Enumerations</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="quadrature.html">Quadrature object and helper routines</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="quadrature.html#quadrature-class">Quadrature Class</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quadrature.html#gll-glj-helper-routines">GLL/GLJ helper routines</a></li>
-<li class="toctree-l2"><a class="reference internal" href="quadrature.html#lagrange-polynomial-helper-routines">Lagrange polynomial helper routines</a></li>
+<li class="toctree-l1"><a class="reference internal" href="domain/index.html">Domain</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="domain/domain.html">Domain API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="domain/kernels/index.html">Kernels</a></li>
+<li class="toctree-l2"><a class="reference internal" href="domain/element/elements.html">Element API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="domain/receivers/receivers.html">Elemental Receivers API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="domain/sources/sources.html">Elemental Sources API</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="solver.html">Solver interface</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="solver.html#_CPPv47specfem"><code class="docutils literal notranslate"><span class="pre">specfem</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="boundary_conditions/index.html">Boundary conditions</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="boundary_conditions/index.html#interface">Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="boundary_conditions/index.html#types-of-boundary-conditions">Types of boundary conditions</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="sources_recievers.html">Sources and Recievers Interface</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="sources_recievers.html#source-interface">Source Interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sources_recievers.html#reciever-interface">Reciever Interface</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sources_recievers.html#helper-routines">Helper Routines</a></li>
-<li class="toctree-l2"><a class="reference internal" href="sources_recievers.html#source-time-function">Source Time Function</a></li>
+<li class="toctree-l1"><a class="reference internal" href="coupling_physics/index.html">Coupled Interface</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="coupling_physics/coupled_interface.html">Coupled Interface API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coupling_physics/edge/edge.html">Edge API</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="specfem_mpi.html">SPECFEM abstractions for MPI interface</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="specfem_mpi.html#_CPPv47specfem"><code class="docutils literal notranslate"><span class="pre">specfem</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="timescheme/index.html">Time Scheme API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="timescheme/index.html#_CPPv4N7specfem10TimeScheme10TimeSchemeE"><code class="docutils literal notranslate"><span class="pre">TimeScheme</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="timescheme/index.html#types-of-time-schemes">Types of Time Schemes</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="timescheme.html">Time marching schemes</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="timescheme.html#_CPPv47specfem"><code class="docutils literal notranslate"><span class="pre">specfem</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="solver/index.html">Solver API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="solver/index.html#_CPPv4N7specfem6solver6solverE"><code class="docutils literal notranslate"><span class="pre">solver</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="solver/index.html#types-of-solvers">Types of solvers</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="writer.html">Writer interface</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="writer.html#_CPPv47specfem"><code class="docutils literal notranslate"><span class="pre">specfem</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="setup_parameters/index.html">Setup Parameters</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="setup_parameters/header.html">Header</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup_parameters/quadrature.html">Quadrature</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup_parameters/solver/index.html">Solver API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup_parameters/receivers.html">Receiver information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup_parameters/run_setup.html">Runtime Setup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup_parameters/database_configuration.html">Database information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup_parameters/seismogram.html">Seismogram information</a></li>
+<li class="toctree-l2"><a class="reference internal" href="setup_parameters/setup.html">Setup class</a></li>
 </ul>
 </li>
 </ul>
@@ -175,14 +215,14 @@
            </div>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
-        <a href="../developer_documentation/style.html" class="btn btn-neutral float-left" title="Style" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="IO.html" class="btn btn-neutral float-right" title="Input/Output module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../benchmarks/benchmarks.html" class="btn btn-neutral float-left" title="Performance Benchmarks" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="kokkos_abstractions.html" class="btn btn-neutral float-right" title="Views and Execution Policies" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>
 
   <div role="contentinfo">
-    <p>&#169; Copyright 2020, Rohit Kakodkar.</p>
+    <p>&#169; Copyright 2023, Rohit Kakodkar.</p>
   </div>
 
   Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a

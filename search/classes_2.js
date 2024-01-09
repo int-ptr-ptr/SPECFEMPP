@@ -1,5 +1,14 @@
 var searchData=
 [
-  ['elastic_0',['Elastic',['../classspecfem_1_1_domain_1_1_elastic.html',1,'specfem::Domain']]],
-  ['elastic_5fmaterial_1',['elastic_material',['../classspecfem_1_1elastic__material.html',1,'specfem']]]
+  ['composite_5fboundary_0',['composite_boundary',['../classspecfem_1_1enums_1_1boundary__conditions_1_1composite__boundary.html',1,'specfem::enums::boundary_conditions']]],
+  ['composite_5fboundary_3c_20specfem_3a_3aenums_3a_3aboundary_5fconditions_3a_3astacey_3c_20properties_2e_2e_2e_20_3e_2c_20specfem_3a_3aenums_3a_3aboundary_5fconditions_3a_3adirichlet_3c_20properties_2e_2e_2e_20_3e_20_3e_1',['composite_boundary&lt; specfem::enums::boundary_conditions::stacey&lt; properties... &gt;, specfem::enums::boundary_conditions::dirichlet&lt; properties... &gt; &gt;',['../classspecfem_1_1enums_1_1boundary__conditions_1_1composite__boundary_3_01specfem_1_1enums_1_1bou21c7c6860395a681480f522141a715e0.html',1,'specfem::enums::boundary_conditions']]],
+  ['composite_5fstacey_5fdirichlet_2',['composite_stacey_dirichlet',['../structspecfem_1_1compute_1_1composite__stacey__dirichlet.html',1,'specfem::compute']]],
+  ['compute_3',['compute',['../structspecfem_1_1compute_1_1compute.html',1,'specfem::compute']]],
+  ['container_4',['container',['../structspecfem_1_1domain_1_1impl_1_1elements_1_1container.html',1,'specfem::domain::impl::elements']]],
+  ['coordinates_5',['coordinates',['../structspecfem_1_1compute_1_1coordinates.html',1,'specfem::compute']]],
+  ['coupled_5finterface_6',['coupled_interface',['../classspecfem_1_1coupled__interface_1_1coupled__interface.html',1,'specfem::coupled_interface']]],
+  ['coupled_5finterface_3c_20specfem_3a_3adomain_3a_3adomain_3c_20specfem_3a_3aenums_3a_3aelement_3a_3amedium_3a_3aacoustic_2c_20qp_5ftype_20_3e_2c_20specfem_3a_3adomain_3a_3adomain_3c_20specfem_3a_3aenums_3a_3aelement_3a_3amedium_3a_3aelastic_2c_20qp_5ftype_20_3e_20_3e_7',['coupled_interface&lt; specfem::domain::domain&lt; specfem::enums::element::medium::acoustic, qp_type &gt;, specfem::domain::domain&lt; specfem::enums::element::medium::elastic, qp_type &gt; &gt;',['../classspecfem_1_1coupled__interface_1_1coupled__interface.html',1,'specfem::coupled_interface']]],
+  ['coupled_5finterface_3c_20specfem_3a_3adomain_3a_3adomain_3c_20specfem_3a_3aenums_3a_3aelement_3a_3amedium_3a_3aelastic_2c_20qp_5ftype_20_3e_2c_20specfem_3a_3adomain_3a_3adomain_3c_20specfem_3a_3aenums_3a_3aelement_3a_3amedium_3a_3aacoustic_2c_20qp_5ftype_20_3e_20_3e_8',['coupled_interface&lt; specfem::domain::domain&lt; specfem::enums::element::medium::elastic, qp_type &gt;, specfem::domain::domain&lt; specfem::enums::element::medium::acoustic, qp_type &gt; &gt;',['../classspecfem_1_1coupled__interface_1_1coupled__interface.html',1,'specfem::coupled_interface']]],
+  ['coupled_5finterfaces_9',['coupled_interfaces',['../structspecfem_1_1compute_1_1coupled__interfaces_1_1coupled__interfaces.html',1,'specfem::compute::coupled_interfaces']]],
+  ['coupled_5fiterator_10',['coupled_iterator',['../structspecfem_1_1coupled__interface_1_1impl_1_1edges_1_1coupled__iterator.html',1,'specfem::coupled_interface::impl::edges']]]
 ];

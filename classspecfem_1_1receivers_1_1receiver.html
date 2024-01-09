@@ -83,19 +83,19 @@ $(function() {
 <p>Receiver Class.  
  <a href="classspecfem_1_1receivers_1_1receiver.html#details">More...</a></p>
 
-<p><code>#include &lt;receiver.h&gt;</code></p>
+<p><code>#include &lt;receiver.hpp&gt;</code></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a9d0b0496cf23c0936ef1c53fa7fdf25e" id="r_a9d0b0496cf23c0936ef1c53fa7fdf25e"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1receivers_1_1receiver.html#a9d0b0496cf23c0936ef1c53fa7fdf25e">receiver</a> (const std::string network_name, const std::string station_name, const type_real x, const type_real z, const type_real angle)</td></tr>
 <tr class="memdesc:a9d0b0496cf23c0936ef1c53fa7fdf25e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a new receiver object.  <br /></td></tr>
 <tr class="separator:a9d0b0496cf23c0936ef1c53fa7fdf25e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8f2b7e0d632ea9c737fbfd8cdf9d7705" id="r_a8f2b7e0d632ea9c737fbfd8cdf9d7705"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1receivers_1_1receiver.html#a8f2b7e0d632ea9c737fbfd8cdf9d7705">locate</a> (const specfem::kokkos::HostView2d&lt; type_real &gt; coord, const specfem::kokkos::HostMirror3d&lt; int &gt; h_ibool, const specfem::kokkos::HostMirror1d&lt; type_real &gt; xigll, const specfem::kokkos::HostMirror1d&lt; type_real &gt; zigll, const int nproc, const specfem::kokkos::HostView2d&lt; type_real &gt; coorg, const specfem::kokkos::HostView2d&lt; int &gt; knods, const int npgeo, const specfem::kokkos::HostMirror1d&lt; <a class="el" href="namespacespecfem_1_1elements.html#a88c727adceb8da1c70cf615e864470b3">specfem::elements::type</a> &gt; ispec_type, const <a class="el" href="classspecfem_1_1_m_p_i_1_1_m_p_i.html">specfem::MPI::MPI</a> *mpi)</td></tr>
-<tr class="memdesc:a8f2b7e0d632ea9c737fbfd8cdf9d7705"><td class="mdescLeft">&#160;</td><td class="mdescRight">Locate station within the mesh.  <br /></td></tr>
-<tr class="separator:a8f2b7e0d632ea9c737fbfd8cdf9d7705"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa1e65ff31f1e31ceb2e4081678d38aac" id="r_aa1e65ff31f1e31ceb2e4081678d38aac"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1receivers_1_1receiver.html#aa1e65ff31f1e31ceb2e4081678d38aac">compute_receiver_array</a> (const specfem::quadrature::quadrature &amp;quadx, const specfem::quadrature::quadrature &amp;quadz, specfem::kokkos::HostView3d&lt; type_real &gt; receiver_array)</td></tr>
-<tr class="memdesc:aa1e65ff31f1e31ceb2e4081678d38aac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the receiver array (lagrangians) for this station.  <br /></td></tr>
-<tr class="separator:aa1e65ff31f1e31ceb2e4081678d38aac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad184db3c1f84c0786baf55813aaaa598" id="r_ad184db3c1f84c0786baf55813aaaa598"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1receivers_1_1receiver.html#ad184db3c1f84c0786baf55813aaaa598">locate</a> (const specfem::kokkos::HostView2d&lt; type_real &gt; coord, const specfem::kokkos::HostMirror3d&lt; int &gt; h_ibool, const specfem::kokkos::HostMirror1d&lt; type_real &gt; xigll, const specfem::kokkos::HostMirror1d&lt; type_real &gt; zigll, const int nproc, const specfem::kokkos::HostView2d&lt; type_real &gt; coorg, const specfem::kokkos::HostView2d&lt; int &gt; knods, const int npgeo, const specfem::kokkos::HostMirror1d&lt; specfem::enums::element::type &gt; ispec_type, const <a class="el" href="classspecfem_1_1_m_p_i_1_1_m_p_i.html">specfem::MPI::MPI</a> *mpi)</td></tr>
+<tr class="memdesc:ad184db3c1f84c0786baf55813aaaa598"><td class="mdescLeft">&#160;</td><td class="mdescRight">Locate station within the mesh.  <br /></td></tr>
+<tr class="separator:ad184db3c1f84c0786baf55813aaaa598"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d4e349744be4b2f0928b9bf50a7b85d" id="r_a1d4e349744be4b2f0928b9bf50a7b85d"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1receivers_1_1receiver.html#a1d4e349744be4b2f0928b9bf50a7b85d">compute_receiver_array</a> (const <a class="el" href="classspecfem_1_1quadrature_1_1quadrature.html">specfem::quadrature::quadrature</a> *quadx, const <a class="el" href="classspecfem_1_1quadrature_1_1quadrature.html">specfem::quadrature::quadrature</a> *quadz, specfem::kokkos::HostView3d&lt; type_real &gt; receiver_array)</td></tr>
+<tr class="memdesc:a1d4e349744be4b2f0928b9bf50a7b85d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the receiver array (lagrangians) for this station.  <br /></td></tr>
+<tr class="separator:a1d4e349744be4b2f0928b9bf50a7b85d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a350986ef455ef02e20d2a9e9fdda33f9" id="r_a350986ef455ef02e20d2a9e9fdda33f9"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classspecfem_1_1receivers_1_1receiver.html#a350986ef455ef02e20d2a9e9fdda33f9">check_locations</a> (const type_real xmin, const type_real xmax, const type_real zmin, const type_real zmax, const <a class="el" href="classspecfem_1_1_m_p_i_1_1_m_p_i.html">specfem::MPI::MPI</a> *mpi)</td></tr>
 <tr class="memdesc:a350986ef455ef02e20d2a9e9fdda33f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check if the station is within the domain.  <br /></td></tr>
 <tr class="separator:a350986ef455ef02e20d2a9e9fdda33f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -250,8 +250,8 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>print</b> () c
 
 </div>
 </div>
-<a id="aa1e65ff31f1e31ceb2e4081678d38aac" name="aa1e65ff31f1e31ceb2e4081678d38aac"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#aa1e65ff31f1e31ceb2e4081678d38aac">&#9670;&#160;</a></span>compute_receiver_array()</h2>
+<a id="a1d4e349744be4b2f0928b9bf50a7b85d" name="a1d4e349744be4b2f0928b9bf50a7b85d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1d4e349744be4b2f0928b9bf50a7b85d">&#9670;&#160;</a></span>compute_receiver_array()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -259,13 +259,13 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>print</b> () c
         <tr>
           <td class="memname">void specfem::receivers::receiver::compute_receiver_array </td>
           <td>(</td>
-          <td class="paramtype">const specfem::quadrature::quadrature &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classspecfem_1_1quadrature_1_1quadrature.html">specfem::quadrature::quadrature</a> *&#160;</td>
           <td class="paramname"><em>quadx</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const specfem::quadrature::quadrature &amp;&#160;</td>
+          <td class="paramtype">const <a class="el" href="classspecfem_1_1quadrature_1_1quadrature.html">specfem::quadrature::quadrature</a> *&#160;</td>
           <td class="paramname"><em>quadz</em>, </td>
         </tr>
         <tr>
@@ -462,8 +462,8 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>print</b> () c
 
 </div>
 </div>
-<a id="a8f2b7e0d632ea9c737fbfd8cdf9d7705" name="a8f2b7e0d632ea9c737fbfd8cdf9d7705"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a8f2b7e0d632ea9c737fbfd8cdf9d7705">&#9670;&#160;</a></span>locate()</h2>
+<a id="ad184db3c1f84c0786baf55813aaaa598" name="ad184db3c1f84c0786baf55813aaaa598"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad184db3c1f84c0786baf55813aaaa598">&#9670;&#160;</a></span>locate()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -519,7 +519,7 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>print</b> () c
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const specfem::kokkos::HostMirror1d&lt; <a class="el" href="namespacespecfem_1_1elements.html#a88c727adceb8da1c70cf615e864470b3">specfem::elements::type</a> &gt;&#160;</td>
+          <td class="paramtype">const specfem::kokkos::HostMirror1d&lt; specfem::enums::element::type &gt;&#160;</td>
           <td class="paramname"><em>ispec_type</em>, </td>
         </tr>
         <tr>
@@ -557,7 +557,7 @@ std::string&#160;</td><td class="memItemRight" valign="bottom"><b>print</b> () c
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>/Users/runner/work/specfem2d_kokkos/specfem2d_kokkos/include/<b>receiver.h</b></li>
+<li>/Users/runner/work/SPECFEMPP/SPECFEMPP/include/receiver/<b>receiver.hpp</b></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quadrature &mdash; SPECFEM++  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/scrollable_code_blocks.css?v=ebc906c5" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/center_align_table.css?v=f0548739" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Solver API" href="solver/index.html" />
+    <link rel="prev" title="Header" href="header.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            SPECFEM++
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">USER DOCUMENTATION</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user_documentation/index.html">User documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meshfem2d/index.html">MESHFEM Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parameter_documentation/index.html">SPECFEM++ Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source_description/index.html">Source Description</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COOKBOOKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cookbooks/index.html">Cookbooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">CONTRIBUTION GUIDELINES</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_documentation/index.html">Developer documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COMMUNITY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=bug_report.md&amp;title=">Report bugs</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=feature_request.md&amp;title=">Request a new feature</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/orgs/SPECFEM/discussions">Join the discussion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">BENCHMARKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../benchmarks/benchmarks.html">Performance Benchmarks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API DOCUMENTATION</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../kokkos_abstractions.html">Views and Execution Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quadrature/index.html">Quadrature API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../material/index.html">Materials Class API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../IO/index.html">Input/Output modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sources/index.html">Sources API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../receivers/index.html">Receiver API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compute/index.html">Compute Data Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../enumerations/index.html">Enumerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../domain/index.html">Domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../boundary_conditions/index.html">Boundary conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../coupling_physics/index.html">Coupled Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../timescheme/index.html">Time Scheme API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../solver/index.html">Solver API</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Setup Parameters</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="header.html">Header</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Quadrature</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N7specfem21runtime_configuration10quadratureE"><code class="docutils literal notranslate"><span class="pre">quadrature</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="solver/index.html">Solver API</a></li>
+<li class="toctree-l3"><a class="reference internal" href="receivers.html">Receiver information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="run_setup.html">Runtime Setup</a></li>
+<li class="toctree-l3"><a class="reference internal" href="database_configuration.html">Database information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="seismogram.html">Seismogram information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="setup.html">Setup class</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">SPECFEM++</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">API documentation</a></li>
+          <li class="breadcrumb-item"><a href="index.html">Setup Parameters</a></li>
+      <li class="breadcrumb-item active">Quadrature</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/setup_parameters/quadrature.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="quadrature">
+<h1>Quadrature<a class="headerlink" href="#quadrature" title="Link to this heading"></a></h1>
+<p>Methods to read quadrature information from configuration file and instantiate quadrature objects.</p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem21runtime_configuration10quadratureE">
+<span id="_CPPv3N7specfem21runtime_configuration10quadratureE"></span><span id="_CPPv2N7specfem21runtime_configuration10quadratureE"></span><span id="specfem::runtime_configuration::quadrature"></span><span class="target" id="classspecfem_1_1runtime__configuration_1_1quadrature"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">quadrature</span></span></span><a class="headerlink" href="#_CPPv4N7specfem21runtime_configuration10quadratureE" title="Link to this definition"></a><br /></dt>
+<dd><p>Quadrature object is used to read and instantiate the <a class="reference internal" href="../quadrature/index.html#classspecfem_1_1quadrature_1_1quadrature"><span class="std std-ref">specfem::quadrature::quadrature</span></a> classes in different dimensions. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem21runtime_configuration10quadrature10quadratureE9type_real9type_realii">
+<span id="_CPPv3N7specfem21runtime_configuration10quadrature10quadratureE9type_real9type_realii"></span><span id="_CPPv2N7specfem21runtime_configuration10quadrature10quadratureE9type_real9type_realii"></span><span id="specfem::runtime_configuration::quadrature::quadrature__type_real.type_real.i.i"></span><span class="target" id="classspecfem_1_1runtime__configuration_1_1quadrature_1ad0b40da04b1db951c9928ce813fd1272"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">quadrature</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">alpha</span></span>, <span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">beta</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ngllx</span></span>, <span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">ngllz</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem21runtime_configuration10quadrature10quadratureE9type_real9type_realii" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct a new quadrature object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>alpha</strong> – alpha value used to instantiate a <a class="reference internal" href="../quadrature/index.html#classspecfem_1_1quadrature_1_1quadrature"><span class="std std-ref">specfem::quadrature::quadrature</span></a> class </p></li>
+<li><p><strong>beta</strong> – beta value used to instantiate a <a class="reference internal" href="../quadrature/index.html#classspecfem_1_1quadrature_1_1quadrature"><span class="std std-ref">specfem::quadrature::quadrature</span></a> class </p></li>
+<li><p><strong>ngllx</strong> – number of quadrature points in x-dimension </p></li>
+<li><p><strong>ngllz</strong> – number of quadrature points in z-dimension </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem21runtime_configuration10quadrature10quadratureERKN4YAML4NodeE">
+<span id="_CPPv3N7specfem21runtime_configuration10quadrature10quadratureERKN4YAML4NodeE"></span><span id="_CPPv2N7specfem21runtime_configuration10quadrature10quadratureERKN4YAML4NodeE"></span><span id="specfem::runtime_configuration::quadrature::quadrature__YAML::NodeCR"></span><span class="target" id="classspecfem_1_1runtime__configuration_1_1quadrature_1a17a5aecfbb010c404fadf1630e71a82e"></span><span class="sig-name descname"><span class="n"><span class="pre">quadrature</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">YAML</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Node</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">Node</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem21runtime_configuration10quadrature10quadratureERKN4YAML4NodeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct a new quadrature object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>Node</strong> – YAML node describing the quadrature </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem21runtime_configuration10quadrature10quadratureEKNSt6stringE">
+<span id="_CPPv3N7specfem21runtime_configuration10quadrature10quadratureEKNSt6stringE"></span><span id="_CPPv2N7specfem21runtime_configuration10quadrature10quadratureEKNSt6stringE"></span><span id="specfem::runtime_configuration::quadrature::quadrature__ssC"></span><span class="target" id="classspecfem_1_1runtime__configuration_1_1quadrature_1aa6be91bd9350490edcf55f883be8d356"></span><span class="sig-name descname"><span class="n"><span class="pre">quadrature</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">quadrature</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem21runtime_configuration10quadrature10quadratureEKNSt6stringE" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct a new quadrature object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>quadrature</strong> – pre-defined quadratures. e.g. GLL4 for 4th order GLL quadrature </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem21runtime_configuration10quadrature11instantiateEv">
+<span id="_CPPv3N7specfem21runtime_configuration10quadrature11instantiateEv"></span><span id="_CPPv2N7specfem21runtime_configuration10quadrature11instantiateEv"></span><span id="specfem::runtime_configuration::quadrature::instantiate"></span><span class="target" id="classspecfem_1_1runtime__configuration_1_1quadrature_1a68f916c35b5a96da0aff1d0fb17ece7c"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">tuple</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv4N7specfem10quadratureE" title="specfem::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../quadrature/index.html#_CPPv4N7specfem10quadrature10quadratureE" title="specfem::quadrature::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv4N7specfem10quadratureE" title="specfem::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../quadrature/index.html#_CPPv4N7specfem10quadrature10quadratureE" title="specfem::quadrature::quadrature"><span class="n"><span class="pre">quadrature</span></span></a><span class="p"><span class="pre">*</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">instantiate</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem21runtime_configuration10quadrature11instantiateEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Instantiate quadrature objects in x and z dimensions. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>std::tuple&lt;<a class="reference internal" href="../quadrature/index.html#classspecfem_1_1quadrature_1_1quadrature"><span class="std std-ref">specfem::quadrature::quadrature</span></a>, <a class="reference internal" href="../quadrature/index.html#classspecfem_1_1quadrature_1_1quadrature"><span class="std std-ref">specfem::quadrature::quadrature</span></a>&gt; Quadrature objects in x and z dimensions </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem21runtime_configuration10quadrature5alphaE">
+<span id="_CPPv3N7specfem21runtime_configuration10quadrature5alphaE"></span><span id="_CPPv2N7specfem21runtime_configuration10quadrature5alphaE"></span><span id="specfem::runtime_configuration::quadrature::alpha__type_real"></span><span class="target" id="classspecfem_1_1runtime__configuration_1_1quadrature_1aea923406f747f59b6f8b0c3f831d5f08"></span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">alpha</span></span></span><a class="headerlink" href="#_CPPv4N7specfem21runtime_configuration10quadrature5alphaE" title="Link to this definition"></a><br /></dt>
+<dd><p>alpha value used to instantiate a <a class="reference internal" href="../quadrature/index.html#classspecfem_1_1quadrature_1_1quadrature"><span class="std std-ref">specfem::quadrature::quadrature</span></a> class </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem21runtime_configuration10quadrature4betaE">
+<span id="_CPPv3N7specfem21runtime_configuration10quadrature4betaE"></span><span id="_CPPv2N7specfem21runtime_configuration10quadrature4betaE"></span><span id="specfem::runtime_configuration::quadrature::beta__type_real"></span><span class="target" id="classspecfem_1_1runtime__configuration_1_1quadrature_1ac6243c7d5145db5648f74eedb5f0e6a8"></span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">beta</span></span></span><a class="headerlink" href="#_CPPv4N7specfem21runtime_configuration10quadrature4betaE" title="Link to this definition"></a><br /></dt>
+<dd><p>beta value used to instantiate a <a class="reference internal" href="../quadrature/index.html#classspecfem_1_1quadrature_1_1quadrature"><span class="std std-ref">specfem::quadrature::quadrature</span></a> class </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem21runtime_configuration10quadrature5ngllxE">
+<span id="_CPPv3N7specfem21runtime_configuration10quadrature5ngllxE"></span><span id="_CPPv2N7specfem21runtime_configuration10quadrature5ngllxE"></span><span id="specfem::runtime_configuration::quadrature::ngllx__i"></span><span class="target" id="classspecfem_1_1runtime__configuration_1_1quadrature_1ab63c718db001d8fb47ff7c44e5cb2317"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ngllx</span></span></span><a class="headerlink" href="#_CPPv4N7specfem21runtime_configuration10quadrature5ngllxE" title="Link to this definition"></a><br /></dt>
+<dd><p>number of quadrature points in x-dimension </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem21runtime_configuration10quadrature5ngllzE">
+<span id="_CPPv3N7specfem21runtime_configuration10quadrature5ngllzE"></span><span id="_CPPv2N7specfem21runtime_configuration10quadrature5ngllzE"></span><span id="specfem::runtime_configuration::quadrature::ngllz__i"></span><span class="target" id="classspecfem_1_1runtime__configuration_1_1quadrature_1a3bd93093f5b4b4ca07f315e942c1dafa"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ngllz</span></span></span><a class="headerlink" href="#_CPPv4N7specfem21runtime_configuration10quadrature5ngllzE" title="Link to this definition"></a><br /></dt>
+<dd><p>number of quadrature points in z-dimension </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="header.html" class="btn btn-neutral float-left" title="Header" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="solver/index.html" class="btn btn-neutral float-right" title="Solver API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Rohit Kakodkar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

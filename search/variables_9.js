@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['parameters_0',['parameters',['../structspecfem_1_1mesh.html#ab018e1492d227e805f815f0d92d7b292',1,'specfem::mesh']]]
+  ['jacobian_0',['jacobian',['../structspecfem_1_1compute_1_1partial__derivatives.html#a5e7b0cc575e4fe394cc193ebecff3e62',1,'specfem::compute::partial_derivatives']]]
 ];

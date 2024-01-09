@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Time Scheme API &mdash; SPECFEM++  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/scrollable_code_blocks.css?v=ebc906c5" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/center_align_table.css?v=f0548739" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Newmark Time Scheme" href="newmark.html" />
+    <link rel="prev" title="Edge API" href="../coupling_physics/edge/edge.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            SPECFEM++
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">USER DOCUMENTATION</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user_documentation/index.html">User documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meshfem2d/index.html">MESHFEM Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parameter_documentation/index.html">SPECFEM++ Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source_description/index.html">Source Description</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COOKBOOKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cookbooks/index.html">Cookbooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">CONTRIBUTION GUIDELINES</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_documentation/index.html">Developer documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COMMUNITY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=bug_report.md&amp;title=">Report bugs</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=feature_request.md&amp;title=">Request a new feature</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/orgs/SPECFEM/discussions">Join the discussion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">BENCHMARKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../benchmarks/benchmarks.html">Performance Benchmarks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API DOCUMENTATION</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../kokkos_abstractions.html">Views and Execution Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quadrature/index.html">Quadrature API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../material/index.html">Materials Class API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../IO/index.html">Input/Output modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sources/index.html">Sources API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../receivers/index.html">Receiver API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compute/index.html">Compute Data Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../enumerations/index.html">Enumerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../domain/index.html">Domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../boundary_conditions/index.html">Boundary conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../coupling_physics/index.html">Coupled Interface</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Time Scheme API</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#_CPPv4N7specfem10TimeScheme10TimeSchemeE"><code class="docutils literal notranslate"><span class="pre">TimeScheme</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK7specfem10TimeScheme10TimeScheme10timeschemeEv"><code class="docutils literal notranslate"><span class="pre">TimeScheme::timescheme()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK7specfem10TimeScheme10TimeScheme6statusEv"><code class="docutils literal notranslate"><span class="pre">TimeScheme::status()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N7specfem10TimeScheme10TimeScheme14increment_timeEv"><code class="docutils literal notranslate"><span class="pre">TimeScheme::increment_time()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK7specfem10TimeScheme10TimeScheme8get_timeEv"><code class="docutils literal notranslate"><span class="pre">TimeScheme::get_time()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK7specfem10TimeScheme10TimeScheme12get_timestepEv"><code class="docutils literal notranslate"><span class="pre">TimeScheme::get_timestep()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N7specfem10TimeScheme10TimeScheme10reset_timeEv"><code class="docutils literal notranslate"><span class="pre">TimeScheme::reset_time()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N7specfem10TimeScheme10TimeScheme16get_max_timestepEv"><code class="docutils literal notranslate"><span class="pre">TimeScheme::get_max_timestep()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N7specfem10TimeScheme10TimeScheme21apply_predictor_phaseEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEE"><code class="docutils literal notranslate"><span class="pre">TimeScheme::apply_predictor_phase()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N7specfem10TimeScheme10TimeScheme21apply_corrector_phaseEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEE"><code class="docutils literal notranslate"><span class="pre">TimeScheme::apply_corrector_phase()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK7specfem10TimeScheme10TimeScheme5printERNSt7ostreamE"><code class="docutils literal notranslate"><span class="pre">TimeScheme::print()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK7specfem10TimeScheme10TimeScheme18compute_seismogramEv"><code class="docutils literal notranslate"><span class="pre">TimeScheme::compute_seismogram()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK7specfem10TimeScheme10TimeScheme19get_seismogram_stepEv"><code class="docutils literal notranslate"><span class="pre">TimeScheme::get_seismogram_step()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK7specfem10TimeScheme10TimeScheme23get_max_seismogram_stepEv"><code class="docutils literal notranslate"><span class="pre">TimeScheme::get_max_seismogram_step()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N7specfem10TimeScheme10TimeScheme25increment_seismogram_stepEv"><code class="docutils literal notranslate"><span class="pre">TimeScheme::increment_seismogram_step()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4NK7specfem10TimeScheme10TimeScheme18get_time_incrementEv"><code class="docutils literal notranslate"><span class="pre">TimeScheme::get_time_increment()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N7specfem10TimeScheme10TimeSchemeD0Ev"><code class="docutils literal notranslate"><span class="pre">TimeScheme::~TimeScheme()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#_CPPv4N7specfem10TimeScheme10TimeSchemelsERNSt7ostreamER10TimeScheme"><code class="docutils literal notranslate"><span class="pre">TimeScheme::operator&lt;&lt;()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#types-of-time-schemes">Types of Time Schemes</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="newmark.html">Newmark Time Scheme</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../solver/index.html">Solver API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup_parameters/index.html">Setup Parameters</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">SPECFEM++</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">API documentation</a></li>
+      <li class="breadcrumb-item active">Time Scheme API</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/timescheme/index.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="time-scheme-api">
+<h1>Time Scheme API<a class="headerlink" href="#time-scheme-api" title="Link to this heading"></a></h1>
+<p>The <code class="docutils literal notranslate"><span class="pre">TimeScheme</span></code> class provides methods to compute the time evolution of a wavefield.</p>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10TimeScheme10TimeSchemeE">
+<span id="_CPPv3N7specfem10TimeScheme10TimeSchemeE"></span><span id="_CPPv2N7specfem10TimeScheme10TimeSchemeE"></span><span id="specfem::TimeScheme::TimeScheme"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_time_scheme"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">TimeScheme</span></span></span><a class="headerlink" href="#_CPPv4N7specfem10TimeScheme10TimeSchemeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Base time scheme class. </p>
+<p>Subclassed by <a class="reference internal" href="newmark.html#classspecfem_1_1_time_scheme_1_1_newmark"><span class="std std-ref">specfem::TimeScheme::Newmark</span></a></p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem10TimeScheme10TimeScheme10timeschemeEv">
+<span id="_CPPv3NK7specfem10TimeScheme10TimeScheme10timeschemeEv"></span><span id="_CPPv2NK7specfem10TimeScheme10TimeScheme10timeschemeEv"></span><span id="specfem::TimeScheme::TimeScheme::timeschemeC"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_time_scheme_1a4a192f27d8fc05e5edea7abaf5b80615"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enums</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">time_scheme</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">type</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">timescheme</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK7specfem10TimeScheme10TimeScheme10timeschemeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the timescheme type. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem10TimeScheme10TimeScheme6statusEv">
+<span id="_CPPv3NK7specfem10TimeScheme10TimeScheme6statusEv"></span><span id="_CPPv2NK7specfem10TimeScheme10TimeScheme6statusEv"></span><span id="specfem::TimeScheme::TimeScheme::statusC"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_time_scheme_1a5ac62484d5aadd671c8ebf4c105e585f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">status</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem10TimeScheme10TimeScheme6statusEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return the status of simulation. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>false if current step &gt;= number of steps </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>true if current step &lt; number of steps </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10TimeScheme10TimeScheme14increment_timeEv">
+<span id="_CPPv3N7specfem10TimeScheme10TimeScheme14increment_timeEv"></span><span id="_CPPv2N7specfem10TimeScheme10TimeScheme14increment_timeEv"></span><span id="specfem::TimeScheme::TimeScheme::increment_time"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_time_scheme_1ae02de94743a8c69e1950f11e371d8fb1"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">increment_time</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem10TimeScheme10TimeScheme14increment_timeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>increment by one timestep, also updates the simulation time by dt </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem10TimeScheme10TimeScheme8get_timeEv">
+<span id="_CPPv3NK7specfem10TimeScheme10TimeScheme8get_timeEv"></span><span id="_CPPv2NK7specfem10TimeScheme10TimeScheme8get_timeEv"></span><span id="specfem::TimeScheme::TimeScheme::get_timeC"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_time_scheme_1a3a582059bcd73cf9fe0f0a32dd6a9c2c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_time</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem10TimeScheme10TimeScheme8get_timeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the current simulation time. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>type_real current time </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem10TimeScheme10TimeScheme12get_timestepEv">
+<span id="_CPPv3NK7specfem10TimeScheme10TimeScheme12get_timestepEv"></span><span id="_CPPv2NK7specfem10TimeScheme10TimeScheme12get_timestepEv"></span><span id="specfem::TimeScheme::TimeScheme::get_timestepC"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_time_scheme_1a7039d8f24368e55b309a209d6195c866"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_timestep</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem10TimeScheme10TimeScheme12get_timestepEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the current timestep. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int current timestep </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10TimeScheme10TimeScheme10reset_timeEv">
+<span id="_CPPv3N7specfem10TimeScheme10TimeScheme10reset_timeEv"></span><span id="_CPPv2N7specfem10TimeScheme10TimeScheme10reset_timeEv"></span><span id="specfem::TimeScheme::TimeScheme::reset_time"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_time_scheme_1a6a8c54f6cea135b6037c9a6c35c68e52"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">reset_time</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem10TimeScheme10TimeScheme10reset_timeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>reset current time to t0 and timestep to 0 </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10TimeScheme10TimeScheme16get_max_timestepEv">
+<span id="_CPPv3N7specfem10TimeScheme10TimeScheme16get_max_timestepEv"></span><span id="_CPPv2N7specfem10TimeScheme10TimeScheme16get_max_timestepEv"></span><span id="specfem::TimeScheme::TimeScheme::get_max_timestep"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_time_scheme_1a8954c7b77da4011fb865f68cbe96c636"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_max_timestep</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem10TimeScheme10TimeScheme16get_max_timestepEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the max timestep (nstep) of the simuation. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int max timestep </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10TimeScheme10TimeScheme21apply_predictor_phaseEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEE">
+<span id="_CPPv3N7specfem10TimeScheme10TimeScheme21apply_predictor_phaseEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEE"></span><span id="_CPPv2N7specfem10TimeScheme10TimeScheme21apply_predictor_phaseEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEE"></span><span id="specfem::TimeScheme::TimeScheme::apply_predictor_phase__specfem::kokkos::DeviceView2d:type_real.Kokkos::LayoutLeft:.specfem::kokkos::DeviceView2d:type_real.Kokkos::LayoutLeft:.specfem::kokkos::DeviceView2d:type_real.Kokkos::LayoutLeft:"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_time_scheme_1a919e8315619c7cc8063e3a0457a23bc0"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">apply_predictor_phase</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12DeviceView2dE" title="specfem::kokkos::DeviceView2d"><span class="n"><span class="pre">DeviceView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">field</span></span>, <a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12DeviceView2dE" title="specfem::kokkos::DeviceView2d"><span class="n"><span class="pre">DeviceView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">field_dot</span></span>, <a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12DeviceView2dE" title="specfem::kokkos::DeviceView2d"><span class="n"><span class="pre">DeviceView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">field_dot_dot</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem10TimeScheme10TimeScheme21apply_predictor_phaseEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Apply predictor phase of the timescheme. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>domain_class</strong> – Pointer to domain class to apply predictor phase </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10TimeScheme10TimeScheme21apply_corrector_phaseEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEE">
+<span id="_CPPv3N7specfem10TimeScheme10TimeScheme21apply_corrector_phaseEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEE"></span><span id="_CPPv2N7specfem10TimeScheme10TimeScheme21apply_corrector_phaseEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEE"></span><span id="specfem::TimeScheme::TimeScheme::apply_corrector_phase__specfem::kokkos::DeviceView2d:type_real.Kokkos::LayoutLeft:.specfem::kokkos::DeviceView2d:type_real.Kokkos::LayoutLeft:.specfem::kokkos::DeviceView2d:type_real.Kokkos::LayoutLeft:"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_time_scheme_1ab7cce59f9c7984106d8b7a63a5353693"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">apply_corrector_phase</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12DeviceView2dE" title="specfem::kokkos::DeviceView2d"><span class="n"><span class="pre">DeviceView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">field</span></span>, <a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12DeviceView2dE" title="specfem::kokkos::DeviceView2d"><span class="n"><span class="pre">DeviceView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">field_dot</span></span>, <a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12DeviceView2dE" title="specfem::kokkos::DeviceView2d"><span class="n"><span class="pre">DeviceView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">field_dot_dot</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem10TimeScheme10TimeScheme21apply_corrector_phaseEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Apply corrector phase of the timescheme. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>domain_class</strong> – Pointer to domain class to apply corrector phase </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem10TimeScheme10TimeScheme5printERNSt7ostreamE">
+<span id="_CPPv3NK7specfem10TimeScheme10TimeScheme5printERNSt7ostreamE"></span><span id="_CPPv2NK7specfem10TimeScheme10TimeScheme5printERNSt7ostreamE"></span><span id="specfem::TimeScheme::TimeScheme::print__osRC"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_time_scheme_1aed57aefcf10de13ebf1f8d178132d308"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">print</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem10TimeScheme10TimeScheme5printERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd><p>Log timescheme information to console. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem10TimeScheme10TimeScheme18compute_seismogramEv">
+<span id="_CPPv3NK7specfem10TimeScheme10TimeScheme18compute_seismogramEv"></span><span id="_CPPv2NK7specfem10TimeScheme10TimeScheme18compute_seismogramEv"></span><span id="specfem::TimeScheme::TimeScheme::compute_seismogramC"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_time_scheme_1a926ac723c2d9b2a8a57d556568bb218c"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">compute_seismogram</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem10TimeScheme10TimeScheme18compute_seismogramEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Compute if seismogram needs to be calculated at this timestep. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem10TimeScheme10TimeScheme19get_seismogram_stepEv">
+<span id="_CPPv3NK7specfem10TimeScheme10TimeScheme19get_seismogram_stepEv"></span><span id="_CPPv2NK7specfem10TimeScheme10TimeScheme19get_seismogram_stepEv"></span><span id="specfem::TimeScheme::TimeScheme::get_seismogram_stepC"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_time_scheme_1a36f8d974347bfc8420876f39dd9b4c86"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_seismogram_step</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem10TimeScheme10TimeScheme19get_seismogram_stepEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the current seismogram step. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int value of the current seismogram step </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem10TimeScheme10TimeScheme23get_max_seismogram_stepEv">
+<span id="_CPPv3NK7specfem10TimeScheme10TimeScheme23get_max_seismogram_stepEv"></span><span id="_CPPv2NK7specfem10TimeScheme10TimeScheme23get_max_seismogram_stepEv"></span><span id="specfem::TimeScheme::TimeScheme::get_max_seismogram_stepC"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_time_scheme_1a925eaab83d606dd4d03996c6bc3b4355"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_max_seismogram_step</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem10TimeScheme10TimeScheme23get_max_seismogram_stepEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the max seismogram step. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int maximum value of seismogram step </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10TimeScheme10TimeScheme25increment_seismogram_stepEv">
+<span id="_CPPv3N7specfem10TimeScheme10TimeScheme25increment_seismogram_stepEv"></span><span id="_CPPv2N7specfem10TimeScheme10TimeScheme25increment_seismogram_stepEv"></span><span id="specfem::TimeScheme::TimeScheme::increment_seismogram_step"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_time_scheme_1a1ab9c1526250b40be4420952ddaed56d"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">increment_seismogram_step</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem10TimeScheme10TimeScheme25increment_seismogram_stepEv" title="Link to this definition"></a><br /></dt>
+<dd><p>increment seismogram step </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem10TimeScheme10TimeScheme18get_time_incrementEv">
+<span id="_CPPv3NK7specfem10TimeScheme10TimeScheme18get_time_incrementEv"></span><span id="_CPPv2NK7specfem10TimeScheme10TimeScheme18get_time_incrementEv"></span><span id="specfem::TimeScheme::TimeScheme::get_time_incrementC"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_time_scheme_1a483a558c1ea8023458a7212202d598ed"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_time_increment</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK7specfem10TimeScheme10TimeScheme18get_time_incrementEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get time increment. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10TimeScheme10TimeSchemeD0Ev">
+<span id="_CPPv3N7specfem10TimeScheme10TimeSchemeD0Ev"></span><span id="_CPPv2N7specfem10TimeScheme10TimeSchemeD0Ev"></span><span id="specfem::TimeScheme::TimeScheme::~TimeScheme"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_time_scheme_1a658800accbaf9969849b990405e008da"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~TimeScheme</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N7specfem10TimeScheme10TimeSchemeD0Ev" title="Link to this definition"></a><br /></dt>
+<dd><p>Default destructor. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-friends">Friends</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10TimeScheme10TimeSchemelsERNSt7ostreamER10TimeScheme">
+<span id="_CPPv3N7specfem10TimeScheme10TimeSchemelsERNSt7ostreamER10TimeScheme"></span><span id="_CPPv2N7specfem10TimeScheme10TimeSchemelsERNSt7ostreamER10TimeScheme"></span><span id="specfem::TimeScheme::TimeScheme::lshift-operator__osR.TimeSchemeR"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_time_scheme_1abdc0c9e30b960dc39dfecd238cc932b2"></span><span class="k"><span class="pre">friend</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="k"><span class="pre">operator</span></span><span class="o"><span class="pre">&lt;&lt;</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span>, <a class="reference internal" href="#_CPPv4N7specfem10TimeScheme10TimeSchemeE" title="specfem::TimeScheme::TimeScheme"><span class="n"><span class="pre">TimeScheme</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">ts</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem10TimeScheme10TimeSchemelsERNSt7ostreamER10TimeScheme" title="Link to this definition"></a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+<section id="types-of-time-schemes">
+<h2>Types of Time Schemes<a class="headerlink" href="#types-of-time-schemes" title="Link to this heading"></a></h2>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="newmark.html">Newmark Time Scheme</a></li>
+</ul>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="../coupling_physics/edge/edge.html" class="btn btn-neutral float-left" title="Edge API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="newmark.html" class="btn btn-neutral float-right" title="Newmark Time Scheme" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Rohit Kakodkar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

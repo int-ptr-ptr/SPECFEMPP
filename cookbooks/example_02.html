@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wave propagration through fluid-solid interface &mdash; SPECFEM++  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../_static/graphviz.css?v=eafc0fe6" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/scrollable_code_blocks.css?v=ebc906c5" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/center_align_table.css?v=f0548739" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Developer documentation" href="../developer_documentation/index.html" />
+    <link rel="prev" title="Wave propagration through homogeneous media" href="example_01.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            SPECFEM++
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">USER DOCUMENTATION</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../user_documentation/index.html">User documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../meshfem2d/index.html">MESHFEM Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../parameter_documentation/index.html">SPECFEM++ Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../source_description/index.html">Source Description</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COOKBOOKS</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Cookbooks</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="example_01.html">Wave propagration through homogeneous media</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Wave propagration through fluid-solid interface</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#meshing-the-domain">Meshing the domain</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#parameter-file">Parameter file</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#defining-the-topography-of-the-domain">Defining the topography of the domain</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#running-xmeshfem2d">Running <code class="docutils literal notranslate"><span class="pre">xmeshfem2D</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#defining-the-source">Defining the source</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#running-the-simulation">Running the simulation</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">CONTRIBUTION GUIDELINES</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../developer_documentation/index.html">Developer documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COMMUNITY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=bug_report.md&amp;title=">Report bugs</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=feature_request.md&amp;title=">Request a new feature</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/orgs/SPECFEM/discussions">Join the discussion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">BENCHMARKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../benchmarks/benchmarks.html">Performance Benchmarks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API DOCUMENTATION</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../api/index.html">API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">SPECFEM++</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Cookbooks</a></li>
+      <li class="breadcrumb-item active">Wave propagration through fluid-solid interface</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/cookbooks/example_02.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="wave-propagration-through-fluid-solid-interface">
+<h1>Wave propagration through fluid-solid interface<a class="headerlink" href="#wave-propagration-through-fluid-solid-interface" title="Link to this heading"></a></h1>
+<p>This example simulates the fluid-solid example with flat ocean bottom from <a class="reference external" href="https://doi.org/10.1190/1.1444758">Komatitsch et. al.</a>. This example demonstrates the use of the <code class="docutils literal notranslate"><span class="pre">xmeshfem2D</span></code> mesher to generate interface between 2 conforming material systems and the setting up absorbing boundary conditions.</p>
+<section id="meshing-the-domain">
+<h2>Meshing the domain<a class="headerlink" href="#meshing-the-domain" title="Link to this heading"></a></h2>
+<p>We first start by generating a mesh for our simulation domain using <code class="docutils literal notranslate"><span class="pre">xmeshfem2D</span></code>. To do this, we first define our simulation domain and the meshing parmeters in a parameter file.</p>
+<section id="parameter-file">
+<h3>Parameter file<a class="headerlink" href="#parameter-file" title="Link to this heading"></a></h3>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1">#-----------------------------------------------------------</span>
+<span class="c1">#</span>
+<span class="c1"># Simulation input parameters</span>
+<span class="c1">#</span>
+<span class="c1">#-----------------------------------------------------------</span>
+
+<span class="c1"># title of job</span>
+<span class="nv">title</span><span class="w">                           </span><span class="o">=</span><span class="w"> </span>Flat<span class="w"> </span>fluid/solid<span class="w"> </span>interface
+
+<span class="c1"># parameters concerning partitioning</span>
+<span class="nv">NPROC</span><span class="w">                           </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="w">              </span><span class="c1"># number of processes</span>
+
+<span class="c1"># Output folder to store mesh related files</span>
+<span class="nv">OUTPUT_FILES</span><span class="w">                   </span><span class="o">=</span><span class="w"> </span>&lt;Location<span class="w"> </span>to<span class="w"> </span>store<span class="w"> </span>output<span class="w"> </span>artifacts&gt;
+
+<span class="c1">#-----------------------------------------------------------</span>
+<span class="c1">#</span>
+<span class="c1"># Mesh</span>
+<span class="c1">#</span>
+<span class="c1">#-----------------------------------------------------------</span>
+
+<span class="c1"># Partitioning algorithm for decompose_mesh</span>
+<span class="nv">PARTITIONING_TYPE</span><span class="w">               </span><span class="o">=</span><span class="w"> </span><span class="m">3</span><span class="w">              </span><span class="c1"># SCOTCH = 3, ascending order (very bad idea) = 1</span>
+
+<span class="c1"># number of control nodes per element (4 or 9)</span>
+<span class="nv">NGNOD</span><span class="w">                           </span><span class="o">=</span><span class="w"> </span><span class="m">4</span>
+
+<span class="c1"># location to store the mesh</span>
+<span class="nv">database_filename</span><span class="w">               </span><span class="o">=</span><span class="w"> </span>&lt;Output<span class="w"> </span>file<span class="w"> </span>to<span class="w"> </span>store<span class="w"> </span>the<span class="w"> </span>mesh<span class="w"> </span>generated&gt;
+
+<span class="c1">#-----------------------------------------------------------</span>
+<span class="c1">#</span>
+<span class="c1"># Receivers</span>
+<span class="c1">#</span>
+<span class="c1">#-----------------------------------------------------------</span>
+
+<span class="c1"># use an existing STATION file found in ./DATA or create a new one from the receiver positions below in this Par_file</span>
+<span class="nv">use_existing_STATIONS</span><span class="w">           </span><span class="o">=</span><span class="w"> </span>.false.
+
+<span class="c1"># number of receiver sets (i.e. number of receiver lines to create below)</span>
+<span class="nv">nreceiversets</span><span class="w">                   </span><span class="o">=</span><span class="w"> </span><span class="m">1</span>
+
+<span class="c1"># orientation</span>
+<span class="nv">anglerec</span><span class="w">                        </span><span class="o">=</span><span class="w"> </span><span class="m">0</span>.d0<span class="w">           </span><span class="c1"># angle to rotate components at receivers</span>
+<span class="nv">rec_normal_to_surface</span><span class="w">           </span><span class="o">=</span><span class="w"> </span>.false.<span class="w">        </span><span class="c1"># base anglerec normal to surface (external mesh and curve file needed)</span>
+
+<span class="c1"># first receiver set (repeat these 6 lines and adjust nreceiversets accordingly)</span>
+<span class="nv">nrec</span><span class="w">                            </span><span class="o">=</span><span class="w"> </span><span class="m">110</span><span class="w">            </span><span class="c1"># number of receivers</span>
+<span class="nv">xdeb</span><span class="w">                            </span><span class="o">=</span><span class="w"> </span><span class="m">2500</span>.d0<span class="w">        </span><span class="c1"># first receiver x in meters</span>
+<span class="nv">zdeb</span><span class="w">                            </span><span class="o">=</span><span class="w"> </span><span class="m">2933</span>.33333d0<span class="w">   </span><span class="c1"># first receiver z in meters</span>
+<span class="nv">xfin</span><span class="w">                            </span><span class="o">=</span><span class="w"> </span><span class="m">6000</span>.d0<span class="w">        </span><span class="c1"># last receiver x in meters (ignored if only one receiver)</span>
+<span class="nv">zfin</span><span class="w">                            </span><span class="o">=</span><span class="w"> </span><span class="m">2933</span>.33333d0<span class="w">   </span><span class="c1"># last receiver z in meters (ignored if only one receiver)</span>
+<span class="nv">record_at_surface_same_vertical</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>.false.<span class="w">        </span><span class="c1"># receivers inside the medium or at the surface</span>
+
+<span class="c1"># filename to store stations file</span>
+<span class="nv">stations_filename</span><span class="w">              </span><span class="o">=</span><span class="w"> </span>&lt;Location<span class="w"> </span>to<span class="w"> </span>stations<span class="w"> </span>file&gt;
+
+<span class="c1">#-----------------------------------------------------------</span>
+<span class="c1">#</span>
+<span class="c1"># Velocity and density models</span>
+<span class="c1">#</span>
+<span class="c1">#-----------------------------------------------------------</span>
+
+<span class="c1"># number of model materials</span>
+<span class="nv">nbmodels</span><span class="w">                        </span><span class="o">=</span><span class="w"> </span><span class="m">2</span>
+<span class="c1"># available material types (see user manual for more information)</span>
+<span class="c1">#   acoustic:    model_number 1 rho Vp 0  0 0 QKappa Qmu 0 0 0 0 0 0</span>
+<span class="c1">#   elastic:     model_number 1 rho Vp Vs 0 0 QKappa Qmu 0 0 0 0 0 0</span>
+<span class="c1">#   anistoropic: model_number 2 rho c11 c13 c15 c33 c35 c55 c12 c23 c25 0 0 0</span>
+<span class="c1">#   poroelastic: model_number 3 rhos rhof phi c kxx kxz kzz Ks Kf Kfr etaf mufr Qmu</span>
+<span class="c1">#   tomo:        model_number -1 0 9999 9999 A 0 0 9999 9999 0 0 0 0 0</span>
+<span class="m">1</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="m">2500</span>.d0<span class="w"> </span><span class="m">3400</span>.d0<span class="w"> </span><span class="m">1963</span>.d0<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">9999</span><span class="w"> </span><span class="m">9999</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span>
+<span class="m">2</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="m">1020</span>.d0<span class="w"> </span><span class="m">1500</span>.d0<span class="w"> </span><span class="m">0</span>.d0<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">9999</span><span class="w"> </span><span class="m">9999</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span>
+
+<span class="c1"># external tomography file</span>
+<span class="nv">TOMOGRAPHY_FILE</span><span class="w">                 </span><span class="o">=</span><span class="w"> </span>./DATA/tomo_file.xyz
+
+<span class="c1"># use an external mesh created by an external meshing tool or use the internal mesher</span>
+<span class="nv">read_external_mesh</span><span class="w">              </span><span class="o">=</span><span class="w"> </span>.false.
+
+<span class="c1">#-----------------------------------------------------------</span>
+<span class="c1">#</span>
+<span class="c1"># PARAMETERS FOR EXTERNAL MESHING</span>
+<span class="c1">#</span>
+<span class="c1">#-----------------------------------------------------------</span>
+
+<span class="c1"># data concerning mesh, when generated using third-party app (more info in README)</span>
+<span class="c1"># (see also absorbing_conditions above)</span>
+<span class="nv">mesh_file</span><span class="w">                       </span><span class="o">=</span><span class="w"> </span>./DATA/Mesh_canyon/canyon_mesh_file<span class="w">   </span><span class="c1"># file containing the mesh</span>
+<span class="nv">nodes_coords_file</span><span class="w">               </span><span class="o">=</span><span class="w"> </span>./DATA/Mesh_canyon/canyon_nodes_coords_file<span class="w">   </span><span class="c1"># file containing the nodes coordinates</span>
+<span class="nv">materials_file</span><span class="w">                  </span><span class="o">=</span><span class="w"> </span>./DATA/Mesh_canyon/canyon_materials_file<span class="w">   </span><span class="c1"># file containing the material number for each element</span>
+<span class="nv">free_surface_file</span><span class="w">               </span><span class="o">=</span><span class="w"> </span>./DATA/Mesh_canyon/canyon_free_surface_file<span class="w">   </span><span class="c1"># file containing the free surface</span>
+<span class="nv">axial_elements_file</span><span class="w">             </span><span class="o">=</span><span class="w"> </span>./DATA/axial_elements_file<span class="w">   </span><span class="c1"># file containing the axial elements if AXISYM is true</span>
+<span class="nv">absorbing_surface_file</span><span class="w">          </span><span class="o">=</span><span class="w"> </span>./DATA/Mesh_canyon/canyon_absorbing_surface_file<span class="w">   </span><span class="c1"># file containing the absorbing surface</span>
+<span class="nv">acoustic_forcing_surface_file</span><span class="w">   </span><span class="o">=</span><span class="w"> </span>./DATA/MSH/Surf_acforcing_Bottom_enforcing_mesh<span class="w">   </span><span class="c1"># file containing the acoustic forcing surface</span>
+<span class="nv">absorbing_cpml_file</span><span class="w">             </span><span class="o">=</span><span class="w"> </span>./DATA/absorbing_cpml_file<span class="w">   </span><span class="c1"># file containing the CPML element numbers</span>
+<span class="nv">tangential_detection_curve_file</span><span class="w"> </span><span class="o">=</span><span class="w"> </span>./DATA/courbe_eros_nodes<span class="w">  </span><span class="c1"># file containing the curve delimiting the velocity model</span>
+
+<span class="c1">#-----------------------------------------------------------</span>
+<span class="c1">#</span>
+<span class="c1"># PARAMETERS FOR INTERNAL MESHING</span>
+<span class="c1">#</span>
+<span class="c1">#-----------------------------------------------------------</span>
+
+<span class="c1"># file containing interfaces for internal mesh</span>
+<span class="nv">interfacesfile</span><span class="w">                  </span><span class="o">=</span><span class="w"> </span>&lt;Location<span class="w"> </span>to<span class="w"> </span>topography<span class="w"> </span>file&gt;
+
+<span class="c1"># geometry of the model (origin lower-left corner = 0,0) and mesh description</span>
+<span class="nv">xmin</span><span class="w">                            </span><span class="o">=</span><span class="w"> </span><span class="m">0</span>.d0<span class="w">           </span><span class="c1"># abscissa of left side of the model</span>
+<span class="nv">xmax</span><span class="w">                            </span><span class="o">=</span><span class="w"> </span><span class="m">6400</span>.d0<span class="w">        </span><span class="c1"># abscissa of right side of the model</span>
+<span class="nv">nx</span><span class="w">                              </span><span class="o">=</span><span class="w"> </span><span class="m">144</span><span class="w">            </span><span class="c1"># number of elements along X</span>
+
+<span class="c1"># absorbing boundary parameters (see absorbing_conditions above)</span>
+<span class="nv">absorbbottom</span><span class="w">                    </span><span class="o">=</span><span class="w"> </span>.true.
+<span class="nv">absorbright</span><span class="w">                     </span><span class="o">=</span><span class="w"> </span>.true.
+<span class="nv">absorbtop</span><span class="w">                       </span><span class="o">=</span><span class="w"> </span>.true.
+<span class="nv">absorbleft</span><span class="w">                      </span><span class="o">=</span><span class="w"> </span>.true.
+
+<span class="c1"># define the different regions of the model in the (nx,nz) spectral-element mesh</span>
+<span class="nv">nbregions</span><span class="w">                       </span><span class="o">=</span><span class="w"> </span><span class="m">2</span><span class="w">              </span><span class="c1"># then set below the different regions and model number for each region</span>
+<span class="m">1</span><span class="w"> </span><span class="m">144</span><span class="w"> </span><span class="m">1</span><span class="w">   </span><span class="m">54</span><span class="w"> </span><span class="m">1</span>
+<span class="m">1</span><span class="w"> </span><span class="m">144</span><span class="w"> </span><span class="m">55</span><span class="w"> </span><span class="m">108</span><span class="w"> </span><span class="m">2</span>
+
+<span class="c1">#-----------------------------------------------------------</span>
+<span class="c1">#</span>
+<span class="c1"># DISPLAY PARAMETERS</span>
+<span class="c1">#</span>
+<span class="c1">#-----------------------------------------------------------</span>
+
+<span class="c1"># meshing output</span>
+<span class="nv">output_grid_Gnuplot</span><span class="w">             </span><span class="o">=</span><span class="w"> </span>.false.<span class="w">        </span><span class="c1"># generate a GNUPLOT file containing the grid, and a script to plot it</span>
+<span class="nv">output_grid_ASCII</span><span class="w">               </span><span class="o">=</span><span class="w"> </span>.false.<span class="w">        </span><span class="c1"># dump the grid in an ASCII text file consisting of a set of X,Y,Z points or not</span>
+</pre></div>
+</div>
+<ul class="simple">
+<li><p>We define the acoustic and elastic velocity models in the <cite>Velocity and density models</cite> section of the parameter file.
+- Firstly, <code class="docutils literal notranslate"><span class="pre">nbmodels</span></code> defines the number of material systems in the simulation domain.
+- We then define the velocity model for each material system using the following format: <code class="docutils literal notranslate"><span class="pre">model_number</span> <span class="pre">rho</span> <span class="pre">Vp</span> <span class="pre">Vs</span> <span class="pre">0</span> <span class="pre">0</span> <span class="pre">QKappa</span> <span class="pre">Qmu</span> <span class="pre">0</span> <span class="pre">0</span> <span class="pre">0</span> <span class="pre">0</span> <span class="pre">0</span> <span class="pre">0</span></code>.</p></li>
+<li><p>We define stacey absorbing boundary conditions on all the edges of the domain using the <code class="docutils literal notranslate"><span class="pre">absorbbottom</span></code>, <code class="docutils literal notranslate"><span class="pre">absorbright</span></code>, <code class="docutils literal notranslate"><span class="pre">absorbtop</span></code> and <code class="docutils literal notranslate"><span class="pre">absorbleft</span></code> parameters.</p></li>
+</ul>
+</section>
+<section id="defining-the-topography-of-the-domain">
+<h3>Defining the topography of the domain<a class="headerlink" href="#defining-the-topography-of-the-domain" title="Link to this heading"></a></h3>
+<p>We define the topography of the domain using the following topography file</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1">#</span>
+<span class="c1"># number of interfaces</span>
+<span class="c1">#</span>
+<span class="w"> </span><span class="m">3</span>
+<span class="c1">#</span>
+<span class="c1"># for each interface below, we give the number of points and then x,z for each point</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># interface number 1 (bottom of the mesh)</span>
+<span class="c1">#</span>
+<span class="w"> </span><span class="m">2</span>
+<span class="w"> </span><span class="m">0</span><span class="w"> </span><span class="m">0</span>
+<span class="w"> </span><span class="m">6400</span><span class="w"> </span><span class="m">0</span>
+<span class="c1">#</span>
+<span class="c1"># interface number 2 (ocean bottom)</span>
+<span class="c1">#</span>
+<span class="w"> </span><span class="m">2</span>
+<span class="w">    </span><span class="m">0</span><span class="w"> </span><span class="m">2400</span>
+<span class="w"> </span><span class="m">6400</span><span class="w"> </span><span class="m">2400</span>
+<span class="c1">#</span>
+<span class="c1"># interface number 3 (topography, top of the mesh)</span>
+<span class="c1">#</span>
+<span class="w"> </span><span class="m">2</span>
+<span class="w">    </span><span class="m">0</span><span class="w"> </span><span class="m">4800</span>
+<span class="w"> </span><span class="m">6400</span><span class="w"> </span><span class="m">4800</span>
+<span class="c1">#</span>
+<span class="c1"># for each layer, we give the number of spectral elements in the vertical direction</span>
+<span class="c1">#</span>
+<span class="c1">#</span>
+<span class="c1"># layer number 1 (bottom layer)</span>
+<span class="c1">#</span>
+<span class="c1">## The original 2000 Geophysics paper used nz = 90 but NGLLZ = 6</span>
+<span class="c1">## here I rescale it to nz = 108 and NGLLZ = 5 because nowadays we almost always use NGLLZ = 5</span>
+<span class="w"> </span><span class="m">54</span>
+<span class="c1">#</span>
+<span class="c1"># layer number 2 (top layer)</span>
+<span class="c1">#</span>
+<span class="w"> </span><span class="m">54</span>
+</pre></div>
+</div>
+</section>
+<section id="running-xmeshfem2d">
+<h3>Running <code class="docutils literal notranslate"><span class="pre">xmeshfem2D</span></code><a class="headerlink" href="#running-xmeshfem2d" title="Link to this heading"></a></h3>
+<p>To execute the mesher run</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>./xmeshfem2D<span class="w"> </span>-p<span class="w"> </span>&lt;PATH<span class="w"> </span>TO<span class="w"> </span>PAR_FILE&gt;
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Make sure either your are in the build directory of SPECFEM2D kokkos or the build directory is added to your <code class="docutils literal notranslate"><span class="pre">PATH</span></code>.</p>
+</div>
+<p>Note the path of the database file and <a class="reference internal" href="../user_documentation/seismogram.html#stations-file"><span class="std std-ref">STATIONS file</span></a> generated after successfully running the mesher.</p>
+</section>
+<section id="defining-the-source">
+<h3>Defining the source<a class="headerlink" href="#defining-the-source" title="Link to this heading"></a></h3>
+<p>We define the source location and the source time function in the source file.</p>
+</section>
+</section>
+<section id="running-the-simulation">
+<h2>Running the simulation<a class="headerlink" href="#running-the-simulation" title="Link to this heading"></a></h2>
+<p>To run the solver, we first need to define a configuration file <code class="docutils literal notranslate"><span class="pre">specfem_config.yaml</span></code>.</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-text">specfem_config.yaml</span><a class="headerlink" href="#id1" title="Link to this code"></a></div>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="linenos"> 1</span><span class="nt">parameters</span><span class="p">:</span>
+<span class="linenos"> 2</span>
+<span class="linenos"> 3</span><span class="w">  </span><span class="nt">header</span><span class="p">:</span>
+<span class="linenos"> 4</span><span class="w">    </span><span class="c1">## Header information is used for logging. It is good practice to give your simulations explicit names</span>
+<span class="linenos"> 5</span><span class="w">    </span><span class="nt">title</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Heterogeneous acoustic-elastic medium with 1 acoustic-elastic interface</span><span class="w"> </span><span class="c1"># name for your simulation</span>
+<span class="linenos"> 6</span><span class="w">    </span><span class="c1"># A detailed description for your simulation</span>
+<span class="linenos"> 7</span><span class="w">    </span><span class="nt">description</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">|</span>
+<span class="linenos"> 8</span><span class="w">      </span><span class="no">Material systems : Elastic domain (1), Acoustic domain (1)</span>
+<span class="linenos"> 9</span><span class="w">      </span><span class="no">Interfaces : Acoustic-elastic interface (1)</span>
+<span class="linenos">10</span><span class="w">      </span><span class="no">Sources : Force source (1)</span>
+<span class="linenos">11</span><span class="w">      </span><span class="no">Boundary conditions : Neumann BCs on all edges</span>
+<span class="linenos">12</span>
+<span class="linenos">13</span><span class="w">  </span><span class="nt">simulation-setup</span><span class="p">:</span>
+<span class="linenos">14</span><span class="w">    </span><span class="c1">## quadrature setup</span>
+<span class="linenos">15</span><span class="w">    </span><span class="nt">quadrature</span><span class="p">:</span>
+<span class="linenos">16</span><span class="w">      </span><span class="nt">alpha</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="linenos">17</span><span class="w">      </span><span class="nt">beta</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="linenos">18</span><span class="w">      </span><span class="nt">ngllx</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span>
+<span class="linenos">19</span><span class="w">      </span><span class="nt">ngllz</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">5</span>
+<span class="linenos">20</span>
+<span class="linenos">21</span><span class="w">    </span><span class="c1">## Solver setup</span>
+<span class="linenos">22</span><span class="w">    </span><span class="nt">solver</span><span class="p">:</span>
+<span class="linenos">23</span><span class="w">      </span><span class="nt">time-marching</span><span class="p">:</span>
+<span class="linenos">24</span><span class="w">        </span><span class="nt">type-of-simulation</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">forward</span>
+<span class="linenos">25</span><span class="w">        </span><span class="nt">time-scheme</span><span class="p">:</span>
+<span class="linenos">26</span><span class="w">          </span><span class="nt">type</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">Newmark</span>
+<span class="linenos">27</span><span class="w">          </span><span class="nt">dt</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.85e-3</span>
+<span class="linenos">28</span><span class="w">          </span><span class="nt">nstep</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">800</span>
+<span class="linenos">29</span>
+<span class="linenos">30</span><span class="w">  </span><span class="nt">receivers</span><span class="p">:</span>
+<span class="linenos">31</span><span class="w">    </span><span class="nt">stations-file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;Location of Stations file&gt;</span>
+<span class="linenos">32</span><span class="w">    </span><span class="nt">angle</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">0.0</span>
+<span class="linenos">33</span><span class="w">    </span><span class="nt">seismogram-type</span><span class="p">:</span>
+<span class="linenos">34</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">displacement</span>
+<span class="linenos">35</span><span class="w">      </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">velocity</span>
+<span class="linenos">36</span><span class="w">    </span><span class="nt">nstep_between_samples</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="linenos">37</span>
+<span class="linenos">38</span><span class="w">  </span><span class="c1">## Runtime setup</span>
+<span class="linenos">39</span><span class="w">  </span><span class="nt">run-setup</span><span class="p">:</span>
+<span class="linenos">40</span><span class="w">    </span><span class="nt">number-of-processors</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="linenos">41</span><span class="w">    </span><span class="nt">number-of-runs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1</span>
+<span class="linenos">42</span>
+<span class="linenos">43</span><span class="w">  </span><span class="c1">## databases</span>
+<span class="linenos">44</span><span class="w">  </span><span class="nt">databases</span><span class="p">:</span>
+<span class="linenos">45</span><span class="w">    </span><span class="nt">mesh-database</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;Location to mesh database file&gt;</span>
+<span class="linenos">46</span><span class="w">    </span><span class="nt">source-file</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;Location to source file&gt;</span>
+<span class="linenos">47</span>
+<span class="linenos">48</span><span class="w">  </span><span class="nt">seismogram</span><span class="p">:</span>
+<span class="linenos">49</span><span class="w">    </span><span class="nt">seismogram-format</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ascii</span>
+<span class="linenos">50</span><span class="w">    </span><span class="nt">output-folder</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;.&quot;</span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="example_01.html" class="btn btn-neutral float-left" title="Wave propagration through homogeneous media" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../developer_documentation/index.html" class="btn btn-neutral float-right" title="Developer documentation" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Rohit Kakodkar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

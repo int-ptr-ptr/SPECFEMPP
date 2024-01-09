@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Domain and Coupled Interface Developer Guide &mdash; SPECFEM++  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/scrollable_code_blocks.css?v=ebc906c5" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/center_align_table.css?v=f0548739" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Performance Benchmarks" href="../../benchmarks/benchmarks.html" />
+    <link rel="prev" title="Compute namespace developer guide" href="compute.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            SPECFEM++
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">USER DOCUMENTATION</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user_documentation/index.html">User documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meshfem2d/index.html">MESHFEM Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parameter_documentation/index.html">SPECFEM++ Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source_description/index.html">Source Description</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COOKBOOKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cookbooks/index.html">Cookbooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">CONTRIBUTION GUIDELINES</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">Developer documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../git_workflow.html">Git development workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../build_requirements.html">Build system requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../style.html">Style</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../style.html#pre-commit">Pre-commit</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../tests.html">Tests</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="architecture.html">SPECFEM++ Architecture</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="quadrature.html">Quadrature developer guide:</a></li>
+<li class="toctree-l3"><a class="reference internal" href="mesh.html">Mesh developer guide</a></li>
+<li class="toctree-l3"><a class="reference internal" href="compute.html">Compute namespace developer guide</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Domain and Coupled Interface Developer Guide</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#brief-introduction-to-c-templates">Brief introduction to C++ templates</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#anatomy-of-a-specfem-domain-and-coupled-interface">Anatomy of a SPECFEM++ Domain and Coupled Interface</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#understanding-the-parallelism">Understanding the parallelism</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#specializing-elemental-implementations">Specializing elemental implementations</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#optimization-using-loop-unrolling">Optimization using loop unrolling</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#understanding-the-coupled-interface">Understanding the coupled interface</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COMMUNITY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=bug_report.md&amp;title=">Report bugs</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=feature_request.md&amp;title=">Request a new feature</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/orgs/SPECFEM/discussions">Join the discussion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">BENCHMARKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../benchmarks/benchmarks.html">Performance Benchmarks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API DOCUMENTATION</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../api/index.html">API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">SPECFEM++</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Developer documentation</a></li>
+          <li class="breadcrumb-item"><a href="architecture.html">SPECFEM++ Architecture</a></li>
+      <li class="breadcrumb-item active">Domain and Coupled Interface Developer Guide</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/developer_documentation/SPECFEM_architecture/domain.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="domain-and-coupled-interface-developer-guide">
+<h1>Domain and Coupled Interface Developer Guide<a class="headerlink" href="#domain-and-coupled-interface-developer-guide" title="Link to this heading"></a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">specfem::domain::domain</span></code> is a templated C++ class. A templated domain class allows us to provide cookie-cutter parallelism frameworks while allowing developers to describe the physics at elemental level <code class="docutils literal notranslate"><span class="pre">specfem::domain::impl::elements</span></code>. This developer guide provides an in-depth methodology for understanding and extending the domain class to implement new physics.</p>
+<section id="brief-introduction-to-c-templates">
+<h2>Brief introduction to C++ templates<a class="headerlink" href="#brief-introduction-to-c-templates" title="Link to this heading"></a></h2>
+<p>C++ templates are a powerful tool for generic programming. They allow us to write code that is independent of the type of data it operates on.</p>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span>
+<span class="n">T</span><span class="w"> </span><span class="n">add</span><span class="p">(</span><span class="n">T</span><span class="w"> </span><span class="n">a</span><span class="p">,</span><span class="w"> </span><span class="n">T</span><span class="w"> </span><span class="n">b</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">a</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">b</span><span class="p">;</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>For example the function above, adds two numbers without knowing whether they are integers, floating point numbers, or complex numbers. The compiler will generate a different version of the function for each type of data. Thus the compiler needs to know the type of data at compile time. In modern compilers (C++17 and above) the compiler can utilize type deduction to infer the type of data from the function arguments.</p>
+<p>The power of templates for writing portable code becomes obvious when using user defined types. For example, consider the following function which allows us to calculate L2 norm of a vector in dimension independent manner.</p>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">dim2</span><span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="k">constexpr</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">dim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">2</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">dim3</span><span class="p">{</span>
+<span class="k">public</span><span class="o">:</span>
+<span class="w">    </span><span class="k">constexpr</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">dim</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">3</span><span class="p">;</span>
+<span class="p">};</span>
+
+<span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">T</span><span class="o">&gt;</span>
+<span class="kt">double</span><span class="w"> </span><span class="n">l2_norm</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">vector</span><span class="o">&lt;</span><span class="kt">double</span><span class="o">&gt;</span><span class="w"> </span><span class="n">vec</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">double</span><span class="w"> </span><span class="n">norm</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span>
+<span class="w">    </span><span class="n">assert</span><span class="p">(</span><span class="n">vec</span><span class="p">.</span><span class="n">size</span><span class="p">()</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="n">T</span><span class="o">::</span><span class="n">dim</span><span class="p">;</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">T</span><span class="o">::</span><span class="n">dim</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="n">norm</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">vec</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">vec</span><span class="p">[</span><span class="n">i</span><span class="p">];</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">    </span><span class="k">return</span><span class="w"> </span><span class="n">std</span><span class="o">::</span><span class="n">sqrt</span><span class="p">(</span><span class="n">norm</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>There are a couple of key points to note here from a performance standpoint:</p>
+<ol class="arabic simple">
+<li><p>The compiler will generate a different version of the function for each dimension.</p></li>
+<li><p>Since <code class="docutils literal notranslate"><span class="pre">T::dim</span></code> is a <code class="docutils literal notranslate"><span class="pre">constexpr</span></code> the compiler will unroll the loop - which on modern CPUs and GPUs can lead to significant performance gains.</p></li>
+</ol>
+<p>Apart from performance, templates also provide us a way to define a generic interface for different types of data i.e. in the above code we didn’t need to write two different functions for <cite>dim2</cite> and <cite>dim3</cite> vectors. The importance of this in SPECFEM++ context will become clear in the following sections.</p>
+</section>
+<section id="anatomy-of-a-specfem-domain-and-coupled-interface">
+<h2>Anatomy of a SPECFEM++ Domain and Coupled Interface<a class="headerlink" href="#anatomy-of-a-specfem-domain-and-coupled-interface" title="Link to this heading"></a></h2>
+<p>The following figure shows the different components of a SPECFEM++ domain and coupled interface.</p>
+<figure class="align-center" id="id2">
+<a class="reference internal image-reference" href="../../_images/domain_coupled_interface_definition.svg"><img alt="Domain definition" src="../../_images/domain_coupled_interface_definition.svg" width="800" /></a>
+<figcaption>
+<p><span class="caption-text">Schematic of elements of domain and coupled interface. Each of the elements are implemented as C++ objects within SPECFEM++.</span><a class="headerlink" href="#id2" title="Link to this image"></a></p>
+</figcaption>
+</figure>
+<p>As the name suggests <code class="docutils literal notranslate"><span class="pre">specfem::domain::domain</span></code> is closely related to a spectral element domain. The domain is comprised of set of finite elements. The finite element method provide us a way to descritize the domain into small elements where we can approximate the solution using a polynomial basis. The approach is then to compute the coefficients of the polynomial basis at elemental levels which greatly reduces the computational cost.</p>
+<p>Similaly, coupled interface is a set of finite element edges which are used to describe coupling physics between different domains. Each edge contains a mapping between coupled GLL points between the 2 domains.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>While the above figure depicts the finite elements are conforming between the 2 domains, this is not a nacessity. For example, non-conforming elements are used to describe the coupling physics at a fault.</p>
+</div>
+<p>Let us look at computing the contribution of acoustic domain to global <span class="math notranslate nohighlight">\(\frac {\partial \chi}{\partial t^2}\)</span>. The mathematical formulation to which is given by <a class="reference external" href="https://doi.org/10.1046/j.1365-246X.2002.01653.x">Komatitsch and Tromp, 2002</a>:</p>
+<div class="math notranslate nohighlight">
+\[\int \kappa^{-1} w \partial_t^2 \chi dV = - \int \rho^{-1} \nabla w \cdot \nabla \chi dV + \int w \hat{n} \cdot \partial_t s dS\]</div>
+<p>Where the first term on the right hand side is the contribution from the acoustic domain and the second term is the contribution from the coupled interface. The above equation is evaluated at each GLL point in the domain. Thus the contribution from the acoustic domain at elemental level is given by:</p>
+<div class="math notranslate nohighlight">
+\[\int_{\Omega_e} \rho^{-1} \nabla w \cdot \nabla \chi dV \approx \sum_{\alpha, \beta, \gamma = 0}^{n_{\alpha}, n_{\beta}, n_{\gamma}} w^{\alpha \beta \gamma} \left[ \omega_{\beta} \omega_{\gamma} \sigma_{\xi}  + \omega_{\alpha} \omega_{\gamma} \sigma_{\eta} + \omega_{\alpha} \omega_{\beta} \sigma_{\zeta} \right]\]</div>
+<p>where:</p>
+<div class="math notranslate nohighlight">
+\[ \begin{align}\begin{aligned}\sigma_{\xi} = \sum_{\alpha' = 0}^{n_{\alpha}} \omega_{\alpha'} J^{\alpha' \beta \gamma} \left( \rho^{\alpha' \beta \gamma} \right)^{-1} \left( \partial_1 \chi \right)^{\alpha' \beta \gamma} l'_{\alpha} \left( \xi_{\alpha'} \right)\\\sigma_{\eta} = \sum_{\beta' = 0}^{n_{\beta}} \omega_{\beta'} J^{\alpha \beta' \gamma} \left( \rho^{\alpha \beta' \gamma} \right)^{-1} \left( \partial_2 \chi \right)^{\alpha \beta' \gamma} l'_{\beta} \left( \eta_{\beta'} \right)\\\sigma_{\zeta} = \sum_{\gamma' = 0}^{n_{\gamma}} \omega_{\gamma'} J^{\alpha \beta \gamma'} \left( \rho^{\alpha \beta \gamma'} \right)^{-1} \left( \partial_3 \chi \right)^{\alpha \beta \gamma'} l'_{\gamma} \left( \zeta_{\gamma'} \right)\end{aligned}\end{align} \]</div>
+<p>The terms <span class="math notranslate nohighlight">\(J^{\alpha' \beta \gamma} \left( \rho^{\alpha' \beta \gamma} \right)^{-1} \left( \partial_1 \chi \right)^{\alpha' \beta \gamma}\)</span> is what we call stress integrand in SPECFEM++. Finally, the gradient of the potential (i.e. <span class="math notranslate nohighlight">\(\partial_i \chi\)</span>) is given by:</p>
+<div class="math notranslate nohighlight">
+\[\left( \partial_i \chi \right)^{\alpha \beta \gamma} = \sum_{\alpha = 0}^{n_{\alpha}} \chi^{\alpha \beta' \gamma'} l'_{\alpha} \left( \xi_{\alpha'} \right) \partial_i \xi + \sum_{\beta = 0}^{n_{\beta}} \chi^{\alpha' \beta \gamma'} l'_{\beta} \left( \eta_{\beta'} \right) \partial_i \eta + \sum_{\gamma = 0}^{n_{\gamma}} \chi^{\alpha' \beta' \gamma} l'_{\gamma} \left( \zeta_{\gamma'} \right) \partial_i \zeta\]</div>
+<p>There are several key features of this equation that can be exploited when designing the domain class:</p>
+<ol class="arabic simple">
+<li><p>As with any finite element code, the integration over a whole domain involves computing the elemental contribution at all GLL points within that domain.</p></li>
+<li><p>The elemental contribution at each GLL point is independent of the other GLL points and is independent of other elements in the domain.</p></li>
+</ol>
+<p>Thus we can design the domain class in an element agnostic way. The domain class provides a generic interface to compute the elemental contribution of a given physics - separating the physics from the parallelism.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Later we will see a similar analogy of separating the physics from parallelism can be drawn between coupled interface and finite element edges.</p>
+</div>
+</section>
+<section id="understanding-the-parallelism">
+<h2>Understanding the parallelism<a class="headerlink" href="#understanding-the-parallelism" title="Link to this heading"></a></h2>
+<p>Let us now look at a naive serial implementation for the above formulation in 3D.</p>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">compute_acoustic_stiffness_interaction</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">ispec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">ispec</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">nspec</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">iz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">iz</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">ngllz</span><span class="p">;</span><span class="w"> </span><span class="n">iz</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">iy</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">iy</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">ngllz</span><span class="p">;</span><span class="w"> </span><span class="n">iy</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">ix</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">ix</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">ngllx</span><span class="p">;</span><span class="w"> </span><span class="n">ix</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">                    </span><span class="c1">// compute the global index of the GLL point</span>
+<span class="w">                    </span><span class="n">iglob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ibool</span><span class="p">(</span><span class="n">ispec</span><span class="p">,</span><span class="w"> </span><span class="n">iz</span><span class="p">,</span><span class="w"> </span><span class="n">iy</span><span class="p">,</span><span class="w"> </span><span class="n">ix</span><span class="p">);</span><span class="w"> </span><span class="c1">// ibool is the mapping vector from GLL point to global index</span>
+<span class="w">                    </span><span class="c1">// compute gradient at GLL point ix, iy, iz</span>
+<span class="w">                    </span><span class="n">acoustic_element</span><span class="p">.</span><span class="n">compute_gradient</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span><span class="w"> </span><span class="n">iy</span><span class="p">,</span><span class="w"> </span><span class="n">iz</span><span class="p">);</span>
+<span class="w">                    </span><span class="c1">// compute stresses at GLL point ix, iy, iz</span>
+<span class="w">                    </span><span class="n">acoustic_element</span><span class="p">.</span><span class="n">compute_stresses</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span><span class="w"> </span><span class="n">iy</span><span class="p">,</span><span class="w"> </span><span class="n">iz</span><span class="p">);</span>
+<span class="w">                    </span><span class="c1">// compute the md2chidt2 at GLL point ix, iy, iz</span>
+<span class="w">                    </span><span class="n">type_real</span><span class="w"> </span><span class="n">md2chidt2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">acoustic_element</span><span class="p">.</span><span class="n">compute_acceleration</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span><span class="w"> </span><span class="n">iy</span><span class="p">,</span><span class="w"> </span><span class="n">iz</span><span class="p">);</span>
+<span class="w">                    </span><span class="c1">// add the contribution to the global vector</span>
+<span class="w">                    </span><span class="n">potential_dot_dot</span><span class="p">[</span><span class="n">iglob</span><span class="p">]</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">md2chidt2</span><span class="p">;</span>
+<span class="w">                </span><span class="p">}</span>
+<span class="w">            </span><span class="p">}</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Since the computations in each dimension are independent of each other we can simplify the above code even further.</p>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">compute_acoustic_stiffness_interaction</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">ispec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">ispec</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">nspec</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">xyz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">xyx</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">ngllxyz</span><span class="p">;</span><span class="w"> </span><span class="n">xyx</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">           </span><span class="k">auto</span><span class="w"> </span><span class="p">[</span><span class="n">ix</span><span class="p">,</span><span class="w"> </span><span class="n">iy</span><span class="p">,</span><span class="w"> </span><span class="n">iz</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sub2ind</span><span class="p">(</span><span class="n">xyz</span><span class="p">);</span>
+<span class="w">           </span><span class="c1">// compute the global index of the GLL point</span>
+<span class="w">           </span><span class="n">iglob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ibool</span><span class="p">(</span><span class="n">ispec</span><span class="p">,</span><span class="w"> </span><span class="n">iz</span><span class="p">,</span><span class="w"> </span><span class="n">iy</span><span class="p">,</span><span class="w"> </span><span class="n">ix</span><span class="p">);</span><span class="w"> </span><span class="c1">// ibool is the mapping vector from GLL point to global index</span>
+<span class="w">           </span><span class="c1">// compute gradient at GLL point ix, iy, iz</span>
+<span class="w">           </span><span class="n">acoustic_element</span><span class="p">.</span><span class="n">compute_gradient</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span><span class="w"> </span><span class="n">iy</span><span class="p">,</span><span class="w"> </span><span class="n">iz</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="n">other_arguments</span><span class="o">&gt;</span><span class="p">);</span>
+<span class="w">           </span><span class="c1">// compute stresses at GLL point ix, iy, iz</span>
+<span class="w">           </span><span class="n">acoustic_element</span><span class="p">.</span><span class="n">compute_stresses</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span><span class="w"> </span><span class="n">iy</span><span class="p">,</span><span class="w"> </span><span class="n">iz</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="n">other_arguments</span><span class="o">&gt;</span><span class="p">);</span>
+<span class="w">           </span><span class="c1">// compute the md2chidt2 at GLL point ix, iy, iz</span>
+<span class="w">           </span><span class="n">type_real</span><span class="w"> </span><span class="n">md2chidt2</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">acoustic_element</span><span class="p">.</span><span class="n">compute_acceleration</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span><span class="w"> </span><span class="n">iy</span><span class="p">,</span><span class="w"> </span><span class="n">iz</span><span class="p">,</span><span class="w"> </span><span class="o">&lt;</span><span class="n">other_arguments</span><span class="o">&gt;</span><span class="p">);</span>
+<span class="w">           </span><span class="c1">// add the contribution to the global vector</span>
+<span class="w">           </span><span class="n">potential_dot_dot</span><span class="p">[</span><span class="n">iglob</span><span class="p">]</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">md2chidt2</span><span class="p">;</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Now let us template the above code to make it dimension independent using a bit of macro magic.</p>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#ifdef DIM2</span>
+<span class="w">    </span><span class="cp">#define INDEX iz,ix</span>
+<span class="cp">#endif</span>
+
+<span class="cp">#ifdef DIM3</span>
+<span class="w">    </span><span class="cp">#define INDEX iz,iy, ix</span>
+<span class="cp">#endif</span>
+
+<span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">quadrature_points</span><span class="o">&gt;</span>
+<span class="kt">void</span><span class="w"> </span><span class="n">compute_acoustic_stiffness_interaction</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">ispec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">ispec</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">nspec</span><span class="p">;</span><span class="w"> </span><span class="n">i</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">qp</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">qp</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">dimension</span><span class="o">::</span><span class="n">get_num_qp</span><span class="p">();</span><span class="w"> </span><span class="n">qp</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">auto</span><span class="w"> </span><span class="p">[</span><span class="n">INDEX</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sub2ind</span><span class="p">(</span><span class="n">qp</span><span class="p">);</span>
+<span class="w">            </span><span class="c1">// rest of the code</span>
+<span class="w">            </span><span class="p">...</span>
+<span class="w">        </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<section id="kokkos-parallelism">
+<h3>Kokkos parallelism<a class="headerlink" href="#kokkos-parallelism" title="Link to this heading"></a></h3>
+<p>The above code is a good starting point for parallelizing the code. A naive method of parallelizing the above section would be to distribute the 2 for loops among the available threads for example using OpenMP <cite>collapse(2)</cite> clause. However, since different elements could have different implementation (physics) for calculating the gradient, stresses, and acceleration contribution such a parallelization would result in poor performance on GPUs cause of warp divergence. Even on CPUs the performance would be poor since compiler could miss vectorization opportunities.</p>
+<p>Kokkos provides a natural formalism to exploit this type of parallelism using <a class="reference external" href="https://kokkos.github.io/kokkos-core-wiki/ProgrammingGuide/HierarchicalParallelism.html">heirarchical parallelism</a> . The idea is to parallelize the outer loop over elements using Kokkos teams and then parallelize the inner loop over quadrature points using Kokkos thread teams. This guarantees that all the threads in a team (which is mapped to CUDA blocks on NVIDIA GPUs) execute the same code path - thus avoiding warp divergence.</p>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">quadrature_points</span><span class="o">&gt;</span>
+<span class="kt">void</span><span class="w"> </span><span class="n">compute_acoustic_stiffness_interaction</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">parallel_for</span><span class="p">(</span><span class="s">&quot;compute_acoustic_stiffness_interaction&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">TeamPolicy</span><span class="o">&lt;</span><span class="n">execution_space</span><span class="o">&gt;</span><span class="p">(</span><span class="n">nspec</span><span class="p">,</span><span class="w"> </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">AUTO</span><span class="p">),</span><span class="w"> </span><span class="n">KOKKOS_LAMBDA</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">TeamPolicy</span><span class="o">&lt;</span><span class="n">execution_space</span><span class="o">&gt;::</span><span class="n">member_type</span><span class="o">&amp;</span><span class="w"> </span><span class="n">team</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">ispec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">team</span><span class="p">.</span><span class="n">league_rank</span><span class="p">();</span>
+<span class="w">        </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">parallel_for</span><span class="p">(</span><span class="n">Kokkos</span><span class="o">::</span><span class="n">TeamThreadRange</span><span class="p">(</span><span class="n">team</span><span class="p">,</span><span class="w"> </span><span class="n">dimension</span><span class="o">::</span><span class="n">get_num_qp</span><span class="p">()),</span><span class="w"> </span><span class="p">[</span><span class="o">=</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="o">&amp;</span><span class="w"> </span><span class="n">qp</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">auto</span><span class="w"> </span><span class="p">[</span><span class="n">INDEX</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sub2ind</span><span class="p">(</span><span class="n">qp</span><span class="p">);</span>
+<span class="w">            </span><span class="c1">// rest of the code</span>
+<span class="w">            </span><span class="p">...</span>
+<span class="w">        </span><span class="p">});</span>
+<span class="w">    </span><span class="p">});</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="optimizing-using-shared-cache-memory">
+<h3>Optimizing using shared/cache memory<a class="headerlink" href="#optimizing-using-shared-cache-memory" title="Link to this heading"></a></h3>
+<p>At this point, it would be good to look at elmental implementations to understand the performance bottlenecks. Let us start by looking at function to compute the gradient of the potential inside a 2D acoustic element.</p>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">acoustic_element</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">compute_gradient</span><span class="p">(</span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ispec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">&amp;</span><span class="n">xz</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">View2d</span><span class="o">&lt;</span><span class="n">type_real</span><span class="o">&gt;</span><span class="w"> </span><span class="n">hprime_xx</span><span class="p">,</span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="n">View2d</span><span class="o">&lt;</span><span class="n">type_real</span><span class="o">&gt;</span><span class="w"> </span><span class="n">hprime_zz</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">View1d</span><span class="o">&lt;</span><span class="n">type_real</span><span class="o">&gt;</span><span class="w"> </span><span class="n">field_chi</span><span class="p">,</span>
+<span class="w">        </span><span class="n">type_real</span><span class="w"> </span><span class="o">*</span><span class="n">dchidxl</span><span class="p">,</span><span class="w"> </span><span class="n">type_real</span><span class="w"> </span><span class="o">*</span><span class="n">dchidzl</span><span class="p">){</span>
+
+
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">ix</span><span class="p">,</span><span class="w"> </span><span class="n">iz</span><span class="p">,</span><span class="w"> </span><span class="n">iglob</span><span class="p">;</span>
+<span class="w">        </span><span class="n">sub2ind</span><span class="p">(</span><span class="n">xz</span><span class="p">,</span><span class="w"> </span><span class="n">NGLL</span><span class="p">,</span><span class="w"> </span><span class="n">iz</span><span class="p">,</span><span class="w"> </span><span class="n">ix</span><span class="p">);</span>
+
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="n">type_real</span><span class="w"> </span><span class="n">xixl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">xix</span><span class="p">(</span><span class="n">ispec</span><span class="p">,</span><span class="w"> </span><span class="n">iz</span><span class="p">,</span><span class="w"> </span><span class="n">ix</span><span class="p">);</span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="n">type_real</span><span class="w"> </span><span class="n">gammaxl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">gammax</span><span class="p">(</span><span class="n">ispec</span><span class="p">,</span><span class="w"> </span><span class="n">iz</span><span class="p">,</span><span class="w"> </span><span class="n">ix</span><span class="p">);</span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="n">type_real</span><span class="w"> </span><span class="n">xizl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">xiz</span><span class="p">(</span><span class="n">ispec</span><span class="p">,</span><span class="w"> </span><span class="n">iz</span><span class="p">,</span><span class="w"> </span><span class="n">ix</span><span class="p">);</span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="n">type_real</span><span class="w"> </span><span class="n">gammazl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">gammaz</span><span class="p">(</span><span class="n">ispec</span><span class="p">,</span><span class="w"> </span><span class="n">iz</span><span class="p">,</span><span class="w"> </span><span class="n">ix</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">type_real</span><span class="w"> </span><span class="n">dchi_dxi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span>
+<span class="w">        </span><span class="n">type_real</span><span class="w"> </span><span class="n">dchi_dgamma</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span>
+
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">ngllx</span><span class="p">;</span><span class="w"> </span><span class="n">l</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">iglob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ibool</span><span class="p">(</span><span class="n">ispec</span><span class="p">,</span><span class="w"> </span><span class="n">iz</span><span class="p">,</span><span class="w"> </span><span class="n">l</span><span class="p">)</span>
+<span class="w">            </span><span class="n">dchi_dxi</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">hprime_xx</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span><span class="w"> </span><span class="n">l</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">field_chi</span><span class="p">(</span><span class="n">iglob</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">ngllz</span><span class="p">;</span><span class="w"> </span><span class="n">l</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">iglob</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">ibool</span><span class="p">(</span><span class="n">ispec</span><span class="p">,</span><span class="w"> </span><span class="n">l</span><span class="p">,</span><span class="w"> </span><span class="n">ix</span><span class="p">)</span>
+<span class="w">            </span><span class="n">dchi_dgamma</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">hprime_zz</span><span class="p">(</span><span class="n">iz</span><span class="p">,</span><span class="w"> </span><span class="n">l</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">field_chi</span><span class="p">(</span><span class="n">iglob</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="c1">// dchidx</span>
+<span class="w">        </span><span class="n">dchidxl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dchi_dxi</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">xixl</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dchi_dgamma</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">gammaxl</span><span class="p">;</span>
+
+<span class="w">        </span><span class="c1">// dchidz</span>
+<span class="w">        </span><span class="n">dchidzl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dchi_dxi</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">xizl</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dchi_dgamma</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">gammazl</span><span class="p">;</span>
+
+<span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>This implementation is not very efficient since it requires a lot of global memory accesses. In particular, if we look at the inner loop the accesses to <cite>hprime_xx</cite>, <cite>hprime_zz</cite> and <cite>field_chi</cite> are not coalesced. To improve the performance we can use shared memory to cache the values of <cite>hprime_xx</cite>, <cite>hprime_zz</cite> and <cite>field_chi</cite> for each element.</p>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="w"> </span><span class="nc">quadrature_points</span><span class="o">&gt;</span>
+<span class="kt">void</span><span class="w"> </span><span class="n">compute_acoustic_stiffness_interaction</span><span class="p">()</span><span class="w"> </span><span class="p">{</span>
+
+<span class="w">    </span><span class="c1">// allocate shared memory</span>
+<span class="w">    </span><span class="k">typedef</span><span class="w"> </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">DefaultExecutionSpace</span><span class="o">::</span><span class="n">scratch_memory_space</span><span class="w"> </span><span class="n">ScratchSpace</span><span class="p">;</span>
+<span class="w">    </span><span class="c1">// Define a view type in ScratchSpace</span>
+<span class="w">    </span><span class="k">typedef</span><span class="w"> </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">View</span><span class="o">&lt;</span><span class="n">type_real</span><span class="o">**</span><span class="p">,</span><span class="n">ScratchSpace</span><span class="p">,</span>
+<span class="w">                </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">MemoryTraits</span><span class="o">&lt;</span><span class="n">Kokkos</span><span class="o">::</span><span class="n">Unmanaged</span><span class="o">&gt;&gt;</span><span class="w"> </span><span class="n">scratch_view</span><span class="p">;</span>
+
+<span class="w">    </span><span class="c1">// allocate shared memory for hprime_xx, hprime_zz, and field_chi</span>
+<span class="w">    </span><span class="kt">size_t</span><span class="w"> </span><span class="n">scratch_size</span><span class="w"> </span><span class="o">=</span>
+<span class="w">                </span><span class="n">scratch_view</span><span class="o">::</span><span class="n">shmem_size</span><span class="p">(</span><span class="n">ngllx</span><span class="p">,</span><span class="w"> </span><span class="n">ngllx</span><span class="p">)</span><span class="w"> </span><span class="o">+</span>
+<span class="w">                </span><span class="n">scratch_view</span><span class="o">::</span><span class="n">shmem_size</span><span class="p">(</span><span class="n">ngllx</span><span class="p">,</span><span class="w"> </span><span class="n">ngllx</span><span class="p">)</span><span class="w"> </span><span class="o">+</span>
+<span class="w">                </span><span class="n">scratch_view</span><span class="o">::</span><span class="n">shmem_size</span><span class="p">(</span><span class="n">ngllz</span><span class="p">,</span><span class="w"> </span><span class="n">ngllx</span><span class="p">);</span>
+
+<span class="w">    </span><span class="kt">int</span><span class="w"> </span><span class="n">scratch_size</span><span class="w"> </span><span class="o">=</span>
+<span class="w">    </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">parallel_for</span><span class="p">(</span><span class="s">&quot;compute_acoustic_stiffness_interaction&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">TeamPolicy</span><span class="o">&lt;</span><span class="n">execution_space</span><span class="o">&gt;</span><span class="p">(</span><span class="n">nspec</span><span class="p">,</span><span class="w"> </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">AUTO</span><span class="p">),</span><span class="w"> </span><span class="n">KOKKOS_LAMBDA</span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">TeamPolicy</span><span class="o">&lt;</span><span class="n">execution_space</span><span class="o">&gt;::</span><span class="n">member_type</span><span class="o">&amp;</span><span class="w"> </span><span class="n">team</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">ispec</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">team</span><span class="p">.</span><span class="n">league_rank</span><span class="p">();</span>
+<span class="w">        </span><span class="c1">// allocate shared memory</span>
+<span class="w">        </span><span class="n">scratch_view</span><span class="w"> </span><span class="nf">s_hprime_xx</span><span class="p">(</span><span class="n">team</span><span class="p">.</span><span class="n">team_scratch</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span><span class="w"> </span><span class="n">ngllx</span><span class="p">,</span><span class="w"> </span><span class="n">ngllx</span><span class="p">);</span>
+<span class="w">        </span><span class="n">scratch_view</span><span class="w"> </span><span class="nf">s_hprime_zz</span><span class="p">(</span><span class="n">team</span><span class="p">.</span><span class="n">team_scratch</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span><span class="w"> </span><span class="n">ngllz</span><span class="p">,</span><span class="w"> </span><span class="n">ngllz</span><span class="p">);</span>
+<span class="w">        </span><span class="n">scratch_view</span><span class="w"> </span><span class="nf">s_field_chi</span><span class="p">(</span><span class="n">team</span><span class="p">.</span><span class="n">team_scratch</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span><span class="w"> </span><span class="n">ngllz</span><span class="p">,</span><span class="w"> </span><span class="n">ngllx</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// copy data to shared memory</span>
+<span class="w">        </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">parallel_for</span><span class="p">(</span><span class="n">Kokkos</span><span class="o">::</span><span class="n">TeamThreadRange</span><span class="p">(</span><span class="n">team</span><span class="p">,</span><span class="w"> </span><span class="n">ngllxx</span><span class="p">),</span><span class="w"> </span><span class="p">[</span><span class="o">=</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">&amp;</span><span class="n">xx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xx</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">ngllx</span><span class="p">;</span>
+<span class="w">            </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">xx</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">ngllx</span><span class="p">;</span>
+<span class="w">            </span><span class="n">s_hprime_xx</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hprime_xx</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">);</span>
+<span class="w">        </span><span class="p">});</span>
+
+<span class="w">        </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">parallel_for</span><span class="p">(</span><span class="n">Kokkos</span><span class="o">::</span><span class="n">TeamThreadRange</span><span class="p">(</span><span class="n">team</span><span class="p">,</span><span class="w"> </span><span class="n">ngllzz</span><span class="p">),</span><span class="w"> </span><span class="p">[</span><span class="o">=</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">&amp;</span><span class="n">xx</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">i</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zz</span><span class="w"> </span><span class="o">%</span><span class="w"> </span><span class="n">ngllz</span><span class="p">;</span>
+<span class="w">            </span><span class="n">j</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">zz</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">ngllz</span><span class="p">;</span>
+<span class="w">            </span><span class="n">s_hprime_zz</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">hprime_zz</span><span class="p">(</span><span class="n">i</span><span class="p">,</span><span class="w"> </span><span class="n">j</span><span class="p">);</span>
+<span class="w">        </span><span class="p">});</span>
+
+<span class="w">        </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">parallel_for</span><span class="p">(</span><span class="n">Kokkos</span><span class="o">::</span><span class="n">TeamThreadRange</span><span class="p">(</span><span class="n">team</span><span class="p">,</span><span class="w"> </span><span class="n">ngllxz</span><span class="p">)</span><span class="w"> </span><span class="p">[</span><span class="o">=</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">&amp;</span><span class="n">xz</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="kt">int</span><span class="w"> </span><span class="n">ix</span><span class="p">,</span><span class="w"> </span><span class="n">iz</span><span class="p">;</span>
+<span class="w">            </span><span class="n">sub2ind</span><span class="p">(</span><span class="n">xz</span><span class="p">,</span><span class="w"> </span><span class="n">ngllxz</span><span class="p">,</span><span class="w"> </span><span class="n">iz</span><span class="p">,</span><span class="w"> </span><span class="n">ix</span><span class="p">);</span>
+<span class="w">            </span><span class="n">s_field_chi</span><span class="p">(</span><span class="n">iz</span><span class="p">,</span><span class="w"> </span><span class="n">ix</span><span class="p">)</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">field_chi</span><span class="p">(</span><span class="n">ibool</span><span class="p">(</span><span class="n">ispec</span><span class="p">,</span><span class="w"> </span><span class="n">iz</span><span class="p">,</span><span class="w"> </span><span class="n">ix</span><span class="p">),</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="w">        </span><span class="p">});</span>
+
+<span class="w">        </span><span class="n">team</span><span class="p">.</span><span class="n">team_barrier</span><span class="p">();</span>
+
+<span class="w">        </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">parallel_for</span><span class="p">(</span><span class="n">Kokkos</span><span class="o">::</span><span class="n">TeamThreadRange</span><span class="p">(</span><span class="n">team</span><span class="p">,</span><span class="w"> </span><span class="n">dimension</span><span class="o">::</span><span class="n">get_num_qp</span><span class="p">()),</span><span class="w"> </span><span class="p">[</span><span class="o">=</span><span class="p">]</span><span class="w"> </span><span class="p">(</span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="o">&amp;</span><span class="w"> </span><span class="n">qp</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="k">auto</span><span class="w"> </span><span class="n">ix</span><span class="p">,</span><span class="w"> </span><span class="n">iz</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">sub2ind</span><span class="p">(</span><span class="n">qp</span><span class="p">);</span>
+
+<span class="w">            </span><span class="n">acoustic_element</span><span class="p">.</span><span class="n">compute_gradient</span><span class="p">(</span><span class="n">ispec</span><span class="p">,</span><span class="w"> </span><span class="n">qp</span><span class="p">,</span><span class="w"> </span><span class="n">s_hprime_xx</span><span class="p">,</span><span class="w"> </span><span class="n">s_hprime_zz</span><span class="p">,</span><span class="w"> </span><span class="n">s_field_chi</span><span class="p">,</span><span class="w"> </span><span class="n">dchidxl</span><span class="p">,</span><span class="w"> </span><span class="n">dchidzl</span><span class="p">);</span>
+<span class="w">            </span><span class="c1">// rest of the code</span>
+<span class="w">            </span><span class="p">...</span>
+<span class="w">        </span><span class="p">});</span>
+<span class="w">    </span><span class="p">});</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The description provided here serves as a good starting point for understanding the domain class. The actual implementation, while based on ideas presented here, is more complex and optimized for performance.</p>
+</div>
+</section>
+</section>
+<section id="specializing-elemental-implementations">
+<h2>Specializing elemental implementations<a class="headerlink" href="#specializing-elemental-implementations" title="Link to this heading"></a></h2>
+<p>Let us next consider the elemental implementation for computing stresses in 2D isotropic elastic element and 2D anisotropic elastic element.</p>
+<div class="math notranslate nohighlight">
+\[\bf{T(\bf{x} (\xi_{\alpha}, \eta_{beta}, \zeta_{\gamma}), t)} = \bf{c}(\bf{x} (\xi_{\alpha}, \eta_{\beta}, \zeta_{\gamma}), t) : \bf{e}(\bf{x} (\xi_{\alpha}, \eta_{\beta}, \zeta_{\gamma}), t)\]</div>
+<p>The elasticity tensor <span class="math notranslate nohighlight">\(C^{ijkl}\)</span> for anisotropic elements is a 4th order tensor with 21 independent components. However, for isotropic elements the tensor <span class="math notranslate nohighlight">\(\bf{c(x)}\)</span> is a diagonal with only 2 independent components given by:</p>
+<div class="math notranslate nohighlight">
+\[C^{ijkl} = \lambda \delta^{ij} \delta^{kl} + \mu \left( \delta^{ik} \delta^{jl} + \delta^{il} \delta^{jk} \right)\]</div>
+<p>Computationally, the number of accesses from global memory when computing the stresses for isotropic elements is an order or magnitude less than that for anisotropic elements (2 accesses vs 21 accesses). Thus it makes sense to specialize the elemental implementation for isotropic and anisotropic elements.</p>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="c1">// definition of element class</span>
+<span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="k">typename</span><span class="p">...</span><span class="w"> </span><span class="n">properties</span><span class="o">&gt;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">element</span><span class="p">{}</span>
+
+<span class="c1">// specialization for acoustic isotropic elements</span>
+<span class="k">template</span><span class="w"> </span><span class="o">&lt;&gt;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">element</span><span class="o">&lt;</span><span class="n">dim2</span><span class="p">,</span><span class="w"> </span><span class="n">acoustic</span><span class="p">,</span><span class="w"> </span><span class="n">isotropic</span><span class="o">&gt;</span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// implementation specific details</span>
+<span class="p">}</span>
+
+<span class="c1">// specialization for elastic isotropic elements</span>
+<span class="k">template</span><span class="w"> </span><span class="o">&lt;&gt;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">element</span><span class="o">&lt;</span><span class="n">dim2</span><span class="p">,</span><span class="w"> </span><span class="n">elastic</span><span class="p">,</span><span class="w"> </span><span class="n">isotropic</span><span class="o">&gt;</span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// implementation specific details</span>
+<span class="p">}</span>
+
+<span class="c1">// specialization for elastic anisotropic elements</span>
+<span class="k">template</span><span class="w"> </span><span class="o">&lt;&gt;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">element</span><span class="o">&lt;</span><span class="n">dim2</span><span class="p">,</span><span class="w"> </span><span class="n">elastic</span><span class="p">,</span><span class="w"> </span><span class="n">anisotropic</span><span class="o">&gt;</span><span class="p">{</span>
+<span class="w">    </span><span class="c1">// implementation specific details</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Using the above specialization we’ve provided a unified interface for acoustic and elastic elements where we can further specialize those elements based on domain/spectral element properties.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Specializing the elemental implementation for different types of elements is a powerful tool for performance optimization. However, it requires us to launch a different kernel for each type of element. This creates a bookkeeping overhead - where we need to make sure every element is accounted for exactly once. This bookkeeping and launch of the kernels is done by <code class="docutils literal notranslate"><span class="pre">specfem::domain::impl::kernels</span></code></p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The other solution to the above problem is to use a single kernel and use class inheritance and polymorphism to deduce elemental specialization at runtime. However, this approach is not very efficient since GPUs are very inefficient at resolving virtual function calls.</p>
+</div>
+</section>
+<section id="optimization-using-loop-unrolling">
+<h2>Optimization using loop unrolling<a class="headerlink" href="#optimization-using-loop-unrolling" title="Link to this heading"></a></h2>
+<p>From some profiling experiments we found that the most computationally intensive loop is the one used to compute gradients and evaluate integrals. The loops is shown below:</p>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="c1">// compute gradients</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">ngllx</span><span class="p">;</span><span class="w"> </span><span class="n">l</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">dchi_dxi</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">s_hprime_xx</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span><span class="w"> </span><span class="n">l</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">s_field_chi</span><span class="p">(</span><span class="n">l</span><span class="p">,</span><span class="w"> </span><span class="n">ix</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">ngllz</span><span class="p">;</span><span class="w"> </span><span class="n">l</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">dchi_dgamma</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">s_hprime_zz</span><span class="p">(</span><span class="n">iz</span><span class="p">,</span><span class="w"> </span><span class="n">l</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">s_field_chi</span><span class="p">(</span><span class="n">iz</span><span class="p">,</span><span class="w"> </span><span class="n">l</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="c1">// evaluate integrals</span>
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">ngllx</span><span class="p">;</span><span class="w"> </span><span class="n">l</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">temp1</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">s_hprimewgll_xx</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span><span class="w"> </span><span class="n">l</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">stress_integrand_xx</span><span class="p">(</span><span class="n">l</span><span class="p">,</span><span class="w"> </span><span class="n">iz</span><span class="p">);</span>
+<span class="p">}</span>
+
+<span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">ngllz</span><span class="p">;</span><span class="w"> </span><span class="n">l</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">temp2</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">s_hprimewgll_zz</span><span class="p">(</span><span class="n">iz</span><span class="p">,</span><span class="w"> </span><span class="n">l</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">stress_integrand_zz</span><span class="p">(</span><span class="n">l</span><span class="p">,</span><span class="w"> </span><span class="n">ix</span><span class="p">);</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>The above loops are not very efficient, especially on the GPU, since there are large number of memory accesses for each iteration. In many applications where SPECFEM++ is used, the number of GLL points is fixed - in most cases 4th order GLL quadrature (NGLL = 5) or 7th order GLL quadrature (NGLL = 8). Thus we can specialize the above methods for those NGLL values and unroll the loops.</p>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="k">template</span><span class="w"> </span><span class="o">&lt;</span><span class="kt">int</span><span class="w"> </span><span class="n">NGLL</span><span class="o">&gt;</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">element</span><span class="o">&lt;</span>
+<span class="w">        </span><span class="n">dim2</span><span class="p">,</span><span class="w"> </span><span class="n">acoustic</span><span class="p">,</span>
+<span class="w">        </span><span class="n">static_quadrature_points</span><span class="o">&lt;</span><span class="n">NGLL</span><span class="o">&gt;</span><span class="p">,</span>
+<span class="w">        </span><span class="n">isotropic</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="kt">void</span><span class="w"> </span><span class="nf">compute_gradient</span><span class="p">(</span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ispec</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="o">&amp;</span><span class="n">xz</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">ScratchView2d</span><span class="o">&lt;</span><span class="n">type_real</span><span class="o">&gt;</span><span class="w"> </span><span class="n">hprime_xx</span><span class="p">,</span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="n">ScratchView2d</span><span class="o">&lt;</span><span class="n">type_real</span><span class="o">&gt;</span><span class="w"> </span><span class="n">hprime_zz</span><span class="p">,</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">ScratchView2d</span><span class="o">&lt;</span><span class="n">type_real</span><span class="o">&gt;</span><span class="w"> </span><span class="n">field_chi</span><span class="p">,</span>
+<span class="w">        </span><span class="n">type_real</span><span class="w"> </span><span class="o">*</span><span class="n">dchidxl</span><span class="p">,</span><span class="w"> </span><span class="n">type_real</span><span class="w"> </span><span class="o">*</span><span class="n">dchidzl</span><span class="p">){</span>
+
+
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">ix</span><span class="p">,</span><span class="w"> </span><span class="n">iz</span><span class="p">,</span><span class="w"> </span><span class="n">iglob</span><span class="p">;</span>
+<span class="w">        </span><span class="n">sub2ind</span><span class="p">(</span><span class="n">xz</span><span class="p">,</span><span class="w"> </span><span class="n">NGLL</span><span class="p">,</span><span class="w"> </span><span class="n">iz</span><span class="p">,</span><span class="w"> </span><span class="n">ix</span><span class="p">);</span>
+
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="n">type_real</span><span class="w"> </span><span class="n">xixl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">xix</span><span class="p">(</span><span class="n">ispec</span><span class="p">,</span><span class="w"> </span><span class="n">iz</span><span class="p">,</span><span class="w"> </span><span class="n">ix</span><span class="p">);</span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="n">type_real</span><span class="w"> </span><span class="n">gammaxl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">gammax</span><span class="p">(</span><span class="n">ispec</span><span class="p">,</span><span class="w"> </span><span class="n">iz</span><span class="p">,</span><span class="w"> </span><span class="n">ix</span><span class="p">);</span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="n">type_real</span><span class="w"> </span><span class="n">xizl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">xiz</span><span class="p">(</span><span class="n">ispec</span><span class="p">,</span><span class="w"> </span><span class="n">iz</span><span class="p">,</span><span class="w"> </span><span class="n">ix</span><span class="p">);</span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="n">type_real</span><span class="w"> </span><span class="n">gammazl</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">gammaz</span><span class="p">(</span><span class="n">ispec</span><span class="p">,</span><span class="w"> </span><span class="n">iz</span><span class="p">,</span><span class="w"> </span><span class="n">ix</span><span class="p">);</span>
+
+<span class="w">        </span><span class="n">type_real</span><span class="w"> </span><span class="n">dchi_dxi</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span>
+<span class="w">        </span><span class="n">type_real</span><span class="w"> </span><span class="n">dchi_dgamma</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mf">0.0</span><span class="p">;</span>
+
+<span class="cp">#ifdef KOKKOS_ENABLE_CUDA</span>
+<span class="cp">#pragma unroll</span>
+<span class="cp">#endif</span>
+<span class="w">        </span><span class="k">for</span><span class="w"> </span><span class="p">(</span><span class="kt">int</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="mi">0</span><span class="p">;</span><span class="w"> </span><span class="n">l</span><span class="w"> </span><span class="o">&lt;</span><span class="w"> </span><span class="n">NGLL</span><span class="p">;</span><span class="w"> </span><span class="n">l</span><span class="o">++</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">            </span><span class="n">dchi_dxi</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">s_hprime_xx</span><span class="p">(</span><span class="n">ix</span><span class="p">,</span><span class="w"> </span><span class="n">l</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">field_chi</span><span class="p">(</span><span class="n">iz</span><span class="p">,</span><span class="w"> </span><span class="n">l</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="w">            </span><span class="n">dchi_dgamma</span><span class="w"> </span><span class="o">+=</span><span class="w"> </span><span class="n">s_hprime_zz</span><span class="p">(</span><span class="n">iz</span><span class="p">,</span><span class="w"> </span><span class="n">l</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">)</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">field_chi</span><span class="p">(</span><span class="n">l</span><span class="p">,</span><span class="w"> </span><span class="n">ix</span><span class="p">,</span><span class="w"> </span><span class="mi">0</span><span class="p">);</span>
+<span class="w">        </span><span class="p">}</span>
+
+<span class="w">        </span><span class="c1">// dchidx</span>
+<span class="w">        </span><span class="n">dchidxl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dchi_dxi</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">xixl</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dchi_dgamma</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">gammaxl</span><span class="p">;</span>
+
+<span class="w">        </span><span class="c1">// dchidz</span>
+<span class="w">        </span><span class="n">dchidzl</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">dchi_dxi</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">xizl</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">dchi_dgamma</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">gammazl</span><span class="p">;</span>
+
+<span class="w">        </span><span class="k">return</span><span class="p">;</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="p">};</span>
+</pre></div>
+</div>
+<p>The speedup from the above optimization is significant. For example, for 4th order GLL quadrature the speedup is ~ 4x on NVIDIA A100 GPU.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The key thing to note here is we need to define NGLL at compile time. As stated earlier, in many applications the NGLL = 5 or 8 so we can specialize the above method for those values in our implementation of the solver. However, to support cases when NGLL is not either of those values we have a general, <em>much slower</em>, implementation of the above method. So the performance of SPECFEM++, by design, is dependent on the NGLL value.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The generalized implementation is not included in this release. It will be added soon as a patch release.</p>
+</div>
+</section>
+<section id="understanding-the-coupled-interface">
+<h2>Understanding the coupled interface<a class="headerlink" href="#understanding-the-coupled-interface" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">specfem::coupled_interfaces::coupled_interface</span></code> is a templated C++ class that lets us define coupling physics between two types of domains. Similar to <code class="docutils literal notranslate"><span class="pre">specfem::domain::domain</span></code> class the <code class="docutils literal notranslate"><span class="pre">specfem::coupled_interfaces::coupled_interface</span></code> class serves as parallelism framework to implement the coupling physics defined inside <code class="docutils literal notranslate"><span class="pre">specfem::coupled_interface::impl::edge</span></code> class.</p>
+<p>Let us now look at the mathematical formulation for the coupling physics on the coupling interface (<span class="math notranslate nohighlight">\(\Gamma\)</span>) between elastic and acoustic domains as described on the elastic side by <a class="reference external" href="https://doi.org/10.1046/j.1365-246X.2002.01653.x">Komatitsch and Tromp, 2002</a>:</p>
+<div class="math notranslate nohighlight">
+\[\int_{\Gamma} p \hat{n} \cdot w d\Gamma = \sum_b \int_{\Gamma_b} p \hat{n} \cdot w d\Gamma_b \approx \sum_b \sum_{\alpha, \beta = 0}^{n_{\alpha}, n_{\beta}} \omega_{\alpha} \omega_{\beta} J_b^{\alpha \beta} \dot{\chi}(t) \sum_{i = 1}^{3} w_i^{\alpha \beta} \hat{n}_i^{\alpha \beta}\]</div>
+<p>Again, similar to a methodology described in section <a class="reference internal" href="#understanding-the-parallelism">Understanding the parallelism</a> we can describe the the outer summation over all edges using Kokkos teams and the inner summation over all quadrature points using Kokkos thread teams. This ensures that we avoid warp divergence on GPUs and potentially benefit from vectorization on CPUs.</p>
+<div class="highlight-C++ notranslate"><div class="highlight"><pre><span></span><span class="kt">void</span><span class="w"> </span><span class="nf">compute_coupling</span><span class="p">(){</span>
+<span class="w">    </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">parallel_for</span><span class="p">(</span>
+<span class="w">        </span><span class="s">&quot;specfem::coupled_interfaces::coupled_interfaces::compute_coupling&quot;</span><span class="p">,</span>
+<span class="w">        </span><span class="n">specfem</span><span class="o">::</span><span class="n">kokkos</span><span class="o">::</span><span class="n">DeviceTeam</span><span class="p">(</span><span class="k">this</span><span class="o">-&gt;</span><span class="n">nedges</span><span class="p">,</span><span class="w"> </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">AUTO</span><span class="p">,</span><span class="w"> </span><span class="mi">1</span><span class="p">),</span>
+<span class="w">        </span><span class="n">KOKKOS_CLASS_LAMBDA</span><span class="p">(</span>
+<span class="w">            </span><span class="k">const</span><span class="w"> </span><span class="n">specfem</span><span class="o">::</span><span class="n">kokkos</span><span class="o">::</span><span class="n">DeviceTeam</span><span class="o">::</span><span class="n">member_type</span><span class="w"> </span><span class="o">&amp;</span><span class="n">team_member</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="c1">// Get number of quadrature points</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">ngllx</span><span class="p">,</span><span class="w"> </span><span class="n">ngllz</span><span class="p">;</span>
+<span class="w">        </span><span class="n">quadrature_points</span><span class="p">.</span><span class="n">get_ngll</span><span class="p">(</span><span class="o">&amp;</span><span class="n">ngllx</span><span class="p">,</span><span class="w"> </span><span class="o">&amp;</span><span class="n">ngllz</span><span class="p">);</span>
+<span class="w">        </span><span class="kt">int</span><span class="w"> </span><span class="n">iedge_l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">team_member</span><span class="p">.</span><span class="n">league_rank</span><span class="p">();</span>
+<span class="w">        </span><span class="c1">// Get the edge</span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">self_edge_l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">self_edge</span><span class="p">(</span><span class="n">iedge_l</span><span class="p">);</span>
+<span class="w">        </span><span class="k">const</span><span class="w"> </span><span class="k">auto</span><span class="w"> </span><span class="n">coupled_edge_l</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="k">this</span><span class="o">-&gt;</span><span class="n">coupled_edge</span><span class="p">(</span><span class="n">iedge_l</span><span class="p">);</span>
+
+<span class="w">        </span><span class="k">auto</span><span class="w"> </span><span class="n">npoints</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">specfem</span><span class="o">::</span><span class="n">compute</span><span class="o">::</span><span class="n">coupled_interfaces</span><span class="o">::</span><span class="n">iterator</span><span class="o">::</span><span class="n">npoints</span><span class="p">(</span>
+<span class="w">            </span><span class="n">self_edge_l</span><span class="p">,</span><span class="w"> </span><span class="n">ngllx</span><span class="p">,</span><span class="w"> </span><span class="n">ngllz</span><span class="p">);</span>
+
+<span class="w">        </span><span class="c1">// Iterate over the edges using TeamThreadRange</span>
+<span class="w">        </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">parallel_for</span><span class="p">(</span>
+<span class="w">            </span><span class="n">Kokkos</span><span class="o">::</span><span class="n">TeamThreadRange</span><span class="p">(</span><span class="n">team_member</span><span class="p">,</span><span class="w"> </span><span class="n">npoints</span><span class="p">),</span>
+<span class="w">                </span><span class="p">[</span><span class="o">=</span><span class="p">](</span><span class="k">const</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">ipoint</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="n">edge</span><span class="p">.</span><span class="n">compute_coupling</span><span class="p">(</span><span class="n">iedge_l</span><span class="p">,</span><span class="w"> </span><span class="n">ipoint</span><span class="p">);</span><span class="w"> </span><span class="p">});</span>
+<span class="w">    </span><span class="p">});</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="compute.html" class="btn btn-neutral float-left" title="Compute namespace developer guide" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../../benchmarks/benchmarks.html" class="btn btn-neutral float-right" title="Performance Benchmarks" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Rohit Kakodkar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

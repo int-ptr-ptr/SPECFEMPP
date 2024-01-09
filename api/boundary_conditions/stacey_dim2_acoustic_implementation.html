@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>&lt;no title&gt; &mdash; SPECFEM++  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/scrollable_code_blocks.css?v=ebc906c5" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/center_align_table.css?v=f0548739" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            SPECFEM++
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">USER DOCUMENTATION</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user_documentation/index.html">User documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meshfem2d/index.html">MESHFEM Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parameter_documentation/index.html">SPECFEM++ Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source_description/index.html">Source Description</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COOKBOOKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cookbooks/index.html">Cookbooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">CONTRIBUTION GUIDELINES</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_documentation/index.html">Developer documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COMMUNITY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=bug_report.md&amp;title=">Report bugs</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=feature_request.md&amp;title=">Request a new feature</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/orgs/SPECFEM/discussions">Join the discussion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">BENCHMARKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../benchmarks/benchmarks.html">Performance Benchmarks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API DOCUMENTATION</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../index.html">API documentation</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">SPECFEM++</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">&lt;no title&gt;</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/boundary_conditions/stacey_dim2_acoustic_implementation.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4I00EN7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeEE">
+<span id="_CPPv3I00EN7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeEE"></span><span id="_CPPv2I00EN7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">property</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">qp_type</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1stacey_3_01specfem_1_1enums_1_1element_1_1dimenf6e79381bfa63a98ed7bed442a5ffd06"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">stacey</span></span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enums</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">element</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">dimension</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../enumerations/element/dim2.html#_CPPv4N7specfem5enums7element9dimension4dim2E" title="specfem::enums::element::dimension::dim2"><span class="n"><span class="pre">dim2</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enums</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">element</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">medium</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../enumerations/element/acoustic.html#_CPPv4N7specfem5enums7element6medium8acousticE" title="specfem::enums::element::medium::acoustic"><span class="n"><span class="pre">acoustic</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00EN7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeEE" title="specfem::enums::boundary_conditions::stacey&lt;specfem::enums::element::dimension::dim2, specfem::enums::element::medium::acoustic, property, qp_type&gt;::property"><span class="n"><span class="pre">property</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00EN7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeEE" title="specfem::enums::boundary_conditions::stacey&lt;specfem::enums::element::dimension::dim2, specfem::enums::element::medium::acoustic, property, qp_type&gt;::qp_type"><span class="n"><span class="pre">qp_type</span></span></a><span class="p"><span class="pre">&gt;</span></span><a class="headerlink" href="#_CPPv4I00EN7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Stacey boundary conditions for 2D acoustic elements. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>property</strong> – property type for the boundary condition (iso/anisotropic) </p></li>
+<li><p><strong>qp_type</strong> – Quadrature points type for the boundary condition (compile/run time) </p></li>
+</ul>
+</dd>
+</dl>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-typedefs">Typedefs</p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE11medium_typeE">
+<span id="_CPPv3N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE11medium_typeE"></span><span id="_CPPv2N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE11medium_typeE"></span><span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1stacey_3_01specfem_1_1enums_1_1element_1_1dimenf6e79381bfa63a98ed7bed442a5ffd06_1a0817d1d43267b48062e08b8a306112de"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">medium_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enums</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">element</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">medium</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../enumerations/element/acoustic.html#_CPPv4N7specfem5enums7element6medium8acousticE" title="specfem::enums::element::medium::acoustic"><span class="n"><span class="pre">acoustic</span></span></a><a class="headerlink" href="#_CPPv4N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE11medium_typeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Medium type of the boundary. </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE9dimensionE">
+<span id="_CPPv3N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE9dimensionE"></span><span id="_CPPv2N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE9dimensionE"></span><span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1stacey_3_01specfem_1_1enums_1_1element_1_1dimenf6e79381bfa63a98ed7bed442a5ffd06_1a153c006e1597c170662ea06c2a940642"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dimension</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enums</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">element</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">dimension</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../enumerations/element/dim2.html#_CPPv4N7specfem5enums7element9dimension4dim2E" title="specfem::enums::element::dimension::dim2"><span class="n"><span class="pre">dim2</span></span></a><a class="headerlink" href="#_CPPv4N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE9dimensionE" title="Link to this definition"></a><br /></dt>
+<dd><p>Dimension of the boundary. </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE22quadrature_points_typeE">
+<span id="_CPPv3N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE22quadrature_points_typeE"></span><span id="_CPPv2N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE22quadrature_points_typeE"></span><span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1stacey_3_01specfem_1_1enums_1_1element_1_1dimenf6e79381bfa63a98ed7bed442a5ffd06_1a6cc8bcca2c100676d10c423f68faf5fc"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">quadrature_points_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00EN7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeEE" title="specfem::enums::boundary_conditions::stacey&lt;specfem::enums::element::dimension::dim2, specfem::enums::element::medium::acoustic, property, qp_type&gt;::qp_type"><span class="n"><span class="pre">qp_type</span></span></a><a class="headerlink" href="#_CPPv4N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE22quadrature_points_typeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Quadrature points object to define the quadrature points either at compile time or run time. </p>
+</dd></dl>
+
+<dl class="cpp type">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE13property_typeE">
+<span id="_CPPv3N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE13property_typeE"></span><span id="_CPPv2N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE13property_typeE"></span><span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1stacey_3_01specfem_1_1enums_1_1element_1_1dimenf6e79381bfa63a98ed7bed442a5ffd06_1a47f1f97ce6204177ce4b1f5c6c4417cc"></span><span class="k"><span class="pre">using</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">property_type</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00EN7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeEE" title="specfem::enums::boundary_conditions::stacey&lt;specfem::enums::element::dimension::dim2, specfem::enums::element::medium::acoustic, property, qp_type&gt;::property"><span class="n"><span class="pre">property</span></span></a><a class="headerlink" href="#_CPPv4N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE13property_typeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Property type of the boundary. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE6staceyEv">
+<span id="_CPPv3N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE6staceyEv"></span><span id="_CPPv2N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE6staceyEv"></span><span id="specfem::enums::boundary_conditions::stacey:specfem::enums::element::dimension::dim2.specfem::enums::element::medium::acoustic.property.qp_type:::stacey"></span><span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1stacey_3_01specfem_1_1enums_1_1element_1_1dimenf6e79381bfa63a98ed7bed442a5ffd06_1a1f26068e5de35fd685e8dc689081c650"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">stacey</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE6staceyEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct a new stacey object. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE6staceyERK22quadrature_points_typeRKN7specfem6kokkos12DeviceView1dIN7specfem7compute6access14boundary_typesEEE">
+<span id="_CPPv3N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE6staceyERK22quadrature_points_typeRKN7specfem6kokkos12DeviceView1dIN7specfem7compute6access14boundary_typesEEE"></span><span id="_CPPv2N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE6staceyERK22quadrature_points_typeRKN7specfem6kokkos12DeviceView1dIN7specfem7compute6access14boundary_typesEEE"></span><span id="specfem::enums::boundary_conditions::stacey:specfem::enums::element::dimension::dim2.specfem::enums::element::medium::acoustic.property.qp_type:::stacey__quadrature_points_typeCR.specfem::kokkos::DeviceView1d:specfem::compute::access::boundary_types:CR"></span><span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1stacey_3_01specfem_1_1enums_1_1element_1_1dimenf6e79381bfa63a98ed7bed442a5ffd06_1a6e5ebb04cbf03226d146ee881b9a2895"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">stacey</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE22quadrature_points_typeE" title="specfem::enums::boundary_conditions::stacey&lt;specfem::enums::element::dimension::dim2, specfem::enums::element::medium::acoustic, property, qp_type&gt;::quadrature_points_type"><span class="n"><span class="pre">quadrature_points_type</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">quadrature_points</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12DeviceView1dE" title="specfem::kokkos::DeviceView1d"><span class="n"><span class="pre">DeviceView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv4N7specfem7computeE" title="specfem::compute"><span class="n"><span class="pre">compute</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">access</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">boundary_types</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">type</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE6staceyERK22quadrature_points_typeRKN7specfem6kokkos12DeviceView1dIN7specfem7compute6access14boundary_typesEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct a new stacey object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>quadrature_points</strong> – Quadrature points object </p></li>
+<li><p><strong>type</strong> – type of the edge on an element on the boundary (top, bottom, left, right etc.) </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE6staceyERKN7specfem7compute10boundariesERK22quadrature_points_type">
+<span id="_CPPv3N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE6staceyERKN7specfem7compute10boundariesERK22quadrature_points_type"></span><span id="_CPPv2N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE6staceyERKN7specfem7compute10boundariesERK22quadrature_points_type"></span><span id="specfem::enums::boundary_conditions::stacey:specfem::enums::element::dimension::dim2.specfem::enums::element::medium::acoustic.property.qp_type:::stacey__specfem::compute::boundariesCR.quadrature_points_typeCR"></span><span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1stacey_3_01specfem_1_1enums_1_1element_1_1dimenf6e79381bfa63a98ed7bed442a5ffd06_1a957ffc750f927a1a2de9fba5fecba746"></span><span class="sig-name descname"><span class="n"><span class="pre">stacey</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv4N7specfem7computeE" title="specfem::compute"><span class="n"><span class="pre">compute</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">boundaries</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">boundary_conditions</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE22quadrature_points_typeE" title="specfem::enums::boundary_conditions::stacey&lt;specfem::enums::element::dimension::dim2, specfem::enums::element::medium::acoustic, property, qp_type&gt;::quadrature_points_type"><span class="n"><span class="pre">quadrature_points_type</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">quadrature_points</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE6staceyERKN7specfem7compute10boundariesERK22quadrature_points_type" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct a new stacey object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>boundary_conditions</strong> – boundary conditions object specifying the boundary conditions for the mesh </p></li>
+<li><p><strong>quadrature_points</strong> – Quadrature points object </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1stacey_3_01specfem_1_1enums_1_1element_1_1dimenf6e79381bfa63a98ed7bed442a5ffd06_1a3bc91ce64a9e2b225b05a64b223f6a7e"></span><span class="sig-name descname"><span class="pre">template&lt;specfem::enums::time_scheme::type</span> <span class="pre">time_scheme&gt;</span> <span class="pre">KOKKOS_INLINE_FUNCTION</span> <span class="pre">void</span> <span class="pre">mass_time_contribution</span> <span class="pre">(const</span> <span class="pre">int</span> <span class="pre">&amp;ielement,</span> <span class="pre">const</span> <span class="pre">int</span> <span class="pre">&amp;xz,</span> <span class="pre">const</span> <span class="pre">type_real</span> <span class="pre">&amp;dt,</span> <span class="pre">const</span> <span class="pre">specfem::kokkos::array_type&lt;</span> <span class="pre">type_real,</span> <span class="pre">dimension::dim</span> <span class="pre">&gt;</span> <span class="pre">&amp;weight,</span> <span class="pre">const</span> <span class="pre">specfem::compute::element_partial_derivatives</span> <span class="pre">&amp;partial_derivatives,</span> <span class="pre">const</span> <span class="pre">specfem::compute::element_properties&lt;</span> <span class="pre">medium_type::value,</span> <span class="pre">property_type::value</span> <span class="pre">&gt;</span> <span class="pre">&amp;properties,</span> <span class="pre">specfem::kokkos::array_type&lt;</span> <span class="pre">type_real,</span> <span class="pre">medium_type::components</span> <span class="pre">&gt;</span> <span class="pre">&amp;mass_matrix)</span> <span class="pre">const</span></span></dt>
+<dd><p>Compute the mass time contribution for the boundary condition. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Template Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>time_scheme</strong> – Time scheme to use when computing the mass time contribution </p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>ielement</strong> – index of the element </p></li>
+<li><p><strong>xz</strong> – index of the quadrature point </p></li>
+<li><p><strong>dt</strong> – time step </p></li>
+<li><p><strong>weight</strong> – weights(x,z) for the quadrature point </p></li>
+<li><p><strong>partial_derivatives</strong> – partial derivatives of the shape functions </p></li>
+<li><p><strong>properties</strong> – properties of the element at the quadrature point </p></li>
+<li><p><strong>mass_matrix</strong> – mass matrix to update </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1stacey_3_01specfem_1_1enums_1_1element_1_1dimenf6e79381bfa63a98ed7bed442a5ffd06_1aa57c5e0e045e3558070f3c6617b413eb"></span><span class="sig-name descname"><span class="pre">inline</span> <span class="pre">KOKKOS_INLINE_FUNCTION</span> <span class="pre">void</span> <span class="pre">enforce_gradient</span> <span class="pre">(const</span> <span class="pre">int</span> <span class="pre">&amp;ielement,</span> <span class="pre">const</span> <span class="pre">int</span> <span class="pre">&amp;xz,</span> <span class="pre">const</span> <span class="pre">specfem::compute::element_partial_derivatives</span> <span class="pre">&amp;partial_derivatives,</span> <span class="pre">specfem::kokkos::array_type&lt;</span> <span class="pre">type_real,</span> <span class="pre">medium_type::components</span> <span class="pre">&gt;</span> <span class="pre">&amp;df_dx,</span> <span class="pre">specfem::kokkos::array_type&lt;</span> <span class="pre">type_real,</span> <span class="pre">medium_type::components</span> <span class="pre">&gt;</span> <span class="pre">&amp;df_dz)</span> <span class="pre">const</span></span></dt>
+<dd><p>Compute the contribuition of BC to the gradient term. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ielement</strong> – index of the element </p></li>
+<li><p><strong>xz</strong> – index of the quadrature point </p></li>
+<li><p><strong>partial_derivatives</strong> – spacial derivatives at the quadrature point </p></li>
+<li><p><strong>df_dx</strong> – Gradient of field in x-direction to update </p></li>
+<li><p><strong>df_dz</strong> – Gradient of field in z-direction to update </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1stacey_3_01specfem_1_1enums_1_1element_1_1dimenf6e79381bfa63a98ed7bed442a5ffd06_1ab02fb5e74aca0065bf836e827d2f65c2"></span><span class="sig-name descname"><span class="pre">inline</span> <span class="pre">KOKKOS_INLINE_FUNCTION</span> <span class="pre">void</span> <span class="pre">enforce_stress</span> <span class="pre">(const</span> <span class="pre">int</span> <span class="pre">&amp;ielement,</span> <span class="pre">const</span> <span class="pre">int</span> <span class="pre">&amp;xz,</span> <span class="pre">const</span> <span class="pre">specfem::compute::element_partial_derivatives</span> <span class="pre">&amp;partial_derivatives,</span> <span class="pre">const</span> <span class="pre">specfem::compute::element_properties&lt;</span> <span class="pre">medium_type::value,</span> <span class="pre">property_type::value</span> <span class="pre">&gt;</span> <span class="pre">&amp;properties,</span> <span class="pre">specfem::kokkos::array_type&lt;</span> <span class="pre">type_real,</span> <span class="pre">medium_type::components</span> <span class="pre">&gt;</span> <span class="pre">&amp;stress_integrand_xi,</span> <span class="pre">specfem::kokkos::array_type&lt;</span> <span class="pre">type_real,</span> <span class="pre">medium_type::components</span> <span class="pre">&gt;</span> <span class="pre">&amp;stress_integrand_xgamma)</span> <span class="pre">const</span></span></dt>
+<dd><p>Compute the contribution of BC to the stress term. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ielement</strong> – index of the element </p></li>
+<li><p><strong>xz</strong> – index of the quadrature point </p></li>
+<li><p><strong>partial_derivatives</strong> – spacial derivatives at the quadrature point </p></li>
+<li><p><strong>properties</strong> – properties of the element at the quadrature point </p></li>
+<li><p><strong>stress_integrand_xi</strong> – /f$ \sigma_{\xi} /f$ to update </p></li>
+<li><p><strong>stress_integrand_xgamma</strong> – /f$ \sigma_{\gamma} /f$ to update </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>KOKKOS_INLINE_FUNCTION </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp">
+<span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1stacey_3_01specfem_1_1enums_1_1element_1_1dimenf6e79381bfa63a98ed7bed442a5ffd06_1a42e45de1f1a63643002b69b290d07e0d"></span><span class="sig-name descname"><span class="pre">KOKKOS_INLINE_FUNCTION</span> <span class="pre">void</span> <span class="pre">enforce_traction</span> <span class="pre">(const</span> <span class="pre">int</span> <span class="pre">&amp;ielement,</span> <span class="pre">const</span> <span class="pre">int</span> <span class="pre">&amp;xz,</span> <span class="pre">const</span> <span class="pre">specfem::kokkos::array_type&lt;</span> <span class="pre">type_real,</span> <span class="pre">dimension::dim</span> <span class="pre">&gt;</span> <span class="pre">&amp;weight,</span> <span class="pre">const</span> <span class="pre">specfem::compute::element_partial_derivatives</span> <span class="pre">&amp;partial_derivatives,</span> <span class="pre">const</span> <span class="pre">specfem::compute::element_properties&lt;</span> <span class="pre">medium_type::value,</span> <span class="pre">property_type::value</span> <span class="pre">&gt;</span> <span class="pre">&amp;properties,</span> <span class="pre">const</span> <span class="pre">specfem::kokkos::array_type&lt;</span> <span class="pre">type_real,</span> <span class="pre">medium_type::components</span> <span class="pre">&gt;</span> <span class="pre">&amp;velocity,</span> <span class="pre">specfem::kokkos::array_type&lt;</span> <span class="pre">type_real,</span> <span class="pre">medium_type::components</span> <span class="pre">&gt;</span> <span class="pre">&amp;accelation)</span> <span class="pre">const</span></span></dt>
+<dd><p>Compute the contribution of BC to the traction term. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ielement</strong> – index of the element </p></li>
+<li><p><strong>xz</strong> – index of the quadrature point </p></li>
+<li><p><strong>weight</strong> – weights(x,z) for the quadrature point </p></li>
+<li><p><strong>partial_derivatives</strong> – partial derivatives of the shape functions </p></li>
+<li><p><strong>properties</strong> – properties of the element at the quadrature point </p></li>
+<li><p><strong>velocity</strong> – first derivative of the field computed from previous time step </p></li>
+<li><p><strong>accelation</strong> – second derivative of the field to update </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>KOKKOS_INLINE_FUNCTION </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-functions">Public Static Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE9to_stringEv">
+<span id="_CPPv3N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE9to_stringEv"></span><span id="_CPPv2N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE9to_stringEv"></span><span id="specfem::enums::boundary_conditions::stacey:specfem::enums::element::dimension::dim2.specfem::enums::element::medium::acoustic.property.qp_type:::to_string"></span><span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1stacey_3_01specfem_1_1enums_1_1element_1_1dimenf6e79381bfa63a98ed7bed442a5ffd06_1ae44d0eabe7d91b1542385778a7252437"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">to_string</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE9to_stringEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Convert Stacey BC to string. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>std::string String representation of the boundary condition </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-static-attributes">Public Static Attributes</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE5valueE">
+<span id="_CPPv3N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE5valueE"></span><span id="_CPPv2N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE5valueE"></span><span id="specfem::enums::boundary_conditions::stacey:specfem::enums::element::dimension::dim2.specfem::enums::element::medium::acoustic.property.qp_type:::value__specfem::enums::element::boundary_tag"></span><span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1stacey_3_01specfem_1_1enums_1_1element_1_1dimenf6e79381bfa63a98ed7bed442a5ffd06_1a9093cfd59fc59e0875b485765d046345"></span><span class="k"><span class="pre">static</span></span><span class="w"> </span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enums</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">element</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../enumerations/element/element_enumeration.html#_CPPv4N7specfem5enums7element12boundary_tagE" title="specfem::enums::element::boundary_tag"><span class="n"><span class="pre">boundary_tag</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">value</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enums</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">element</span></span><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../enumerations/element/element_enumeration.html#_CPPv4N7specfem5enums7element12boundary_tagE" title="specfem::enums::element::boundary_tag"><span class="n"><span class="pre">boundary_tag</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../enumerations/element/element_enumeration.html#_CPPv4N7specfem5enums7element12boundary_tag6staceyE" title="specfem::enums::element::boundary_tag::stacey"><span class="n"><span class="pre">stacey</span></span></a><a class="headerlink" href="#_CPPv4N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE5valueE" title="Link to this definition"></a><br /></dt>
+<dd><p>boundary tag </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE17quadrature_pointsE">
+<span id="_CPPv3N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE17quadrature_pointsE"></span><span id="_CPPv2N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE17quadrature_pointsE"></span><span id="specfem::enums::boundary_conditions::stacey:specfem::enums::element::dimension::dim2.specfem::enums::element::medium::acoustic.property.qp_type:::quadrature_points__quadrature_points_type"></span><span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1stacey_3_01specfem_1_1enums_1_1element_1_1dimenf6e79381bfa63a98ed7bed442a5ffd06_1abce5e276dc054571e42e2fcece0af8d7"></span><a class="reference internal" href="#_CPPv4N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE22quadrature_points_typeE" title="specfem::enums::boundary_conditions::stacey&lt;specfem::enums::element::dimension::dim2, specfem::enums::element::medium::acoustic, property, qp_type&gt;::quadrature_points_type"><span class="n"><span class="pre">quadrature_points_type</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">quadrature_points</span></span></span><a class="headerlink" href="#_CPPv4N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE17quadrature_pointsE" title="Link to this definition"></a><br /></dt>
+<dd><p>Quadrature points object. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE4typeE">
+<span id="_CPPv3N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE4typeE"></span><span id="_CPPv2N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE4typeE"></span><span id="specfem::enums::boundary_conditions::stacey:specfem::enums::element::dimension::dim2.specfem::enums::element::medium::acoustic.property.qp_type:::type__specfem::kokkos::DeviceView1d:specfem::compute::access::boundary_types:"></span><span class="target" id="classspecfem_1_1enums_1_1boundary__conditions_1_1stacey_3_01specfem_1_1enums_1_1element_1_1dimenf6e79381bfa63a98ed7bed442a5ffd06_1a006b3e67bca0a664216728836cc789bd"></span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12DeviceView1dE" title="specfem::kokkos::DeviceView1d"><span class="n"><span class="pre">DeviceView1d</span></span></a><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv4N7specfem7computeE" title="specfem::compute"><span class="n"><span class="pre">compute</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">access</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">boundary_types</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">type</span></span></span><a class="headerlink" href="#_CPPv4N7specfem5enums19boundary_conditions6staceyIN7specfem5enums7element9dimension4dim2EN7specfem5enums7element6medium8acousticE8property7qp_typeE4typeE" title="Link to this definition"></a><br /></dt>
+<dd><p>type of the edge on an element on the boundary. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Rohit Kakodkar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

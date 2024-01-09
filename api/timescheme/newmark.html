@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Newmark Time Scheme &mdash; SPECFEM++  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=80d5e7a1" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=19f00094" />
+      <link rel="stylesheet" type="text/css" href="../../_static/graphviz.css?v=eafc0fe6" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/scrollable_code_blocks.css?v=ebc906c5" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/center_align_table.css?v=f0548739" />
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../../_static/documentation_options.js?v=5929fcd5"></script>
+        <script src="../../_static/doctools.js?v=888ff710"></script>
+        <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Solver API" href="../solver/index.html" />
+    <link rel="prev" title="Time Scheme API" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            SPECFEM++
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">USER DOCUMENTATION</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user_documentation/index.html">User documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../meshfem2d/index.html">MESHFEM Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../parameter_documentation/index.html">SPECFEM++ Parameter Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../source_description/index.html">Source Description</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COOKBOOKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cookbooks/index.html">Cookbooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">CONTRIBUTION GUIDELINES</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../developer_documentation/index.html">Developer documentation</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">COMMUNITY</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=bug_report.md&amp;title=">Report bugs</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/PrincetonUniversity/specfempp/issues/new?assignees=&amp;labels=&amp;projects=&amp;template=feature_request.md&amp;title=">Request a new feature</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/orgs/SPECFEM/discussions">Join the discussion</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">BENCHMARKS</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../benchmarks/benchmarks.html">Performance Benchmarks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">API DOCUMENTATION</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../index.html">API documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="../kokkos_abstractions.html">Views and Execution Policies</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../quadrature/index.html">Quadrature API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../material/index.html">Materials Class API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../IO/index.html">Input/Output modules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../sources/index.html">Sources API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../receivers/index.html">Receiver API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../compute/index.html">Compute Data Interface</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../enumerations/index.html">Enumerations</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../domain/index.html">Domain</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../boundary_conditions/index.html">Boundary conditions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../coupling_physics/index.html">Coupled Interface</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="index.html">Time Scheme API</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="index.html#_CPPv4N7specfem10TimeScheme10TimeSchemeE"><code class="docutils literal notranslate"><span class="pre">TimeScheme</span></code></a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="index.html#types-of-time-schemes">Types of Time Schemes</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Newmark Time Scheme</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../solver/index.html">Solver API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../setup_parameters/index.html">Setup Parameters</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">SPECFEM++</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">API documentation</a></li>
+          <li class="breadcrumb-item"><a href="index.html">Time Scheme API</a></li>
+      <li class="breadcrumb-item active">Newmark Time Scheme</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../../_sources/api/timescheme/newmark.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="newmark-time-scheme">
+<h1>Newmark Time Scheme<a class="headerlink" href="#newmark-time-scheme" title="Link to this heading"></a></h1>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10TimeScheme7NewmarkE">
+<span id="_CPPv3N7specfem10TimeScheme7NewmarkE"></span><span id="_CPPv2N7specfem10TimeScheme7NewmarkE"></span><span id="specfem::TimeScheme::Newmark"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_newmark"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Newmark</span></span></span><span class="w"> </span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="k"><span class="pre">public</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../namespaces/index.html#_CPPv4N7specfem10TimeSchemeE" title="specfem::TimeScheme"><span class="n"><span class="pre">TimeScheme</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="index.html#_CPPv4N7specfem10TimeScheme10TimeSchemeE" title="specfem::TimeScheme::TimeScheme"><span class="n"><span class="pre">TimeScheme</span></span></a><a class="headerlink" href="#_CPPv4N7specfem10TimeScheme7NewmarkE" title="Link to this definition"></a><br /></dt>
+<dd><p><a class="reference internal" href="#classspecfem_1_1_time_scheme_1_1_newmark"><span class="std std-ref">Newmark</span></a> timescheme. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem10TimeScheme7Newmark10timeschemeEv">
+<span id="_CPPv3NK7specfem10TimeScheme7Newmark10timeschemeEv"></span><span id="_CPPv2NK7specfem10TimeScheme7Newmark10timeschemeEv"></span><span id="specfem::TimeScheme::Newmark::timeschemeC"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_newmark_1acdc90407983abede3f4d657a46b94234"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">enums</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">time_scheme</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">type</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">timescheme</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK7specfem10TimeScheme7Newmark10timeschemeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the timescheme type. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>constexpr specfem::enums::time_scheme </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10TimeScheme7Newmark7NewmarkEKiK9type_realK9type_realKi">
+<span id="_CPPv3N7specfem10TimeScheme7Newmark7NewmarkEKiK9type_realK9type_realKi"></span><span id="_CPPv2N7specfem10TimeScheme7Newmark7NewmarkEKiK9type_realK9type_realKi"></span><span id="specfem::TimeScheme::Newmark::Newmark__iC.type_realC.type_realC.iC"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_newmark_1aa62dcb2d1ff2a96cbf79d758e2a41480"></span><span class="sig-name descname"><span class="n"><span class="pre">Newmark</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nstep</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">t0</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">dt</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">nstep_between_samples</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N7specfem10TimeScheme7Newmark7NewmarkEKiK9type_realK9type_realKi" title="Link to this definition"></a><br /></dt>
+<dd><p>Construct a new <a class="reference internal" href="#classspecfem_1_1_time_scheme_1_1_newmark"><span class="std std-ref">Newmark</span></a> timescheme object. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nstep</strong> – maximum number of timesteps in the simulation </p></li>
+<li><p><strong>t0</strong> – Simulation start time </p></li>
+<li><p><strong>dt</strong> – delta for the newmark timescheme </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem10TimeScheme7Newmark6statusEv">
+<span id="_CPPv3NK7specfem10TimeScheme7Newmark6statusEv"></span><span id="_CPPv2NK7specfem10TimeScheme7Newmark6statusEv"></span><span id="specfem::TimeScheme::Newmark::statusC"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_newmark_1afafdd40b71dd750d8a1da4c19531adf5"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">status</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK7specfem10TimeScheme7Newmark6statusEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Return the status of simulation. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>false if current step &gt;= number of steps </p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>true if current step &lt; number of steps </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10TimeScheme7Newmark14increment_timeEv">
+<span id="_CPPv3N7specfem10TimeScheme7Newmark14increment_timeEv"></span><span id="_CPPv2N7specfem10TimeScheme7Newmark14increment_timeEv"></span><span id="specfem::TimeScheme::Newmark::increment_time"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_newmark_1a101a4ce3ed256022052ada57308c85c8"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">increment_time</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N7specfem10TimeScheme7Newmark14increment_timeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>increment by one timestep, also updates the simulation time by dt </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem10TimeScheme7Newmark8get_timeEv">
+<span id="_CPPv3NK7specfem10TimeScheme7Newmark8get_timeEv"></span><span id="_CPPv2NK7specfem10TimeScheme7Newmark8get_timeEv"></span><span id="specfem::TimeScheme::Newmark::get_timeC"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_newmark_1a868062a4ab6fafd6415141dd1e4fa964"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_time</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK7specfem10TimeScheme7Newmark8get_timeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the current simulation time. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>type_real current time </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem10TimeScheme7Newmark12get_timestepEv">
+<span id="_CPPv3NK7specfem10TimeScheme7Newmark12get_timestepEv"></span><span id="_CPPv2NK7specfem10TimeScheme7Newmark12get_timestepEv"></span><span id="specfem::TimeScheme::Newmark::get_timestepC"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_newmark_1a7179798996d5776bebcfc54e01969aed"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_timestep</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK7specfem10TimeScheme7Newmark12get_timestepEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the current timestep. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int current timestep </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10TimeScheme7Newmark10reset_timeEv">
+<span id="_CPPv3N7specfem10TimeScheme7Newmark10reset_timeEv"></span><span id="_CPPv2N7specfem10TimeScheme7Newmark10reset_timeEv"></span><span id="specfem::TimeScheme::Newmark::reset_time"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_newmark_1ae692bdb4c9b2b1f3716f380f17d02842"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">reset_time</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N7specfem10TimeScheme7Newmark10reset_timeEv" title="Link to this definition"></a><br /></dt>
+<dd><p>reset current time to t0 and timestep to 0 </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10TimeScheme7Newmark16get_max_timestepEv">
+<span id="_CPPv3N7specfem10TimeScheme7Newmark16get_max_timestepEv"></span><span id="_CPPv2N7specfem10TimeScheme7Newmark16get_max_timestepEv"></span><span id="specfem::TimeScheme::Newmark::get_max_timestep"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_newmark_1a8c5909880f821c256431716494f7ca95"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_max_timestep</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N7specfem10TimeScheme7Newmark16get_max_timestepEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the max timestep (nstep) of the simuation. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int max timestep </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10TimeScheme7Newmark21apply_predictor_phaseEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEE">
+<span id="_CPPv3N7specfem10TimeScheme7Newmark21apply_predictor_phaseEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEE"></span><span id="_CPPv2N7specfem10TimeScheme7Newmark21apply_predictor_phaseEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEE"></span><span id="specfem::TimeScheme::Newmark::apply_predictor_phase__specfem::kokkos::DeviceView2d:type_real.Kokkos::LayoutLeft:.specfem::kokkos::DeviceView2d:type_real.Kokkos::LayoutLeft:.specfem::kokkos::DeviceView2d:type_real.Kokkos::LayoutLeft:"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_newmark_1ae8b5a8f7551a95851fa074328ba95916"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">apply_predictor_phase</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12DeviceView2dE" title="specfem::kokkos::DeviceView2d"><span class="n"><span class="pre">DeviceView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">field</span></span>, <a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12DeviceView2dE" title="specfem::kokkos::DeviceView2d"><span class="n"><span class="pre">DeviceView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">field_dot</span></span>, <a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12DeviceView2dE" title="specfem::kokkos::DeviceView2d"><span class="n"><span class="pre">DeviceView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">field_dot_dot</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N7specfem10TimeScheme7Newmark21apply_predictor_phaseEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Apply predictor phase of the timescheme. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>domain_class</strong> – Pointer to domain class to apply predictor phase </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10TimeScheme7Newmark21apply_corrector_phaseEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEE">
+<span id="_CPPv3N7specfem10TimeScheme7Newmark21apply_corrector_phaseEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEE"></span><span id="_CPPv2N7specfem10TimeScheme7Newmark21apply_corrector_phaseEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEE"></span><span id="specfem::TimeScheme::Newmark::apply_corrector_phase__specfem::kokkos::DeviceView2d:type_real.Kokkos::LayoutLeft:.specfem::kokkos::DeviceView2d:type_real.Kokkos::LayoutLeft:.specfem::kokkos::DeviceView2d:type_real.Kokkos::LayoutLeft:"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_newmark_1a45fd8a4cb8bc08e071d62f59965303b5"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">apply_corrector_phase</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12DeviceView2dE" title="specfem::kokkos::DeviceView2d"><span class="n"><span class="pre">DeviceView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">field</span></span>, <a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12DeviceView2dE" title="specfem::kokkos::DeviceView2d"><span class="n"><span class="pre">DeviceView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">field_dot</span></span>, <a class="reference internal" href="../namespaces/index.html#_CPPv47specfem" title="specfem"><span class="n"><span class="pre">specfem</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4N7specfem6kokkosE" title="specfem::kokkos"><span class="n"><span class="pre">kokkos</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../kokkos_abstractions.html#_CPPv4I00DpEN7specfem6kokkos12DeviceView2dE" title="specfem::kokkos::DeviceView2d"><span class="n"><span class="pre">DeviceView2d</span></span></a><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">type_real</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">Kokkos</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LayoutLeft</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">field_dot_dot</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N7specfem10TimeScheme7Newmark21apply_corrector_phaseEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEEN7specfem6kokkos12DeviceView2dI9type_realN6Kokkos10LayoutLeftEEE" title="Link to this definition"></a><br /></dt>
+<dd><p>Apply corrector phase of the timescheme. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>domain_class</strong> – Pointer to domain class to apply corrector phase </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem10TimeScheme7Newmark18compute_seismogramEv">
+<span id="_CPPv3NK7specfem10TimeScheme7Newmark18compute_seismogramEv"></span><span id="_CPPv2NK7specfem10TimeScheme7Newmark18compute_seismogramEv"></span><span id="specfem::TimeScheme::Newmark::compute_seismogramC"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_newmark_1a4cd0352ddbefd467a9a09a1c6f77585a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">compute_seismogram</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK7specfem10TimeScheme7Newmark18compute_seismogramEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Compute if seismogram needs to be calculated at this timestep. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem10TimeScheme7Newmark19get_seismogram_stepEv">
+<span id="_CPPv3NK7specfem10TimeScheme7Newmark19get_seismogram_stepEv"></span><span id="_CPPv2NK7specfem10TimeScheme7Newmark19get_seismogram_stepEv"></span><span id="specfem::TimeScheme::Newmark::get_seismogram_stepC"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_newmark_1a9e7510fd5f518fe07d312f5343bc54be"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_seismogram_step</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK7specfem10TimeScheme7Newmark19get_seismogram_stepEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the current seismogram step. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int value of the current seismogram step </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem10TimeScheme7Newmark23get_max_seismogram_stepEv">
+<span id="_CPPv3NK7specfem10TimeScheme7Newmark23get_max_seismogram_stepEv"></span><span id="_CPPv2NK7specfem10TimeScheme7Newmark23get_max_seismogram_stepEv"></span><span id="specfem::TimeScheme::Newmark::get_max_seismogram_stepC"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_newmark_1a6af1dd13890f93028e3774c3fdffe399"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_max_seismogram_step</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK7specfem10TimeScheme7Newmark23get_max_seismogram_stepEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get the max seismogram step. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>int maximum value of seismogram step </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10TimeScheme7Newmark25increment_seismogram_stepEv">
+<span id="_CPPv3N7specfem10TimeScheme7Newmark25increment_seismogram_stepEv"></span><span id="_CPPv2N7specfem10TimeScheme7Newmark25increment_seismogram_stepEv"></span><span id="specfem::TimeScheme::Newmark::increment_seismogram_step"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_newmark_1ae0e470d46a212f6e34613b9d0ae03c61"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">increment_seismogram_step</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4N7specfem10TimeScheme7Newmark25increment_seismogram_stepEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Increment seismogram step. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem10TimeScheme7Newmark18get_time_incrementEv">
+<span id="_CPPv3NK7specfem10TimeScheme7Newmark18get_time_incrementEv"></span><span id="_CPPv2NK7specfem10TimeScheme7Newmark18get_time_incrementEv"></span><span id="specfem::TimeScheme::Newmark::get_time_incrementC"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_newmark_1ac99a5446f75e874524233efe1a23d003"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">get_time_increment</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK7specfem10TimeScheme7Newmark18get_time_incrementEv" title="Link to this definition"></a><br /></dt>
+<dd><p>Get time increment. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK7specfem10TimeScheme7Newmark5printERNSt7ostreamE">
+<span id="_CPPv3NK7specfem10TimeScheme7Newmark5printERNSt7ostreamE"></span><span id="_CPPv2NK7specfem10TimeScheme7Newmark5printERNSt7ostreamE"></span><span id="specfem::TimeScheme::Newmark::print__osRC"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_newmark_1a36fb64446826a374c1c34be2d69db5a7"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">print</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ostream</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">out</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="k"><span class="pre">override</span></span><a class="headerlink" href="#_CPPv4NK7specfem10TimeScheme7Newmark5printERNSt7ostreamE" title="Link to this definition"></a><br /></dt>
+<dd><p>Log newmark timescheme information to console. </p>
+</dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10TimeScheme7Newmark12current_timeE">
+<span id="_CPPv3N7specfem10TimeScheme7Newmark12current_timeE"></span><span id="_CPPv2N7specfem10TimeScheme7Newmark12current_timeE"></span><span id="specfem::TimeScheme::Newmark::current_time__type_real"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_newmark_1a24f6f9bedc217ccb3e8fc3fc28a43b6f"></span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">current_time</span></span></span><a class="headerlink" href="#_CPPv4N7specfem10TimeScheme7Newmark12current_timeE" title="Link to this definition"></a><br /></dt>
+<dd><p>Current simulation time in seconds. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10TimeScheme7Newmark5istepE">
+<span id="_CPPv3N7specfem10TimeScheme7Newmark5istepE"></span><span id="_CPPv2N7specfem10TimeScheme7Newmark5istepE"></span><span id="specfem::TimeScheme::Newmark::istep__i"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_newmark_1a1246d3250e6e869e35455bcb85dd5916"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">istep</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N7specfem10TimeScheme7Newmark5istepE" title="Link to this definition"></a><br /></dt>
+<dd><p>Current simulation step. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10TimeScheme7Newmark6deltatE">
+<span id="_CPPv3N7specfem10TimeScheme7Newmark6deltatE"></span><span id="_CPPv2N7specfem10TimeScheme7Newmark6deltatE"></span><span id="specfem::TimeScheme::Newmark::deltat__type_real"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_newmark_1a9087a3713553a18d09d6fe6f4965fdfa"></span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">deltat</span></span></span><a class="headerlink" href="#_CPPv4N7specfem10TimeScheme7Newmark6deltatE" title="Link to this definition"></a><br /></dt>
+<dd><p>time increment ( <span class="math notranslate nohighlight">\( \delta t \)</span>) </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10TimeScheme7Newmark11deltatover2E">
+<span id="_CPPv3N7specfem10TimeScheme7Newmark11deltatover2E"></span><span id="_CPPv2N7specfem10TimeScheme7Newmark11deltatover2E"></span><span id="specfem::TimeScheme::Newmark::deltatover2__type_real"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_newmark_1a0bd3ed5d5263c7e685af33c4f69b1bc9"></span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">deltatover2</span></span></span><a class="headerlink" href="#_CPPv4N7specfem10TimeScheme7Newmark11deltatover2E" title="Link to this definition"></a><br /></dt>
+<dd><p><span class="math notranslate nohighlight">\( \delta t / 2 \)</span></p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10TimeScheme7Newmark17deltatsquareover2E">
+<span id="_CPPv3N7specfem10TimeScheme7Newmark17deltatsquareover2E"></span><span id="_CPPv2N7specfem10TimeScheme7Newmark17deltatsquareover2E"></span><span id="specfem::TimeScheme::Newmark::deltatsquareover2__type_real"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_newmark_1a9f200cfdf31db8d5e4bb5effb6b24fe0"></span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">deltatsquareover2</span></span></span><a class="headerlink" href="#_CPPv4N7specfem10TimeScheme7Newmark17deltatsquareover2E" title="Link to this definition"></a><br /></dt>
+<dd><p><span class="math notranslate nohighlight">\( \delta t^2 / 2 \)</span></p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10TimeScheme7Newmark5nstepE">
+<span id="_CPPv3N7specfem10TimeScheme7Newmark5nstepE"></span><span id="_CPPv2N7specfem10TimeScheme7Newmark5nstepE"></span><span id="specfem::TimeScheme::Newmark::nstep__i"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_newmark_1aa08ec34dc53eb1270e80e295dcc60e8b"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nstep</span></span></span><a class="headerlink" href="#_CPPv4N7specfem10TimeScheme7Newmark5nstepE" title="Link to this definition"></a><br /></dt>
+<dd><p>Maximum value of timestep. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10TimeScheme7Newmark2t0E">
+<span id="_CPPv3N7specfem10TimeScheme7Newmark2t0E"></span><span id="_CPPv2N7specfem10TimeScheme7Newmark2t0E"></span><span id="specfem::TimeScheme::Newmark::t0__type_real"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_newmark_1a3a78bd8fa09b7a0718051950d8d63228"></span><span class="n"><span class="pre">type_real</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">t0</span></span></span><a class="headerlink" href="#_CPPv4N7specfem10TimeScheme7Newmark2t0E" title="Link to this definition"></a><br /></dt>
+<dd><p>Simultion start time in seconds. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10TimeScheme7Newmark21nstep_between_samplesE">
+<span id="_CPPv3N7specfem10TimeScheme7Newmark21nstep_between_samplesE"></span><span id="_CPPv2N7specfem10TimeScheme7Newmark21nstep_between_samplesE"></span><span id="specfem::TimeScheme::Newmark::nstep_between_samples__i"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_newmark_1a60fb5f2474c58b8280362a455d7e2886"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">nstep_between_samples</span></span></span><a class="headerlink" href="#_CPPv4N7specfem10TimeScheme7Newmark21nstep_between_samplesE" title="Link to this definition"></a><br /></dt>
+<dd><p>Number of time steps between seismogram outputs </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7specfem10TimeScheme7Newmark9isig_stepE">
+<span id="_CPPv3N7specfem10TimeScheme7Newmark9isig_stepE"></span><span id="_CPPv2N7specfem10TimeScheme7Newmark9isig_stepE"></span><span id="specfem::TimeScheme::Newmark::isig_step__i"></span><span class="target" id="classspecfem_1_1_time_scheme_1_1_newmark_1a24bc059f9336359bc461e6765e5ab950"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isig_step</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N7specfem10TimeScheme7Newmark9isig_stepE" title="Link to this definition"></a><br /></dt>
+<dd><p>current seismogram step </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="index.html" class="btn btn-neutral float-left" title="Time Scheme API" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="../solver/index.html" class="btn btn-neutral float-right" title="Solver API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Rohit Kakodkar.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

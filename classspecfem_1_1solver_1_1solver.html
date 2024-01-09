@@ -76,28 +76,36 @@ $(function() {
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="classspecfem_1_1solver_1_1solver-members.html">List of all members</a>  </div>
-  <div class="headertitle"><div class="title">specfem::solver::solver Class Reference</div></div>
+  <div class="headertitle"><div class="title">specfem::solver::solver Class Reference<span class="mlabels"><span class="mlabel">abstract</span></span></div></div>
 </div><!--header-->
 <div class="contents">
 
 <p>Base solver class.  
  <a href="classspecfem_1_1solver_1_1solver.html#details">More...</a></p>
 
-<p><code>#include &lt;solver.h&gt;</code></p>
-
-<p>Inherited by specfem::solver::time_marching.</p>
+<p><code>#include &lt;solver.hpp&gt;</code></p>
+<div class="dynheader">
+Inheritance diagram for specfem::solver::solver:</div>
+<div class="dyncontent">
+ <div class="center">
+  <img src="classspecfem_1_1solver_1_1solver.png" usemap="#specfem::solver::solver_map" alt=""/>
+  <map id="specfem::solver::solver_map" name="specfem::solver::solver_map">
+<area href="classspecfem_1_1solver_1_1time__marching.html" title="Time marching solver class." alt="specfem::solver::time_marching&lt; qp_type &gt;" shape="rect" coords="0,56,255,80"/>
+  </map>
+</div></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:af5b059e97a63c36d152be5362ae233c6" id="r_af5b059e97a63c36d152be5362ae233c6"><td class="memItemLeft" align="right" valign="top"><a id="af5b059e97a63c36d152be5362ae233c6" name="af5b059e97a63c36d152be5362ae233c6"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>run</b> ()</td></tr>
-<tr class="memdesc:af5b059e97a63c36d152be5362ae233c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run solver algorithm. <br /></td></tr>
-<tr class="separator:af5b059e97a63c36d152be5362ae233c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab32f65d2ab1f6c0ba6cc456cb0ba94aa" id="r_ab32f65d2ab1f6c0ba6cc456cb0ba94aa"><td class="memItemLeft" align="right" valign="top"><a id="ab32f65d2ab1f6c0ba6cc456cb0ba94aa" name="ab32f65d2ab1f6c0ba6cc456cb0ba94aa"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><b>run</b> ()=0</td></tr>
+<tr class="memdesc:ab32f65d2ab1f6c0ba6cc456cb0ba94aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Run solver algorithm. <br /></td></tr>
+<tr class="separator:ab32f65d2ab1f6c0ba6cc456cb0ba94aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Base solver class. </p>
+<p>Solver class is the base class for all solver algorithms (implicit or explicit). The class contains a pure virtual function <a class="el" href="classspecfem_1_1solver_1_1solver.html#ab32f65d2ab1f6c0ba6cc456cb0ba94aa" title="Run solver algorithm.">run()</a> that must be implemented by the derived solver implementations. </p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
-<li>/Users/runner/work/specfem2d_kokkos/specfem2d_kokkos/include/<b>solver.h</b></li>
+<li>/Users/runner/work/SPECFEMPP/SPECFEMPP/include/solver/<b>solver.hpp</b></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
