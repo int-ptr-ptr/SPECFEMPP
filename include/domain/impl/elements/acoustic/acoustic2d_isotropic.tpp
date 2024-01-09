@@ -155,7 +155,7 @@ KOKKOS_INLINE_FUNCTION void specfem::domain::impl::elements::element<
 #ifdef KOKKOS_ENABLE_CUDA
 #pragma unroll
 #endif
-  for (int l = 0; l < NGLL; l++) {
+  for (int l = 0; l < NGLL; ++l) {
     dchi_dxi += s_hprime_xx(ix, l, 0) * field_chi(iz, l, 0);
     dchi_dgamma += s_hprime_zz(iz, l, 0) * field_chi(l, ix, 0);
   }
@@ -290,7 +290,7 @@ KOKKOS_INLINE_FUNCTION void specfem::domain::impl::elements::element<
 #ifdef KOKKOS_ENABLE_CUDA
 #pragma unroll
 #endif
-  for (int l = 0; l < NGLL; l++) {
+  for (int l = 0; l < NGLL; ++l) {
     temp1l += s_hprimewgll_xx(ix, l, 0) * stress_integrand_xi(iz, l, 0);
     temp2l += s_hprimewgll_zz(iz, l, 0) * stress_integrand_gamma(l, ix, 0);
   }
