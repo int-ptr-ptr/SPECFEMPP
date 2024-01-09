@@ -254,28 +254,38 @@ KOKKOS_INLINE_FUNCTION void specfem::domain::impl::elements::element<
 
   static_assert(components == 1, "Acoustic medium has only one component");
 
-  specfem::compute::element_partial_derivatives partial_derivatives;
+  // Cache elemental properties and partial derivatives if needed
+  constexpr bool cache_element =
+      ((boundary_conditions_type::value ==
+        specfem::enums::element::boundary_tag::stacey) ||
+       (boundary_conditions_type::value ==
+        specfem::enums::element::boundary_tag::composite_stacey_dirichlet));
 
-  specfem::compute::element_properties<medium_type::value, property_type::value>
-      properties;
+  const auto partial_derivatives =
+      [&]() -> specfem::compute::element_partial_derivatives {
+    if constexpr (cache_element) {
+      return specfem::compute::element_partial_derivatives(
+          this->xix(ispec, iz, ix), this->gammax(ispec, iz, ix),
+          this->xiz(ispec, iz, ix), this->gammaz(ispec, iz, ix),
+          this->jacobian(ispec, iz, ix));
+    } else {
+      return specfem::compute::element_partial_derivatives();
+    }
+  }();
 
-  // populate partial derivatives only if the boundary is stacey
-  // or if the boundary is composite_stacey_dirichlet
-  if constexpr ((boundary_conditions_type::value ==
-                 specfem::enums::element::boundary_tag::stacey) ||
-                (boundary_conditions_type::value ==
-                 specfem::enums::element::boundary_tag::
-                     composite_stacey_dirichlet)) {
-    partial_derivatives = specfem::compute::element_partial_derivatives(
-        this->xix(ispec, iz, ix), this->gammax(ispec, iz, ix),
-        this->xiz(ispec, iz, ix), this->gammaz(ispec, iz, ix),
-        this->jacobian(ispec, iz, ix));
-
-    properties = specfem::compute::element_properties<medium_type::value,
-                                                      property_type::value>(
-        this->lambdaplus2mu_inverse(ispec, iz, ix),
-        this->rho_inverse(ispec, iz, ix));
-  }
+  const auto properties =
+      [&]() -> specfem::compute::element_properties<medium_type::value,
+                                                    property_type::value> {
+    if constexpr (cache_element) {
+      return specfem::compute::element_properties<medium_type::value,
+                                                  property_type::value>(
+          this->lambdaplus2mu_inverse(ispec, iz, ix),
+          this->rho_inverse(ispec, iz, ix));
+    } else {
+      return specfem::compute::element_properties<medium_type::value,
+                                                  property_type::value>();
+    }
+  }();
 
 #ifdef KOKKOS_ENABLE_CUDA
 #pragma unroll

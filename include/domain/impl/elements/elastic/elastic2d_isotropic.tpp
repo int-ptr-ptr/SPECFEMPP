@@ -292,27 +292,35 @@ KOKKOS_INLINE_FUNCTION void specfem::domain::impl::elements::element<
                 "Number of components must be 2 for 2D isotropic elastic "
                 "medium");
 
-  specfem::compute::element_partial_derivatives partial_derivatives;
+  // Cache element if boundary conditions require it
+  constexpr bool cache_element =
+      ((boundary_conditions_type::value ==
+        specfem::enums::element::boundary_tag::stacey) ||
+       (boundary_conditions_type::value ==
+        specfem::enums::element::boundary_tag::composite_stacey_dirichlet));
 
-  specfem::compute::element_properties<medium_type::value, property_type::value>
-      properties;
+  const auto partial_derivatives = [&]() {
+    if constexpr (cache_element) {
+      return specfem::compute::element_partial_derivatives(
+          this->xix(ispec, iz, ix), this->gammax(ispec, iz, ix),
+          this->xiz(ispec, iz, ix), this->gammaz(ispec, iz, ix),
+          this->jacobian(ispec, iz, ix));
+    } else {
+      return specfem::compute::element_partial_derivatives();
+    }
+  }();
 
-  //   populate partial derivatives only if the boundary is stacey
-  if constexpr ((boundary_conditions_type::value ==
-                 specfem::enums::element::boundary_tag::stacey) ||
-                (boundary_conditions_type::value ==
-                 specfem::enums::element::boundary_tag::
-                     composite_stacey_dirichlet)) {
-    partial_derivatives = specfem::compute::element_partial_derivatives(
-        this->xix(ispec, iz, ix), this->gammax(ispec, iz, ix),
-        this->xiz(ispec, iz, ix), this->gammaz(ispec, iz, ix),
-        this->jacobian(ispec, iz, ix));
-
-    properties = specfem::compute::element_properties<medium_type::value,
-                                                      property_type::value>(
-        this->lambdaplus2mu(ispec, iz, ix), this->mu(ispec, iz, ix),
-        this->rho(ispec, iz, ix));
-  }
+  const auto properties = [&]() {
+    if constexpr (cache_element) {
+      return specfem::compute::element_properties<medium_type::value,
+                                                  property_type::value>(
+          this->lambdaplus2mu(ispec, iz, ix), this->mu(ispec, iz, ix),
+          this->rho(ispec, iz, ix));
+    } else {
+      return specfem::compute::element_properties<medium_type::value,
+                                                  property_type::value>();
+    }
+  }();
 
 #ifdef KOKKOS_ENABLE_CUDA
 #pragma unroll
