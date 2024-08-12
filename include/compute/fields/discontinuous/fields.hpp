@@ -1,5 +1,5 @@
-#ifndef _COMPUTE_FIELDS_FIELDS_HPP_
-#define _COMPUTE_FIELDS_FIELDS_HPP_
+#ifndef _COMPUTE_FIELDS_DISCONTINUOUS_FIELDS_HPP_
+#define _COMPUTE_FIELDS_DISCONTINUOUS_FIELDS_HPP_
 
 #include "compute/compute_mesh.hpp"
 #include "compute/properties/interface.hpp"
@@ -8,11 +8,9 @@
 #include "simulation_field.hpp"
 #include "simulation_field.tpp"
 
-#include "discontinuous/discont_simulation_field.hpp"
-
 namespace specfem {
 namespace compute {
-struct fields {
+struct discontinuous_fields {
 
   fields() = default;
 
@@ -50,10 +48,10 @@ struct fields {
     backward.copy_to_host();
   }
 
-  specfem::compute::discontinuous_simulation_field<specfem::wavefield::type::buffer> buffer;
-  specfem::compute::discontinuous_simulation_field<specfem::wavefield::type::forward> forward;
-  specfem::compute::discontinuous_simulation_field<specfem::wavefield::type::adjoint> adjoint;
-  specfem::compute::discontinuous_simulation_field<specfem::wavefield::type::backward>
+  specfem::compute::simulation_field<specfem::wavefield::type::buffer> buffer;
+  specfem::compute::simulation_field<specfem::wavefield::type::forward> forward;
+  specfem::compute::simulation_field<specfem::wavefield::type::adjoint> adjoint;
+  specfem::compute::simulation_field<specfem::wavefield::type::backward>
       backward;
 };
 

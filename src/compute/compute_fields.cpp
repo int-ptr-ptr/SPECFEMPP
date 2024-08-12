@@ -5,21 +5,25 @@
 #include "compute/fields/simulation_field.hpp"
 #include "compute/fields/simulation_field.tpp"
 
+
+#include "compute/fields/discontinuous/discont_simulation_field.hpp"
+#include "compute/fields/discontinuous/discont_simulation_field.tpp"
+
 // Explcitly instantiate the template class
-template class specfem::compute::simulation_field<
+template class specfem::compute::discontinuous_simulation_field<
     specfem::wavefield::type::forward>;
 
-template class specfem::compute::simulation_field<
+template class specfem::compute::discontinuous_simulation_field<
     specfem::wavefield::type::adjoint>;
 
-template class specfem::compute::simulation_field<
+template class specfem::compute::discontinuous_simulation_field<
     specfem::wavefield::type::backward>;
 
 specfem::compute::fields::fields(const specfem::compute::mesh &mesh,
                                  const specfem::compute::properties &properties,
                                  const specfem::simulation::type simulation)
     : // Initialize the forward field only if the simulation type is forward
-      forward([&]() -> specfem::compute::simulation_field<
+      forward([&]() -> specfem::compute::discontinuous_simulation_field<
                         specfem::wavefield::type::forward> {
         if (simulation == specfem::simulation::type::forward) {
           return { mesh, properties };
@@ -30,7 +34,7 @@ specfem::compute::fields::fields(const specfem::compute::mesh &mesh,
         }
       }()),
       // Initiaze the adjoint field only if the simulation type is adjoint
-      adjoint([&]() -> specfem::compute::simulation_field<
+      adjoint([&]() -> specfem::compute::discontinuous_simulation_field<
                         specfem::wavefield::type::adjoint> {
         if (simulation == specfem::simulation::type::forward) {
           return {};
@@ -41,7 +45,7 @@ specfem::compute::fields::fields(const specfem::compute::mesh &mesh,
         }
       }()),
       // Initialize the backward field only if the simulation type is adjoint
-      backward([&]() -> specfem::compute::simulation_field<
+      backward([&]() -> specfem::compute::discontinuous_simulation_field<
                          specfem::wavefield::type::backward> {
         if (simulation == specfem::simulation::type::forward) {
           return {};
@@ -52,7 +56,7 @@ specfem::compute::fields::fields(const specfem::compute::mesh &mesh,
         }
       }()),
       // Initialize the buffer field only if the simulation type is adjoint
-      buffer([&]() -> specfem::compute::simulation_field<
+      buffer([&]() -> specfem::compute::discontinuous_simulation_field<
                        specfem::wavefield::type::buffer> {
         if (simulation == specfem::simulation::type::forward) {
           return {};
