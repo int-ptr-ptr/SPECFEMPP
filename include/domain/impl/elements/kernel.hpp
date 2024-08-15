@@ -41,16 +41,16 @@ public:
       const quadrature_points_type &quadrature_points);
 
   void compute_mass_matrix(
-      const specfem::compute::simulation_field<WavefieldType> &field) const;
+      const specfem::compute::discontinuous_simulation_field<WavefieldType> &field) const;
 
   void compute_stiffness_interaction(
       const int istep,
-      const specfem::compute::simulation_field<WavefieldType> &field) const;
+      const specfem::compute::discontinuous_simulation_field<WavefieldType> &field) const;
 
   template <specfem::enums::time_scheme::type time_scheme>
   void mass_time_contribution(
       const type_real dt,
-      const specfem::compute::simulation_field<WavefieldType> &field) const;
+      const specfem::compute::discontinuous_simulation_field<WavefieldType> &field) const;
 
 protected:
   int nelements;
@@ -109,7 +109,7 @@ public:
   }
 
 private:
-  specfem::compute::simulation_field<WavefieldType> field;
+  specfem::compute::discontinuous_simulation_field<WavefieldType> field;
 };
 
 template <specfem::dimension::type DimensionType,
@@ -166,7 +166,7 @@ public:
   void compute_stiffness_interaction(const int istep) const;
 
 private:
-  specfem::compute::simulation_field<specfem::wavefield::type::backward> field;
+  specfem::compute::discontinuous_simulation_field<specfem::wavefield::type::backward> field;
 };
 
 } // namespace kernels

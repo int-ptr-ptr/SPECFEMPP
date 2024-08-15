@@ -23,9 +23,9 @@ public:
 private:
   specfem::kokkos::DeviceView1d<int> element_index;
   specfem::kokkos::HostMirror1d<int> h_element_index;
-  specfem::compute::simulation_field<specfem::wavefield::type::adjoint>
+  specfem::compute::discontinuous_simulation_field<specfem::wavefield::type::adjoint>
       adjoint_field;
-  specfem::compute::simulation_field<specfem::wavefield::type::backward>
+  specfem::compute::discontinuous_simulation_field<specfem::wavefield::type::backward>
       backward_field;
   specfem::compute::kernels kernels;
   specfem::compute::quadrature quadrature;

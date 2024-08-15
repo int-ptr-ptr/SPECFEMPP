@@ -30,8 +30,6 @@ template <specfem::wavefield::type WavefieldType> struct simulation_field {
   simulation_field(const specfem::compute::mesh &mesh,
                    const specfem::compute::properties &properties);
 
-  virtual ~simulation_field() = default;
-
   // template <specfem::element::medium_tag medium>
   // KOKKOS_INLINE_FUNCTION
   //     specfem::compute::impl::field_impl<specfem::dimension::type::dim2,

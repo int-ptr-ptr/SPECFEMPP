@@ -91,7 +91,7 @@ public:
   template <specfem::wavefield::type WaveFieldType>
   KOKKOS_FUNCTION CoupledPointFieldType load_field_elements(
       const specfem::point::index &index,
-      const specfem::compute::simulation_field<WaveFieldType> &field) const {
+      const specfem::compute::discontinuous_simulation_field<WaveFieldType> &field) const {
     CoupledPointFieldType field_elements;
     specfem::compute::load_on_device(index, field, field_elements);
     return field_elements;

@@ -21,7 +21,7 @@ struct fields {
          const specfem::simulation::type simulation);
 
   template <specfem::wavefield::type fieldtype>
-  KOKKOS_INLINE_FUNCTION specfem::compute::simulation_field<fieldtype>
+  KOKKOS_INLINE_FUNCTION specfem::compute::discontinuous_simulation_field<fieldtype>
   get_simulation_field() const {
     if constexpr (fieldtype == specfem::wavefield::type::forward) {
       return forward;

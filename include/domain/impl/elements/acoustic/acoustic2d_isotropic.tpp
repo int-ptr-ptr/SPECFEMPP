@@ -202,7 +202,18 @@ KOKKOS_INLINE_FUNCTION void specfem::domain::impl::elements::element<
   boundary_conditions.enforce_traction(xz, weight, partial_derivatives,
                                        properties, boundary_type, velocity,
                                        acceleration);
+  
+  if (!specfem::point::is_on_boundary(specfem::element::boundary_tag::none, boundary_type, iz, ix, NGLL,
+                                      NGLL)) {
+    return;
+  }
 
+#ifdef KOKKOS_ENABLE_CUDA
+#pragma unroll
+#endif
+  for (int icomp = 0; icomp < components; ++icomp){
+    //foreach component
+  }
   return;
 }
 

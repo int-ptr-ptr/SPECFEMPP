@@ -57,7 +57,7 @@ private:
   type_real deltat;
   type_real deltatover2;
   type_real deltasquareover2;
-  specfem::compute::simulation_field<specfem::wavefield::type::forward> field;
+  specfem::compute::discontinuous_simulation_field<specfem::wavefield::type::forward> field;
 };
 
 template <>
@@ -106,9 +106,9 @@ private:
   type_real deltat;
   type_real deltatover2;
   type_real deltasquareover2;
-  specfem::compute::simulation_field<specfem::wavefield::type::adjoint>
+  specfem::compute::discontinuous_simulation_field<specfem::wavefield::type::adjoint>
       adjoint_field;
-  specfem::compute::simulation_field<specfem::wavefield::type::backward>
+  specfem::compute::discontinuous_simulation_field<specfem::wavefield::type::backward>
       backward_field;
 };
 

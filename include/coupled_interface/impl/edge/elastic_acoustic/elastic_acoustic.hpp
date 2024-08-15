@@ -71,7 +71,7 @@ public:
   template <specfem::wavefield::type WavefieldType>
   KOKKOS_FUNCTION CoupledPointFieldType load_field_elements(
       const specfem::point::index &index,
-      const specfem::compute::simulation_field<WavefieldType> &field) const;
+      const specfem::compute::discontinuous_simulation_field<WavefieldType> &field) const;
 
 private:
   //   specfem::kokkos::DeviceView1d<int> acoustic_ispec; ///< Index of acoustic

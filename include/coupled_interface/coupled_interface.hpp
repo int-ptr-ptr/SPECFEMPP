@@ -45,7 +45,7 @@ private:
   specfem::compute::points points;
   specfem::compute::quadrature quadrature;
   specfem::compute::partial_derivatives partial_derivatives;
-  specfem::compute::simulation_field<WavefieldType> field;
+  specfem::compute::discontinuous_simulation_field<WavefieldType> field;
   specfem::compute::interface_container<SelfMedium, CoupledMedium>
       interface_data; ///< Struct containing the coupling information.
   EdgeType edge;      ///< Edge class to implement coupling physics

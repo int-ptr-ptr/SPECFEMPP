@@ -38,7 +38,7 @@ public:
   void divide_mass_matrix();
 
 private:
-  specfem::compute::simulation_field<WavefieldType> field; ///< Field object
+  specfem::compute::discontinuous_simulation_field<WavefieldType> field; ///< Field object
 };
 } // namespace domain
 

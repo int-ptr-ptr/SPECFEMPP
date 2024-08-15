@@ -63,7 +63,7 @@ void specfem::domain::impl::kernels::element_kernel_base<
     WavefieldType, DimensionType, MediumTag, PropertyTag, BoundaryTag,
     quadrature_points_type>::
     compute_mass_matrix(
-        const specfem::compute::simulation_field<WavefieldType> &field) const {
+        const specfem::compute::discontinuous_simulation_field<WavefieldType> &field) const {
   constexpr int components = medium_type::components;
   using PointMassType = specfem::point::field<DimensionType, MediumTag, false,
                                               false, false, true>;
@@ -143,7 +143,7 @@ void specfem::domain::impl::kernels::element_kernel_base<
     quadrature_points_type>::
     mass_time_contribution(
         const type_real dt,
-        const specfem::compute::simulation_field<WavefieldType> &field) const {
+        const specfem::compute::discontinuous_simulation_field<WavefieldType> &field) const {
 
   constexpr int components = medium_type::components;
   using PointMassType = specfem::point::field<DimensionType, MediumTag, false,
@@ -224,7 +224,7 @@ void specfem::domain::impl::kernels::element_kernel_base<
     quadrature_points_type>::
     compute_stiffness_interaction(
         const int istep,
-        const specfem::compute::simulation_field<WavefieldType> &field) const {
+        const specfem::compute::discontinuous_simulation_field<WavefieldType> &field) const {
 
   constexpr int components = medium_type::components;
   // Number of quadrature points
@@ -368,10 +368,11 @@ void specfem::domain::impl::kernels::element_kernel_base<
               // Get velocity, partial derivatives, and properties
               // only if needed by the boundary condition
               // ---------------------------------------------------------------
-              constexpr bool load_boundary_variables =
-                  ((tag == specfem::element::boundary_tag::stacey) ||
-                   (tag == specfem::element::boundary_tag::
-                               composite_stacey_dirichlet));
+              // constexpr bool load_boundary_variables =
+              //     ((tag == specfem::element::boundary_tag::stacey) ||
+              //      (tag == specfem::element::boundary_tag::
+              //                  composite_stacey_dirichlet));
+              constexpr bool load_boundary_variables = true;
 
               constexpr bool store_boundary_values =
                   ((BoundaryTag == specfem::element::boundary_tag::stacey) &&

@@ -41,7 +41,7 @@ private:
   specfem::kokkos::DeviceView1d<int> source_domain_index_mapping;
   specfem::kokkos::HostMirror1d<int> h_source_domain_index_mapping;
   specfem::compute::properties properties;
-  specfem::compute::simulation_field<WavefieldType> field;
+  specfem::compute::discontinuous_simulation_field<WavefieldType> field;
   specfem::compute::impl::sources::source_medium<DimensionType, MediumTag>
       sources;
   quadrature_point_type quadrature_points;
