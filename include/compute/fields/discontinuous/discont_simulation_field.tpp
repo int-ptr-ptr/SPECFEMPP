@@ -114,16 +114,15 @@ specfem::compute::discontinuous_simulation_field<WavefieldType>::discontinuous_s
 
     
   Kokkos::deep_copy(mesh_adjacency, h_mesh_adjacency);
-
   edge_values_x = //(ispec,edge,pt,data_index)
        specfem::kokkos::DeviceView4d<type_real, Kokkos::LayoutLeft>(
-      "specfem::compute::simulation_field::edge_values_x", this->nspec,2,this->ngllz,1);//TODO change last index to be dependent on #components?
+      "specfem::compute::simulation_field::edge_values_x", this->nspec,2,this->ngllz,_DISCONT_SIMFIELD_EDGE_COMPONENTS);//TODO change last index to be dependent on #components?
   h_edge_values_x = specfem::kokkos::HostMirror4d<type_real, Kokkos::LayoutLeft>(
       Kokkos::create_mirror_view(edge_values_x));
 
   edge_values_z = //(ispec,edge,pt,data_index)
        specfem::kokkos::DeviceView4d<type_real, Kokkos::LayoutLeft>(
-      "specfem::compute::simulation_field::edge_values_z", this->nspec,2,this->ngllx,1);//TODO change last index to be dependent on #components?
+      "specfem::compute::simulation_field::edge_values_z", this->nspec,2,this->ngllx,_DISCONT_SIMFIELD_EDGE_COMPONENTS);//TODO change last index to be dependent on #components?
   h_edge_values_z = specfem::kokkos::HostMirror4d<type_real, Kokkos::LayoutLeft>(
       Kokkos::create_mirror_view(edge_values_z));
 

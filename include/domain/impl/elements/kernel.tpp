@@ -321,7 +321,9 @@ void specfem::domain::impl::kernels::element_kernel_base<
               
               //TODO copy values by better accessing, and handle non-acoustic case
               if constexpr(MediumTag == specfem::element::medium_tag::acoustic){
-                type_real nx, nz, invmag, det; //to store outward facing normal dotted with field
+                //storing dchi/dn * dS, the normal derivative of chi, times the linear jacobian
+
+                type_real nx, nz, det; //to store outward facing normal dotted with field
                 //note that column i of the transformation is ortho to row 1-i (0-indexing)
                 //of the inverse -- whether or not we have the right sign,
                 // you just have to take my word for it, or write out the transformations
@@ -329,27 +331,31 @@ void specfem::domain::impl::kernels::element_kernel_base<
                   //n ~ (dz/dgamma, -dx/dgamma) ~~ ortho to d/dgamma vector
                   nx = point_partial_derivatives.xix;
                   nz = point_partial_derivatives.xiz;
-                  invmag = 1/sqrt(nx*nx + nz*nz);
-                  field.edge_values_x(ispec_l,0,iz,0) = invmag*(dudxl[0]*nx + dudzl[0]*nz);
+                  det =fabs(point_partial_derivatives.xix*point_partial_derivatives.gammaz - 
+                            point_partial_derivatives.xiz*point_partial_derivatives.gammax);
+                  field.edge_values_x(ispec_l,0,iz,0) = (dudxl[0]*nx + dudzl[0]*nz)/det;
                 }else if(ix == 0){//edge 2: -x
                   //n ~ (-dz/dgamma, dx/dgamma) ~~ ortho to d/dgamma vector
                   nx = -point_partial_derivatives.xix;
                   nz = -point_partial_derivatives.xiz;
-                  invmag = 1/sqrt(nx*nx + nz*nz);
-                  field.edge_values_x(ispec_l,1,iz,0) = invmag*(dudxl[0]*nx + dudzl[0]*nz);
+                  det =fabs(point_partial_derivatives.xix*point_partial_derivatives.gammaz - 
+                            point_partial_derivatives.xiz*point_partial_derivatives.gammax);
+                  field.edge_values_x(ispec_l,1,iz,0) = (dudxl[0]*nx + dudzl[0]*nz)/det;
                 }
                 if(iz == ngllz-1){ //edge 1: +z
                   //n ~ (dz/dxi, -dx/dxi) ~~ ortho to d/dxi vector
                   nx = point_partial_derivatives.gammax;
                   nz = point_partial_derivatives.gammaz;
-                  invmag = 1/sqrt(nx*nx + nz*nz);
-                  field.edge_values_z(ispec_l,0,ix,0) = invmag*(dudxl[0]*nx + dudzl[0]*nz);
+                  det =fabs(point_partial_derivatives.xix*point_partial_derivatives.gammaz - 
+                            point_partial_derivatives.xiz*point_partial_derivatives.gammax);
+                  field.edge_values_z(ispec_l,0,ix,0) = (dudxl[0]*nx + dudzl[0]*nz)/det;
                 }else if(iz == 0){//edge 3: -z
                   //n ~ (dz/dxi, -dx/dxi) ~~ ortho to d/dxi vector
                   nx = -point_partial_derivatives.gammax;
                   nz = -point_partial_derivatives.gammaz;
-                  invmag = 1/sqrt(nx*nx + nz*nz);
-                  field.edge_values_z(ispec_l,1,ix,0) = invmag*(dudxl[0]*nx + dudzl[0]*nz);
+                  det =fabs(point_partial_derivatives.xix*point_partial_derivatives.gammaz - 
+                            point_partial_derivatives.xiz*point_partial_derivatives.gammax);
+                  field.edge_values_z(ispec_l,1,ix,0) = (dudxl[0]*nx + dudzl[0]*nz)/det;
                 }
               }
 
@@ -483,41 +489,92 @@ void specfem::domain::impl::kernels::element_kernel_base<
   Kokkos::fence();
 
   //TODO handle non-acoustic case
-  if constexpr(MediumTag != specfem::element::medium_tag::acoustic) return;
+  if constexpr(MediumTag == specfem::element::medium_tag::acoustic){
+
+
+  int ngllx, ngllz;
+  quadrature_points.get_ngll(&ngllx, &ngllz);
+
+    
+  //surface_integral (rho_inv * tilde chi * dchi/dn) dS ~ rho_inv * gllweight * linear_jac * dchi/dn
+  //central flux: average; note that outward facing normal means adj needs flipping
+  const auto fluxcalc = [&](const specfem::point::index index,int e_ind,
+  specfem::kokkos::array_type<type_real, _DISCONT_SIMFIELD_EDGE_COMPONENTS> thisval,
+  specfem::kokkos::array_type<type_real, _DISCONT_SIMFIELD_EDGE_COMPONENTS> adjval) -> type_real {
+    const auto point_property =
+        [&]() -> specfem::point::properties<MediumTag, PropertyTag> {
+        specfem::point::properties<MediumTag, PropertyTag>
+            point_property;
+        specfem::compute::load_on_device(index, properties,
+                                          point_property);
+        return point_property;
+    }();
+    return wgll(e_ind) * point_property.rho_inverse * (
+      (thisval[0] - adjval[0])/2
+    );
+  };
+
+  //returns a subview of the point corresponding to the edge adjacent to edge (ispec,iedge)
+  const auto adjview = [&](int ispec,int iedge,int e_ind)
+      -> specfem::kokkos::array_type<type_real, _DISCONT_SIMFIELD_EDGE_COMPONENTS> {
+    const int adj_spec = field.mesh_adjacency(ispec,iedge,0);
+    int adj_edge = field.mesh_adjacency(ispec,iedge,1);
+    const bool adj_flip = (adj_edge & 4) != 0;
+    adj_edge = 3 & adj_edge;
+    if(adj_edge % 2 == 0){// left/right
+      return Kokkos::subview(field.edge_values_x,adj_spec,adj_edge & 2,
+      adj_flip ? (ngllz-1-e_ind):e_ind,Kokkos::ALL);
+    }else{// top/bottom
+      return Kokkos::subview(field.edge_values_z,adj_spec,adj_edge & 2,
+      adj_flip ? (ngllx-1-e_ind):e_ind,Kokkos::ALL);
+    }
+  };
 
   Kokkos::parallel_for(nelements,[&](const int ind) { //TODO teams/deviceteam policy
     const auto ispec_l = element_kernel_index_mapping(ind);
-    //surface_integral (rho_inv * tilde chi * dchi/dn) dS ~ rho_inv * gllweight * linear_jac * dchi/dn
+    const auto point_boundary_type = boundary_conditions(ispec_l);
 
     //TODO set acceleration by integral above: use field.edge_values_<x,z> and field.mesh_adjacencies
     // to pull data for dchi/dn
     
     Kokkos::parallel_for(ngllz,[&](const int e_ind) { //left/right bdries
       PointAccelerationType acceleration;
-      if (boundary_type.right==specfem_enums::element::boundary_tag::none) {//right; +x
+      if (point_boundary_type.right==specfem::element::boundary_tag::none) {//right; +x
         const specfem::point::index index(ispec_l, e_ind, ngllx-1);
-        acceleration.acceleration[0] = 0;
+        acceleration.acceleration[0] = fluxcalc(index,e_ind,
+          Kokkos::subview(field.edge_values_x,ispec_l,0,e_ind,Kokkos::ALL),
+          adjview(ispec_l,0,e_ind)
+        );
         specfem::compute::atomic_add_on_device(index, acceleration,
                                                 field);
       }
-      if (boundary_type.left==specfem_enums::element::boundary_tag::none) {//left; -x
+      if (point_boundary_type.left==specfem::element::boundary_tag::none) {//left; -x
         const specfem::point::index index(ispec_l, e_ind, 0);
-        acceleration.acceleration[0] = 0;
+        acceleration.acceleration[0] = fluxcalc(index,e_ind,
+          Kokkos::subview(field.edge_values_x,ispec_l,1,e_ind,Kokkos::ALL),
+          adjview(ispec_l,2,e_ind)
+        );
         specfem::compute::atomic_add_on_device(index, acceleration,
                                                 field);
       }
     });
     Kokkos::parallel_for(ngllx,[&](const int e_ind) { //top/bottom bdries
       PointAccelerationType acceleration;
-      if (boundary_type.top==specfem_enums::element::boundary_tag::none) {//top; +z
+      if (point_boundary_type.top==specfem::element::boundary_tag::none) {//top; +z
         const specfem::point::index index(ispec_l, e_ind, ngllx-1);
-        acceleration.acceleration[0] = 0;
+        acceleration.acceleration[0] = fluxcalc(index,e_ind,
+          Kokkos::subview(field.edge_values_z,ispec_l,0,e_ind,Kokkos::ALL),
+          adjview(ispec_l,1,e_ind)
+        );
         specfem::compute::atomic_add_on_device(index, acceleration,
                                                 field);
       }
-      if (boundary_type.bottom==specfem_enums::element::boundary_tag::none) {//bottom; -z
+      if (point_boundary_type.bottom==specfem::element::boundary_tag::none) {//bottom; -z
         const specfem::point::index index(ispec_l, e_ind, 0);
-        acceleration.acceleration[0] = 0;
+        acceleration.acceleration[0] = fluxcalc(index,e_ind,
+          Kokkos::subview(field.edge_values_z,ispec_l,1,e_ind,Kokkos::ALL),
+          adjview(ispec_l,3,e_ind)
+        );
         specfem::compute::atomic_add_on_device(index, acceleration,
                                                 field);
       }
@@ -526,7 +583,7 @@ void specfem::domain::impl::kernels::element_kernel_base<
 
   });
   Kokkos::fence();
-
+  }
   return;
 }
 
