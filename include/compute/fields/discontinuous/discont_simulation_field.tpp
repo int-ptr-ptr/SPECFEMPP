@@ -62,6 +62,71 @@ specfem::compute::discontinuous_simulation_field<WavefieldType>::discontinuous_s
 
   Kokkos::deep_copy(assembly_ispec_mapping, h_assembly_ispec_mapping);
 
+
+  //TODO generate adjacencies in mesh, then just set pointers to them;
+  //this is just placeholder code using the global indices
+
+  mesh_adjacency = //(ispec,edge,data_index) data_index(0: ispec, 1: edge+flip*4)
+       specfem::kokkos::DeviceView3d<int, Kokkos::LayoutLeft>(
+      "specfem::compute::simulation_field::mesh_adj", this->nspec,4,2);
+  h_mesh_adjacency = specfem::kokkos::HostMirror3d<int, Kokkos::LayoutLeft>(
+      Kokkos::create_mirror_view(mesh_adjacency));
+
+  std::vector<int> spec_from_glob(this->nglob);
+  std::vector<int8_t> edge_from_glob(this->nglob);
+  for (int iglob = 0; iglob < this->nglob; iglob++) {
+    spec_from_glob[iglob] = -1; //init as null
+  }
+
+  const auto verify_adjacencies = [&](int ispec, int ix, int iz, int edge) {
+    int iglob = h_index_mapping(ispec,iz,ix);
+    if(spec_from_glob[iglob] == -1){
+      //not yet defined, so define it
+      spec_from_glob[iglob] = ispec;
+      edge_from_glob[iglob] = edge;
+    }else{
+      //this matches another point, so set adjacency
+      h_mesh_adjacency(ispec,edge & 3, 0) = spec_from_glob[iglob];
+      h_mesh_adjacency(ispec,edge & 3, 1) = (edge_from_glob[iglob] & 3)
+          | (4&(edge ^ edge_from_glob[iglob]));
+      // (flip:1b)(edge:2b) - edge = opposite edge, get from edge_from_glob
+      // flip = 0 if local coordinates increase in same direction
+      // we assume edge&4 flag is set on one side of the edge based on
+      // local coordinate
+    }
+  };
+
+  for (int ispec = 0; ispec < this->nspec; ispec++) {
+    //edge 0 - +x
+    verify_adjacencies(ispec,this->ngllx-1,1,            0);
+    verify_adjacencies(ispec,this->ngllx-1,this->ngllz-2,4);
+    //edge 1 - +z
+    verify_adjacencies(ispec,1,            this->ngllz-1,1);
+    verify_adjacencies(ispec,this->ngllx-2,this->ngllz-1,5);
+    //edge 2 - -x
+    verify_adjacencies(ispec,0,1,            2);
+    verify_adjacencies(ispec,0,this->ngllz-2,6);
+    //edge 3 - -z
+    verify_adjacencies(ispec,1,            0,1);
+    verify_adjacencies(ispec,this->ngllx-2,0,5);
+  }
+
+
+    
+  Kokkos::deep_copy(mesh_adjacency, h_mesh_adjacency);
+
+  edge_values_x = //(ispec,edge,pt,data_index)
+       specfem::kokkos::DeviceView4d<type_real, Kokkos::LayoutLeft>(
+      "specfem::compute::simulation_field::edge_values_x", this->nspec,2,this->ngllz,1);//TODO change last index to be dependent on #components?
+  h_edge_values_x = specfem::kokkos::HostMirror4d<type_real, Kokkos::LayoutLeft>(
+      Kokkos::create_mirror_view(edge_values_x));
+
+  edge_values_z = //(ispec,edge,pt,data_index)
+       specfem::kokkos::DeviceView4d<type_real, Kokkos::LayoutLeft>(
+      "specfem::compute::simulation_field::edge_values_z", this->nspec,2,this->ngllx,1);//TODO change last index to be dependent on #components?
+  h_edge_values_z = specfem::kokkos::HostMirror4d<type_real, Kokkos::LayoutLeft>(
+      Kokkos::create_mirror_view(edge_values_z));
+
   return;
 }
 

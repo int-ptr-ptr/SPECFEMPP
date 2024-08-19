@@ -318,6 +318,40 @@ void specfem::domain::impl::kernels::element_kernel_base<
               element.compute_gradient(
                   xz, element_quadrature.hprime_gll, element_field.displacement,
                   point_partial_derivatives, point_boundary_type, dudxl, dudzl);
+              
+              //TODO copy values by better accessing, and handle non-acoustic case
+              if constexpr(MediumTag == specfem::element::medium_tag::acoustic){
+                type_real nx, nz, invmag, det; //to store outward facing normal dotted with field
+                //note that column i of the transformation is ortho to row 1-i (0-indexing)
+                //of the inverse -- whether or not we have the right sign,
+                // you just have to take my word for it, or write out the transformations
+                if(ix == ngllx-1){ //edge 0: +x
+                  //n ~ (dz/dgamma, -dx/dgamma) ~~ ortho to d/dgamma vector
+                  nx = point_partial_derivatives.xix;
+                  nz = point_partial_derivatives.xiz;
+                  invmag = 1/sqrt(nx*nx + nz*nz);
+                  field.edge_values_x(ispec_l,0,iz,0) = invmag*(dudxl[0]*nx + dudzl[0]*nz);
+                }else if(ix == 0){//edge 2: -x
+                  //n ~ (-dz/dgamma, dx/dgamma) ~~ ortho to d/dgamma vector
+                  nx = -point_partial_derivatives.xix;
+                  nz = -point_partial_derivatives.xiz;
+                  invmag = 1/sqrt(nx*nx + nz*nz);
+                  field.edge_values_x(ispec_l,1,iz,0) = invmag*(dudxl[0]*nx + dudzl[0]*nz);
+                }
+                if(iz == ngllz-1){ //edge 1: +z
+                  //n ~ (dz/dxi, -dx/dxi) ~~ ortho to d/dxi vector
+                  nx = point_partial_derivatives.gammax;
+                  nz = point_partial_derivatives.gammaz;
+                  invmag = 1/sqrt(nx*nx + nz*nz);
+                  field.edge_values_z(ispec_l,0,ix,0) = invmag*(dudxl[0]*nx + dudzl[0]*nz);
+                }else if(iz == 0){//edge 3: -z
+                  //n ~ (dz/dxi, -dx/dxi) ~~ ortho to d/dxi vector
+                  nx = -point_partial_derivatives.gammax;
+                  nz = -point_partial_derivatives.gammaz;
+                  invmag = 1/sqrt(nx*nx + nz*nz);
+                  field.edge_values_z(ispec_l,1,ix,0) = invmag*(dudxl[0]*nx + dudzl[0]*nz);
+                }
+              }
 
               specfem::kokkos::array_type<type_real, medium_type::components>
                   stress_integrand_xi;
@@ -368,11 +402,10 @@ void specfem::domain::impl::kernels::element_kernel_base<
               // Get velocity, partial derivatives, and properties
               // only if needed by the boundary condition
               // ---------------------------------------------------------------
-              // constexpr bool load_boundary_variables =
-              //     ((tag == specfem::element::boundary_tag::stacey) ||
-              //      (tag == specfem::element::boundary_tag::
-              //                  composite_stacey_dirichlet));
-              constexpr bool load_boundary_variables = true;
+              constexpr bool load_boundary_variables =
+                  ((tag == specfem::element::boundary_tag::stacey) ||
+                   (tag == specfem::element::boundary_tag::
+                               composite_stacey_dirichlet));
 
               constexpr bool store_boundary_values =
                   ((BoundaryTag == specfem::element::boundary_tag::stacey) &&
@@ -449,8 +482,155 @@ void specfem::domain::impl::kernels::element_kernel_base<
 
   Kokkos::fence();
 
+  //TODO handle non-acoustic case
+  if constexpr(MediumTag != specfem::element::medium_tag::acoustic) return;
+
+  Kokkos::parallel_for(nelements,[&](const int ind) { //TODO teams/deviceteam policy
+    const auto ispec_l = element_kernel_index_mapping(ind);
+    //surface_integral (rho_inv * tilde chi * dchi/dn) dS ~ rho_inv * gllweight * linear_jac * dchi/dn
+
+    //TODO set acceleration by integral above: use field.edge_values_<x,z> and field.mesh_adjacencies
+    // to pull data for dchi/dn
+    
+    Kokkos::parallel_for(ngllz,[&](const int e_ind) { //left/right bdries
+      PointAccelerationType acceleration;
+      if (boundary_type.right==specfem_enums::element::boundary_tag::none) {//right; +x
+        const specfem::point::index index(ispec_l, e_ind, ngllx-1);
+        acceleration.acceleration[0] = 0;
+        specfem::compute::atomic_add_on_device(index, acceleration,
+                                                field);
+      }
+      if (boundary_type.left==specfem_enums::element::boundary_tag::none) {//left; -x
+        const specfem::point::index index(ispec_l, e_ind, 0);
+        acceleration.acceleration[0] = 0;
+        specfem::compute::atomic_add_on_device(index, acceleration,
+                                                field);
+      }
+    });
+    Kokkos::parallel_for(ngllx,[&](const int e_ind) { //top/bottom bdries
+      PointAccelerationType acceleration;
+      if (boundary_type.top==specfem_enums::element::boundary_tag::none) {//top; +z
+        const specfem::point::index index(ispec_l, e_ind, ngllx-1);
+        acceleration.acceleration[0] = 0;
+        specfem::compute::atomic_add_on_device(index, acceleration,
+                                                field);
+      }
+      if (boundary_type.bottom==specfem_enums::element::boundary_tag::none) {//bottom; -z
+        const specfem::point::index index(ispec_l, e_ind, 0);
+        acceleration.acceleration[0] = 0;
+        specfem::compute::atomic_add_on_device(index, acceleration,
+                                                field);
+      }
+    });
+    
+
+  });
+  Kokkos::fence();
+
   return;
 }
+
+// template <specfem::wavefield::type WavefieldType,
+//           specfem::dimension::type DimensionType,
+//           specfem::element::medium_tag MediumTag,
+//           specfem::element::property_tag PropertyTag,
+//           specfem::element::boundary_tag BoundaryTag,
+//           typename quadrature_points_type>
+// template <specfem::enums::boundaries::type edge>
+// void _edge_iter_helper(const int &ngllx, const int &ngllz,
+//           const specfem::point::boundary &boundary_type){
+
+//   if (
+//     (edge == specfem::enums::boundaries::type::LEFT &&
+//       boundary_type.left == specfem::enums::element::boundary_tag::none)
+//   ||(edge == specfem::enums::boundaries::type::TOP &&
+//       boundary_type.top == specfem::enums::element::boundary_tag::none)
+//   ||(edge == specfem::enums::boundaries::type::RIGHT &&
+//       boundary_type.right == specfem::enums::element::boundary_tag::none)
+//   ||(edge == specfem::enums::boundaries::type::BOTTOM &&
+//       boundary_type.bottom == specfem::enums::element::boundary_tag::none)
+//   ) {
+//     return;
+//   }
+//   const int edgelen = (edge==specfem::enums::boundaries::type::LEFT
+//                     || edge==specfem::enums::boundaries::type::RIGHT)?
+//               ngllz: ngllx;
+
+//   Kokkos::parallel_for(edgelen,
+//     [&, istep](const int xz) {
+//       const int ix = (edge==specfem::enums::boundaries::type::LEFT
+//                    || edge==specfem::enums::boundaries::type::RIGHT)?
+//           ((edge==specfem::enums::boundaries::type::LEFT)? 0:(ngllx-1)):xz;
+//       const int iz = (edge==specfem::enums::boundaries::type::LEFT
+//                    || edge==specfem::enums::boundaries::type::RIGHT)?
+//           xz:((edge==specfem::enums::boundaries::type::TOP)? (ngllz-1):0);
+//       constexpr auto tag = boundary_conditions_type::value;
+
+//       const specfem::kokkos::array_type<type_real, dimension::dim>
+//           weight(wgll(ix), wgll(iz));
+
+//       PointAccelerationType acceleration;
+
+//       constexpr bool load_boundary_variables = true;
+
+//       const specfem::point::index index(ispec_l, iz, ix);
+
+//       const auto velocity = [&]() -> PointVelocityType {
+//         if constexpr (load_boundary_variables) {
+//           PointVelocityType velocity_l;
+//           specfem::compute::load_on_device(index, field, velocity_l);
+//           return velocity_l;
+//         } else {
+//           return {};
+//         }
+//       }();
+
+//       const auto point_partial_derivatives =
+//           [&]() -> specfem::point::partial_derivatives2<true> {
+//         if constexpr (load_boundary_variables) {
+//           specfem::point::partial_derivatives2<true>
+//               point_partial_derivatives;
+//           specfem::compute::load_on_device(index, partial_derivatives,
+//                                           point_partial_derivatives);
+//           return point_partial_derivatives;
+
+//         } else {
+//           return {};
+//         }
+//       }();
+
+//       const auto point_property =
+//           [&]() -> specfem::point::properties<MediumTag, PropertyTag> {
+//         if constexpr (load_boundary_variables) {
+//           specfem::point::properties<MediumTag, PropertyTag>
+//               point_property;
+//           specfem::compute::load_on_device(index, properties,
+//                                           point_property);
+//           return point_property;
+//         } else {
+//           return specfem::point::properties<MediumTag, PropertyTag>();
+//         }
+//       }();
+//       // ---------------------------------------------------------------
+//       // element.compute_acceleration(
+//       //     xz, weight, s_stress_integrand_xi, s_stress_integrand_gamma,
+//       //     element_quadrature.hprimew_gll, point_partial_derivatives,
+//       //     point_property, point_boundary_type, velocity.velocity,
+//       //     acceleration.acceleration);
+//       // compute bdry accel
+
+//       if constexpr (store_boundary_values) {
+//         specfem::compute::store_on_device(istep, index, acceleration,
+//                                           boundary_values);
+//       }
+
+//       specfem::compute::atomic_add_on_device(index, acceleration,
+//                                             field);
+
+//     }
+//   );
+  
+// }
 
 template <specfem::dimension::type DimensionType,
           specfem::element::medium_tag MediumType,

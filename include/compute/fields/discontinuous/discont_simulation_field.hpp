@@ -57,6 +57,12 @@ struct discontinuous_simulation_field{
     this->h_assembly_ispec_mapping = rhs.h_assembly_ispec_mapping;
     this->elastic = rhs.elastic;
     this->acoustic = rhs.acoustic;
+    this->mesh_adjacency = rhs.mesh_adjacency;
+    this->h_mesh_adjacency = rhs.h_mesh_adjacency;
+    this->edge_values_x = rhs.edge_values_x;
+    this->h_edge_values_x = rhs.h_edge_values_x;
+    this->edge_values_z = rhs.edge_values_z;
+    this->h_edge_values_z = rhs.h_edge_values_z;
     return;
   }
 
@@ -100,6 +106,16 @@ struct discontinuous_simulation_field{
   specfem::compute::impl::discontinuous_field_impl<specfem::dimension::type::dim2,
                                      specfem::element::medium_tag::acoustic>
       acoustic;
+
+  //TODO change to be more efficient?
+  specfem::kokkos::DeviceView3d<int, Kokkos::LayoutLeft> mesh_adjacency;
+  specfem::kokkos::HostMirror3d<int, Kokkos::LayoutLeft> h_mesh_adjacency;
+
+
+  specfem::kokkos::DeviceView4d<type_real, Kokkos::LayoutLeft> edge_values_x;
+  specfem::kokkos::HostMirror4d<type_real, Kokkos::LayoutLeft> h_edge_values_x;
+  specfem::kokkos::DeviceView4d<type_real, Kokkos::LayoutLeft> edge_values_z;
+  specfem::kokkos::HostMirror4d<type_real, Kokkos::LayoutLeft> h_edge_values_z;
 
   void copy_to_host() { sync_fields<specfem::sync::kind::DeviceToHost>(); }
 
