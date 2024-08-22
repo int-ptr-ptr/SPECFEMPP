@@ -77,7 +77,34 @@ specfem::compute::discontinuous_simulation_field<WavefieldType>::discontinuous_s
   for (int iglob = 0; iglob < this->nglob; iglob++) {
     spec_from_glob[iglob] = -1; //init as null
   }
+  for (int ispec = 0; ispec < this->nspec; ispec++) {
+    for (int edge = 0; edge < 4; edge++){
+      h_mesh_adjacency(ispec,edge,0) = -1; //init as null
+    }
+    
+  }
 
+  /*
+    using the above vectors, we initialize index_mapping, by setting adjacencies
+    according to shared global indices.
+
+      if we have not encountered this global index:
+        mark it encountered and point to this (ispec,edge)
+      
+      else:
+        match (ispec,edge) to the stored values in *_from_glob[iglob]
+   */
+  const auto link_edges = [&](int ispec1, int edge1, int ispec2, int edge2){
+    const int flip_bit = 4&(edge1 ^ edge2);
+    h_mesh_adjacency(ispec1,edge1 & 3, 0) = ispec2;
+    h_mesh_adjacency(ispec2,edge2 & 3, 0) = ispec1;
+    h_mesh_adjacency(ispec1,edge1 & 3, 1) = (edge2 & 3) | flip_bit;
+    h_mesh_adjacency(ispec2,edge2 & 3, 1) = (edge1 & 3) | flip_bit;
+      // (flip:1b)(edge:2b) - edge = opposite edge, get from edge_from_glob
+      // flip = 0 if local coordinates increase in same direction
+      // we assume edge&4 flag is set on one side of the edge based on
+      // local coordinate
+  };
   const auto verify_adjacencies = [&](int ispec, int ix, int iz, int edge) {
     int iglob = h_index_mapping(ispec,iz,ix);
     if(spec_from_glob[iglob] == -1){
@@ -86,13 +113,7 @@ specfem::compute::discontinuous_simulation_field<WavefieldType>::discontinuous_s
       edge_from_glob[iglob] = edge;
     }else{
       //this matches another point, so set adjacency
-      h_mesh_adjacency(ispec,edge & 3, 0) = spec_from_glob[iglob];
-      h_mesh_adjacency(ispec,edge & 3, 1) = (edge_from_glob[iglob] & 3)
-          | (4&(edge ^ edge_from_glob[iglob]));
-      // (flip:1b)(edge:2b) - edge = opposite edge, get from edge_from_glob
-      // flip = 0 if local coordinates increase in same direction
-      // we assume edge&4 flag is set on one side of the edge based on
-      // local coordinate
+      link_edges(ispec,edge,spec_from_glob[iglob],edge_from_glob[iglob]);
     }
   };
 
@@ -107,8 +128,8 @@ specfem::compute::discontinuous_simulation_field<WavefieldType>::discontinuous_s
     verify_adjacencies(ispec,0,1,            2);
     verify_adjacencies(ispec,0,this->ngllz-2,6);
     //edge 3 - -z
-    verify_adjacencies(ispec,1,            0,1);
-    verify_adjacencies(ispec,this->ngllx-2,0,5);
+    verify_adjacencies(ispec,1,            0,3);
+    verify_adjacencies(ispec,this->ngllx-2,0,7);
   }
 
 

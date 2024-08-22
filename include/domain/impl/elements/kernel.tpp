@@ -11,6 +11,7 @@
 #include "quadrature/interface.hpp"
 #include "specfem_setup.hpp"
 #include <Kokkos_Core.hpp>
+#include "_util/dump_discont_simfield.hpp"
 
 template <specfem::wavefield::type WavefieldType,
           specfem::dimension::type DimensionType,
@@ -334,6 +335,14 @@ void specfem::domain::impl::kernels::element_kernel_base<
                   det =fabs(point_partial_derivatives.xix*point_partial_derivatives.gammaz - 
                             point_partial_derivatives.xiz*point_partial_derivatives.gammax);
                   field.edge_values_x(ispec_l,0,iz,0) = (dudxl[0]*nx + dudzl[0]*nz)/det;
+
+                  //TODO remove debug:
+                  field.edge_values_x(ispec_l,0,iz,1) = dudxl[0];
+                  field.edge_values_x(ispec_l,0,iz,2) = dudzl[0];
+                  field.edge_values_x(ispec_l,0,iz,3) = nx;
+                  field.edge_values_x(ispec_l,0,iz,4) = nz;
+                  field.edge_values_x(ispec_l,0,iz,5) = det;
+                  //end debug
                 }else if(ix == 0){//edge 2: -x
                   //n ~ (-dz/dgamma, dx/dgamma) ~~ ortho to d/dgamma vector
                   nx = -point_partial_derivatives.xix;
@@ -341,6 +350,13 @@ void specfem::domain::impl::kernels::element_kernel_base<
                   det =fabs(point_partial_derivatives.xix*point_partial_derivatives.gammaz - 
                             point_partial_derivatives.xiz*point_partial_derivatives.gammax);
                   field.edge_values_x(ispec_l,1,iz,0) = (dudxl[0]*nx + dudzl[0]*nz)/det;
+                  //TODO remove debug:
+                  field.edge_values_x(ispec_l,1,iz,1) = dudxl[0];
+                  field.edge_values_x(ispec_l,1,iz,2) = dudzl[0];
+                  field.edge_values_x(ispec_l,1,iz,3) = nx;
+                  field.edge_values_x(ispec_l,1,iz,4) = nz;
+                  field.edge_values_x(ispec_l,1,iz,5) = det;
+                  //end debug
                 }
                 if(iz == ngllz-1){ //edge 1: +z
                   //n ~ (dz/dxi, -dx/dxi) ~~ ortho to d/dxi vector
@@ -349,6 +365,13 @@ void specfem::domain::impl::kernels::element_kernel_base<
                   det =fabs(point_partial_derivatives.xix*point_partial_derivatives.gammaz - 
                             point_partial_derivatives.xiz*point_partial_derivatives.gammax);
                   field.edge_values_z(ispec_l,0,ix,0) = (dudxl[0]*nx + dudzl[0]*nz)/det;
+                  //TODO remove debug:
+                  field.edge_values_z(ispec_l,0,ix,1) = dudxl[0];
+                  field.edge_values_z(ispec_l,0,ix,2) = dudzl[0];
+                  field.edge_values_z(ispec_l,0,ix,3) = nx;
+                  field.edge_values_z(ispec_l,0,ix,4) = nz;
+                  field.edge_values_z(ispec_l,0,ix,5) = det;
+                  //end debug
                 }else if(iz == 0){//edge 3: -z
                   //n ~ (dz/dxi, -dx/dxi) ~~ ortho to d/dxi vector
                   nx = -point_partial_derivatives.gammax;
@@ -356,6 +379,13 @@ void specfem::domain::impl::kernels::element_kernel_base<
                   det =fabs(point_partial_derivatives.xix*point_partial_derivatives.gammaz - 
                             point_partial_derivatives.xiz*point_partial_derivatives.gammax);
                   field.edge_values_z(ispec_l,1,ix,0) = (dudxl[0]*nx + dudzl[0]*nz)/det;
+                  //TODO remove debug:
+                  field.edge_values_z(ispec_l,1,ix,1) = dudxl[0];
+                  field.edge_values_z(ispec_l,1,ix,2) = dudzl[0];
+                  field.edge_values_z(ispec_l,1,ix,3) = nx;
+                  field.edge_values_z(ispec_l,1,ix,4) = nz;
+                  field.edge_values_z(ispec_l,1,ix,5) = det;
+                  //end debug
                 }
               }
 
@@ -500,7 +530,9 @@ void specfem::domain::impl::kernels::element_kernel_base<
   //central flux: average; note that outward facing normal means adj needs flipping
   const auto fluxcalc = [&](const specfem::point::index index,int e_ind,
   specfem::kokkos::array_type<type_real, _DISCONT_SIMFIELD_EDGE_COMPONENTS> thisval,
-  specfem::kokkos::array_type<type_real, _DISCONT_SIMFIELD_EDGE_COMPONENTS> adjval) -> type_real {
+  specfem::kokkos::array_type<type_real, _DISCONT_SIMFIELD_EDGE_COMPONENTS> adjval,
+  specfem::kokkos::DeviceView4d<type_real, Kokkos::LayoutLeft> edgefield, int ispec, int pmind//TODO remove
+  ) -> type_real {
     const auto point_property =
         [&]() -> specfem::point::properties<MediumTag, PropertyTag> {
         specfem::point::properties<MediumTag, PropertyTag>
@@ -509,6 +541,15 @@ void specfem::domain::impl::kernels::element_kernel_base<
                                           point_property);
         return point_property;
     }();
+    //TODO remove debug:
+    edgefield(ispec,pmind,e_ind,6) = wgll(e_ind) * point_property.rho_inverse * (
+      (thisval[0] - adjval[0])/2
+    );
+    edgefield(ispec,pmind,e_ind,7) = wgll(e_ind);
+    edgefield(ispec,pmind,e_ind,8) = point_property.rho_inverse;
+    
+
+    //end debug
     return wgll(e_ind) * point_property.rho_inverse * (
       (thisval[0] - adjval[0])/2
     );
@@ -539,20 +580,22 @@ void specfem::domain::impl::kernels::element_kernel_base<
     
     Kokkos::parallel_for(ngllz,[&](const int e_ind) { //left/right bdries
       PointAccelerationType acceleration;
-      if (point_boundary_type.right==specfem::element::boundary_tag::none) {//right; +x
+      if (point_boundary_type.right==specfem::element::boundary_tag::none &&
+            field.mesh_adjacency(ispec_l,0,0) != -1) {//right; +x
         const specfem::point::index index(ispec_l, e_ind, ngllx-1);
         acceleration.acceleration[0] = fluxcalc(index,e_ind,
           Kokkos::subview(field.edge_values_x,ispec_l,0,e_ind,Kokkos::ALL),
-          adjview(ispec_l,0,e_ind)
+          adjview(ispec_l,0,e_ind) ,field.edge_values_x,ispec_l,0
         );
         specfem::compute::atomic_add_on_device(index, acceleration,
                                                 field);
       }
-      if (point_boundary_type.left==specfem::element::boundary_tag::none) {//left; -x
+      if (point_boundary_type.left==specfem::element::boundary_tag::none &&
+            field.mesh_adjacency(ispec_l,2,0) != -1) {//left; -x
         const specfem::point::index index(ispec_l, e_ind, 0);
         acceleration.acceleration[0] = fluxcalc(index,e_ind,
           Kokkos::subview(field.edge_values_x,ispec_l,1,e_ind,Kokkos::ALL),
-          adjview(ispec_l,2,e_ind)
+          adjview(ispec_l,2,e_ind) ,field.edge_values_x,ispec_l,1
         );
         specfem::compute::atomic_add_on_device(index, acceleration,
                                                 field);
@@ -560,20 +603,22 @@ void specfem::domain::impl::kernels::element_kernel_base<
     });
     Kokkos::parallel_for(ngllx,[&](const int e_ind) { //top/bottom bdries
       PointAccelerationType acceleration;
-      if (point_boundary_type.top==specfem::element::boundary_tag::none) {//top; +z
+      if (point_boundary_type.top==specfem::element::boundary_tag::none &&
+            field.mesh_adjacency(ispec_l,1,0) != -1) {//top; +z
         const specfem::point::index index(ispec_l, e_ind, ngllx-1);
         acceleration.acceleration[0] = fluxcalc(index,e_ind,
           Kokkos::subview(field.edge_values_z,ispec_l,0,e_ind,Kokkos::ALL),
-          adjview(ispec_l,1,e_ind)
+          adjview(ispec_l,1,e_ind) ,field.edge_values_z,ispec_l,0
         );
         specfem::compute::atomic_add_on_device(index, acceleration,
                                                 field);
       }
-      if (point_boundary_type.bottom==specfem::element::boundary_tag::none) {//bottom; -z
+      if (point_boundary_type.bottom==specfem::element::boundary_tag::none &&
+            field.mesh_adjacency(ispec_l,3,0) != -1) {//bottom; -z
         const specfem::point::index index(ispec_l, e_ind, 0);
         acceleration.acceleration[0] = fluxcalc(index,e_ind,
           Kokkos::subview(field.edge_values_z,ispec_l,1,e_ind,Kokkos::ALL),
-          adjview(ispec_l,3,e_ind)
+          adjview(ispec_l,3,e_ind) ,field.edge_values_z,ispec_l,1
         );
         specfem::compute::atomic_add_on_device(index, acceleration,
                                                 field);
@@ -583,7 +628,19 @@ void specfem::domain::impl::kernels::element_kernel_base<
 
   });
   Kokkos::fence();
+
+  //TODO remove this ifblock below
+
+  // if(istep == 10){
+  //   Kokkos::deep_copy(field.h_edge_values_x, field.edge_values_x);
+  //   Kokkos::deep_copy(field.h_edge_values_z, field.edge_values_z);
+  //   _util::dump_discont_simfield("debug_dump.dat",
+  //     field,points);
+  //   std::exit(0);
+  // }
   }
+
+
   return;
 }
 
