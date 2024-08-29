@@ -83,5 +83,17 @@ namespace _util{
 
     dump.close();
   }
+
+  static int dump_interval = 10;
+  static int laststep = -dump_interval;
+  template <specfem::wavefield::type WavefieldType>
+  void dump_discont_simfield_per_step(const int istep, const std::string &filename,
+      const specfem::compute::discontinuous_simulation_field<WavefieldType> &simfield,
+      const specfem::compute::points &points){
+    if(istep >= laststep + dump_interval){
+      dump_discont_simfield(filename + std::to_string(istep)+".dat",simfield,points);
+      laststep = istep;
+    }
+  }
 }
 #endif

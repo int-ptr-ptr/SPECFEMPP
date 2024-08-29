@@ -112,8 +112,8 @@ struct discontinuous_simulation_field{
   specfem::kokkos::HostMirror3d<int, Kokkos::LayoutLeft> h_mesh_adjacency;
 
 
-//TODO figure this size out; current debugging: (du/dn ds, dudx,dudz, nx, nz, det, fluxresult, wgll, rho_inv)
-#define _DISCONT_SIMFIELD_EDGE_COMPONENTS 9
+//TODO figure this size out; current debugging: (du/dn ds, dudx,dudz, nx, nz, det, fluxresult, wgll, rho_inv, du/dn ds from fluxcalc, du/dn ds adjacent)
+#define _DISCONT_SIMFIELD_EDGE_COMPONENTS 11
   specfem::kokkos::DeviceView4d<type_real, Kokkos::LayoutLeft> edge_values_x;
   specfem::kokkos::HostMirror4d<type_real, Kokkos::LayoutLeft> h_edge_values_x;
   specfem::kokkos::DeviceView4d<type_real, Kokkos::LayoutLeft> edge_values_z;

@@ -332,60 +332,41 @@ void specfem::domain::impl::kernels::element_kernel_base<
                   //n ~ (dz/dgamma, -dx/dgamma) ~~ ortho to d/dgamma vector
                   nx = point_partial_derivatives.xix;
                   nz = point_partial_derivatives.xiz;
-                  det =fabs(point_partial_derivatives.xix*point_partial_derivatives.gammaz - 
-                            point_partial_derivatives.xiz*point_partial_derivatives.gammax);
-                  field.edge_values_x(ispec_l,0,iz,0) = (dudxl[0]*nx + dudzl[0]*nz)/det;
 
-                  //TODO remove debug:
-                  field.edge_values_x(ispec_l,0,iz,1) = dudxl[0];
-                  field.edge_values_x(ispec_l,0,iz,2) = dudzl[0];
-                  field.edge_values_x(ispec_l,0,iz,3) = nx;
-                  field.edge_values_x(ispec_l,0,iz,4) = nz;
-                  field.edge_values_x(ispec_l,0,iz,5) = det;
-                  //end debug
+                  //this is inv transform, we want Jacobian of base transform
+                  det =1/fabs(point_partial_derivatives.xix*point_partial_derivatives.gammaz - 
+                              point_partial_derivatives.xiz*point_partial_derivatives.gammax);
+                  field.edge_values_x(ispec_l,0,iz,0) = (dudxl[0]*nx + dudzl[0]*nz)*det;    // dX/dn dS
+                  field.edge_values_x(ispec_l,0,iz,1) = element_field.displacement(iz,ix,0);// X
+                  field.edge_values_x(ispec_l,0,iz,2) = sqrt(nx*nx + nz*nz)*det;            // dS
                 }else if(ix == 0){//edge 2: -x
                   //n ~ (-dz/dgamma, dx/dgamma) ~~ ortho to d/dgamma vector
                   nx = -point_partial_derivatives.xix;
                   nz = -point_partial_derivatives.xiz;
-                  det =fabs(point_partial_derivatives.xix*point_partial_derivatives.gammaz - 
-                            point_partial_derivatives.xiz*point_partial_derivatives.gammax);
-                  field.edge_values_x(ispec_l,1,iz,0) = (dudxl[0]*nx + dudzl[0]*nz)/det;
-                  //TODO remove debug:
-                  field.edge_values_x(ispec_l,1,iz,1) = dudxl[0];
-                  field.edge_values_x(ispec_l,1,iz,2) = dudzl[0];
-                  field.edge_values_x(ispec_l,1,iz,3) = nx;
-                  field.edge_values_x(ispec_l,1,iz,4) = nz;
-                  field.edge_values_x(ispec_l,1,iz,5) = det;
-                  //end debug
+                  det =1/fabs(point_partial_derivatives.xix*point_partial_derivatives.gammaz - 
+                              point_partial_derivatives.xiz*point_partial_derivatives.gammax);
+                  field.edge_values_x(ispec_l,1,iz,0) = (dudxl[0]*nx + dudzl[0]*nz)*det;    // dX/dn dS
+                  field.edge_values_x(ispec_l,1,iz,1) = element_field.displacement(iz,ix,0);// X
+                  field.edge_values_x(ispec_l,1,iz,2) = sqrt(nx*nx + nz*nz)*det;            // dS
                 }
                 if(iz == ngllz-1){ //edge 1: +z
                   //n ~ (dz/dxi, -dx/dxi) ~~ ortho to d/dxi vector
                   nx = point_partial_derivatives.gammax;
                   nz = point_partial_derivatives.gammaz;
-                  det =fabs(point_partial_derivatives.xix*point_partial_derivatives.gammaz - 
-                            point_partial_derivatives.xiz*point_partial_derivatives.gammax);
-                  field.edge_values_z(ispec_l,0,ix,0) = (dudxl[0]*nx + dudzl[0]*nz)/det;
-                  //TODO remove debug:
-                  field.edge_values_z(ispec_l,0,ix,1) = dudxl[0];
-                  field.edge_values_z(ispec_l,0,ix,2) = dudzl[0];
-                  field.edge_values_z(ispec_l,0,ix,3) = nx;
-                  field.edge_values_z(ispec_l,0,ix,4) = nz;
-                  field.edge_values_z(ispec_l,0,ix,5) = det;
-                  //end debug
+                  det =1/fabs(point_partial_derivatives.xix*point_partial_derivatives.gammaz - 
+                              point_partial_derivatives.xiz*point_partial_derivatives.gammax);
+                  field.edge_values_z(ispec_l,0,ix,0) = (dudxl[0]*nx + dudzl[0]*nz)*det;    // dX/dn dS
+                  field.edge_values_z(ispec_l,0,ix,1) = element_field.displacement(iz,ix,0);// X
+                  field.edge_values_z(ispec_l,0,ix,2) = sqrt(nx*nx + nz*nz)*det;            // dS
                 }else if(iz == 0){//edge 3: -z
                   //n ~ (dz/dxi, -dx/dxi) ~~ ortho to d/dxi vector
                   nx = -point_partial_derivatives.gammax;
                   nz = -point_partial_derivatives.gammaz;
-                  det =fabs(point_partial_derivatives.xix*point_partial_derivatives.gammaz - 
-                            point_partial_derivatives.xiz*point_partial_derivatives.gammax);
-                  field.edge_values_z(ispec_l,1,ix,0) = (dudxl[0]*nx + dudzl[0]*nz)/det;
-                  //TODO remove debug:
-                  field.edge_values_z(ispec_l,1,ix,1) = dudxl[0];
-                  field.edge_values_z(ispec_l,1,ix,2) = dudzl[0];
-                  field.edge_values_z(ispec_l,1,ix,3) = nx;
-                  field.edge_values_z(ispec_l,1,ix,4) = nz;
-                  field.edge_values_z(ispec_l,1,ix,5) = det;
-                  //end debug
+                  det =1/fabs(point_partial_derivatives.xix*point_partial_derivatives.gammaz - 
+                              point_partial_derivatives.xiz*point_partial_derivatives.gammax);
+                  field.edge_values_z(ispec_l,1,ix,0) = (dudxl[0]*nx + dudzl[0]*nz)*det;    // dX/dn dS
+                  field.edge_values_z(ispec_l,1,ix,1) = element_field.displacement(iz,ix,0);// X
+                  field.edge_values_z(ispec_l,1,ix,2) = sqrt(nx*nx + nz*nz)*det;            // dS
                 }
               }
 
@@ -541,18 +522,22 @@ void specfem::domain::impl::kernels::element_kernel_base<
                                           point_property);
         return point_property;
     }();
-    //TODO remove debug:
-    edgefield(ispec,pmind,e_ind,6) = wgll(e_ind) * point_property.rho_inverse * (
-      (thisval[0] - adjval[0])/2
-    );
-    edgefield(ispec,pmind,e_ind,7) = wgll(e_ind);
-    edgefield(ispec,pmind,e_ind,8) = point_property.rho_inverse;
-    
+    //TODO: change FAC to be a per-nearby-element quantity (FAC = a = alpha * cmax/hmax @ Grote et al. 2006)
+    constexpr type_real FAC = 3.0e-4;
 
+    //TODO remove debug:
+    edgefield(ispec,pmind,e_ind,3) = (thisval[0] - adjval[0])/2; //normalderiv avg
+    edgefield(ispec,pmind,e_ind,4) = (thisval[1] - adjval[1]);   //field jump
+    edgefield(ispec,pmind,e_ind,5) = wgll(e_ind) * point_property.rho_inverse
+          * (thisval[0] - adjval[0])/2;
+    edgefield(ispec,pmind,e_ind,6) = FAC * (thisval[1] - adjval[1]) * thisval[2] * wgll(e_ind);
+    edgefield(ispec,pmind,e_ind,7) = point_property.rho_inverse;
+    edgefield(ispec,pmind,e_ind,8) = point_property.kappa;
+    edgefield(ispec,pmind,e_ind,9) = wgll(e_ind);
     //end debug
-    return wgll(e_ind) * point_property.rho_inverse * (
-      (thisval[0] - adjval[0])/2
-    );
+
+    return wgll(e_ind) * point_property.rho_inverse * (thisval[0] - adjval[0])/2
+      - FAC * (thisval[1] - adjval[1]) * thisval[2] * wgll(e_ind);
   };
 
   //returns a subview of the point corresponding to the edge adjacent to edge (ispec,iedge)
@@ -563,10 +548,10 @@ void specfem::domain::impl::kernels::element_kernel_base<
     const bool adj_flip = (adj_edge & 4) != 0;
     adj_edge = 3 & adj_edge;
     if(adj_edge % 2 == 0){// left/right
-      return Kokkos::subview(field.edge_values_x,adj_spec,adj_edge & 2,
+      return Kokkos::subview(field.edge_values_x,adj_spec,(adj_edge & 2) >> 1,
       adj_flip ? (ngllz-1-e_ind):e_ind,Kokkos::ALL);
     }else{// top/bottom
-      return Kokkos::subview(field.edge_values_z,adj_spec,adj_edge & 2,
+      return Kokkos::subview(field.edge_values_z,adj_spec,(adj_edge & 2) >> 1,
       adj_flip ? (ngllx-1-e_ind):e_ind,Kokkos::ALL);
     }
   };
@@ -605,7 +590,7 @@ void specfem::domain::impl::kernels::element_kernel_base<
       PointAccelerationType acceleration;
       if (point_boundary_type.top==specfem::element::boundary_tag::none &&
             field.mesh_adjacency(ispec_l,1,0) != -1) {//top; +z
-        const specfem::point::index index(ispec_l, e_ind, ngllx-1);
+        const specfem::point::index index(ispec_l, ngllz-1, e_ind);
         acceleration.acceleration[0] = fluxcalc(index,e_ind,
           Kokkos::subview(field.edge_values_z,ispec_l,0,e_ind,Kokkos::ALL),
           adjview(ispec_l,1,e_ind) ,field.edge_values_z,ispec_l,0
@@ -615,7 +600,7 @@ void specfem::domain::impl::kernels::element_kernel_base<
       }
       if (point_boundary_type.bottom==specfem::element::boundary_tag::none &&
             field.mesh_adjacency(ispec_l,3,0) != -1) {//bottom; -z
-        const specfem::point::index index(ispec_l, e_ind, 0);
+        const specfem::point::index index(ispec_l, 0, e_ind);
         acceleration.acceleration[0] = fluxcalc(index,e_ind,
           Kokkos::subview(field.edge_values_z,ispec_l,1,e_ind,Kokkos::ALL),
           adjview(ispec_l,3,e_ind) ,field.edge_values_z,ispec_l,1
@@ -631,13 +616,21 @@ void specfem::domain::impl::kernels::element_kernel_base<
 
   //TODO remove this ifblock below
 
-  // if(istep == 10){
+  
+  Kokkos::deep_copy(field.h_edge_values_x, field.edge_values_x);
+  Kokkos::deep_copy(field.h_edge_values_z, field.edge_values_z);
+  _util::dump_discont_simfield_per_step(istep,"tmp/debug_dump",
+    field,points);
+  // if(istep == 50){
+  //   std::cout << "\nCopying edge values ("<<field.h_edge_values_x.extent(3)<<"), dumping, then exiting\n";
   //   Kokkos::deep_copy(field.h_edge_values_x, field.edge_values_x);
   //   Kokkos::deep_copy(field.h_edge_values_z, field.edge_values_z);
   //   _util::dump_discont_simfield("debug_dump.dat",
   //     field,points);
   //   std::exit(0);
   // }
+
+
   }
 
 
