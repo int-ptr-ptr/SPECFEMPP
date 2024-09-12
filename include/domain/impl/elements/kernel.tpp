@@ -523,7 +523,7 @@ void specfem::domain::impl::kernels::element_kernel_base<
         return point_property;
     }();
     //TODO: change FAC to be a per-nearby-element quantity (FAC = a = alpha * cmax/hmax @ Grote et al. 2006)
-    constexpr type_real FAC = 3.0e-4;
+    constexpr type_real FAC = 15 * (2500*2500) / 70.7;
 
     //TODO remove debug:
     edgefield(ispec,pmind,e_ind,3) = (thisval[0] - adjval[0])/2; //normalderiv avg
@@ -532,11 +532,14 @@ void specfem::domain::impl::kernels::element_kernel_base<
           * (thisval[0] - adjval[0])/2;
     edgefield(ispec,pmind,e_ind,6) = FAC * (thisval[1] - adjval[1]) * thisval[2] * wgll(e_ind);
     edgefield(ispec,pmind,e_ind,7) = point_property.rho_inverse;
-    edgefield(ispec,pmind,e_ind,8) = point_property.kappa;
+    edgefield(ispec,pmind,e_ind,8) = (-hprime(0,0));
     edgefield(ispec,pmind,e_ind,9) = wgll(e_ind);
+    edgefield(ispec,pmind,e_ind,10) = wgll(e_ind) * thisval[2] * point_property.rho_inverse * (thisval[1] - adjval[1]) * (-hprime(0,0)/2);
     //end debug
 
-    return wgll(e_ind) * point_property.rho_inverse * (thisval[0] - adjval[0])/2
+    return 
+      wgll(e_ind) * thisval[2] * point_property.rho_inverse * (thisval[1] - adjval[1]) * (-hprime(0,0)/2)
+      + wgll(e_ind) * point_property.rho_inverse * (thisval[0] - adjval[0])/2
       - FAC * (thisval[1] - adjval[1]) * thisval[2] * wgll(e_ind);
   };
 
@@ -559,9 +562,6 @@ void specfem::domain::impl::kernels::element_kernel_base<
   Kokkos::parallel_for(nelements,[&](const int ind) { //TODO teams/deviceteam policy
     const auto ispec_l = element_kernel_index_mapping(ind);
     const auto point_boundary_type = boundary_conditions(ispec_l);
-
-    //TODO set acceleration by integral above: use field.edge_values_<x,z> and field.mesh_adjacencies
-    // to pull data for dchi/dn
     
     Kokkos::parallel_for(ngllz,[&](const int e_ind) { //left/right bdries
       PointAccelerationType acceleration;
