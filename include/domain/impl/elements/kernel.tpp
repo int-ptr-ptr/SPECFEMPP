@@ -328,6 +328,20 @@ void specfem::domain::impl::kernels::element_kernel_base<
                 //note that column i of the transformation is ortho to row 1-i (0-indexing)
                 //of the inverse -- whether or not we have the right sign,
                 // you just have to take my word for it, or write out the transformations
+
+                type_real dvdx, dvdz, dvdxi, dvdga;
+
+                //v derivs: v = L_{ix}(x) L_{iz}(z)
+                dvdxi = hprime(ix,ix);
+                dvdga = hprime(iz,iz);
+                // dchidx
+                dvdx = dvdxi * point_partial_derivatives.xix +
+                            dvdxi * point_partial_derivatives.gammax;
+
+                // dchidz
+                dvdz = dvdxi * point_partial_derivatives.xiz +
+                            dvdxi * point_partial_derivatives.gammaz;
+
                 if(ix == ngllx-1){ //edge 0: +x
                   //n ~ (dz/dgamma, -dx/dgamma) ~~ ortho to d/dgamma vector
                   nx = point_partial_derivatives.xix;
@@ -339,6 +353,12 @@ void specfem::domain::impl::kernels::element_kernel_base<
                   field.edge_values_x(ispec_l,0,iz,0) = (dudxl[0]*nx + dudzl[0]*nz)*det;    // dX/dn dS
                   field.edge_values_x(ispec_l,0,iz,1) = element_field.displacement(iz,ix,0);// X
                   field.edge_values_x(ispec_l,0,iz,2) = sqrt(nx*nx + nz*nz)*det;            // dS
+                  field.edge_values_x(ispec_l,0,iz,11)= (dvdx*nx + dvdz*nz)*det;            // dv/dn dS (test fcn)
+                  field.edge_values_x(ispec_l,0,iz,12)= dvdx;
+                  field.edge_values_x(ispec_l,0,iz,13)= dvdz;
+                  field.edge_values_x(ispec_l,0,iz,14)= nx;
+                  field.edge_values_x(ispec_l,0,iz,15)= nz;
+                  field.edge_values_x(ispec_l,0,iz,16)= det;
                 }else if(ix == 0){//edge 2: -x
                   //n ~ (-dz/dgamma, dx/dgamma) ~~ ortho to d/dgamma vector
                   nx = -point_partial_derivatives.xix;
@@ -348,6 +368,12 @@ void specfem::domain::impl::kernels::element_kernel_base<
                   field.edge_values_x(ispec_l,1,iz,0) = (dudxl[0]*nx + dudzl[0]*nz)*det;    // dX/dn dS
                   field.edge_values_x(ispec_l,1,iz,1) = element_field.displacement(iz,ix,0);// X
                   field.edge_values_x(ispec_l,1,iz,2) = sqrt(nx*nx + nz*nz)*det;            // dS
+                  field.edge_values_x(ispec_l,1,iz,11)= (dvdx*nx + dvdz*nz)*det;            // dv/dn dS (test fcn)
+                  field.edge_values_x(ispec_l,1,iz,12)= dvdx;
+                  field.edge_values_x(ispec_l,1,iz,13)= dvdz;
+                  field.edge_values_x(ispec_l,1,iz,14)= nx;
+                  field.edge_values_x(ispec_l,1,iz,15)= nz;
+                  field.edge_values_x(ispec_l,1,iz,16)= det;
                 }
                 if(iz == ngllz-1){ //edge 1: +z
                   //n ~ (dz/dxi, -dx/dxi) ~~ ortho to d/dxi vector
@@ -358,6 +384,12 @@ void specfem::domain::impl::kernels::element_kernel_base<
                   field.edge_values_z(ispec_l,0,ix,0) = (dudxl[0]*nx + dudzl[0]*nz)*det;    // dX/dn dS
                   field.edge_values_z(ispec_l,0,ix,1) = element_field.displacement(iz,ix,0);// X
                   field.edge_values_z(ispec_l,0,ix,2) = sqrt(nx*nx + nz*nz)*det;            // dS
+                  field.edge_values_z(ispec_l,0,ix,11)= (dvdx*nx + dvdz*nz)*det;            // dv/dn dS (test fcn)
+                  field.edge_values_z(ispec_l,0,ix,12)= dvdx;
+                  field.edge_values_z(ispec_l,0,ix,13)= dvdz;
+                  field.edge_values_z(ispec_l,0,ix,14)= nx;
+                  field.edge_values_z(ispec_l,0,ix,15)= nz;
+                  field.edge_values_z(ispec_l,0,ix,16)= det;
                 }else if(iz == 0){//edge 3: -z
                   //n ~ (dz/dxi, -dx/dxi) ~~ ortho to d/dxi vector
                   nx = -point_partial_derivatives.gammax;
@@ -367,6 +399,12 @@ void specfem::domain::impl::kernels::element_kernel_base<
                   field.edge_values_z(ispec_l,1,ix,0) = (dudxl[0]*nx + dudzl[0]*nz)*det;    // dX/dn dS
                   field.edge_values_z(ispec_l,1,ix,1) = element_field.displacement(iz,ix,0);// X
                   field.edge_values_z(ispec_l,1,ix,2) = sqrt(nx*nx + nz*nz)*det;            // dS
+                  field.edge_values_z(ispec_l,1,ix,11)= (dvdx*nx + dvdz*nz)*det;            // dv/dn dS (test fcn)
+                  field.edge_values_z(ispec_l,1,ix,12)= dvdx;
+                  field.edge_values_z(ispec_l,1,ix,13)= dvdz;
+                  field.edge_values_z(ispec_l,1,ix,14)= nx;
+                  field.edge_values_z(ispec_l,1,ix,15)= nz;
+                  field.edge_values_z(ispec_l,1,ix,16)= det;
                 }
               }
 
@@ -523,7 +561,7 @@ void specfem::domain::impl::kernels::element_kernel_base<
         return point_property;
     }();
     //TODO: change FAC to be a per-nearby-element quantity (FAC = a = alpha * cmax/hmax @ Grote et al. 2006)
-    constexpr type_real FAC = 15 * (2500*2500) / 70.7;
+    constexpr type_real FAC = 20 * (2500*2500) / 70.7;
 
     //TODO remove debug:
     edgefield(ispec,pmind,e_ind,3) = (thisval[0] - adjval[0])/2; //normalderiv avg
@@ -532,13 +570,13 @@ void specfem::domain::impl::kernels::element_kernel_base<
           * (thisval[0] - adjval[0])/2;
     edgefield(ispec,pmind,e_ind,6) = FAC * (thisval[1] - adjval[1]) * thisval[2] * wgll(e_ind);
     edgefield(ispec,pmind,e_ind,7) = point_property.rho_inverse;
-    edgefield(ispec,pmind,e_ind,8) = (-hprime(0,0));
+    edgefield(ispec,pmind,e_ind,8) = (hprime(e_ind,e_ind));
     edgefield(ispec,pmind,e_ind,9) = wgll(e_ind);
-    edgefield(ispec,pmind,e_ind,10) = wgll(e_ind) * thisval[2] * point_property.rho_inverse * (thisval[1] - adjval[1]) * (-hprime(0,0)/2);
+    edgefield(ispec,pmind,e_ind,10) =wgll(e_ind) * point_property.rho_inverse * (thisval[1] - adjval[1]) * (thisval[11]/2);
     //end debug
 
     return 
-      wgll(e_ind) * thisval[2] * point_property.rho_inverse * (thisval[1] - adjval[1]) * (-hprime(0,0)/2)
+      wgll(e_ind) * point_property.rho_inverse * (thisval[1] - adjval[1]) * (thisval[11]/2)
       + wgll(e_ind) * point_property.rho_inverse * (thisval[0] - adjval[0])/2
       - FAC * (thisval[1] - adjval[1]) * thisval[2] * wgll(e_ind);
   };

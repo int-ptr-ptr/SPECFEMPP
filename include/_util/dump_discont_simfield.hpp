@@ -84,7 +84,7 @@ namespace _util{
     dump.close();
   }
 
-  static int dump_interval = 10;
+  static int dump_interval = 100;
   static int laststep = -dump_interval;
   template <specfem::wavefield::type WavefieldType>
   void dump_discont_simfield_per_step(const int istep, const std::string &filename,
