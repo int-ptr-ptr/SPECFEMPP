@@ -417,6 +417,29 @@ target_link_libraries(
         ${HDF5_LIBRARIES}
 )
 
+add_executable(
+        specfem2d_order1
+        src/order1_solver/order1_sim.cpp
+)
+target_link_libraries(
+        specfem2d_order1
+        specfem_mpi
+        Kokkos::kokkos
+        mesh
+        quadrature
+        compute
+        source_class
+        parameter_reader
+        receiver_class
+        writer
+        reader
+        coupled_interface
+        kernels
+        Boost::program_options
+        ${HDF5_LIBRARIES}
+)
+
+
 # Include tests
 if (BUILD_TESTS)
         message("-- Including tests.")
