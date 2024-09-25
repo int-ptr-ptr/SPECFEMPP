@@ -72,8 +72,21 @@ specfem::compute::impl::discontinuous_field_impl<DimensionType, MediumTag>::disc
       specfem::kokkos::HostRange(0, count), [=](const int &ispec) {
         for (int iz = 0; iz < ngllz; iz++) {
           for (int ix = 0; ix < ngllx; ix++) {
+            type_real x = mesh.points.h_coord(0,ispec,iz,ix);
+            type_real z = mesh.points.h_coord(1,ispec,iz,ix);
+
             for (int icomp = 0; icomp < medium_type::components; ++icomp) {
-              h_field(ispec,iz,ix, icomp) = 0.0;
+              //TODO initial condition: field is bump
+#define _DSF_BUMP_CENTER_X_ 200
+#define _DSF_BUMP_CENTER_Z_ 150
+#define _DSF_BUMP_TWOSIG2_ 1250
+
+#define _DSF_DISPL_X_ (x-_DSF_BUMP_CENTER_X_)
+#define _DSF_DISPL_Z_ (z-_DSF_BUMP_CENTER_Z_)
+              h_field(ispec,iz,ix, icomp) = exp(-(
+                    _DSF_DISPL_X_ * _DSF_DISPL_X_
+                  + _DSF_DISPL_Z_ * _DSF_DISPL_Z_)
+                  /_DSF_BUMP_TWOSIG2_);
               h_field_dot(ispec,iz,ix, icomp) = 0.0;
               h_field_dot_dot(ispec,iz,ix, icomp) = 0.0;
               h_mass_inverse(ispec,iz,ix, icomp) = 0.0;

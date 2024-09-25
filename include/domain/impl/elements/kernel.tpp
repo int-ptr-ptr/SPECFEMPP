@@ -336,11 +336,11 @@ void specfem::domain::impl::kernels::element_kernel_base<
                 dvdga = hprime(iz,iz);
                 // dchidx
                 dvdx = dvdxi * point_partial_derivatives.xix +
-                            dvdxi * point_partial_derivatives.gammax;
+                            dvdga * point_partial_derivatives.gammax;
 
                 // dchidz
                 dvdz = dvdxi * point_partial_derivatives.xiz +
-                            dvdxi * point_partial_derivatives.gammaz;
+                            dvdga * point_partial_derivatives.gammaz;
 
                 if(ix == ngllx-1){ //edge 0: +x
                   //n ~ (dz/dgamma, -dx/dgamma) ~~ ortho to d/dgamma vector
