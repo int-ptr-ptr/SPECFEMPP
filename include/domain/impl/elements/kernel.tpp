@@ -334,6 +334,7 @@ void specfem::domain::impl::kernels::element_kernel_base<
                 //v derivs: v = L_{ix}(x) L_{iz}(z)
                 dvdxi = hprime(ix,ix);
                 dvdga = hprime(iz,iz);
+                //(the problem was here)
                 // dchidx
                 dvdx = dvdxi * point_partial_derivatives.xix +
                             dvdga * point_partial_derivatives.gammax;
@@ -561,7 +562,9 @@ void specfem::domain::impl::kernels::element_kernel_base<
         return point_property;
     }();
     //TODO: change FAC to be a per-nearby-element quantity (FAC = a = alpha * cmax/hmax @ Grote et al. 2006)
-    constexpr type_real FAC = 20 * (2500*2500) / 70.7;
+    //                                            cmax was c^2, but for our problem should be 1/rho
+    // what we have here should be an actual maximum, but this will work for constant field
+    constexpr type_real FAC = 20 * (point_property.rho_inverse) / 70.7;
 
     //TODO remove debug:
     edgefield(ispec,pmind,e_ind,3) = (thisval[0] - adjval[0])/2; //normalderiv avg
