@@ -54,6 +54,20 @@ static void _stream_view(std::ofstream &stream, const ViewType &view){
 
 namespace _util{
 
+  static std::string tostr(specfem::element::boundary_tag tag){
+    switch(tag){
+      case specfem::element::boundary_tag::none:
+        return "none";
+      case specfem::element::boundary_tag::acoustic_free_surface:
+        return "acoustic_free_surface";
+      case specfem::element::boundary_tag::stacey:
+        return "stacey";
+      case specfem::element::boundary_tag::composite_stacey_dirichlet:
+        return "composite_stacey_dirichlet";
+      default:
+        return "UNKNOWN";
+    }
+  };
 
   template <specfem::wavefield::type WavefieldType>
   void dump_discont_simfield(const std::string &filename,

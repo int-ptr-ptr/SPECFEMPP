@@ -86,7 +86,7 @@ specfem::compute::impl::discontinuous_field_impl<DimensionType, MediumTag>::disc
               h_field(ispec,iz,ix, icomp) = exp(-(
                     _DSF_DISPL_X_ * _DSF_DISPL_X_
                   + _DSF_DISPL_Z_ * _DSF_DISPL_Z_)
-                  /_DSF_BUMP_TWOSIG2_) * 0; // TODO THIS CHANGES THE IC
+                  /_DSF_BUMP_TWOSIG2_) * 1; // TODO THIS CHANGES THE IC
               h_field_dot(ispec,iz,ix, icomp) = 0.0;
               h_field_dot_dot(ispec,iz,ix, icomp) = 0.0;
               h_mass_inverse(ispec,iz,ix, icomp) = 0.0;

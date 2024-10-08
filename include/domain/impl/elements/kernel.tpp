@@ -360,6 +360,7 @@ void specfem::domain::impl::kernels::element_kernel_base<
                   field.edge_values_x(ispec_l,0,iz,14)= nx;
                   field.edge_values_x(ispec_l,0,iz,15)= nz;
                   field.edge_values_x(ispec_l,0,iz,16)= det;
+                  field.edge_values_x(ispec_l,0,iz,17)= 1; // has it been set this frame?
                 }else if(ix == 0){//edge 2: -x
                   //n ~ (-dz/dgamma, dx/dgamma) ~~ ortho to d/dgamma vector
                   nx = -point_partial_derivatives.xix;
@@ -375,6 +376,7 @@ void specfem::domain::impl::kernels::element_kernel_base<
                   field.edge_values_x(ispec_l,1,iz,14)= nx;
                   field.edge_values_x(ispec_l,1,iz,15)= nz;
                   field.edge_values_x(ispec_l,1,iz,16)= det;
+                  field.edge_values_x(ispec_l,1,iz,17)= 1; // has it been set this frame?
                 }
                 if(iz == ngllz-1){ //edge 1: +z
                   //n ~ (dz/dxi, -dx/dxi) ~~ ortho to d/dxi vector
@@ -391,6 +393,7 @@ void specfem::domain::impl::kernels::element_kernel_base<
                   field.edge_values_z(ispec_l,0,ix,14)= nx;
                   field.edge_values_z(ispec_l,0,ix,15)= nz;
                   field.edge_values_z(ispec_l,0,ix,16)= det;
+                  field.edge_values_z(ispec_l,0,ix,17)= 1; // has it been set this frame?
                 }else if(iz == 0){//edge 3: -z
                   //n ~ (dz/dxi, -dx/dxi) ~~ ortho to d/dxi vector
                   nx = -point_partial_derivatives.gammax;
@@ -406,6 +409,7 @@ void specfem::domain::impl::kernels::element_kernel_base<
                   field.edge_values_z(ispec_l,1,ix,14)= nx;
                   field.edge_values_z(ispec_l,1,ix,15)= nz;
                   field.edge_values_z(ispec_l,1,ix,16)= det;
+                  field.edge_values_z(ispec_l,1,ix,17)= 1; // has it been set this frame?
                 }
               }
 
@@ -564,7 +568,7 @@ void specfem::domain::impl::kernels::element_kernel_base<
     //TODO: change FAC to be a per-nearby-element quantity (FAC = a = alpha * cmax/hmax @ Grote et al. 2006)
     //                                            cmax was c^2, but for our problem should be 1/rho
     // what we have here should be an actual maximum, but this will work for constant field
-    constexpr type_real FAC = 20 * (point_property.rho_inverse) / 70.7;
+    const type_real FAC = 20 * (point_property.rho_inverse) / 70.7;
 
     //TODO remove debug:
     edgefield(ispec,pmind,e_ind,3) = (thisval[0] - adjval[0])/2; //normalderiv avg
@@ -576,6 +580,20 @@ void specfem::domain::impl::kernels::element_kernel_base<
     edgefield(ispec,pmind,e_ind,8) = (hprime(e_ind,e_ind));
     edgefield(ispec,pmind,e_ind,9) = wgll(e_ind);
     edgefield(ispec,pmind,e_ind,10) =wgll(e_ind) * point_property.rho_inverse * (thisval[1] - adjval[1]) * (thisval[11]/2);
+    // if(istep == 200 && ((ispec == 3)||(ispec==13))){
+
+    // const int adj_spec1 = field.mesh_adjacency(ispec,1,0);
+    // const int adj_spec2 = field.mesh_adjacency(ispec,3,0);
+    // int adj_spec;
+    // if(pmind == 0){
+    //   //we are on the top side;
+    //   adj_spec = adj_spec1;
+    // }else{
+    //   adj_spec = adj_spec2;
+    // }
+    // if(((ispec == 3 && (adj_spec == 13))||(ispec==13 && (adj_spec == 3))))
+    // std::cout << thisval[1] << " > this ("<<ispec<<") | other ("<<adj_spec<<") < " << adjval[1] << "; jmp: " << edgefield(ispec,pmind,e_ind,4)<<std::endl;
+    // }
     //end debug
 
     return 
@@ -591,6 +609,10 @@ void specfem::domain::impl::kernels::element_kernel_base<
     int adj_edge = field.mesh_adjacency(ispec,iedge,1);
     const bool adj_flip = (adj_edge & 4) != 0;
     adj_edge = 3 & adj_edge;
+//     if(istep == 200 && ((ispec == 3 && e_ind == 0)||(ispec==13 && e_ind == 3))){
+// std::cout << "ispec " << ispec << " ; iedge " << iedge <<" ; eind " << e_ind<< " ; adjspec ";
+// std::cout << adj_spec << " ; adjedge " << adj_edge << " ; adjflp " << adj_flip << " ; pmind "<<((adj_edge & 2) >> 1) <<" ; adjind "<< (adj_flip ? (ngllx-1-e_ind):e_ind) << " ; mesh_adj[1] "<<field.mesh_adjacency(ispec,iedge,1) << "\n";
+//     }
     if(adj_edge % 2 == 0){// left/right
       return Kokkos::subview(field.edge_values_x,adj_spec,(adj_edge & 2) >> 1,
       adj_flip ? (ngllz-1-e_ind):e_ind,Kokkos::ALL);
@@ -600,54 +622,171 @@ void specfem::domain::impl::kernels::element_kernel_base<
     }
   };
 
+  const auto set_accels_symm = [&](int ispec, int iedge, int e_ind){
+    PointAccelerationType acceleration_self;
+    PointAccelerationType acceleration_other;
+    const int adj_ispec = field.mesh_adjacency(ispec,iedge,0);
+    int adj_edge = field.mesh_adjacency(ispec,iedge,1);
+    const bool adj_flip = (adj_edge & 4) != 0;
+    const int pmind = ((iedge & 2) >> 1);
+    const int adj_e_ind = (adj_flip ? (ngllx-1-e_ind):e_ind);
+    const int adj_pmind = (adj_edge & 2) >> 1;
+    if(iedge % 2 == 0){ // +/- x
+      const specfem::point::index index = specfem::point::index(ispec,e_ind,(pmind==0)? (ngllx-1):(0));
+      const specfem::point::index adj_index = specfem::point::index(adj_ispec,adj_e_ind,(adj_pmind==0)? (ngllx-1):(0));
+      const auto self_view = Kokkos::subview(field.edge_values_x,index.ispec,pmind,e_ind,Kokkos::ALL);
+      const auto adj_view = Kokkos::subview(field.edge_values_x,adj_ispec,adj_pmind,adj_e_ind,Kokkos::ALL);
+
+      //verify set flags
+      if (self_view[17] == 1 && adj_view[17] == 1){
+        acceleration_self.acceleration[0] = fluxcalc(index,e_ind,self_view,adj_view,field.edge_values_x,index.ispec,pmind);
+        acceleration_other.acceleration[0] = fluxcalc(adj_index,adj_e_ind,adj_view,self_view,field.edge_values_x,adj_index.ispec,adj_pmind);
+
+        specfem::compute::atomic_add_on_device(index, acceleration_self,field);
+        specfem::compute::atomic_add_on_device(adj_index, acceleration_other,field);
+
+        field.edge_values_x(ispec,pmind,e_ind,17) = 0;
+        field.edge_values_x(adj_ispec,adj_pmind,adj_e_ind,17) = 0;
+      }
+    }else{ // +/- z
+      const specfem::point::index index = specfem::point::index(ispec,(pmind==0)? (ngllz-1):(0),e_ind);
+      const specfem::point::index adj_index = specfem::point::index(adj_ispec,(adj_pmind==0)? (ngllz-1):(0),adj_e_ind);
+      const auto self_view = Kokkos::subview(field.edge_values_z,index.ispec,pmind,e_ind,Kokkos::ALL);
+      const auto adj_view = Kokkos::subview(field.edge_values_z,adj_ispec,adj_pmind,adj_e_ind,Kokkos::ALL);
+
+      if (self_view[17] == 1 && adj_view[17] == 1){
+        acceleration_self.acceleration[0] = fluxcalc(index,e_ind,self_view,adj_view,field.edge_values_z,index.ispec,pmind);
+        acceleration_other.acceleration[0] = fluxcalc(adj_index,adj_e_ind,adj_view,self_view,field.edge_values_z,adj_index.ispec,adj_pmind);
+
+        specfem::compute::atomic_add_on_device(index, acceleration_self,field);
+        specfem::compute::atomic_add_on_device(adj_index, acceleration_other,field);
+
+        field.edge_values_z(ispec,pmind,e_ind,17) = 0;
+        field.edge_values_z(adj_ispec,adj_pmind,adj_e_ind,17) = 0;
+        
+      }
+    }
+  };
+
+// field.edge_values_z(3,0,1,1) = 1;
+// field.edge_values_z(3,1,1,1) = 1.5;
+
+
+// field.edge_values_z(13,0,1,1) = -10;
+// field.edge_values_z(13,1,1,1) = -15;
+
+// if(istep == 200){
+  
+//   std::cout << "3:\n";
+//   for(int i = 0; i <= 5; i++)
+//   adjview(3,1,i);
+//   std::cout << "--\n";
+// int ispec = 3;
+// int i = 1;
+// specfem::point::index index_(ispec, ngllz-1, i);
+//         fluxcalc(index_,i,
+//           Kokkos::subview(field.edge_values_z,ispec,0,i,Kokkos::ALL),
+//           adjview(ispec,1,i) ,field.edge_values_z,ispec,0
+//         );
+//   std::cout << "\n13:\n";
+//   for(int i = 0; i <= 5; i++)
+//   adjview(13,3,i);
+//   std::cout << "--\n";
+//   ispec = 13;
+// index_ = specfem::point::index(ispec, 0, i);
+//         fluxcalc(index_,i,
+//           Kokkos::subview(field.edge_values_z,ispec,1,i,Kokkos::ALL),
+//           adjview(ispec,3,i) ,field.edge_values_z,ispec,1
+//         );
+//   std::cout << "--\n";
+//   std::cout << "--\n";
+//   ispec = 3;
+//   auto point_boundary_type_ = boundary_conditions(ispec);
+//     std::cout << _util::tostr(point_boundary_type_.right) << " - ";
+//     std::cout << _util::tostr(point_boundary_type_.top) << " - ";
+//     std::cout << _util::tostr(point_boundary_type_.left) << " - ";
+//     std::cout << _util::tostr(point_boundary_type_.bottom) << "\n";
+//     for(int i = 0; i < 3; i ++){
+//     std::cout << "adj"<<i<<" = [" << field.mesh_adjacency(ispec,i,0) <<","<<field.mesh_adjacency(ispec,i,1)<<"]\n";
+//     }
+//     std::cout << std::endl;
+//     std::cout << std::endl;
+
+//   ispec = 13; point_boundary_type_ = boundary_conditions(ispec);
+//     std::cout << _util::tostr(point_boundary_type_.right) << " - ";
+//     std::cout << _util::tostr(point_boundary_type_.top) << " - ";
+//     std::cout << _util::tostr(point_boundary_type_.left) << " - ";
+//     std::cout << _util::tostr(point_boundary_type_.bottom) << "\n";
+//     for(int i = 0; i < 3; i ++){
+//     std::cout << "adj"<<i<<" = [" << field.mesh_adjacency(ispec,i,0) <<","<<field.mesh_adjacency(ispec,i,1)<<"]\n";
+//     }
+//   std::cout << "--\n";
+//   std::cout << "--\n";
+//   //throw std::runtime_error("exit out; remove this code when no longer needed!! (include/domain/impl/elements/kernel.tpp)");
+//   }
+
   Kokkos::parallel_for(nelements,[&](const int ind) { //TODO teams/deviceteam policy
     const auto ispec_l = element_kernel_index_mapping(ind);
     const auto point_boundary_type = boundary_conditions(ispec_l);
     
     Kokkos::parallel_for(ngllz,[&](const int e_ind) { //left/right bdries
-      PointAccelerationType acceleration;
       if (point_boundary_type.right==specfem::element::boundary_tag::none &&
             field.mesh_adjacency(ispec_l,0,0) != -1) {//right; +x
-        const specfem::point::index index(ispec_l, e_ind, ngllx-1);
-        acceleration.acceleration[0] = fluxcalc(index,e_ind,
-          Kokkos::subview(field.edge_values_x,ispec_l,0,e_ind,Kokkos::ALL),
-          adjview(ispec_l,0,e_ind) ,field.edge_values_x,ispec_l,0
-        );
-        specfem::compute::atomic_add_on_device(index, acceleration,
-                                                field);
+        set_accels_symm(ispec_l,0,e_ind); // (ispec,iedge,e_ind)
+        // const specfem::point::index index(ispec_l, e_ind, ngllx-1);
+        // acceleration.acceleration[0] = fluxcalc(index,e_ind,
+        //   Kokkos::subview(field.edge_values_x,ispec_l,0,e_ind,Kokkos::ALL),
+        //   adjview(ispec_l,0,e_ind) ,field.edge_values_x,ispec_l,0
+        // );
+        // specfem::compute::atomic_add_on_device(index, acceleration,
+        //                                         field);
+      }else{
+        //accel will never be updated since there is no neighbor; reset the set flag
+        field.edge_values_x(ispec_l,0,e_ind,17) = 0;
       }
       if (point_boundary_type.left==specfem::element::boundary_tag::none &&
             field.mesh_adjacency(ispec_l,2,0) != -1) {//left; -x
-        const specfem::point::index index(ispec_l, e_ind, 0);
-        acceleration.acceleration[0] = fluxcalc(index,e_ind,
-          Kokkos::subview(field.edge_values_x,ispec_l,1,e_ind,Kokkos::ALL),
-          adjview(ispec_l,2,e_ind) ,field.edge_values_x,ispec_l,1
-        );
-        specfem::compute::atomic_add_on_device(index, acceleration,
-                                                field);
+        set_accels_symm(ispec_l,2,e_ind); // (ispec,iedge,e_ind)
+        // const specfem::point::index index(ispec_l, e_ind, 0);
+        // acceleration.acceleration[0] = fluxcalc(index,e_ind,
+        //   Kokkos::subview(field.edge_values_x,ispec_l,1,e_ind,Kokkos::ALL),
+        //   adjview(ispec_l,2,e_ind) ,field.edge_values_x,ispec_l,1
+        // );
+        // specfem::compute::atomic_add_on_device(index, acceleration,
+        //                                         field);
+      }else{
+        //accel will never be updated since there is no neighbor; reset the set flag
+        field.edge_values_x(ispec_l,1,e_ind,17) = 0;
       }
     });
     Kokkos::parallel_for(ngllx,[&](const int e_ind) { //top/bottom bdries
-      PointAccelerationType acceleration;
       if (point_boundary_type.top==specfem::element::boundary_tag::none &&
             field.mesh_adjacency(ispec_l,1,0) != -1) {//top; +z
-        const specfem::point::index index(ispec_l, ngllz-1, e_ind);
-        acceleration.acceleration[0] = fluxcalc(index,e_ind,
-          Kokkos::subview(field.edge_values_z,ispec_l,0,e_ind,Kokkos::ALL),
-          adjview(ispec_l,1,e_ind) ,field.edge_values_z,ispec_l,0
-        );
-        specfem::compute::atomic_add_on_device(index, acceleration,
-                                                field);
+        set_accels_symm(ispec_l,1,e_ind); // (ispec,iedge,e_ind)
+        // const specfem::point::index index(ispec_l, ngllz-1, e_ind);
+        // acceleration.acceleration[0] = fluxcalc(index,e_ind,
+        //   Kokkos::subview(field.edge_values_z,ispec_l,0,e_ind,Kokkos::ALL),
+        //   adjview(ispec_l,1,e_ind) ,field.edge_values_z,ispec_l,0
+        // );
+        // specfem::compute::atomic_add_on_device(index, acceleration,
+        //                                         field);
+      }else{
+        //accel will never be updated since there is no neighbor; reset the set flag
+        field.edge_values_z(ispec_l,0,e_ind,17) = 0;
       }
       if (point_boundary_type.bottom==specfem::element::boundary_tag::none &&
             field.mesh_adjacency(ispec_l,3,0) != -1) {//bottom; -z
-        const specfem::point::index index(ispec_l, 0, e_ind);
-        acceleration.acceleration[0] = fluxcalc(index,e_ind,
-          Kokkos::subview(field.edge_values_z,ispec_l,1,e_ind,Kokkos::ALL),
-          adjview(ispec_l,3,e_ind) ,field.edge_values_z,ispec_l,1
-        );
-        specfem::compute::atomic_add_on_device(index, acceleration,
-                                                field);
+        set_accels_symm(ispec_l,3,e_ind); // (ispec,iedge,e_ind)
+        // const specfem::point::index index(ispec_l, 0, e_ind);
+        // acceleration.acceleration[0] = fluxcalc(index,e_ind,
+        //   Kokkos::subview(field.edge_values_z,ispec_l,1,e_ind,Kokkos::ALL),
+        //   adjview(ispec_l,3,e_ind) ,field.edge_values_z,ispec_l,1
+        // );
+        // specfem::compute::atomic_add_on_device(index, acceleration,
+        //                                         field);
+      }else{
+        //accel will never be updated since there is no neighbor; reset the set flag
+        field.edge_values_z(ispec_l,1,e_ind,17) = 0;
       }
     });
     
@@ -656,20 +795,45 @@ void specfem::domain::impl::kernels::element_kernel_base<
   Kokkos::fence();
 
   //TODO remove this ifblock below
+  int any_update_flags_x;
+  Kokkos::parallel_reduce( "verify update flags for print", field.edge_values_x.extent(0)*field.edge_values_x.extent(1)*field.edge_values_x.extent(2),
+  KOKKOS_LAMBDA (const int& ind, int& lmax) {
+    int e_ind = ind;
+    const int pmind = e_ind % 2;
+    e_ind /= 2;
+    const int ispec = e_ind % field.nspec;
+    e_ind /= field.nspec;
+    int val = field.edge_values_x(ispec,pmind,e_ind,17);
+    if( val > lmax ) lmax = val;
+  }, Kokkos::Max<int>(any_update_flags_x));
 
+  int any_update_flags_z;
+  Kokkos::parallel_reduce( "verify update flags for print", field.edge_values_z.extent(0)*field.edge_values_z.extent(1)*field.edge_values_z.extent(2),
+  KOKKOS_LAMBDA (const int& ind, int& lmax) {
+    int e_ind = ind;
+    const int pmind = e_ind % 2;
+    e_ind /= 2;
+    const int ispec = e_ind % field.nspec;
+    e_ind /= field.nspec;
+    int val = field.edge_values_z(ispec,pmind,e_ind,17);
+    if( val > lmax ) lmax = val;
+  }, Kokkos::Max<int>(any_update_flags_z));
   
-  Kokkos::deep_copy(field.h_edge_values_x, field.edge_values_x);
-  Kokkos::deep_copy(field.h_edge_values_z, field.edge_values_z);
-  _util::dump_discont_simfield_per_step(istep,"tmp/debug_dump",
-    field,points);
-  // if(istep == 50){
-  //   std::cout << "\nCopying edge values ("<<field.h_edge_values_x.extent(3)<<"), dumping, then exiting\n";
-  //   Kokkos::deep_copy(field.h_edge_values_x, field.edge_values_x);
-  //   Kokkos::deep_copy(field.h_edge_values_z, field.edge_values_z);
-  //   _util::dump_discont_simfield("debug_dump.dat",
-  //     field,points);
-  //   std::exit(0);
-  // }
+  if(any_update_flags_x == 0 && any_update_flags_z == 0){
+    Kokkos::deep_copy(field.h_edge_values_x, field.edge_values_x);
+    Kokkos::deep_copy(field.h_edge_values_z, field.edge_values_z);
+
+    _util::dump_discont_simfield_per_step(istep,"tmp/debug_dump",
+      field,points);
+    // if(istep == 50){
+    //   std::cout << "\nCopying edge values ("<<field.h_edge_values_x.extent(3)<<"), dumping, then exiting\n";
+    //   Kokkos::deep_copy(field.h_edge_values_x, field.edge_values_x);
+    //   Kokkos::deep_copy(field.h_edge_values_z, field.edge_values_z);
+    //   _util::dump_discont_simfield("debug_dump.dat",
+    //     field,points);
+    //   std::exit(0);
+    // }
+  }
 
 
   }
