@@ -1,0 +1,85 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "specfem-pythia"
+dynamic = ["version"]
+description = 'A module used to interact with the specfem-delphi server library, allowing for control over SPECFEM++ via Python.'
+readme = "README.md"
+requires-python = ">=3.8"
+license = "GPL-3.0"
+keywords = []
+authors = [
+  { name = "Kentaro Hanson", email = "kh3372@princeton.edu" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+dependencies = ["numpy","websockets"]
+
+[project.urls]
+Documentation = ""
+Issues = ""
+Source = ""
+
+[tool.hatch.version]
+path = "src/specfem_pythia/__about__.py"
+
+[tool.hatch.envs.types]
+extra-dependencies = [
+  "mypy>=1.0.0",
+]
+[tool.hatch.envs.types.scripts]
+check = "mypy --install-types --non-interactive {args:src/specfem_pythia tests}"
+
+[tool.hatch.envs.dev]
+dependencies = [
+  "ipython",
+  "ruff",
+  "isort",
+  "pyright",
+  "pytest",
+  "coverage",
+]
+path = ".venv-dev"
+[tool.hatch.envs.dev.scripts]
+lint = "ruff check src/specfem_pythia && ruff check tests"
+sort = "isort src/specfem_pythia && isort tests"
+check-types = "pyright src/specfem_pythia && pyright tests"
+tests = "pytest"
+tests-and-coverage = "coverage run -m pytest && coverage report && coverage html --show-contexts"
+
+[tool.coverage.run]
+source = ["specfem_pythia"]
+relative_files = true
+branch = true
+parallel = true
+omit = [
+  "src/specfem_pythia/__about__.py",
+]
+
+
+[tool.coverage.report]
+exclude_lines = [
+  "no cov",
+  "if __name__ == .__main__.:",
+  "if TYPE_CHECKING:",
+]
+
+[tool.ruff]
+output-format = "github"
+
+[tool.pytest.ini_options]
+addopts = [
+    "-ra",              # Show extra test summary info for all tests
+    "--strict-markers", # Don't allow unknown markers
+    "--strict-config",  # Always fail if there are unknown configuration options
+]
+testpaths = ["tests"]

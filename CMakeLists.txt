@@ -49,7 +49,7 @@ FetchContent_MakeAvailable(yaml)
 include_directories(BEFORE SYSTEM ${yaml_BINARY_DIR} ${yaml_SOURCE_DIR}/include)
 
 # Try finding boost and if not found install.
-find_package(Boost 1.73.0 COMPONENTS program_options filesystem system)
+find_package(Boost 1.80.0 COMPONENTS program_options filesystem system thread)
 
 if (NOT ${Boost_FOUND})
         add_subdirectory(boost-cmake)
@@ -499,6 +499,31 @@ target_link_libraries(
         kernels
         solver
         Boost::program_options
+)
+
+include_directories(specfem-delphi/server/include)
+
+add_library(
+        specfem-delphi-server
+        specfem-delphi/server/src/server/host_impl.cpp
+        specfem-delphi/server/src/server/host.cpp
+)
+
+target_link_libraries(
+        specfem-delphi-server
+        Boost::boost
+        Boost::system
+        Boost::thread
+)
+
+add_executable(
+        specfem_delphi_host
+        specfem-delphi/server/src/run_delphi.cpp
+)
+
+target_link_libraries(
+        specfem_delphi_host
+        specfem-delphi-server
 )
 
 # Include tests
