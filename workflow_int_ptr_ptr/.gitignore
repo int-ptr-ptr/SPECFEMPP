@@ -1,0 +1,4 @@
+data/**
+.nox/**
+reference/**
+**/__pycache__/**

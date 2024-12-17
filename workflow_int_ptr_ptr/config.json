@@ -1,0 +1,40 @@
+{
+  "specfem": {
+    "root": "${root_dir}/..",
+    "reference": {
+      "dir": "${root_dir}/reference",
+      "repo_remote": "https://github.com/int-ptr-ptr/SPECFEMPP/archive/d4fe2fd3cec2c54800fb42eac51b3d8fb99f353d.zip",
+      "remote_download_local_filename": "${specfem.reference.dir}/specfem_reference.zip",
+      "local_repo_dir": "${specfem.reference.dir}/repo",
+      "build_dir": "${specfem.reference.dir}/build",
+      "exe": "${specfem.reference.build_dir}/specfem2d_eventmarcher",
+      "meshfem": "${specfem.reference.build_dir}/xmeshfem2D",
+      "cmake_build_options": "-DKokkos_ENABLE_SERIAL=ON -DCMAKE_BUILD_TYPE=Release -DVTK_CXX_BUILD=OFF"
+    },
+    "live_exe": "${specfem.root}/build/specfem2d_eventmarcher"
+  },
+  "tests": [
+    {
+      "name": "acoustic-elastic-conforming",
+      "prov_dir": "${root_dir}/data/conforming/provenance_acoustic_elastic",
+      "workspace": "${root_dir}/data/conforming/workspace_acoustic_elastic",
+      "config": {
+        "meshfem_parfile": "${root_dir}/run_configs/PAR_FILE_acoustic_elastic",
+        "specfem_parfile": "${root_dir}/run_configs/specfem_config.yaml",
+        "source": "${root_dir}/run_configs/source_config.yaml",
+        "topography": "${root_dir}/run_configs/topography_twolayer.dat"
+      }
+    },
+    {
+      "name": "acoustic-acoustic-conforming",
+      "prov_dir": "${root_dir}/data/conforming/provenance_acoustic_acoustic",
+      "workspace": "${root_dir}/data/conforming/workspace_acoustic_acoustic",
+      "config": {
+        "meshfem_parfile": "${root_dir}/run_configs/PAR_FILE_acoustic_acoustic",
+        "specfem_parfile": "${root_dir}/run_configs/specfem_config.yaml",
+        "source": "${root_dir}/run_configs/source_config.yaml",
+        "topography": "${root_dir}/run_configs/topography_twolayer.dat"
+      }
+    }
+  ]
+}
