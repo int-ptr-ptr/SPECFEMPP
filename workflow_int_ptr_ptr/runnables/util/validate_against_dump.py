@@ -12,7 +12,7 @@ import re
 STOPKEY = "INITIATE_STOP"
 tol = 1e-3
 
-specfem_exe = config.get("specfem.live_exe")
+specfem_exe = config.get("specfem.live.exe")
 
 
 def run_sims(sim, queue):
