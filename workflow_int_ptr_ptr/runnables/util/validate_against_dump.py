@@ -23,7 +23,8 @@ def run_sims(sim, queue):
     os.chdir(sim["workspace"])
     res = subprocess.run(specfem_exe, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     if res.returncode != 0:
-        print("xmeshfem2D failed! Output:\n" + res.stdout.decode("utf-8"))
+        print("xmeshfem2D failed! stdout:\n" + res.stdout.decode("utf-8"))
+        print("                   stderr:\n" + res.stderr.decode("utf-8"))
         print("Make sure the parameter file is named PAR_FILE.")
         return
 
@@ -39,6 +40,10 @@ def compare_sims(sim, queue_out, queue_in):
     should_continue = True
     dumpnum = -1
     dumpfol = os.path.join(sim["workspace"], "dump/simfield")
+    tlast = tstart
+
+    maxerr = dict()
+    dump_of_maxerr = dict()
     while should_continue:
         while not queue_in.empty():
             v = queue_in.get()
@@ -63,7 +68,6 @@ def compare_sims(sim, queue_out, queue_in):
         dumplive = read_sfdump(os.path.join(dumpfol, fname))
 
         # sqrt(frob^2 / num_entries)  ~ RMS
-        errstr = fname + " errors:"
         should_exit = False
         for fieldname in ["acoustic_field", "elastic_field"]:
             if dumptrue[fieldname].size == 0:
@@ -72,10 +76,22 @@ def compare_sims(sim, queue_out, queue_in):
                 np.linalg.norm(dumptrue[fieldname] - dumplive[fieldname])
                 / dumptrue[fieldname].size ** 0.5
             )
-            errstr += f" {fieldname}: {err:10.6e}"
+            if fieldname not in maxerr or err > maxerr[fieldname]:
+                dump_of_maxerr[fieldname] = dumpnum
+                maxerr[fieldname] = err
             if err > tol:
                 should_exit = True
-        log(errstr)
+        tnow = time.time()
+        if tnow - tlast > 2:
+            tlast = tnow
+            log(
+                f"dump #{dumpnum} max errors so far: "
+                + " ".join(
+                    f" {fieldname}: {maxerr[fieldname]:10.6e} @ dump #{dump_of_maxerr[fieldname]}"
+                    for fieldname in maxerr
+                )
+            )
+
         if should_exit:
             log(fname + f" - errs exceeded tolerance {tol}. Exiting.")
             log(STOPKEY)

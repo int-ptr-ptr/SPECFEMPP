@@ -1,3 +1,29 @@
+#define EDGEIND_NX 0
+#define EDGEIND_NZ 1
+#define EDGEIND_DET 2
+#define EDGEIND_DS 3
+#define EDGEIND_FIELD 4
+#define EDGEIND_FIELDNDERIV 6
+#define EDGEIND_SPEEDPARAM 8
+#define EDGEIND_SHAPENDERIV 9
+#define EDGEIND_BDRY_TYPE 14
+
+#define data_capacity 20
+#define edge_capacity 5
+#define INTERIND_FLUXTOTAL_A 0
+#define INTERIND_FLUX1_A (qp5.NGLL)
+#define INTERIND_FLUX2_A (qp5.NGLL * 2)
+#define INTERIND_FLUX3_A (qp5.NGLL * 3)
+#define INTERIND_FLUXTOTAL_B (qp5.NGLL * 4)
+#define INTERIND_FLUX1_B (qp5.NGLL * 5)
+#define INTERIND_FLUX2_B (qp5.NGLL * 6)
+#define INTERIND_FLUX3_B (qp5.NGLL * 7)
+#define INTERIND_UJMP (qp5.NGLL * 8)
+#define INTERIND_DU_AVG (qp5.NGLL * 9)
+#define INTERIND_ACCEL_INCLUDE_A (qp5.NGLL * 10)
+#define INTERIND_ACCEL_INCLUDE_B (qp5.NGLL * 11)
+
+#define intersect_data_capacity (qp5.NGLL * (12))
 
 #include "_util/build_demo_assembly.hpp"
 #include "compute/assembly/assembly.hpp"
@@ -192,34 +218,8 @@ void execute(specfem::MPI::MPI *mpi) {
   for (int i = 0; i < edge_removals.size(); i++) {
     dg_edges[i].id = edge_removals[i].elem;
     dg_edges[i].bdry = edge_from_id(edge_removals[i].side);
+    dg_edges[i].medium = assembly->properties.h_element_types(dg_edges[i].id);
   }
-
-#define EDGEIND_NX 0
-#define EDGEIND_NZ 1
-#define EDGEIND_DET 2
-#define EDGEIND_DS 3
-#define EDGEIND_FIELD 4
-#define EDGEIND_FIELDNDERIV 6
-#define EDGEIND_SPEEDPARAM 8
-#define EDGEIND_SHAPENDERIV 9
-#define EDGEIND_BDRY_TYPE 14
-
-#define data_capacity 20
-#define edge_capacity 5
-#define INTERIND_FLUXTOTAL_A 0
-#define INTERIND_FLUX1_A (qp5.NGLL)
-#define INTERIND_FLUX2_A (qp5.NGLL * 2)
-#define INTERIND_FLUX3_A (qp5.NGLL * 3)
-#define INTERIND_FLUXTOTAL_B (qp5.NGLL * 4)
-#define INTERIND_FLUX1_B (qp5.NGLL * 5)
-#define INTERIND_FLUX2_B (qp5.NGLL * 6)
-#define INTERIND_FLUX3_B (qp5.NGLL * 7)
-#define INTERIND_UJMP (qp5.NGLL * 8)
-#define INTERIND_DU_AVG (qp5.NGLL * 9)
-#define INTERIND_ACCEL_INCLUDE_A (qp5.NGLL * 10)
-#define INTERIND_ACCEL_INCLUDE_B (qp5.NGLL * 11)
-
-#define intersect_data_capacity (qp5.NGLL * (12))
   _util::edge_manager::edge_storage<edge_capacity, data_capacity>
       dg_edge_storage(dg_edges);
 

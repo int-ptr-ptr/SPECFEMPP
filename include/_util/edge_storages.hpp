@@ -1,6 +1,9 @@
 #ifndef __UTIL_EDGE_STORAGES_HPP_
 #define __UTIL_EDGE_STORAGES_HPP_
 
+#include "compute/coupled_interfaces/loose_couplings/interface_container.hpp"
+#include "compute/coupled_interfaces/loose_couplings/symmetric_flux_container.hpp"
+#include "compute/coupled_interfaces/loose_couplings/traction_continuity_container.hpp"
 #include "enumerations/specfem_enums.hpp"
 #include "kokkos_abstractions.h"
 #include <functional>
@@ -39,6 +42,7 @@ quadrature_rule gen_GLL(int ngll);
 struct edge {
   int id;
   specfem::enums::edge::type bdry;
+  specfem::element::medium_tag medium;
   edge() : id(-1), bdry(specfem::enums::edge::type::NONE) {}
   // edge(const edge& other) : id(other.id), bdry(other.bdry) {}
 };
@@ -91,6 +95,14 @@ public:
   edge_data<ngll, datacapacity> &get_edge_on_host(int edge);
   edge_intersection<ngll> &get_intersection_on_host(int intersection);
 
+  edge_data<ngll, datacapacity> load_edge(const int edgeID);
+  void store_edge(const int edgeID, const edge_data<ngll, datacapacity> &edge);
+  edge_intersection<ngll> load_intersection(const int intersectionID);
+  void store_intersection(const int intersectionID,
+                          const edge_intersection<ngll> &intersection);
+  void load_all_intersections();
+  void store_all_intersections();
+
   int num_edges() const { return n_edges; }
   int num_intersections() const { return n_intersections; }
   specfem::kokkos::HostView2d<type_real> &get_intersection_data_on_host() {
@@ -105,6 +117,9 @@ public:
 private:
   int n_edges;
   std::vector<edge> edges;
+  std::vector<edge> acoustic_edges;
+  std::vector<edge> elastic_edges;
+  std::vector<int> edge_sorted_inds;
 
   specfem::kokkos::DeviceView1d<edge_data<ngll, datacapacity> >
       edge_data_container;
@@ -117,10 +132,31 @@ private:
       intersection_container;
   specfem::kokkos::HostView1d<edge_intersection<ngll> >
       h_intersection_container;
+  std::vector<int> intersection_sorted_inds;
 
   bool intersection_data_built;
   specfem::kokkos::DeviceView2d<type_real> intersection_data;
   specfem::kokkos::HostView2d<type_real> h_intersection_data;
+
+  bool interface_structs_initialized;
+  specfem::compute::loose::interface_container<
+      specfem::dimension::type::dim2, specfem::element::medium_tag::acoustic,
+      specfem::element::medium_tag::elastic,
+      specfem::enums::element::quadrature::static_quadrature_points<5>,
+      specfem::coupled_interface::loose::flux::traction_continuity>
+      acoustic_elastic_interface;
+  specfem::compute::loose::interface_container<
+      specfem::dimension::type::dim2, specfem::element::medium_tag::acoustic,
+      specfem::element::medium_tag::acoustic,
+      specfem::enums::element::quadrature::static_quadrature_points<5>,
+      specfem::coupled_interface::loose::flux::symmetric_flux>
+      acoustic_acoustic_interface;
+  specfem::compute::loose::interface_container<
+      specfem::dimension::type::dim2, specfem::element::medium_tag::elastic,
+      specfem::element::medium_tag::elastic,
+      specfem::enums::element::quadrature::static_quadrature_points<5>,
+      specfem::coupled_interface::loose::flux::symmetric_flux>
+      elastic_elastic_interface;
 };
 
 } // namespace edge_manager

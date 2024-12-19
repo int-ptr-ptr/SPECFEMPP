@@ -9,6 +9,57 @@
 namespace _util {
 namespace edge_manager {
 
+
+template<typename ViewType, typename HostMirrorType>
+void init_views(ViewType& view, HostMirrorType& host_mirror, int size, std::string label){
+  view = ViewType(label,size);
+  host_mirror = Kokkos::create_mirror_view(view);
+}
+
+template <specfem::dimension::type DimensionType,
+          specfem::element::medium_tag MediumTag1,
+          specfem::element::medium_tag MediumTag2,
+          typename QuadratureType,
+          typename FluxScheme>
+void init_interface_views(specfem::compute::loose::interface_container<DimensionType,MediumTag1,MediumTag2,QuadratureType,FluxScheme>& container,
+int num_interfaces){
+  init_views(container.interface_medium1_index,container.h_interface_medium1_index,num_interfaces,"interface_medium1_index");
+  init_views(container.interface_medium2_index,container.h_interface_medium2_index,num_interfaces,"interface_medium2_index");
+  init_views(container.interface_medium1_param_start,container.h_interface_medium1_param_start,num_interfaces,"interface_medium1_param_start");
+  init_views(container.interface_medium2_param_start,container.h_interface_medium2_param_start,num_interfaces,"interface_medium2_param_start");
+  init_views(container.interface_medium2_param_end,container.h_interface_medium1_param_end,num_interfaces,"interface_medium1_param_end");
+  init_views(container.interface_medium2_param_end,container.h_interface_medium2_param_end,num_interfaces,"interface_medium2_param_end");
+  init_views(container.interface_medium1_mortar_transfer,container.h_interface_medium1_mortar_transfer,num_interfaces,"interface_medium1_mortar_transfer");
+  init_views(container.interface_medium2_mortar_transfer,container.h_interface_medium2_mortar_transfer,num_interfaces,"interface_medium2_mortar_transfer");
+}
+
+template <specfem::dimension::type DimensionType,
+          specfem::element::medium_tag MediumTag1,
+          specfem::element::medium_tag MediumTag2,
+          typename QuadratureType,
+          typename FluxScheme>
+void init_edge_views(specfem::compute::loose::interface_container<DimensionType,MediumTag1,MediumTag2,QuadratureType,FluxScheme>& container,
+int num_medium1_edges, int num_medium2_edges){
+  init_views(container.medium1_index_mapping,container.h_medium1_index_mapping, num_medium1_edges,"medium1_index");
+  init_views(container.medium2_index_mapping,container.h_medium2_index_mapping, num_medium2_edges,"medium2_index");
+  init_views(container.medium1_edge_type,container.h_medium1_edge_type, num_medium1_edges,"medium1_edge_type");
+  init_views(container.medium2_edge_type,container.h_medium2_edge_type, num_medium2_edges,"medium2_edge_type");
+  init_views(container.a_NORMAL,container.h_a_NORMAL,num_medium1_edges,"a_NORMAL");
+  init_views(container.b_NORMAL,container.h_b_NORMAL,num_medium2_edges,"b_NORMAL");
+  init_views(container.a_DET,container.h_a_DET,num_medium1_edges,"a_DET");
+  init_views(container.b_DET,container.h_b_DET,num_medium2_edges,"b_DET");
+  init_views(container.a_DS,container.h_a_DS,num_medium1_edges,"a_DS");
+  init_views(container.b_DS,container.h_b_DS,num_medium2_edges,"b_DS");
+  init_views(container.a_FIELD,container.h_a_FIELD,num_medium1_edges,"a_FIELD");
+  init_views(container.b_FIELD,container.h_b_FIELD,num_medium2_edges,"b_FIELD");
+  init_views(container.a_FIELDNDERIV,container.h_a_FIELDNDERIV,num_medium1_edges,"a_FIELDNDERIV");
+  init_views(container.b_FIELDNDERIV,container.h_b_FIELDNDERIV,num_medium2_edges,"b_FIELDNDERIV");
+  init_views(container.a_SPEEDPARAM,container.h_a_SPEEDPARAM,num_medium1_edges,"a_SPEED_PARAM");
+  init_views(container.b_SPEEDPARAM,container.h_b_SPEEDPARAM,num_medium2_edges,"b_SPEED_PARAM");
+  init_views(container.a_SHAPENDERIV,container.h_a_SHAPENDERIV,num_medium1_edges,"a_SHAPENDERIV");
+  init_views(container.b_SHAPENDERIV,container.h_b_SHAPENDERIV,num_medium2_edges,"b_SHAPENDERIV");
+}
+
 template <int ngll, int datacapacity>
 edge_data<ngll,datacapacity>& edge_storage<ngll, datacapacity>::get_edge_on_host(int edge){
   return h_edge_data_container(edge);
@@ -27,11 +78,26 @@ edge_storage<ngll, datacapacity>::edge_storage(const std::vector<edge> edges)
       edge_data_container(
           specfem::kokkos::DeviceView1d<edge_data<ngll, datacapacity> >(
               "_util::edge_manager::edge_storage::edge_data", n_edges)),
-      h_edge_data_container(Kokkos::create_mirror_view(edge_data_container)) {
+      h_edge_data_container(Kokkos::create_mirror_view(edge_data_container)),
+      edge_sorted_inds(n_edges),
+      interface_structs_initialized(false) {
   for (int i = 0; i < n_edges; i++) {
     h_edge_data_container(i).parent = edges[i];
+    if(edges[i].medium == specfem::element::medium_tag::acoustic){
+      edge_sorted_inds[i] = acoustic_edges.size();
+      acoustic_edges.push_back(edges[i]);
+    }else{
+      edge_sorted_inds[i] = elastic_edges.size();
+      elastic_edges.push_back(edges[i]);
+    }
   }
   Kokkos::deep_copy(edge_data_container, h_edge_data_container);
+
+
+
+  init_edge_views(acoustic_acoustic_interface,acoustic_edges.size(),acoustic_edges.size());
+  init_edge_views(acoustic_elastic_interface,acoustic_edges.size(),elastic_edges.size());
+  init_edge_views(elastic_elastic_interface,elastic_edges.size(),elastic_edges.size());
 }
 
 template <int ngll, int datacapacity>
@@ -305,8 +371,12 @@ bool intersect(edge_data<ngll, datacapacity> &a,
 
 template <int ngll, int datacapacity>
 void edge_storage<ngll, datacapacity>::build_intersections_on_host() {
+  int intersections_acoustic_acoustic = 0;
+  int intersections_acoustic_elastic = 0;
+  int intersections_elastic_elastic = 0;
   std::vector<edge_intersection<ngll> > intersections;
   edge_intersection<ngll> intersection;
+  intersection_sorted_inds = std::vector<int>();
   // foreach unordered pair (edge[i], edge[j]), j != i
   for (int i = 0; i < n_edges; i++) {
     for (int j = i + 1; j < n_edges; j++) {
@@ -316,6 +386,18 @@ void edge_storage<ngll, datacapacity>::build_intersections_on_host() {
         intersection.a_ref_ind = i;
         intersection.b_ref_ind = j;
         intersections.push_back(intersection);
+        if(h_edge_data_container(i).parent.medium == specfem::element::medium_tag::acoustic
+        &&h_edge_data_container(j).parent.medium == specfem::element::medium_tag::acoustic){
+          intersection_sorted_inds.push_back(intersections_acoustic_acoustic);
+          intersections_acoustic_acoustic++;
+        }else if(h_edge_data_container(i).parent.medium == specfem::element::medium_tag::elastic
+        &&h_edge_data_container(j).parent.medium == specfem::element::medium_tag::elastic){
+          intersection_sorted_inds.push_back(intersections_elastic_elastic);
+          intersections_elastic_elastic++;
+        }else{
+          intersection_sorted_inds.push_back(intersections_acoustic_elastic);
+          intersections_acoustic_elastic++;
+        }
 
         // edge_data<ngll,datacapacity> a = h_edge_data_container(i);
         // edge_data<ngll,datacapacity> b = h_edge_data_container(j);
@@ -339,10 +421,51 @@ void edge_storage<ngll, datacapacity>::build_intersections_on_host() {
       specfem::kokkos::DeviceView1d<edge_intersection<ngll> >(
           "_util::edge_manager::edge_storage::edge_data", n_intersections);
   h_intersection_container = Kokkos::create_mirror_view(intersection_container);
+
+
+  init_interface_views(acoustic_acoustic_interface,intersections_acoustic_acoustic);
+  init_interface_views(acoustic_elastic_interface,intersections_acoustic_elastic);
+  init_interface_views(elastic_elastic_interface,intersections_elastic_elastic);
+  interface_structs_initialized = true;
+
   for (int i = 0; i < n_intersections; i++) {
+    int a_ind = intersections[i].a_ref_ind;
+    int b_ind = intersections[i].b_ref_ind;
+    if(h_edge_data_container(a_ind).parent.medium == specfem::element::medium_tag::elastic
+    &&h_edge_data_container(b_ind).parent.medium == specfem::element::medium_tag::acoustic){
+        // swap a and b
+        int tmpi;
+        type_real tmpr;
+        #define swpi(a, b)                                                             \
+          {                                                                            \
+            tmpi = a;                                                                  \
+            a = b;                                                                     \
+            b = tmpi;                                                                  \
+          }
+        #define swpr(a, b)                                                             \
+          {                                                                            \
+            tmpr = a;                                                                  \
+            a = b;                                                                     \
+            b = tmpr;                                                                  \
+          }
+                  swpi(intersections[i].a_ref_ind, intersections[i].b_ref_ind);
+                  swpi(intersections[i].a_ngll, intersections[i].b_ngll);
+                  swpr(intersections[i].a_param_start, intersections[i].b_param_start);
+                  swpr(intersections[i].a_param_end, intersections[i].b_param_end);
+                  for (int igll1 = 0; igll1 < ngll; igll1++) {
+                    for (int igll2 = 0; igll2 < ngll; igll2++) {
+                      swpr(intersections[i].a_mortar_trans[igll1][igll2],
+                          intersections[i].b_mortar_trans[igll1][igll2])
+                    }
+                  }
+        swpi(a_ind,b_ind);
+        #undef swpi
+        #undef swpr
+    }
     h_intersection_container(i) = intersections[i];
   }
   Kokkos::deep_copy(intersection_container, h_intersection_container);
+  store_all_intersections();
   intersections_built = true;
 }
 
@@ -461,6 +584,215 @@ type_real edge_intersection<ngllcapacity>::b_to_mortar(int mortar_index,
   }
   return val;
 }
+
+template<int ngll, int datacapacity>
+edge_data<ngll, datacapacity> edge_storage<ngll, datacapacity>::load_edge(const int id) {
+  edge_data<ngll, datacapacity> edgedata;
+  const auto& edge = edgedata.parent;
+  const int sorted_ind = edge_sorted_inds[id];
+#define transfer_edge_vals(interface,media_id) {\
+if(media_id == 1){\
+  edge.id = interface.h_medium1_index_mapping(sorted_ind);\
+  edge.bdry = interface.h_medium1_edge_type(sorted_ind);\
+  for(int igll = 0; igll < interface.a_NORMAL.extent(1); igll++){\
+    edgedata.data[EDGEIND_NX][igll] = interface.h_a_NORMAL(sorted_ind,igll,0);\
+    edgedata.data[EDGEIND_NZ][igll] = interface.h_a_NORMAL(sorted_ind,igll,1);\
+    edgedata.data[EDGEIND_DET][igll] = interface.h_a_DET(sorted_ind,igll);\
+    edgedata.data[EDGEIND_DS][igll] = interface.h_a_DS(sorted_ind,igll);\
+    edgedata.data[EDGEIND_FIELD][igll] = interface.h_a_FIELD(sorted_ind,igll,0);\
+    edgedata.data[EDGEIND_FIELD+1][igll] = interface.h_a_FIELD(sorted_ind,igll,1);\
+    edgedata.data[EDGEIND_FIELDNDERIV][igll] = interface.h_a_FIELDNDERIV(sorted_ind,igll,0);\
+    edgedata.data[EDGEIND_FIELDNDERIV+1][igll] = interface.h_a_FIELDNDERIV(sorted_ind,igll,1);\
+    edgedata.data[EDGEIND_SPEEDPARAM][igll] = interface.h_a_SPEEDPARAM(sorted_ind,igll);\
+    for(int igll2 = 0; igll2 < interface.a_NORMAL.extent(1); igll2++){\
+      edgedata.data[EDGEIND_SHAPENDERIV+igll2][igll] = interface.h_a_SHAPENDERIV(sorted_ind,igll,igll2);\
+    }\
+  }\
+}else{\
+  edge.id = interface.h_medium2_index_mapping(sorted_ind);\
+  edge.bdry = interface.h_medium2_edge_type(sorted_ind);\
+  for(int igll = 0; igll < interface.b_NORMAL.extent(1); igll++){\
+    edgedata.data[EDGEIND_NX][igll] = interface.h_b_NORMAL(sorted_ind,igll,0);\
+    edgedata.data[EDGEIND_NZ][igll] = interface.h_b_NORMAL(sorted_ind,igll,1);\
+    edgedata.data[EDGEIND_DET][igll] = interface.h_b_DET(sorted_ind,igll);\
+    edgedata.data[EDGEIND_DS][igll] = interface.h_b_DS(sorted_ind,igll);\
+    edgedata.data[EDGEIND_FIELD][igll] = interface.h_b_FIELD(sorted_ind,igll,0);\
+    edgedata.data[EDGEIND_FIELD+1][igll] = interface.h_b_FIELD(sorted_ind,igll,1);\
+    edgedata.data[EDGEIND_FIELDNDERIV][igll] = interface.h_b_FIELDNDERIV(sorted_ind,igll,0);\
+    edgedata.data[EDGEIND_FIELDNDERIV+1][igll] = interface.h_b_FIELDNDERIV(sorted_ind,igll,1);\
+    edgedata.data[EDGEIND_SPEEDPARAM][igll] = interface.h_b_SPEEDPARAM(sorted_ind,igll);\
+    for(int igll2 = 0; igll2 < interface.b_NORMAL.extent(1); igll2++){\
+      edgedata.data[EDGEIND_SHAPENDERIV+igll2][igll] = interface.h_b_SHAPENDERIV(sorted_ind,igll,igll2);\
+    }\
+  }\
+}\
+}
+  if(edge.medium == specfem::element::medium_tag::acoustic){
+    transfer_edge_vals(acoustic_acoustic_interface,1);
+    transfer_edge_vals(acoustic_acoustic_interface,2);
+    transfer_edge_vals(acoustic_elastic_interface,1);
+  }else{;
+    transfer_edge_vals(acoustic_elastic_interface,2);
+    transfer_edge_vals(elastic_elastic_interface,1);
+    transfer_edge_vals(elastic_elastic_interface,2);
+  }
+  return edgedata;
+#undef transfer_edge_vals
+}
+template<int ngll, int datacapacity>
+void edge_storage<ngll, datacapacity>::store_edge(const int id, const edge_data<ngll, datacapacity>& edgedata) {
+  const auto& edge = edgedata.parent;
+  const int sorted_ind = edge_sorted_inds[id];
+#define transfer_edge_vals(interface,media_id) {\
+if(media_id == 1){\
+  interface.h_medium1_index_mapping(sorted_ind) = edge.id;\
+  interface.h_medium1_edge_type(sorted_ind) = edge.bdry;\
+  for(int igll = 0; igll < interface.a_NORMAL.extent(1); igll++){\
+    interface.h_a_NORMAL(sorted_ind,igll,0) = edgedata.data[EDGEIND_NX][igll];\
+    interface.h_a_NORMAL(sorted_ind,igll,1) = edgedata.data[EDGEIND_NZ][igll];\
+    interface.h_a_DET(sorted_ind,igll) = edgedata.data[EDGEIND_DET][igll];\
+    interface.h_a_DS(sorted_ind,igll) = edgedata.data[EDGEIND_DS][igll];\
+    interface.h_a_FIELD(sorted_ind,igll,0) = edgedata.data[EDGEIND_FIELD][igll];\
+    interface.h_a_FIELD(sorted_ind,igll,1) = edgedata.data[EDGEIND_FIELD+1][igll];\
+    interface.h_a_FIELDNDERIV(sorted_ind,igll,0) = edgedata.data[EDGEIND_FIELDNDERIV][igll];\
+    interface.h_a_FIELDNDERIV(sorted_ind,igll,1) = edgedata.data[EDGEIND_FIELDNDERIV+1][igll];\
+    interface.h_a_SPEEDPARAM(sorted_ind,igll) = edgedata.data[EDGEIND_SPEEDPARAM][igll];\
+    for(int igll2 = 0; igll2 < interface.a_NORMAL.extent(1); igll2++){\
+      interface.h_a_SHAPENDERIV(sorted_ind,igll,igll2) = edgedata.data[EDGEIND_SHAPENDERIV+igll2][igll];\
+    }\
+  }\
+}else{\
+  interface.h_medium2_index_mapping(sorted_ind) = edge.id;\
+  interface.h_medium2_edge_type(sorted_ind) = edge.bdry;\
+  for(int igll = 0; igll < interface.b_NORMAL.extent(1); igll++){\
+    interface.h_b_NORMAL(sorted_ind,igll,0) = edgedata.data[EDGEIND_NX][igll];\
+    interface.h_b_NORMAL(sorted_ind,igll,1) = edgedata.data[EDGEIND_NZ][igll];\
+    interface.h_b_DET(sorted_ind,igll) = edgedata.data[EDGEIND_DET][igll];\
+    interface.h_b_DS(sorted_ind,igll) = edgedata.data[EDGEIND_DS][igll];\
+    interface.h_b_FIELD(sorted_ind,igll,0) = edgedata.data[EDGEIND_FIELD][igll];\
+    interface.h_b_FIELD(sorted_ind,igll,1) = edgedata.data[EDGEIND_FIELD+1][igll];\
+    interface.h_b_FIELDNDERIV(sorted_ind,igll,0) = edgedata.data[EDGEIND_FIELDNDERIV][igll];\
+    interface.h_b_FIELDNDERIV(sorted_ind,igll,1) = edgedata.data[EDGEIND_FIELDNDERIV+1][igll];\
+    interface.h_b_SPEEDPARAM(sorted_ind,igll) = edgedata.data[EDGEIND_SPEEDPARAM][igll];\
+    for(int igll2 = 0; igll2 < interface.b_NORMAL.extent(1); igll2++){\
+      interface.h_b_SHAPENDERIV(sorted_ind,igll,igll2) = edgedata.data[EDGEIND_SHAPENDERIV+igll2][igll];\
+    }\
+  }\
+}\
+}
+  if(edge.medium == specfem::element::medium_tag::acoustic){
+    transfer_edge_vals(acoustic_acoustic_interface,1);
+    transfer_edge_vals(acoustic_acoustic_interface,2);
+    // for(int igll = 0; igll < elastic_elastic_interface.h_medium1_shape_nderiv.extent(1); igll++){
+    //   acoustic_acoustic_interface.h_medium1_shape_nderiv(sorted_ind,igll) = edgedata.data[EDGEIND_SHAPENDERIV][igll];
+    //   acoustic_acoustic_interface.h_medium2_shape_nderiv(sorted_ind,igll) = edgedata.data[EDGEIND_SHAPENDERIV][igll];
+    //   acoustic_acoustic_interface.h_medium1_chi_nderiv(sorted_ind,igll) = edgedata.data[EDGEIND_FIELDNDERIV][igll];
+    //   acoustic_acoustic_interface.h_medium2_chi_nderiv(sorted_ind,igll) = edgedata.data[EDGEIND_FIELDNDERIV][igll];
+    // }
+    transfer_edge_vals(acoustic_elastic_interface,1);
+  }else{;
+    transfer_edge_vals(acoustic_elastic_interface,2);
+    transfer_edge_vals(elastic_elastic_interface,1);
+    transfer_edge_vals(elastic_elastic_interface,2);
+    // for(int igll = 0; igll < elastic_elastic_interface.h_medium1_shape_nderiv.extent(1); igll++){
+    //   elastic_elastic_interface.h_medium1_shape_nderiv(sorted_ind,igll) = edgedata.data[EDGEIND_SHAPENDERIV][igll];
+    //   elastic_elastic_interface.h_medium2_shape_nderiv(sorted_ind,igll) = edgedata.data[EDGEIND_SHAPENDERIV][igll];
+    //   for(int idim = 0; idim < elastic_elastic_interface.h_medium1_disp_nderiv.extent(2); idim++){
+    //     elastic_elastic_interface.h_medium1_disp_nderiv(sorted_ind,igll,idim) = edgedata.data[EDGEIND_FIELDNDERIV + idim][igll];
+    //     elastic_elastic_interface.h_medium2_disp_nderiv(sorted_ind,igll,idim) = edgedata.data[EDGEIND_FIELDNDERIV + idim][igll];
+    //   }
+    // }
+  }
+#undef transfer_edge_vals
+}
+template<int ngll, int datacapacity>
+edge_intersection<ngll> edge_storage<ngll, datacapacity>::load_intersection(const int id) {
+  edge_intersection<ngll> intersection;
+  intersection.a_ref_ind = h_intersection_container(id).a_ref_ind;
+  intersection.b_ref_ind = h_intersection_container(id).b_ref_ind;
+  const int a_ind = intersection.a_ref_ind;
+  const int b_ind = intersection.b_ref_ind;
+  const int sorted_ind = intersection_sorted_inds[id];
+#define transfer_interface_vals(interface) {     \
+    intersection.a_param_start = interface.h_interface_medium1_param_start(sorted_ind);\
+    intersection.b_param_start = interface.h_interface_medium2_param_start(sorted_ind);\
+    intersection.a_param_end = interface.h_interface_medium1_param_end(sorted_ind);\
+    intersection.b_param_end = interface.h_interface_medium2_param_end(sorted_ind);\
+    interface.to_edge_data_mortar_trans(sorted_ind,intersection.a_mortar_trans, intersection.b_mortar_trans);\
+  }
+  if(h_edge_data_container(a_ind).parent.medium == specfem::element::medium_tag::acoustic
+  &&h_edge_data_container(b_ind).parent.medium == specfem::element::medium_tag::acoustic){
+      transfer_interface_vals(acoustic_acoustic_interface);
+  }else if(h_edge_data_container(a_ind).parent.medium == specfem::element::medium_tag::elastic
+  &&h_edge_data_container(b_ind).parent.medium == specfem::element::medium_tag::elastic){
+      transfer_interface_vals(elastic_elastic_interface);
+  }else if(h_edge_data_container(a_ind).parent.medium == specfem::element::medium_tag::acoustic
+  &&h_edge_data_container(b_ind).parent.medium == specfem::element::medium_tag::elastic){
+      transfer_interface_vals(acoustic_elastic_interface);
+  }
+  return intersection;
+#undef transfer_interface_vals
+
+}
+template<int ngll, int datacapacity>
+void edge_storage<ngll, datacapacity>::store_intersection(const int id, const edge_intersection<ngll>& intersection) {
+  const int a_ind = intersection.a_ref_ind;
+  const int b_ind = intersection.b_ref_ind;
+  const int sorted_ind = intersection_sorted_inds[id];
+#define transfer_interface_vals(interface) {     \
+    interface.h_interface_medium1_index(sorted_ind) = edge_sorted_inds[a_ind];\
+    interface.h_interface_medium2_index(sorted_ind) = edge_sorted_inds[b_ind];\
+    interface.h_interface_medium1_param_start(sorted_ind) = intersection.a_param_start;\
+    interface.h_interface_medium2_param_start(sorted_ind) = intersection.b_param_start;\
+    interface.h_interface_medium1_param_end(sorted_ind) = intersection.a_param_end;\
+    interface.h_interface_medium2_param_end(sorted_ind) = intersection.b_param_end;\
+    interface.from_edge_data_mortar_trans(sorted_ind,intersection.a_mortar_trans, intersection.b_mortar_trans);\
+  }
+  if(h_edge_data_container(a_ind).parent.medium == specfem::element::medium_tag::acoustic
+  &&h_edge_data_container(b_ind).parent.medium == specfem::element::medium_tag::acoustic){
+      transfer_interface_vals(acoustic_acoustic_interface);
+  }else if(h_edge_data_container(a_ind).parent.medium == specfem::element::medium_tag::elastic
+  &&h_edge_data_container(b_ind).parent.medium == specfem::element::medium_tag::elastic){
+      transfer_interface_vals(elastic_elastic_interface);
+  }else if(h_edge_data_container(a_ind).parent.medium == specfem::element::medium_tag::acoustic
+  &&h_edge_data_container(b_ind).parent.medium == specfem::element::medium_tag::elastic){
+      transfer_interface_vals(acoustic_elastic_interface);
+  }
+#undef transfer_interface_vals
+}
+
+template<int ngll, int datacapacity>
+void edge_storage<ngll, datacapacity>::load_all_intersections() {
+  if(!interface_structs_initialized){
+    throw std::runtime_error("attempting to run edge_storage.load_all_intersections() prior to interface struct initialization.");
+  }
+  //edges first
+  for (int i = 0; i < n_edges; i++) {
+    load_edge(i);
+  }
+  //intersections next
+  for (int i = 0; i < n_intersections; i++) {
+    load_intersection(i);
+  }
+}
+template<int ngll, int datacapacity>
+void edge_storage<ngll, datacapacity>::store_all_intersections() {
+  if(!interface_structs_initialized){
+    throw std::runtime_error("attempting to run edge_storage.store_all_intersections() prior to interface struct initialization.");
+  }
+  //edges first
+  for (int i = 0; i < n_edges; i++) {
+    store_edge(i, h_edge_data_container(i));
+  }
+  //intersections next
+  for (int i = 0; i < n_intersections; i++) {
+    store_intersection(i, h_intersection_container(i));
+  }
+}
+
+
+
+
 
 } // namespace edge_manager
 } // namespace _util
