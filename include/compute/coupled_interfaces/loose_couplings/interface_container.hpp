@@ -83,6 +83,11 @@ public:
   using EdgeQuadView =
       Kokkos::View<type_real * [QuadratureType::NGLL][QuadratureType::NGLL],
                    Kokkos::DefaultExecutionSpace>;
+
+  EdgeVectorView a_POSITION;
+  EdgeVectorView b_POSITION;
+  typename EdgeVectorView::HostMirror h_a_POSITION;
+  typename EdgeVectorView::HostMirror h_b_POSITION;
   EdgeVectorView a_NORMAL;
   EdgeVectorView b_NORMAL;
   typename EdgeVectorView::HostMirror h_a_NORMAL;

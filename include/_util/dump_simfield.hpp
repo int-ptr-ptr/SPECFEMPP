@@ -109,7 +109,7 @@ void dump_edge_container(
                specfem::kokkos::HostMemSpace>
       mortar_trans("_util::dump_edge_storage::mortar_trans", nintersect);
   for (int i = 0; i < nedge; i++) {
-    _util::edge_manager::edge_data<ngllcapacity, datacapacity> &edge_data =
+    _util::edge_manager::edge_data<ngllcapacity, datacapacity> edge_data =
         edge_storage.get_edge_on_host(i);
     edge_intdat(i, 0) = edge_data.parent.id;
     switch (edge_data.parent.bdry) {

@@ -43,8 +43,8 @@ public:
   template <int ngllcapacity>
   void to_edge_data_mortar_trans(
       const int interface_ind,
-      const type_real (&a_mortar_trans)[ngllcapacity][ngllcapacity],
-      const type_real (&b_mortar_trans)[ngllcapacity][ngllcapacity]) {
+      type_real (&a_mortar_trans)[ngllcapacity][ngllcapacity],
+      type_real (&b_mortar_trans)[ngllcapacity][ngllcapacity]) {
     for (int igll1 = 0;
          igll1 < ngllcapacity && igll1 < IntersectionQuadrature::NGLL;
          igll1++) {
