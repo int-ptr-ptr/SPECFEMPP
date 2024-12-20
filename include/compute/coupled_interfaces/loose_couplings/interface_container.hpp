@@ -28,6 +28,7 @@ public:
       MediumTag1; ///< Self medium of the interface
   constexpr static specfem::element::medium_tag medium2_type =
       MediumTag2; ///< Other medium of the interface
+  static constexpr int NGLL_EDGE = QuadratureType::NGLL;
 
   interface_container() = default;
   interface_container(const int num_medium1_edges, const int num_medium2_edges);
@@ -116,6 +117,9 @@ public:
   EdgeQuadView b_SHAPENDERIV;
   typename EdgeQuadView::HostMirror h_a_SHAPENDERIV;
   typename EdgeQuadView::HostMirror h_b_SHAPENDERIV;
+
+  RealView interface_relax_param;
+  RealView::HostMirror h_interface_relax_param;
 };
 
 } // namespace loose

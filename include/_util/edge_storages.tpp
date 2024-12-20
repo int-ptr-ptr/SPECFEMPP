@@ -31,6 +31,7 @@ int num_interfaces){
   init_views(container.interface_medium2_param_end,container.h_interface_medium2_param_end,num_interfaces,"interface_medium2_param_end");
   init_views(container.interface_medium1_mortar_transfer,container.h_interface_medium1_mortar_transfer,num_interfaces,"interface_medium1_mortar_transfer");
   init_views(container.interface_medium2_mortar_transfer,container.h_interface_medium2_mortar_transfer,num_interfaces,"interface_medium2_mortar_transfer");
+  init_views(container.interface_relax_param,container.h_interface_relax_param,num_interfaces,"interface_relax_param");
 }
 
 template <specfem::dimension::type DimensionType,
@@ -67,11 +68,11 @@ edge_data<ngll,datacapacity> edge_storage<ngll, datacapacity>::get_edge_on_host(
   return load_edge(edge);
 }
 template <int ngll, int datacapacity>
-edge_intersection<ngll>& edge_storage<ngll, datacapacity>::get_intersection_on_host(int intersection){
+edge_intersection<ngll> edge_storage<ngll, datacapacity>::get_intersection_on_host(int intersection){
   if(!intersections_built){
     build_intersections_on_host();
   }
-  return h_intersection_container(intersection);
+  return load_intersection(intersection);
 }
 
 template <int ngll, int datacapacity>
@@ -140,14 +141,14 @@ void edge_storage<ngll, datacapacity>::foreach_intersection_on_host(
     build_intersections_on_host();
   }
   for (int i = 0; i < n_intersections; i++) {
-    edge_intersection<ngll> &ei = h_intersection_container(i);
+    edge_intersection<ngll> ei = load_intersection(i);
     edge_data<ngll, datacapacity> a_data = load_edge(ei.a_ref_ind);
     edge_data<ngll, datacapacity> b_data = load_edge(ei.b_ref_ind);
     func(ei, a_data, b_data);
     store_edge(ei.a_ref_ind,a_data);
     store_edge(ei.b_ref_ind,b_data);
+    store_intersection(i,ei);
   }
-  Kokkos::deep_copy(intersection_container, h_intersection_container);
 }
 
 template <int ngll, int datacapacity>
@@ -161,14 +162,14 @@ void edge_storage<ngll, datacapacity>::foreach_intersection_on_host(
     throw std::runtime_error("Attempting a foreach_intersection_on_host() with data access before the intersections array was built!");
   }
   for (int i = 0; i < n_intersections; i++) {
-    edge_intersection<ngll> &ei = h_intersection_container(i);
+    edge_intersection<ngll> ei = load_intersection(i);
     edge_data<ngll, datacapacity> a_data = load_edge(ei.a_ref_ind);
     edge_data<ngll, datacapacity> b_data = load_edge(ei.b_ref_ind);
     func(ei, a_data, b_data, Kokkos::subview(h_intersection_data,i,Kokkos::ALL));
     store_edge(ei.a_ref_ind,a_data);
     store_edge(ei.b_ref_ind,b_data);
+    store_intersection(i,ei);
   }
-  Kokkos::deep_copy(intersection_container, h_intersection_container);
   Kokkos::deep_copy(intersection_data, h_intersection_data);
 }
 
@@ -419,10 +420,10 @@ void edge_storage<ngll, datacapacity>::build_intersections_on_host() {
     }
   }
   n_intersections = intersections.size();
-  intersection_container =
-      specfem::kokkos::DeviceView1d<edge_intersection<ngll> >(
-          "_util::edge_manager::edge_storage::edge_data", n_intersections);
-  h_intersection_container = Kokkos::create_mirror_view(intersection_container);
+  // intersection_container =
+  //     specfem::kokkos::DeviceView1d<edge_intersection<ngll> >(
+  //         "_util::edge_manager::edge_storage::edge_data", n_intersections);
+  // h_intersection_container = Kokkos::create_mirror_view(intersection_container);
 
 
   init_interface_views(acoustic_acoustic_interface,intersections_acoustic_acoustic);
@@ -430,9 +431,14 @@ void edge_storage<ngll, datacapacity>::build_intersections_on_host() {
   init_interface_views(elastic_elastic_interface,intersections_elastic_elastic);
   interface_structs_initialized = true;
 
+  intersection_edge_a = std::vector<int>(n_intersections);
+  intersection_edge_b = std::vector<int>(n_intersections);
+
   for (int i = 0; i < n_intersections; i++) {
     int a_ind = intersections[i].a_ref_ind;
     int b_ind = intersections[i].b_ref_ind;
+    intersection_edge_a[i] = a_ind;
+    intersection_edge_b[i] = b_ind;
     if(edge_media[a_ind] == specfem::element::medium_tag::elastic
     &&edge_media[b_ind] == specfem::element::medium_tag::acoustic){
         // swap a and b
@@ -464,10 +470,8 @@ void edge_storage<ngll, datacapacity>::build_intersections_on_host() {
         #undef swpi
         #undef swpr
     }
-    h_intersection_container(i) = intersections[i];
+    store_intersection(i,intersections[i]);
   }
-  Kokkos::deep_copy(intersection_container, h_intersection_container);
-  store_all_intersections();
   intersections_built = true;
 }
 
@@ -594,11 +598,11 @@ edge_data<ngll, datacapacity> edge_storage<ngll, datacapacity>::load_edge(const 
   const int sorted_ind = edge_sorted_inds[id];
   edge.medium = edge_media[id];
 #define transfer_edge_vals(interface,media_id) {\
+edgedata.ngll = interface.NGLL_EDGE;\
 if(media_id == 1){\
   edge.id = interface.h_medium1_index_mapping(sorted_ind);\
   edge.bdry = interface.h_medium1_edge_type(sorted_ind);\
-  edgedata.ngll = interface.a_NORMAL.extent(1);\
-  for(int igll = 0; igll < interface.a_NORMAL.extent(1); igll++){\
+  for(int igll = 0; igll < interface.NGLL_EDGE; igll++){\
     edgedata.data[EDGEIND_NX][igll] = interface.h_a_NORMAL(sorted_ind,igll,0);\
     edgedata.data[EDGEIND_NZ][igll] = interface.h_a_NORMAL(sorted_ind,igll,1);\
     edgedata.data[EDGEIND_DET][igll] = interface.h_a_DET(sorted_ind,igll);\
@@ -610,15 +614,14 @@ if(media_id == 1){\
     edgedata.data[EDGEIND_SPEEDPARAM][igll] = interface.h_a_SPEEDPARAM(sorted_ind,igll);\
     edgedata.x[igll] = interface.h_a_POSITION(sorted_ind,igll,0);\
     edgedata.z[igll] = interface.h_a_POSITION(sorted_ind,igll,1);\
-    for(int igll2 = 0; igll2 < interface.a_NORMAL.extent(1); igll2++){\
+    for(int igll2 = 0; igll2 < interface.NGLL_EDGE; igll2++){\
       edgedata.data[EDGEIND_SHAPENDERIV+igll2][igll] = interface.h_a_SHAPENDERIV(sorted_ind,igll,igll2);\
     }\
   }\
 }else{\
   edge.id = interface.h_medium2_index_mapping(sorted_ind);\
   edge.bdry = interface.h_medium2_edge_type(sorted_ind);\
-  edgedata.ngll = interface.b_NORMAL.extent(1);\
-  for(int igll = 0; igll < interface.b_NORMAL.extent(1); igll++){\
+  for(int igll = 0; igll < interface.NGLL_EDGE; igll++){\
     edgedata.data[EDGEIND_NX][igll] = interface.h_b_NORMAL(sorted_ind,igll,0);\
     edgedata.data[EDGEIND_NZ][igll] = interface.h_b_NORMAL(sorted_ind,igll,1);\
     edgedata.data[EDGEIND_DET][igll] = interface.h_b_DET(sorted_ind,igll);\
@@ -630,7 +633,7 @@ if(media_id == 1){\
     edgedata.data[EDGEIND_SPEEDPARAM][igll] = interface.h_b_SPEEDPARAM(sorted_ind,igll);\
     edgedata.x[igll] = interface.h_b_POSITION(sorted_ind,igll,0);\
     edgedata.z[igll] = interface.h_b_POSITION(sorted_ind,igll,1);\
-    for(int igll2 = 0; igll2 < interface.b_NORMAL.extent(1); igll2++){\
+    for(int igll2 = 0; igll2 < interface.NGLL_EDGE; igll2++){\
       edgedata.data[EDGEIND_SHAPENDERIV+igll2][igll] = interface.h_b_SHAPENDERIV(sorted_ind,igll,igll2);\
     }\
   }\
@@ -675,7 +678,7 @@ void edge_storage<ngll, datacapacity>::store_edge(const int id, const edge_data<
 if(media_id == 1){\
   interface.h_medium1_index_mapping(sorted_ind) = edge.id;\
   interface.h_medium1_edge_type(sorted_ind) = edge.bdry;\
-  for(int igll = 0; igll < interface.a_NORMAL.extent(1); igll++){\
+  for(int igll = 0; igll < interface.NGLL_EDGE; igll++){\
     interface.h_a_NORMAL(sorted_ind,igll,0) = edgedata.data[EDGEIND_NX][igll];\
     interface.h_a_NORMAL(sorted_ind,igll,1) = edgedata.data[EDGEIND_NZ][igll];\
     interface.h_a_DET(sorted_ind,igll) = edgedata.data[EDGEIND_DET][igll];\
@@ -687,14 +690,14 @@ if(media_id == 1){\
     interface.h_a_SPEEDPARAM(sorted_ind,igll) = edgedata.data[EDGEIND_SPEEDPARAM][igll];\
     interface.h_a_POSITION(sorted_ind,igll,0) = edgedata.x[igll];\
     interface.h_a_POSITION(sorted_ind,igll,1) = edgedata.z[igll];\
-    for(int igll2 = 0; igll2 < interface.a_NORMAL.extent(1); igll2++){\
+    for(int igll2 = 0; igll2 < interface.NGLL_EDGE; igll2++){\
       interface.h_a_SHAPENDERIV(sorted_ind,igll,igll2) = edgedata.data[EDGEIND_SHAPENDERIV+igll2][igll];\
     }\
   }\
 }else{\
   interface.h_medium2_index_mapping(sorted_ind) = edge.id;\
   interface.h_medium2_edge_type(sorted_ind) = edge.bdry;\
-  for(int igll = 0; igll < interface.b_NORMAL.extent(1); igll++){\
+  for(int igll = 0; igll < interface.NGLL_EDGE; igll++){\
     interface.h_b_NORMAL(sorted_ind,igll,0) = edgedata.data[EDGEIND_NX][igll];\
     interface.h_b_NORMAL(sorted_ind,igll,1) = edgedata.data[EDGEIND_NZ][igll];\
     interface.h_b_DET(sorted_ind,igll) = edgedata.data[EDGEIND_DET][igll];\
@@ -706,7 +709,7 @@ if(media_id == 1){\
     interface.h_b_SPEEDPARAM(sorted_ind,igll) = edgedata.data[EDGEIND_SPEEDPARAM][igll];\
     interface.h_b_POSITION(sorted_ind,igll,0) = edgedata.x[igll];\
     interface.h_b_POSITION(sorted_ind,igll,1) = edgedata.z[igll];\
-    for(int igll2 = 0; igll2 < interface.b_NORMAL.extent(1); igll2++){\
+    for(int igll2 = 0; igll2 < interface.NGLL_EDGE; igll2++){\
       interface.h_b_SHAPENDERIV(sorted_ind,igll,igll2) = edgedata.data[EDGEIND_SHAPENDERIV+igll2][igll];\
     }\
   }\
@@ -741,16 +744,20 @@ if(media_id == 1){\
 template<int ngll, int datacapacity>
 edge_intersection<ngll> edge_storage<ngll, datacapacity>::load_intersection(const int id) {
   edge_intersection<ngll> intersection;
-  intersection.a_ref_ind = h_intersection_container(id).a_ref_ind;
-  intersection.b_ref_ind = h_intersection_container(id).b_ref_ind;
-  const int a_ind = intersection.a_ref_ind;
-  const int b_ind = intersection.b_ref_ind;
+  const int a_ind = intersection_edge_a[id];
+  const int b_ind = intersection_edge_b[id];
+  intersection.a_ref_ind = a_ind;
+  intersection.b_ref_ind = b_ind;
   const int sorted_ind = intersection_sorted_inds[id];
 #define transfer_interface_vals(interface) {     \
     intersection.a_param_start = interface.h_interface_medium1_param_start(sorted_ind);\
     intersection.b_param_start = interface.h_interface_medium2_param_start(sorted_ind);\
     intersection.a_param_end = interface.h_interface_medium1_param_end(sorted_ind);\
     intersection.b_param_end = interface.h_interface_medium2_param_end(sorted_ind);\
+    intersection.relax_param = interface.h_interface_relax_param(sorted_ind);\
+    intersection.a_ngll = interface.NGLL_EDGE;\
+    intersection.b_ngll = interface.NGLL_EDGE;\
+    intersection.ngll = interface.NGLL_INTERSECTION;\
     interface.to_edge_data_mortar_trans(sorted_ind,intersection.a_mortar_trans, intersection.b_mortar_trans);\
   }
   if(edge_media[a_ind] == specfem::element::medium_tag::acoustic
@@ -779,6 +786,7 @@ void edge_storage<ngll, datacapacity>::store_intersection(const int id, const ed
     interface.h_interface_medium2_param_start(sorted_ind) = intersection.b_param_start;\
     interface.h_interface_medium1_param_end(sorted_ind) = intersection.a_param_end;\
     interface.h_interface_medium2_param_end(sorted_ind) = intersection.b_param_end;\
+    interface.h_interface_relax_param(sorted_ind) = intersection.relax_param;\
     interface.from_edge_data_mortar_trans(sorted_ind,intersection.a_mortar_trans, intersection.b_mortar_trans);\
   }
   if(edge_media[a_ind] == specfem::element::medium_tag::acoustic
@@ -791,6 +799,7 @@ void edge_storage<ngll, datacapacity>::store_intersection(const int id, const ed
   &&edge_media[b_ind] == specfem::element::medium_tag::elastic){
       transfer_interface_vals(acoustic_elastic_interface);
   }
+  // h_intersection_container(id) = intersection;
 #undef transfer_interface_vals
 }
 
@@ -809,7 +818,7 @@ void edge_storage<ngll, datacapacity>::store_all_intersections() {
     throw std::runtime_error("attempting to run edge_storage.store_all_intersections() prior to interface struct initialization.");
   }
   for (int i = 0; i < n_intersections; i++) {
-    store_intersection(i, h_intersection_container(i));
+    // store_intersection(i, h_intersection_container(i));
   }
 }
 

@@ -17,6 +17,8 @@ protected:
                    Kokkos::DefaultExecutionSpace>;
 
 public:
+  static constexpr int NGLL_INTERSECTION = IntersectionQuadrature::NGLL;
+
   TransferTensorView interface_medium1_mortar_transfer;
   typename TransferTensorView::HostMirror h_interface_medium1_mortar_transfer;
   TransferTensorView interface_medium2_mortar_transfer;

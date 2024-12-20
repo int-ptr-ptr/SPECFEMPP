@@ -139,7 +139,7 @@ void dump_edge_container(
     }
   }
   for (int i = 0; i < nintersect; i++) {
-    _util::edge_manager::edge_intersection<ngllcapacity> &intersect =
+    _util::edge_manager::edge_intersection<ngllcapacity> intersect =
         edge_storage.get_intersection_on_host(i);
     intersect_intdat(i, 0) = intersect.a_ref_ind;
     intersect_intdat(i, 1) = intersect.b_ref_ind;

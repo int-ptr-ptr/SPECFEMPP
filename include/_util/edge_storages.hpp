@@ -93,7 +93,7 @@ public:
                    Kokkos::ALL)))> &func);
   void build_intersections_on_host();
   edge_data<ngll, datacapacity> get_edge_on_host(int edge);
-  edge_intersection<ngll> &get_intersection_on_host(int intersection);
+  edge_intersection<ngll> get_intersection_on_host(int intersection);
 
   edge_data<ngll, datacapacity> load_edge(const int edgeID);
   void store_edge(const int edgeID, const edge_data<ngll, datacapacity> &edge);
@@ -121,6 +121,8 @@ private:
   std::vector<edge> elastic_edges;
   std::vector<int> edge_sorted_inds;
   std::vector<specfem::element::medium_tag> edge_media;
+  std::vector<int> intersection_edge_a;
+  std::vector<int> intersection_edge_b;
 
   // specfem::kokkos::DeviceView1d<edge_data<ngll, datacapacity> >
   //     edge_data_container;
@@ -129,10 +131,10 @@ private:
 
   int n_intersections;
   bool intersections_built;
-  specfem::kokkos::DeviceView1d<edge_intersection<ngll> >
-      intersection_container;
-  specfem::kokkos::HostView1d<edge_intersection<ngll> >
-      h_intersection_container;
+  // specfem::kokkos::DeviceView1d<edge_intersection<ngll> >
+  //     intersection_container;
+  // specfem::kokkos::HostView1d<edge_intersection<ngll> >
+  //     h_intersection_container;
   std::vector<int> intersection_sorted_inds;
 
   bool intersection_data_built;
