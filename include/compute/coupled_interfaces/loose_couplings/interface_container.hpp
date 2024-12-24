@@ -1,6 +1,33 @@
 #pragma once
 
+#include "edge/loose/edge_access.hpp"
 #include "kokkos_abstractions.h"
+
+template <int NGLL>
+KOKKOS_FUNCTION static void
+point_from_edge(int &iz, int &ix, const specfem::enums::edge::type edge,
+                const int iedge) {
+  switch (edge) {
+  case specfem::enums::edge::type::RIGHT:
+    ix = NGLL - 1;
+    iz = iedge;
+    return;
+  case specfem::enums::edge::type::TOP:
+    ix = iedge;
+    iz = NGLL - 1;
+    return;
+  case specfem::enums::edge::type::LEFT:
+    ix = 0;
+    iz = iedge;
+    return;
+  case specfem::enums::edge::type::BOTTOM:
+    ix = iedge;
+    iz = 0;
+    return;
+  default:
+    return;
+  }
+};
 
 namespace specfem {
 namespace compute {
@@ -85,10 +112,6 @@ public:
       Kokkos::View<type_real * [QuadratureType::NGLL][QuadratureType::NGLL],
                    Kokkos::DefaultExecutionSpace>;
 
-  EdgeVectorView a_POSITION;
-  EdgeVectorView b_POSITION;
-  typename EdgeVectorView::HostMirror h_a_POSITION;
-  typename EdgeVectorView::HostMirror h_b_POSITION;
   EdgeVectorView a_NORMAL;
   EdgeVectorView b_NORMAL;
   typename EdgeVectorView::HostMirror h_a_NORMAL;
@@ -101,10 +124,6 @@ public:
   EdgeScalarView b_DS;
   typename EdgeScalarView::HostMirror h_a_DS;
   typename EdgeScalarView::HostMirror h_b_DS;
-  EdgeVectorView a_FIELD;
-  EdgeVectorView b_FIELD;
-  typename EdgeVectorView::HostMirror h_a_FIELD;
-  typename EdgeVectorView::HostMirror h_b_FIELD;
   EdgeVectorView a_FIELDNDERIV;
   EdgeVectorView b_FIELDNDERIV;
   typename EdgeVectorView::HostMirror h_a_FIELDNDERIV;
@@ -120,6 +139,200 @@ public:
 
   RealView interface_relax_param;
   RealView::HostMirror h_interface_relax_param;
+
+  // TODO change out the design to fit closer to specfem?
+  // TODO include UseSIMD=true case.
+
+  template <int medium, bool on_device>
+  KOKKOS_FUNCTION
+      specfem::edge::loose::positions<DimensionType, QuadratureType, false>
+      get_positions(const int edge_index,
+                    specfem::compute::assembly &assembly) {
+    specfem::edge::loose::positions<DimensionType, QuadratureType, false>
+        edge_positions;
+    int ispec;
+    specfem::enums::edge::type edge;
+    if constexpr (medium == 1) {
+      if constexpr (on_device == true) {
+        ispec = medium1_index_mapping(edge_index);
+        edge = medium1_edge_type(edge_index);
+      } else {
+        ispec = h_medium1_index_mapping(edge_index);
+        edge = h_medium1_edge_type(edge_index);
+      }
+    } else if constexpr (medium == 2) {
+      if constexpr (on_device == true) {
+        ispec = medium2_index_mapping(edge_index);
+        edge = medium2_edge_type(edge_index);
+      } else {
+        ispec = h_medium2_index_mapping(edge_index);
+        edge = h_medium2_edge_type(edge_index);
+      }
+    } else {
+      static_assert(false, "Medium can only be 1 or 2!");
+    }
+    int ix, iz;
+#pragma unroll
+    for (int igll = 0; igll < NGLL_EDGE; igll++) {
+      point_from_edge<NGLL_EDGE>(iz, ix, edge, igll);
+      edge_positions.x[igll] = assembly.mesh.points.coord(0, ispec, iz, ix);
+      edge_positions.z[igll] = assembly.mesh.points.coord(1, ispec, iz, ix);
+    }
+    return edge_positions;
+  }
+
+  //   template<int medium, bool on_device,
+  //           specfem::element::medium_tag MediumType, bool StoreDisplacement,
+  //           bool StoreVelocity, bool StoreAcceleration, bool StoreMassMatrix,
+  //           bool UseSIMD>
+  //   KOKKOS_FUNCTION
+  //   void load_field(
+  //         const int edge_index, specfem::compute::assembly& assembly,
+  //          specfem::point::field<DimensionType, MediumType,
+  //          StoreDisplacement, StoreVelocity, StoreAcceleration,
+  //          StoreMassMatrix, UseSIMD>* point_arr
+  //         ){
+  //     int ispec;
+  //     specfem::enums::edge::type edge;
+  //     if constexpr(medium == 1){
+  //       static_assert(MediumType == MediumTag1, "Attemping access for medium
+  //       1 with an incompatible point::field"); if constexpr(on_device ==
+  //       true){
+  //         ispec = medium1_index_mapping(edge_index);
+  //         edge = medium1_edge_type(edge_index);
+  //       }else{
+  //         ispec = h_medium1_index_mapping(edge_index);
+  //         edge = h_medium1_edge_type(edge_index);
+  //       }
+  //     }else if constexpr(medium == 2){
+  //       static_assert(MediumType == MediumTag2, "Attemping access for medium
+  //       2 with an incompatible point::field"); if constexpr(on_device ==
+  //       true){
+  //         ispec = medium2_index_mapping(edge_index);
+  //         edge = medium2_edge_type(edge_index);
+  //       }else{
+  //         ispec = h_medium2_index_mapping(edge_index);
+  //         edge = h_medium2_edge_type(edge_index);
+  //       }
+  //     }else{
+  //       static_assert(false,"Medium can only be 1 or 2!");
+  //     }
+  //     int ix, iz;
+  // #pragma unroll
+  //     for(int igll = 0; igll < NGLL_EDGE; igll++){
+  //       point_from_edge<NGLL_EDGE>(iz,ix,edge,igll);
+  //       specfem::point::index<DimensionType> index(ispec,iz,ix);
+  //       if constexpr(on_device == true){
+  //         specfem::compute::load_on_device(index,assembly.fields.forward,point_arr[igll]);
+  //       }else{
+  //         specfem::compute::load_on_host(index,assembly.fields.forward,point_arr[igll]);
+  //       }
+  //     }
+  //   }
+
+#define impl_field_access_arg_types                                            \
+  const int edge_index, specfem::compute::assembly &assembly,                  \
+      specfem::point::field<DimensionType, MediumType, StoreDisplacement,      \
+                            StoreVelocity, StoreAcceleration, StoreMassMatrix, \
+                            UseSIMD> *point_arr
+#define impl_field_access_args edge_index, assembly, point_arr
+#define impl_field_access_template                                             \
+  int medium, bool on_device, specfem::element::medium_tag MediumType,         \
+      bool StoreDisplacement, bool StoreVelocity, bool StoreAcceleration,      \
+      bool StoreMassMatrix, bool UseSIMD
+
+  template <impl_field_access_template, typename on_host_call,
+            typename on_device_call>
+  KOKKOS_INLINE_FUNCTION void impl_field_access(impl_field_access_arg_types,
+                                                on_host_call on_host_func,
+                                                on_device_call on_device_func) {
+    int ispec;
+    specfem::enums::edge::type edge;
+    if constexpr (medium == 1) {
+      static_assert(
+          MediumType == MediumTag1,
+          "Attemping access for medium 1 with an incompatible point::field");
+      if constexpr (on_device == true) {
+        ispec = medium1_index_mapping(edge_index);
+        edge = medium1_edge_type(edge_index);
+      } else {
+        ispec = h_medium1_index_mapping(edge_index);
+        edge = h_medium1_edge_type(edge_index);
+      }
+    } else if constexpr (medium == 2) {
+      static_assert(
+          MediumType == MediumTag2,
+          "Attemping access for medium 2 with an incompatible point::field");
+      if constexpr (on_device == true) {
+        ispec = medium2_index_mapping(edge_index);
+        edge = medium2_edge_type(edge_index);
+      } else {
+        ispec = h_medium2_index_mapping(edge_index);
+        edge = h_medium2_edge_type(edge_index);
+      }
+    } else {
+      static_assert(false, "Medium can only be 1 or 2!");
+    }
+    int ix, iz;
+#pragma unroll
+    for (int igll = 0; igll < NGLL_EDGE; igll++) {
+      point_from_edge<NGLL_EDGE>(iz, ix, edge, igll);
+      specfem::point::index<DimensionType> index(ispec, iz, ix);
+      if constexpr (on_device == true) {
+        on_device_func(index, point_arr[igll]);
+      } else {
+        on_host_func(index, point_arr[igll]);
+      }
+    }
+  }
+
+#define impl_field_access_lambdify_index_field_point(func)                     \
+  [&](specfem::point::index<DimensionType> index,                              \
+      specfem::point::field<DimensionType, MediumType, StoreDisplacement,      \
+                            StoreVelocity, StoreAcceleration, StoreMassMatrix, \
+                            UseSIMD> &point) {                                 \
+    func(index, assembly.fields.forward, point);                               \
+  }
+#define impl_field_access_lambdify_index_point_field(func)                     \
+  [&](specfem::point::index<DimensionType> index,                              \
+      specfem::point::field<DimensionType, MediumType, StoreDisplacement,      \
+                            StoreVelocity, StoreAcceleration, StoreMassMatrix, \
+                            UseSIMD> &point) {                                 \
+    func(index, point, assembly.fields.forward);                               \
+  }
+
+  template <impl_field_access_template>
+  KOKKOS_FUNCTION void store_field(impl_field_access_arg_types) {
+    impl_field_access<medium, on_device>(
+        impl_field_access_args,
+        impl_field_access_lambdify_index_point_field(
+            specfem::compute::store_on_host),
+        impl_field_access_lambdify_index_point_field(
+            specfem::compute::store_on_device));
+  }
+  template <impl_field_access_template>
+  KOKKOS_FUNCTION void atomic_add_to_field(impl_field_access_arg_types) {
+    impl_field_access<medium, on_device>(
+        impl_field_access_args,
+        impl_field_access_lambdify_index_point_field(
+            specfem::compute::atomic_add_on_host),
+        impl_field_access_lambdify_index_point_field(
+            specfem::compute::atomic_add_on_device));
+  }
+  template <impl_field_access_template>
+  KOKKOS_FUNCTION void load_field(impl_field_access_arg_types) {
+    impl_field_access<medium, on_device>(
+        impl_field_access_args,
+        impl_field_access_lambdify_index_field_point(
+            specfem::compute::load_on_host),
+        impl_field_access_lambdify_index_field_point(
+            specfem::compute::load_on_device));
+  }
+#undef impl_field_access_arg_types
+#undef impl_field_access_args
+#undef impl_field_access_lambdify_index_field_point
+#undef impl_field_access_lambdify_index_point_field
+#undef impl_field_access_template
 };
 
 } // namespace loose

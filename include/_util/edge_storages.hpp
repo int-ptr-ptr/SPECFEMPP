@@ -76,7 +76,7 @@ template <int ngllcapacity, int datacapacity> struct edge_data {
 
 template <int ngll, int datacapacity> struct edge_storage {
 public:
-  edge_storage(const std::vector<edge> edges);
+  edge_storage(std::vector<edge> edges, specfem::compute::assembly &assembly);
 
   void foreach_edge_on_host(
       const std::function<void(edge_data<ngll, datacapacity> &)> &func);
@@ -114,6 +114,26 @@ public:
   }
   void initialize_intersection_data(int capacity);
 
+  bool interface_structs_initialized;
+  specfem::compute::loose::interface_container<
+      specfem::dimension::type::dim2, specfem::element::medium_tag::acoustic,
+      specfem::element::medium_tag::elastic,
+      specfem::enums::element::quadrature::static_quadrature_points<5>,
+      specfem::coupled_interface::loose::flux::traction_continuity>
+      acoustic_elastic_interface;
+  specfem::compute::loose::interface_container<
+      specfem::dimension::type::dim2, specfem::element::medium_tag::acoustic,
+      specfem::element::medium_tag::acoustic,
+      specfem::enums::element::quadrature::static_quadrature_points<5>,
+      specfem::coupled_interface::loose::flux::symmetric_flux>
+      acoustic_acoustic_interface;
+  specfem::compute::loose::interface_container<
+      specfem::dimension::type::dim2, specfem::element::medium_tag::elastic,
+      specfem::element::medium_tag::elastic,
+      specfem::enums::element::quadrature::static_quadrature_points<5>,
+      specfem::coupled_interface::loose::flux::symmetric_flux>
+      elastic_elastic_interface;
+
 private:
   int n_edges;
   std::vector<edge> edges;
@@ -141,25 +161,7 @@ private:
   specfem::kokkos::DeviceView2d<type_real> intersection_data;
   specfem::kokkos::HostView2d<type_real> h_intersection_data;
 
-  bool interface_structs_initialized;
-  specfem::compute::loose::interface_container<
-      specfem::dimension::type::dim2, specfem::element::medium_tag::acoustic,
-      specfem::element::medium_tag::elastic,
-      specfem::enums::element::quadrature::static_quadrature_points<5>,
-      specfem::coupled_interface::loose::flux::traction_continuity>
-      acoustic_elastic_interface;
-  specfem::compute::loose::interface_container<
-      specfem::dimension::type::dim2, specfem::element::medium_tag::acoustic,
-      specfem::element::medium_tag::acoustic,
-      specfem::enums::element::quadrature::static_quadrature_points<5>,
-      specfem::coupled_interface::loose::flux::symmetric_flux>
-      acoustic_acoustic_interface;
-  specfem::compute::loose::interface_container<
-      specfem::dimension::type::dim2, specfem::element::medium_tag::elastic,
-      specfem::element::medium_tag::elastic,
-      specfem::enums::element::quadrature::static_quadrature_points<5>,
-      specfem::coupled_interface::loose::flux::symmetric_flux>
-      elastic_elastic_interface;
+  specfem::compute::assembly &assembly;
 };
 
 } // namespace edge_manager

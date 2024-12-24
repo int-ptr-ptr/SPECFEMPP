@@ -2,6 +2,7 @@
 #define __UTIL_EDGE_STORAGES_TPP_
 
 #include "_util/edge_storages.hpp"
+#include "edge/loose/edge_access.hpp"
 #include <array>
 #include <cmath>
 #include <iostream>
@@ -51,16 +52,12 @@ int num_medium1_edges, int num_medium2_edges){
   init_views(container.b_DET,container.h_b_DET,num_medium2_edges,"b_DET");
   init_views(container.a_DS,container.h_a_DS,num_medium1_edges,"a_DS");
   init_views(container.b_DS,container.h_b_DS,num_medium2_edges,"b_DS");
-  init_views(container.a_FIELD,container.h_a_FIELD,num_medium1_edges,"a_FIELD");
-  init_views(container.b_FIELD,container.h_b_FIELD,num_medium2_edges,"b_FIELD");
   init_views(container.a_FIELDNDERIV,container.h_a_FIELDNDERIV,num_medium1_edges,"a_FIELDNDERIV");
   init_views(container.b_FIELDNDERIV,container.h_b_FIELDNDERIV,num_medium2_edges,"b_FIELDNDERIV");
   init_views(container.a_SPEEDPARAM,container.h_a_SPEEDPARAM,num_medium1_edges,"a_SPEED_PARAM");
   init_views(container.b_SPEEDPARAM,container.h_b_SPEEDPARAM,num_medium2_edges,"b_SPEED_PARAM");
   init_views(container.a_SHAPENDERIV,container.h_a_SHAPENDERIV,num_medium1_edges,"a_SHAPENDERIV");
   init_views(container.b_SHAPENDERIV,container.h_b_SHAPENDERIV,num_medium2_edges,"b_SHAPENDERIV");
-  init_views(container.a_POSITION,container.h_a_POSITION,num_medium1_edges,"a_POSITION");
-  init_views(container.b_POSITION,container.h_b_POSITION,num_medium2_edges,"b_POSITION");
 }
 
 template <int ngll, int datacapacity>
@@ -76,16 +73,19 @@ edge_intersection<ngll> edge_storage<ngll, datacapacity>::get_intersection_on_ho
 }
 
 template <int ngll, int datacapacity>
-edge_storage<ngll, datacapacity>::edge_storage(const std::vector<edge> edges)
+edge_storage<ngll, datacapacity>::edge_storage(std::vector<edge> edges,
+      specfem::compute::assembly& assembly)
     : n_edges(edges.size()), edges(edges), intersections_built(false),
       // edge_data_container(
       //     specfem::kokkos::DeviceView1d<edge_data<ngll, datacapacity> >(
       //         "_util::edge_manager::edge_storage::edge_data", n_edges)),
       // h_edge_data_container(Kokkos::create_mirror_view(edge_data_container)),
       edge_sorted_inds(n_edges),edge_media(n_edges),
-      interface_structs_initialized(false) {
+      interface_structs_initialized(false),
+      assembly(assembly) {
   //count media of edges
   for (int i = 0; i < n_edges; i++) {
+    edges[i].medium = assembly.properties.h_element_types(edges[i].id);
     edge_media[i] = edges[i].medium;
     if(edges[i].medium == specfem::element::medium_tag::acoustic){
       edge_sorted_inds[i] = acoustic_edges.size();
@@ -593,6 +593,7 @@ type_real edge_intersection<ngllcapacity>::b_to_mortar(int mortar_index,
 
 template<int ngll, int datacapacity>
 edge_data<ngll, datacapacity> edge_storage<ngll, datacapacity>::load_edge(const int id) {
+  constexpr auto DimensionType = specfem::dimension::type::dim2;
   edge_data<ngll, datacapacity> edgedata;
   auto& edge = edgedata.parent;
   const int sorted_ind = edge_sorted_inds[id];
@@ -602,18 +603,21 @@ edgedata.ngll = interface.NGLL_EDGE;\
 if(media_id == 1){\
   edge.id = interface.h_medium1_index_mapping(sorted_ind);\
   edge.bdry = interface.h_medium1_edge_type(sorted_ind);\
+  specfem::point::field<DimensionType,decltype(interface)::medium1_type,true,false,false,false,false> field_points[interface.NGLL_EDGE];\
+  interface.load_field<1,false>(sorted_ind,assembly,field_points);\
+  const auto positions = interface.get_positions<1,false>(sorted_ind,assembly);\
   for(int igll = 0; igll < interface.NGLL_EDGE; igll++){\
     edgedata.data[EDGEIND_NX][igll] = interface.h_a_NORMAL(sorted_ind,igll,0);\
     edgedata.data[EDGEIND_NZ][igll] = interface.h_a_NORMAL(sorted_ind,igll,1);\
     edgedata.data[EDGEIND_DET][igll] = interface.h_a_DET(sorted_ind,igll);\
     edgedata.data[EDGEIND_DS][igll] = interface.h_a_DS(sorted_ind,igll);\
-    edgedata.data[EDGEIND_FIELD][igll] = interface.h_a_FIELD(sorted_ind,igll,0);\
-    edgedata.data[EDGEIND_FIELD+1][igll] = interface.h_a_FIELD(sorted_ind,igll,1);\
-    edgedata.data[EDGEIND_FIELDNDERIV][igll] = interface.h_a_FIELDNDERIV(sorted_ind,igll,0);\
-    edgedata.data[EDGEIND_FIELDNDERIV+1][igll] = interface.h_a_FIELDNDERIV(sorted_ind,igll,1);\
+    for(int icomp = 0; icomp < specfem::element::attributes<DimensionType, decltype(interface)::medium1_type>::components(); icomp++){\
+      edgedata.data[EDGEIND_FIELD+icomp][igll] = field_points[igll].displacement(icomp);\
+      edgedata.data[EDGEIND_FIELDNDERIV+icomp][igll] = interface.h_a_FIELDNDERIV(sorted_ind,igll,icomp);\
+    }\
     edgedata.data[EDGEIND_SPEEDPARAM][igll] = interface.h_a_SPEEDPARAM(sorted_ind,igll);\
-    edgedata.x[igll] = interface.h_a_POSITION(sorted_ind,igll,0);\
-    edgedata.z[igll] = interface.h_a_POSITION(sorted_ind,igll,1);\
+    edgedata.x[igll] = positions.x[igll];\
+    edgedata.z[igll] = positions.z[igll];\
     for(int igll2 = 0; igll2 < interface.NGLL_EDGE; igll2++){\
       edgedata.data[EDGEIND_SHAPENDERIV+igll2][igll] = interface.h_a_SHAPENDERIV(sorted_ind,igll,igll2);\
     }\
@@ -621,18 +625,21 @@ if(media_id == 1){\
 }else{\
   edge.id = interface.h_medium2_index_mapping(sorted_ind);\
   edge.bdry = interface.h_medium2_edge_type(sorted_ind);\
+  specfem::point::field<DimensionType,decltype(interface)::medium2_type,true,false,false,false,false> field_points[interface.NGLL_EDGE];\
+  interface.load_field<2,false>(sorted_ind,assembly,field_points);\
+  const auto positions = interface.get_positions<1,false>(sorted_ind,assembly);\
   for(int igll = 0; igll < interface.NGLL_EDGE; igll++){\
     edgedata.data[EDGEIND_NX][igll] = interface.h_b_NORMAL(sorted_ind,igll,0);\
     edgedata.data[EDGEIND_NZ][igll] = interface.h_b_NORMAL(sorted_ind,igll,1);\
     edgedata.data[EDGEIND_DET][igll] = interface.h_b_DET(sorted_ind,igll);\
     edgedata.data[EDGEIND_DS][igll] = interface.h_b_DS(sorted_ind,igll);\
-    edgedata.data[EDGEIND_FIELD][igll] = interface.h_b_FIELD(sorted_ind,igll,0);\
-    edgedata.data[EDGEIND_FIELD+1][igll] = interface.h_b_FIELD(sorted_ind,igll,1);\
-    edgedata.data[EDGEIND_FIELDNDERIV][igll] = interface.h_b_FIELDNDERIV(sorted_ind,igll,0);\
-    edgedata.data[EDGEIND_FIELDNDERIV+1][igll] = interface.h_b_FIELDNDERIV(sorted_ind,igll,1);\
+    for(int icomp = 0; icomp < specfem::element::attributes<DimensionType, decltype(interface)::medium1_type>::components(); icomp++){\
+      edgedata.data[EDGEIND_FIELD+icomp][igll] = field_points[igll].displacement(icomp);\
+      edgedata.data[EDGEIND_FIELDNDERIV+icomp][igll] = interface.h_b_FIELDNDERIV(sorted_ind,igll,icomp);\
+    }\
     edgedata.data[EDGEIND_SPEEDPARAM][igll] = interface.h_b_SPEEDPARAM(sorted_ind,igll);\
-    edgedata.x[igll] = interface.h_b_POSITION(sorted_ind,igll,0);\
-    edgedata.z[igll] = interface.h_b_POSITION(sorted_ind,igll,1);\
+    edgedata.x[igll] = positions.x[igll];\
+    edgedata.z[igll] = positions.z[igll];\
     for(int igll2 = 0; igll2 < interface.NGLL_EDGE; igll2++){\
       edgedata.data[EDGEIND_SHAPENDERIV+igll2][igll] = interface.h_b_SHAPENDERIV(sorted_ind,igll,igll2);\
     }\
@@ -683,13 +690,9 @@ if(media_id == 1){\
     interface.h_a_NORMAL(sorted_ind,igll,1) = edgedata.data[EDGEIND_NZ][igll];\
     interface.h_a_DET(sorted_ind,igll) = edgedata.data[EDGEIND_DET][igll];\
     interface.h_a_DS(sorted_ind,igll) = edgedata.data[EDGEIND_DS][igll];\
-    interface.h_a_FIELD(sorted_ind,igll,0) = edgedata.data[EDGEIND_FIELD][igll];\
-    interface.h_a_FIELD(sorted_ind,igll,1) = edgedata.data[EDGEIND_FIELD+1][igll];\
     interface.h_a_FIELDNDERIV(sorted_ind,igll,0) = edgedata.data[EDGEIND_FIELDNDERIV][igll];\
     interface.h_a_FIELDNDERIV(sorted_ind,igll,1) = edgedata.data[EDGEIND_FIELDNDERIV+1][igll];\
     interface.h_a_SPEEDPARAM(sorted_ind,igll) = edgedata.data[EDGEIND_SPEEDPARAM][igll];\
-    interface.h_a_POSITION(sorted_ind,igll,0) = edgedata.x[igll];\
-    interface.h_a_POSITION(sorted_ind,igll,1) = edgedata.z[igll];\
     for(int igll2 = 0; igll2 < interface.NGLL_EDGE; igll2++){\
       interface.h_a_SHAPENDERIV(sorted_ind,igll,igll2) = edgedata.data[EDGEIND_SHAPENDERIV+igll2][igll];\
     }\
@@ -702,13 +705,9 @@ if(media_id == 1){\
     interface.h_b_NORMAL(sorted_ind,igll,1) = edgedata.data[EDGEIND_NZ][igll];\
     interface.h_b_DET(sorted_ind,igll) = edgedata.data[EDGEIND_DET][igll];\
     interface.h_b_DS(sorted_ind,igll) = edgedata.data[EDGEIND_DS][igll];\
-    interface.h_b_FIELD(sorted_ind,igll,0) = edgedata.data[EDGEIND_FIELD][igll];\
-    interface.h_b_FIELD(sorted_ind,igll,1) = edgedata.data[EDGEIND_FIELD+1][igll];\
     interface.h_b_FIELDNDERIV(sorted_ind,igll,0) = edgedata.data[EDGEIND_FIELDNDERIV][igll];\
     interface.h_b_FIELDNDERIV(sorted_ind,igll,1) = edgedata.data[EDGEIND_FIELDNDERIV+1][igll];\
     interface.h_b_SPEEDPARAM(sorted_ind,igll) = edgedata.data[EDGEIND_SPEEDPARAM][igll];\
-    interface.h_b_POSITION(sorted_ind,igll,0) = edgedata.x[igll];\
-    interface.h_b_POSITION(sorted_ind,igll,1) = edgedata.z[igll];\
     for(int igll2 = 0; igll2 < interface.NGLL_EDGE; igll2++){\
       interface.h_b_SHAPENDERIV(sorted_ind,igll,igll2) = edgedata.data[EDGEIND_SHAPENDERIV+igll2][igll];\
     }\

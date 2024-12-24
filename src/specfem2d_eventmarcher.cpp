@@ -218,10 +218,10 @@ void execute(specfem::MPI::MPI *mpi) {
   for (int i = 0; i < edge_removals.size(); i++) {
     dg_edges[i].id = edge_removals[i].elem;
     dg_edges[i].bdry = edge_from_id(edge_removals[i].side);
-    dg_edges[i].medium = assembly->properties.h_element_types(dg_edges[i].id);
+    // medium is set in the edge_storage constructor. It need not be set here.
   }
   _util::edge_manager::edge_storage<edge_capacity, data_capacity>
-      dg_edge_storage(dg_edges);
+      dg_edge_storage(dg_edges, *assembly);
 
   specfem::event_marching::arbitrary_call_event output_edges(
       [&]() {
@@ -237,84 +237,70 @@ void execute(specfem::MPI::MPI *mpi) {
 #ifdef _EVENT_MARCHER_DUMPS_
   event_system.register_event(&output_edges);
 #endif
-  dg_edge_storage.foreach_edge_on_host([&](_util::edge_manager::edge_data<
-                                           edge_capacity, data_capacity> &e) {
-    using PointPartialDerivativesType =
-        specfem::point::partial_derivatives<specfem::dimension::type::dim2,
-                                            true, false>;
-    e.ngll = qp5.NGLL;
-    int ix, iz;
-    int ispec = e.parent.id;
-    for (int i = 0; i < qp5.NGLL; i++) {
-      point_from_id(ix, iz, e.parent.bdry, i);
-      e.x[i] = assembly->mesh.points.coord(0, ispec, iz, ix);
-      e.z[i] = assembly->mesh.points.coord(1, ispec, iz, ix);
-      specfem::point::index<specfem::dimension::type::dim2> index(ispec, iz,
-                                                                  ix);
+  dg_edge_storage.foreach_edge_on_host(
+      [&](_util::edge_manager::edge_data<edge_capacity, data_capacity> &e) {
+        using PointPartialDerivativesType =
+            specfem::point::partial_derivatives<specfem::dimension::type::dim2,
+                                                true, false>;
+        e.ngll = qp5.NGLL;
+        int ix, iz;
+        int ispec = e.parent.id;
+        for (int i = 0; i < qp5.NGLL; i++) {
+          point_from_id(ix, iz, e.parent.bdry, i);
+          specfem::point::index<specfem::dimension::type::dim2> index(ispec, iz,
+                                                                      ix);
 
-      PointPartialDerivativesType ppd;
-      specfem::compute::load_on_host(index, assembly->partial_derivatives, ppd);
-      // type_real dvdxi = assembly->mesh.quadratures.h_hprime(ix,ix);
-      // type_real dvdga = assembly->mesh.quadratures.h_hprime(iz,iz);
-      // type_real dvdx = dvdxi * ppd.xix +
-      //                  dvdga * ppd.gammax;
-      // type_real dvdz = dvdxi * ppd.xiz +
-      //                  dvdga * ppd.gammaz;
-      type_real det = 1 / fabs(ppd.xix * ppd.gammaz - ppd.xiz * ppd.gammax);
-      type_real nx, nz;
-      switch (e.parent.bdry) {
-      case specfem::enums::edge::type::RIGHT:
-        nx = ppd.xix;
-        nz = ppd.xiz;
-        break;
-      case specfem::enums::edge::type::TOP:
-        nx = ppd.gammax;
-        nz = ppd.gammaz;
-        break;
-      case specfem::enums::edge::type::LEFT:
-        nx = -ppd.xix;
-        nz = -ppd.xiz;
-        break;
-      case specfem::enums::edge::type::BOTTOM:
-        nx = -ppd.gammax;
-        nz = -ppd.gammaz;
-        break;
-      }
-      e.data[EDGEIND_NX][i] = nx;
-      e.data[EDGEIND_NZ][i] = nz;
-      e.data[EDGEIND_DET][i] = det;
-      e.data[EDGEIND_DS][i] = sqrt(nx * nx + nz * nz) * det; // dS
-      for (int ishape = 0; ishape < e.ngll; ishape++) {
-        int ixshape, izshape;
-        point_from_id(ixshape, izshape, e.parent.bdry, ishape);
-        // v = L_{ixshape}(x) L_{izshape}(z);
-        // hprime(i,j) = L_j'(t_i)
-        type_real dvdxi = assembly->mesh.quadratures.gll.h_hprime(ix, ixshape) *
-                          (iz == izshape);
-        type_real dvdga = assembly->mesh.quadratures.gll.h_hprime(iz, izshape) *
-                          (ix == ixshape);
-        type_real dvdx = dvdxi * ppd.xix + dvdga * ppd.gammax;
-        type_real dvdz = dvdxi * ppd.xiz + dvdga * ppd.gammaz;
-        e.data[EDGEIND_SHAPENDERIV + ishape][i] = (dvdx * nx + dvdz * nz) * det;
-      }
-      e.data[EDGEIND_BDRY_TYPE][i] =
-          (type_real)assembly->boundaries.boundary_tags(ispec);
-      specfem::point::boundary<specfem::element::boundary_tag::none,
-                               specfem::dimension::type::dim2, false>
-          bdnone;
-      specfem::compute::load_on_host(index, assembly->boundaries, bdnone);
-      e.data[EDGEIND_BDRY_TYPE + 1][i] =
-          (type_real)(bdnone.tag == specfem::element::boundary_tag::none);
-      specfem::point::boundary<
-          specfem::element::boundary_tag::acoustic_free_surface,
-          specfem::dimension::type::dim2, false>
-          bdafs;
-      specfem::compute::load_on_host(index, assembly->boundaries, bdafs);
-      e.data[EDGEIND_BDRY_TYPE + 2][i] =
-          (type_real)(bdafs.tag ==
-                      specfem::element::boundary_tag::acoustic_free_surface);
-    }
-  });
+          PointPartialDerivativesType ppd;
+          specfem::compute::load_on_host(index, assembly->partial_derivatives,
+                                         ppd);
+          // type_real dvdxi = assembly->mesh.quadratures.h_hprime(ix,ix);
+          // type_real dvdga = assembly->mesh.quadratures.h_hprime(iz,iz);
+          // type_real dvdx = dvdxi * ppd.xix +
+          //                  dvdga * ppd.gammax;
+          // type_real dvdz = dvdxi * ppd.xiz +
+          //                  dvdga * ppd.gammaz;
+          type_real det = 1 / fabs(ppd.xix * ppd.gammaz - ppd.xiz * ppd.gammax);
+          type_real nx, nz;
+          switch (e.parent.bdry) {
+          case specfem::enums::edge::type::RIGHT:
+            nx = ppd.xix;
+            nz = ppd.xiz;
+            break;
+          case specfem::enums::edge::type::TOP:
+            nx = ppd.gammax;
+            nz = ppd.gammaz;
+            break;
+          case specfem::enums::edge::type::LEFT:
+            nx = -ppd.xix;
+            nz = -ppd.xiz;
+            break;
+          case specfem::enums::edge::type::BOTTOM:
+            nx = -ppd.gammax;
+            nz = -ppd.gammaz;
+            break;
+          }
+          e.data[EDGEIND_NX][i] = nx;
+          e.data[EDGEIND_NZ][i] = nz;
+          e.data[EDGEIND_DET][i] = det;
+          e.data[EDGEIND_DS][i] = sqrt(nx * nx + nz * nz) * det; // dS
+          for (int ishape = 0; ishape < e.ngll; ishape++) {
+            int ixshape, izshape;
+            point_from_id(ixshape, izshape, e.parent.bdry, ishape);
+            // v = L_{ixshape}(x) L_{izshape}(z);
+            // hprime(i,j) = L_j'(t_i)
+            type_real dvdxi =
+                assembly->mesh.quadratures.gll.h_hprime(ix, ixshape) *
+                (iz == izshape);
+            type_real dvdga =
+                assembly->mesh.quadratures.gll.h_hprime(iz, izshape) *
+                (ix == ixshape);
+            type_real dvdx = dvdxi * ppd.xix + dvdga * ppd.gammax;
+            type_real dvdz = dvdxi * ppd.xiz + dvdga * ppd.gammaz;
+            e.data[EDGEIND_SHAPENDERIV + ishape][i] =
+                (dvdx * nx + dvdz * nz) * det;
+          }
+        }
+      });
   auto spec_charlen2 = [&](int ispec) {
     type_real lx1 =
         assembly->mesh.points.coord(0, ispec, 0, 0) -
@@ -342,10 +328,8 @@ void execute(specfem::MPI::MPI *mpi) {
             specfem::element::property_tag::isotropic, false>;
         int a_ispec = a.parent.id;
         int b_ispec = b.parent.id;
-        specfem::element::medium_tag a_medium =
-            assembly->properties.h_element_types(a_ispec);
-        specfem::element::medium_tag b_medium =
-            assembly->properties.h_element_types(b_ispec);
+        specfem::element::medium_tag a_medium = a.parent.medium;
+        specfem::element::medium_tag b_medium = b.parent.medium;
         if (a_medium == specfem::element::medium_tag::acoustic &&
             b_medium == specfem::element::medium_tag::acoustic) {
           type_real rho_inv_max = 0;
@@ -369,6 +353,9 @@ void execute(specfem::MPI::MPI *mpi) {
 
         } else if (a_medium == specfem::element::medium_tag::elastic &&
                    b_medium == specfem::element::medium_tag::acoustic) {
+          throw std::runtime_error(
+              "interface elastic-acoustic should have been swapped. This "
+              "should not have been reached.");
           // swap a and b
           int tmpi;
           type_real tmpr;
@@ -477,11 +464,8 @@ void execute(specfem::MPI::MPI *mpi) {
               ncomp = 1;
               dfdxi = std::vector<type_real>(ncomp, 0);
               dfdga = std::vector<type_real>(ncomp, 0);
-              specfem::compute::load_on_host(index, assembly->fields.forward,
-                                             disp);
               specfem::compute::load_on_host(index, assembly->properties,
                                              props);
-              e.data[EDGEIND_FIELD][i] = disp.displacement(0);
               e.data[EDGEIND_SPEEDPARAM][i] = props.rho_inverse;
               for (int k = 0; k < qp5.NGLL; k++) {
                 specfem::point::index<specfem::dimension::type::dim2> index_(
@@ -504,11 +488,6 @@ void execute(specfem::MPI::MPI *mpi) {
                   static_cast<int>(specfem::element::medium_tag::elastic);
               dfdxi = std::vector<type_real>(ncomp, 0);
               dfdga = std::vector<type_real>(ncomp, 0);
-              specfem::compute::load_on_host(index, assembly->fields.forward,
-                                             disp);
-
-              e.data[EDGEIND_FIELD][i] = disp.displacement(0);
-              e.data[EDGEIND_FIELD + 1][i] = disp.displacement(1);
               for (int k = 0; k < qp5.NGLL; k++) {
                 specfem::point::index<specfem::dimension::type::dim2> index_(
                     ispec, iz, k);
@@ -627,10 +606,8 @@ void execute(specfem::MPI::MPI *mpi) {
                   _util::edge_manager::gen_GLL(intersect.ngll);
               int a_ispec = a.parent.id;
               int b_ispec = b.parent.id;
-              specfem::element::medium_tag a_medium =
-                  assembly->properties.h_element_types(a_ispec);
-              specfem::element::medium_tag b_medium =
-                  assembly->properties.h_element_types(b_ispec);
+              specfem::element::medium_tag a_medium = a.parent.medium;
+              specfem::element::medium_tag b_medium = b.parent.medium;
               type_real a_scale_dS =
                   0.5 * (intersect.a_param_end - intersect.a_param_start);
               type_real b_scale_dS =
@@ -639,6 +616,8 @@ void execute(specfem::MPI::MPI *mpi) {
               // have acoustic on the a-side.
               if (a_medium == specfem::element::medium_tag::acoustic) {
                 if (b_medium == specfem::element::medium_tag::acoustic) {
+                  PointAcousticAccel accel_arr
+                      [dg_edge_storage.acoustic_acoustic_interface.NGLL_EDGE];
                   for (int a_ishape = 0; a_ishape < a.ngll; a_ishape++) {
                     // flux += (
                     //       np.einsum("j,j,j,ji->i",JW,u-u_,c/2,dv)
@@ -699,14 +678,19 @@ void execute(specfem::MPI::MPI *mpi) {
                     point_from_id(index.ix, index.iz, a.parent.bdry, a_ishape);
                     if (h_is_bdry_at_pt(index,
                                         specfem::element::boundary_tag::none)) {
+                      accel_arr[a_ishape].acceleration = flux;
                       accel.acceleration = flux;
-                      specfem::compute::atomic_add_on_device(
-                          index, accel, assembly->fields.forward);
+                      // specfem::compute::atomic_add_on_device(
+                      //     index, accel, assembly->fields.forward);
                       data_view[INTERIND_ACCEL_INCLUDE_A + a_ishape] = 0;
                     } else {
+                      accel_arr[a_ishape].acceleration = 0;
                       data_view[INTERIND_ACCEL_INCLUDE_A + a_ishape] = 1;
                     }
                   }
+                  dg_edge_storage.acoustic_acoustic_interface
+                      .atomic_add_to_field<1, false>(intersect.a_ref_ind,
+                                                     *assembly, accel_arr);
                   for (int b_ishape = 0; b_ishape < b.ngll; b_ishape++) {
                     // flux += (
                     //       np.einsum("j,j,j,ji->i",JW,u-u_,c/2,dv)
@@ -855,10 +839,8 @@ void execute(specfem::MPI::MPI *mpi) {
                   _util::edge_manager::gen_GLL(intersect.ngll);
               int a_ispec = a.parent.id;
               int b_ispec = b.parent.id;
-              specfem::element::medium_tag a_medium =
-                  assembly->properties.h_element_types(a_ispec);
-              specfem::element::medium_tag b_medium =
-                  assembly->properties.h_element_types(b_ispec);
+              specfem::element::medium_tag a_medium = a.parent.medium;
+              specfem::element::medium_tag b_medium = b.parent.medium;
               if ((a_ispec == 88 || b_ispec == 88) &&
                   timescheme_wrapper.get_istep() == 1000) {
                 intersect.a_to_mortar(

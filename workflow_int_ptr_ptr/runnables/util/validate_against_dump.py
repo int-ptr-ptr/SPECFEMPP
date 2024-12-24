@@ -35,7 +35,7 @@ def compare_sims(sim, queue_out, queue_in):
 
     def log(st):
         m, s = divmod(int(round(time.time() - tstart)), 50)
-        queue_out.put(f"[COMAPRE {sname} - {m:4d}:{s:02d}] " + st)
+        queue_out.put(f"[COMPARE {sname} - {m:4d}:{s:02d}] " + st)
 
     should_continue = True
     dumpnum = -1
@@ -131,7 +131,7 @@ def compare_dumps():
         time.sleep(1)
         while not queue.empty():
             msg = queue.get()
-            if msg == STOPKEY:
+            if re.match(r"\[COMPARE\s*(.*[^\s])\s*-\s*(\d*:\d\d)\] " + STOPKEY, msg):
                 print("[!] stop issued. Terminating all.")
                 for name, p in list(procs_run.items()):
                     p.terminate()
