@@ -9,7 +9,9 @@
 #define EDGEIND_BDRY_TYPE 14
 
 #define data_capacity 20
-#define edge_capacity 5
+#define edge_storage_quad                                                      \
+  specfem::enums::element::quadrature::static_quadrature_points<5>
+#define edge_capacity edge_storage_quad::NGLL
 #define INTERIND_FLUXTOTAL_A 0
 #define INTERIND_FLUX1_A (qp5.NGLL)
 #define INTERIND_FLUX2_A (qp5.NGLL * 2)
@@ -220,7 +222,7 @@ void execute(specfem::MPI::MPI *mpi) {
     dg_edges[i].bdry = edge_from_id(edge_removals[i].side);
     // medium is set in the edge_storage constructor. It need not be set here.
   }
-  _util::edge_manager::edge_storage<edge_capacity, data_capacity>
+  _util::edge_manager::edge_storage<edge_storage_quad, data_capacity>
       dg_edge_storage(dg_edges, *assembly);
 
   specfem::event_marching::arbitrary_call_event output_edges(
@@ -237,6 +239,17 @@ void execute(specfem::MPI::MPI *mpi) {
 #ifdef _EVENT_MARCHER_DUMPS_
   event_system.register_event(&output_edges);
 #endif
+  // geometric props
+  for (int i = 0;
+       i < dg_edge_storage.acoustic_acoustic_interface.num_medium1_edges; i++) {
+    specfem::compute::loose::compute_geometry<1, false, false>(
+        *assembly, dg_edge_storage.acoustic_acoustic_interface, i);
+  }
+  for (int i = 0;
+       i < dg_edge_storage.acoustic_acoustic_interface.num_medium2_edges; i++) {
+    specfem::compute::loose::compute_geometry<2, false, false>(
+        *assembly, dg_edge_storage.acoustic_acoustic_interface, i);
+  }
   dg_edge_storage.foreach_edge_on_host(
       [&](_util::edge_manager::edge_data<edge_capacity, data_capacity> &e) {
         using PointPartialDerivativesType =
@@ -418,6 +431,8 @@ void execute(specfem::MPI::MPI *mpi) {
 
   specfem::event_marching::arbitrary_call_event store_boundaryvals(
       [&]() {
+        // dg_edge_storage.acoustic_acoustic_interface.compute_edge_intermediates<1,false>();
+        // dg_edge_storage.acoustic_acoustic_interface.compute_edge_intermediates<2,false>();
         dg_edge_storage.foreach_edge_on_host([&](_util::edge_manager::edge_data<
                                                  edge_capacity, data_capacity>
                                                      &e) {

@@ -3,8 +3,12 @@
 #include "edge/loose/edge_access.hpp"
 #include "kokkos_abstractions.h"
 
+namespace specfem {
+namespace compute {
+namespace loose {
+
 template <int NGLL>
-KOKKOS_FUNCTION static void
+KOKKOS_INLINE_FUNCTION void
 point_from_edge(int &iz, int &ix, const specfem::enums::edge::type edge,
                 const int iedge) {
   switch (edge) {
@@ -29,9 +33,15 @@ point_from_edge(int &iz, int &ix, const specfem::enums::edge::type edge,
   }
 };
 
-namespace specfem {
-namespace compute {
-namespace loose {
+template <specfem::dimension::type DimensionType, typename QuadratureType>
+using EdgeVectorView =
+    Kokkos::View<type_real *
+                     [QuadratureType::NGLL]
+                         [specfem::dimension::dimension<DimensionType>::dim],
+                 Kokkos::DefaultExecutionSpace>;
+template <typename QuadratureType>
+using EdgeScalarView = Kokkos::View<type_real * [QuadratureType::NGLL],
+                                    Kokkos::DefaultExecutionSpace>;
 
 template <specfem::dimension::type DimensionType,
           specfem::element::medium_tag MediumTag1,
@@ -40,6 +50,9 @@ template <specfem::dimension::type DimensionType,
 struct interface_container : FluxScheme::container<DimensionType, MediumTag1,
                                                    MediumTag2, QuadratureType> {
 private:
+  using super = typename FluxScheme::container<DimensionType, MediumTag1,
+                                               MediumTag2, QuadratureType>;
+
   using IndexView =
       Kokkos::View<int *, Kokkos::DefaultExecutionSpace>; ///< Underlying view
                                                           ///< type to store
@@ -51,14 +64,91 @@ private:
   using RealView = Kokkos::View<type_real *, Kokkos::DefaultExecutionSpace>;
 
 public:
-  constexpr static specfem::element::medium_tag medium1_type =
+  static constexpr specfem::dimension::type dim_type = DimensionType;
+  static constexpr specfem::element::medium_tag medium1_type =
       MediumTag1; ///< Self medium of the interface
-  constexpr static specfem::element::medium_tag medium2_type =
+  static constexpr specfem::element::medium_tag medium2_type =
       MediumTag2; ///< Other medium of the interface
   static constexpr int NGLL_EDGE = QuadratureType::NGLL;
+  using EdgeQuadrature = QuadratureType;
 
+  // void operator=(const
+  // interface_container<DimensionType,MediumTag1,MediumTag2,QuadratureType,FluxScheme>
+  // &rhs) {
+  //     this->num_medium1_edges = rhs.num_medium1_edges;
+  //     this->num_medium2_edges = rhs.num_medium2_edges;
+  //     this->num_interfaces = rhs.num_interfaces;
+  //     this->medium1_index_mapping = rhs.medium1_index_mapping;
+  //     this->h_medium1_index_mapping = rhs.h_medium1_index_mapping;
+  //     this->medium2_index_mapping = rhs.medium2_index_mapping;
+  //     this->h_medium2_index_mapping = rhs.h_medium2_index_mapping;
+  //     this->medium1_edge_type = rhs.medium1_edge_type;
+  //     this->h_medium1_edge_type = rhs.h_medium1_edge_type;
+  //     this->medium2_edge_type = rhs.medium2_edge_type;
+  //     this->h_medium2_edge_type = rhs.h_medium2_edge_type;
+
+  //     this->interface_medium1_index = rhs.interface_medium1_index;
+  //     this->h_interface_medium1_index = rhs.h_interface_medium1_index;
+  //     this->interface_medium2_index = rhs.interface_medium2_index;
+  //     this->h_interface_medium2_index = rhs.h_interface_medium2_index;
+  //     this->interface_medium1_param_start =
+  //     rhs.interface_medium1_param_start;
+  //     this->h_interface_medium1_param_start =
+  //     rhs.h_interface_medium1_param_start;
+  //     this->interface_medium2_param_start =
+  //     rhs.interface_medium2_param_start;
+  //     this->h_interface_medium2_param_start =
+  //     rhs.h_interface_medium2_param_start; this->interface_medium1_param_end
+  //     = rhs.interface_medium1_param_end; this->h_interface_medium1_param_end
+  //     = rhs.h_interface_medium1_param_end; this->interface_medium2_param_end
+  //     = rhs.interface_medium2_param_end; this->h_interface_medium2_param_end
+  //     = rhs.h_interface_medium2_param_end; super::operator=(rhs);
+
+  //     //todo remove
+
+  //     this->a_NORMAL = rhs.a_NORMAL;
+  //     this->h_a_NORMAL = rhs.h_a_NORMAL;
+  //     this->b_NORMAL = rhs.b_NORMAL;
+  //     this->h_b_NORMAL = rhs.h_b_NORMAL;
+  //     this->a_DET = rhs.a_DET;
+  //     this->h_a_DET = rhs.h_a_DET;
+  //     this->b_DET = rhs.b_DET;
+  //     this->h_b_DET = rhs.h_b_DET;
+  //     this->a_DS = rhs.a_DS;
+  //     this->h_a_DS = rhs.h_a_DS;
+  //     this->b_DS = rhs.b_DS;
+  //     this->h_b_DS = rhs.h_b_DS;
+  //     this->a_SPEEDPARAM = rhs.a_SPEEDPARAM;
+  //     this->h_a_SPEEDPARAM = rhs.h_a_SPEEDPARAM;
+  //     this->b_SPEEDPARAM = rhs.b_SPEEDPARAM;
+  //     this->h_b_SPEEDPARAM = rhs.h_b_SPEEDPARAM;
+  //     this->a_FIELDNDERIV = rhs.a_FIELDNDERIV;
+  //     this->h_a_FIELDNDERIV = rhs.h_a_FIELDNDERIV;
+  //     this->b_FIELDNDERIV = rhs.b_FIELDNDERIV;
+  //     this->h_b_FIELDNDERIV = rhs.h_b_FIELDNDERIV;
+  //     this->a_SHAPENDERIV = rhs.a_SHAPENDERIV;
+  //     this->h_a_SHAPENDERIV = rhs.h_a_SHAPENDERIV;
+  //     this->b_SHAPENDERIV = rhs.b_SHAPENDERIV;
+  //     this->h_b_SHAPENDERIV = rhs.h_b_SHAPENDERIV;
+  //     this->interface_relax_param = rhs.interface_relax_param;
+  //     this->h_interface_relax_param = rhs.h_interface_relax_param;
+  //   }
   interface_container() = default;
-  interface_container(const int num_medium1_edges, const int num_medium2_edges);
+  interface_container(const int num_medium1_edges, const int num_medium2_edges,
+                      const int num_interfaces)
+      : num_medium1_edges(num_medium1_edges),
+        num_medium2_edges(num_medium2_edges), num_interfaces(num_interfaces),
+        medium1_index_mapping("specfem::compute::loose::interface_container."
+                              "medium1_index_mapping",
+                              num_medium1_edges),
+        h_medium1_index_mapping(
+            Kokkos::create_mirror_view(medium1_index_mapping)),
+        medium2_index_mapping("specfem::compute::loose::interface_container."
+                              "medium2_index_mapping",
+                              num_medium2_edges),
+        h_medium2_index_mapping(
+            Kokkos::create_mirror_view(medium2_index_mapping)),
+        super(num_medium1_edges, num_medium2_edges, num_interfaces) {}
 
   int num_medium1_edges;
   int num_medium2_edges;
@@ -101,13 +191,10 @@ public:
   RealView::HostMirror h_interface_medium2_param_end;
 
   // These are temporary until we figure out where to put them all
-  using EdgeScalarView = Kokkos::View<type_real * [QuadratureType::NGLL],
-                                      Kokkos::DefaultExecutionSpace>;
+  using EdgeScalarView =
+      specfem::compute::loose::EdgeScalarView<QuadratureType>;
   using EdgeVectorView =
-      Kokkos::View<type_real *
-                       [QuadratureType::NGLL]
-                           [specfem::dimension::dimension<DimensionType>::dim],
-                   Kokkos::DefaultExecutionSpace>;
+      specfem::compute::loose::EdgeVectorView<DimensionType, QuadratureType>;
   using EdgeQuadView =
       Kokkos::View<type_real * [QuadratureType::NGLL][QuadratureType::NGLL],
                    Kokkos::DefaultExecutionSpace>;
@@ -333,6 +420,33 @@ public:
 #undef impl_field_access_lambdify_index_field_point
 #undef impl_field_access_lambdify_index_point_field
 #undef impl_field_access_template
+
+  // these called before the intersection loop to store intermediate values
+
+  template <int medium, bool on_device> void compute_edge_intermediates() {
+    if constexpr (on_device == true) {
+      static_assert(false, "on_device == true not yet supported.");
+    }
+
+    if constexpr (medium == 1) {
+      for (int i = 0; i < num_medium1_edges; i++) {
+        compute_edge_intermediate<medium, on_device>(i);
+      }
+    } else if constexpr (medium == 2) {
+      for (int i = 0; i < num_medium2_edges; i++) {
+        compute_edge_intermediate<medium, on_device>(i);
+      }
+    } else {
+      static_assert(false, "Medium can only be 1 or 2!");
+    }
+  }
+
+protected:
+  template <int medium, bool on_device>
+  KOKKOS_INLINE_FUNCTION void compute_edge_intermediate(int index) {
+
+    super::template compute_edge_intermediate<medium, on_device>(index);
+  }
 };
 
 } // namespace loose

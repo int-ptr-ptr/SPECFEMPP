@@ -33,6 +33,7 @@ int num_interfaces){
   init_views(container.interface_medium1_mortar_transfer,container.h_interface_medium1_mortar_transfer,num_interfaces,"interface_medium1_mortar_transfer");
   init_views(container.interface_medium2_mortar_transfer,container.h_interface_medium2_mortar_transfer,num_interfaces,"interface_medium2_mortar_transfer");
   init_views(container.interface_relax_param,container.h_interface_relax_param,num_interfaces,"interface_relax_param");
+  container.num_interfaces = num_interfaces;
 }
 
 template <specfem::dimension::type DimensionType,
@@ -42,8 +43,6 @@ template <specfem::dimension::type DimensionType,
           typename FluxScheme>
 void init_edge_views(specfem::compute::loose::interface_container<DimensionType,MediumTag1,MediumTag2,QuadratureType,FluxScheme>& container,
 int num_medium1_edges, int num_medium2_edges){
-  init_views(container.medium1_index_mapping,container.h_medium1_index_mapping, num_medium1_edges,"medium1_index");
-  init_views(container.medium2_index_mapping,container.h_medium2_index_mapping, num_medium2_edges,"medium2_index");
   init_views(container.medium1_edge_type,container.h_medium1_edge_type, num_medium1_edges,"medium1_edge_type");
   init_views(container.medium2_edge_type,container.h_medium2_edge_type, num_medium2_edges,"medium2_edge_type");
   init_views(container.a_NORMAL,container.h_a_NORMAL,num_medium1_edges,"a_NORMAL");
@@ -58,24 +57,23 @@ int num_medium1_edges, int num_medium2_edges){
   init_views(container.b_SPEEDPARAM,container.h_b_SPEEDPARAM,num_medium2_edges,"b_SPEED_PARAM");
   init_views(container.a_SHAPENDERIV,container.h_a_SHAPENDERIV,num_medium1_edges,"a_SHAPENDERIV");
   init_views(container.b_SHAPENDERIV,container.h_b_SHAPENDERIV,num_medium2_edges,"b_SHAPENDERIV");
+  container.num_medium1_edges = num_medium1_edges;
+  container.num_medium2_edges = num_medium2_edges;
 }
 
-template <int ngll, int datacapacity>
-edge_data<ngll,datacapacity> edge_storage<ngll, datacapacity>::get_edge_on_host(int edge){
+template <typename edgequad, int datacapacity>
+edge_data<edge_storage<edgequad, datacapacity>::ngll,datacapacity> edge_storage<edgequad, datacapacity>::get_edge_on_host(int edge){
   return load_edge(edge);
 }
-template <int ngll, int datacapacity>
-edge_intersection<ngll> edge_storage<ngll, datacapacity>::get_intersection_on_host(int intersection){
-  if(!intersections_built){
-    build_intersections_on_host();
-  }
+template <typename edgequad, int datacapacity>
+edge_intersection<edge_storage<edgequad, datacapacity>::ngll> edge_storage<edgequad, datacapacity>::get_intersection_on_host(int intersection){
   return load_intersection(intersection);
 }
 
-template <int ngll, int datacapacity>
-edge_storage<ngll, datacapacity>::edge_storage(std::vector<edge> edges,
+template <typename edgequad, int datacapacity>
+edge_storage<edgequad, datacapacity>::edge_storage(std::vector<edge> edges,
       specfem::compute::assembly& assembly)
-    : n_edges(edges.size()), edges(edges), intersections_built(false),
+    : n_edges(edges.size()), edges(edges),
       // edge_data_container(
       //     specfem::kokkos::DeviceView1d<edge_data<ngll, datacapacity> >(
       //         "_util::edge_manager::edge_storage::edge_data", n_edges)),
@@ -95,6 +93,11 @@ edge_storage<ngll, datacapacity>::edge_storage(std::vector<edge> edges,
       elastic_edges.push_back(edges[i]);
     }
   }
+  //temporary: initialize with no interfaces
+  const auto ref = decltype(acoustic_elastic_interface)(acoustic_edges.size(), elastic_edges.size(), 0);
+  acoustic_elastic_interface = ref;
+  acoustic_acoustic_interface = decltype(acoustic_acoustic_interface)(acoustic_edges.size(), acoustic_edges.size(), 0);
+  elastic_elastic_interface = decltype(elastic_elastic_interface)(elastic_edges.size(), elastic_edges.size(), 0);
   init_edge_views(acoustic_acoustic_interface,acoustic_edges.size(),acoustic_edges.size());
   init_edge_views(acoustic_elastic_interface,acoustic_edges.size(),elastic_edges.size());
   init_edge_views(elastic_elastic_interface,elastic_edges.size(),elastic_edges.size());
@@ -105,15 +108,13 @@ edge_storage<ngll, datacapacity>::edge_storage(std::vector<edge> edges,
     edgedata.ngll = ngll;
     store_edge(i,edgedata);
   }
+  build_intersections_on_host();
 
 
 }
 
-template <int ngll, int datacapacity>
-void edge_storage<ngll, datacapacity>::initialize_intersection_data(int capacity){
-  if (!intersections_built){
-    build_intersections_on_host();
-  }
+template <typename edgequad, int datacapacity>
+void edge_storage<edgequad, datacapacity>::initialize_intersection_data(int capacity){
   intersection_data = specfem::kokkos::DeviceView2d<type_real>(
               "_util::edge_manager::edge_storage::edge_data", n_intersections, capacity);
   h_intersection_data = Kokkos::create_mirror_view(intersection_data);
@@ -121,8 +122,8 @@ void edge_storage<ngll, datacapacity>::initialize_intersection_data(int capacity
   intersection_data_built = true;
 }
 
-template <int ngll, int datacapacity>
-void edge_storage<ngll, datacapacity>::foreach_edge_on_host(
+template <typename edgequad, int datacapacity>
+void edge_storage<edgequad, datacapacity>::foreach_edge_on_host(
     const std::function<void(edge_data<ngll, datacapacity> &)> &func) {
 
   for (int i = 0; i < n_edges; i++) {
@@ -132,14 +133,11 @@ void edge_storage<ngll, datacapacity>::foreach_edge_on_host(
   }
 }
 
-template <int ngll, int datacapacity>
-void edge_storage<ngll, datacapacity>::foreach_intersection_on_host(
+template <typename edgequad, int datacapacity>
+void edge_storage<edgequad, datacapacity>::foreach_intersection_on_host(
     const std::function<void(edge_intersection<ngll> &,
                              edge_data<ngll, datacapacity> &,
                              edge_data<ngll, datacapacity> &)> &func) {
-  if (!intersections_built) {
-    build_intersections_on_host();
-  }
   for (int i = 0; i < n_intersections; i++) {
     edge_intersection<ngll> ei = load_intersection(i);
     edge_data<ngll, datacapacity> a_data = load_edge(ei.a_ref_ind);
@@ -151,8 +149,8 @@ void edge_storage<ngll, datacapacity>::foreach_intersection_on_host(
   }
 }
 
-template <int ngll, int datacapacity>
-void edge_storage<ngll, datacapacity>::foreach_intersection_on_host(
+template <typename edgequad, int datacapacity>
+void edge_storage<edgequad, datacapacity>::foreach_intersection_on_host(
     const std::function<void(edge_intersection<ngll> &,
                               edge_data<ngll, datacapacity> &,
                               edge_data<ngll, datacapacity> &,
@@ -186,20 +184,14 @@ void edge_storage<ngll, datacapacity>::foreach_intersection_on_host(
  * @return true if a nonzero intersection occurs between these two edges
  * @return false if no nonzero intersection occurs between these two edges
  */
-template <int ngll, int datacapacity>
-bool intersect(edge_data<ngll, datacapacity> &a,
-               edge_data<ngll, datacapacity> &b,
+template <int ngll, typename QuadratureType, bool UseSIMD>
+bool intersect(const specfem::edge::loose::positions<specfem::dimension::type::dim2,QuadratureType,UseSIMD> &a,
+               const specfem::edge::loose::positions<specfem::dimension::type::dim2,QuadratureType,UseSIMD> &b,
                edge_intersection<ngll> &intersection) {
 #define intersect_eps 1e-3
 #define intersect_eps2 (intersect_eps * intersect_eps)
   quadrature_rule gll = gen_GLL(ngll);
 
-  // make sure ngll is correct
-  if (a.ngll != ngll || b.ngll != ngll) {
-    throw std::runtime_error(
-        "bool intersect(edge_data,edge_data,edge_intersection): ngll different "
-        "from expected.");
-  }
   //maybe do an AABB check for performance? the box can be precomputed per edge.
 
 
@@ -377,15 +369,15 @@ bool intersect(edge_data<ngll, datacapacity> &a,
   }
   gll.sample_L(intersection.b_mortar_trans, t_samples, ngll);
   intersection.ngll = ngll;
-  intersection.a_ngll = a.ngll;
-  intersection.b_ngll = b.ngll;
+  intersection.a_ngll = ngll;
+  intersection.b_ngll = ngll;
   return true;
 #undef intersect_eps2
 #undef intersect_eps
 }
 
-template <int ngll, int datacapacity>
-void edge_storage<ngll, datacapacity>::build_intersections_on_host() {
+template <typename edgequad, int datacapacity>
+void edge_storage<edgequad, datacapacity>::build_intersections_on_host() {
   int intersections_acoustic_acoustic = 0;
   int intersections_acoustic_elastic = 0;
   int intersections_elastic_elastic = 0;
@@ -394,11 +386,13 @@ void edge_storage<ngll, datacapacity>::build_intersections_on_host() {
   intersection_sorted_inds = std::vector<int>();
   // foreach unordered pair (edge[i], edge[j]), j != i
   for (int i = 0; i < n_edges; i++) {
+    edge_data<ngll, datacapacity> i_data = load_edge(i);
+    specfem::edge::loose::positions<specfem::dimension::type::dim2,edgequad,false> i_pos(i_data.x,i_data.z);
     for (int j = i + 1; j < n_edges; j++) {
       // if there is an intersection, store it.
-      edge_data<ngll, datacapacity> i_data = load_edge(i);
       edge_data<ngll, datacapacity> j_data = load_edge(j);
-      if (intersect(i_data, j_data, intersection)) {
+      specfem::edge::loose::positions<specfem::dimension::type::dim2,edgequad,false> j_pos(j_data.x,j_data.z);
+      if (intersect(i_pos, j_pos, intersection)) {
         intersection.a_ref_ind = i;
         intersection.b_ref_ind = j;
         intersections.push_back(intersection);
@@ -472,17 +466,16 @@ void edge_storage<ngll, datacapacity>::build_intersections_on_host() {
     }
     store_intersection(i,intersections[i]);
   }
-  intersections_built = true;
 }
 
-type_real quadrature_rule::integrate(type_real *f) {
+type_real quadrature_rule::integrate(const type_real *f) {
   type_real sum = 0;
   for (int i = 0; i < nquad; i++) {
     sum += f[i] * w[i];
   }
   return sum;
 }
-type_real quadrature_rule::deriv(type_real *f, type_real t) {
+type_real quadrature_rule::deriv(const type_real *f, const type_real t) {
   // f(t) = sum_{j} f[j] L_j(t) = sum_{ij} f[j] L_{ji} i t^(i-1)
   type_real tim1 = 1; // t^(i-1)
   type_real sum = 0;
@@ -494,7 +487,7 @@ type_real quadrature_rule::deriv(type_real *f, type_real t) {
   }
   return sum;
 }
-type_real quadrature_rule::interpolate(type_real *f, type_real t) {
+type_real quadrature_rule::interpolate(const type_real *f, const type_real t) {
   // f(t) = sum_{j} f[j] L_j(t) = sum_{ij} f[j] L_{ji} t^i
   type_real ti = 1; // t^i
   type_real sum = 0;
@@ -554,8 +547,8 @@ quadrature_rule gen_GLL(int ngll) {
 }
 
 template <int ngllcapacity>
-void quadrature_rule::sample_L(type_real buf[][ngllcapacity], type_real *t_vals,
-                               int t_size) {
+void quadrature_rule::sample_L(type_real buf[][ngllcapacity], const type_real *t_vals,
+                               const int t_size) {
   for (int it = 0; it < t_size; it++) { // foreach t
     type_real tpow = 1;
     // reset accum
@@ -573,8 +566,8 @@ void quadrature_rule::sample_L(type_real buf[][ngllcapacity], type_real *t_vals,
 }
 
 template <int ngllcapacity>
-type_real edge_intersection<ngllcapacity>::a_to_mortar(int mortar_index,
-                                                       type_real *quantity) {
+type_real edge_intersection<ngllcapacity>::a_to_mortar(const int mortar_index,
+                                                       const type_real *quantity) {
   type_real val = 0;
   for (int i = 0; i < a_ngll; i++) {
     val += a_mortar_trans[mortar_index][i] * quantity[i];
@@ -582,8 +575,8 @@ type_real edge_intersection<ngllcapacity>::a_to_mortar(int mortar_index,
   return val;
 }
 template <int ngllcapacity>
-type_real edge_intersection<ngllcapacity>::b_to_mortar(int mortar_index,
-                                                       type_real *quantity) {
+type_real edge_intersection<ngllcapacity>::b_to_mortar(const int mortar_index,
+                                                       const type_real *quantity) {
   type_real val = 0;
   for (int i = 0; i < b_ngll; i++) {
     val += b_mortar_trans[mortar_index][i] * quantity[i];
@@ -591,10 +584,10 @@ type_real edge_intersection<ngllcapacity>::b_to_mortar(int mortar_index,
   return val;
 }
 
-template<int ngll, int datacapacity>
-edge_data<ngll, datacapacity> edge_storage<ngll, datacapacity>::load_edge(const int id) {
+template<typename edgequad, int datacapacity>
+edge_data<edge_storage<edgequad, datacapacity>::ngll, datacapacity> edge_storage<edgequad, datacapacity>::load_edge(const int id) {
   constexpr auto DimensionType = specfem::dimension::type::dim2;
-  edge_data<ngll, datacapacity> edgedata;
+  edge_data<edge_storage<edgequad, datacapacity>::ngll, datacapacity> edgedata;
   auto& edge = edgedata.parent;
   const int sorted_ind = edge_sorted_inds[id];
   edge.medium = edge_media[id];
@@ -604,8 +597,8 @@ if(media_id == 1){\
   edge.id = interface.h_medium1_index_mapping(sorted_ind);\
   edge.bdry = interface.h_medium1_edge_type(sorted_ind);\
   specfem::point::field<DimensionType,decltype(interface)::medium1_type,true,false,false,false,false> field_points[interface.NGLL_EDGE];\
-  interface.load_field<1,false>(sorted_ind,assembly,field_points);\
-  const auto positions = interface.get_positions<1,false>(sorted_ind,assembly);\
+  interface.template load_field<1,false>(sorted_ind,assembly,field_points);\
+  const auto positions = interface.template get_positions<1,false>(sorted_ind,assembly);\
   for(int igll = 0; igll < interface.NGLL_EDGE; igll++){\
     edgedata.data[EDGEIND_NX][igll] = interface.h_a_NORMAL(sorted_ind,igll,0);\
     edgedata.data[EDGEIND_NZ][igll] = interface.h_a_NORMAL(sorted_ind,igll,1);\
@@ -626,8 +619,8 @@ if(media_id == 1){\
   edge.id = interface.h_medium2_index_mapping(sorted_ind);\
   edge.bdry = interface.h_medium2_edge_type(sorted_ind);\
   specfem::point::field<DimensionType,decltype(interface)::medium2_type,true,false,false,false,false> field_points[interface.NGLL_EDGE];\
-  interface.load_field<2,false>(sorted_ind,assembly,field_points);\
-  const auto positions = interface.get_positions<1,false>(sorted_ind,assembly);\
+  interface.template load_field<2,false>(sorted_ind,assembly,field_points);\
+  const auto positions = interface.template get_positions<1,false>(sorted_ind,assembly);\
   for(int igll = 0; igll < interface.NGLL_EDGE; igll++){\
     edgedata.data[EDGEIND_NX][igll] = interface.h_b_NORMAL(sorted_ind,igll,0);\
     edgedata.data[EDGEIND_NZ][igll] = interface.h_b_NORMAL(sorted_ind,igll,1);\
@@ -677,8 +670,8 @@ if(media_id == 1){\
   return edgedata;
 #undef transfer_edge_vals
 }
-template<int ngll, int datacapacity>
-void edge_storage<ngll, datacapacity>::store_edge(const int id, const edge_data<ngll, datacapacity>& edgedata) {
+template<typename edgequad, int datacapacity>
+void edge_storage<edgequad, datacapacity>::store_edge(const int id, const edge_data<edge_storage<edgequad, datacapacity>::ngll, datacapacity>& edgedata) {
   const auto& edge = edgedata.parent;
   const int sorted_ind = edge_sorted_inds[id];
 #define transfer_edge_vals(interface,media_id) {\
@@ -740,9 +733,9 @@ if(media_id == 1){\
   // h_edge_data_container(id) = edgedata;
 #undef transfer_edge_vals
 }
-template<int ngll, int datacapacity>
-edge_intersection<ngll> edge_storage<ngll, datacapacity>::load_intersection(const int id) {
-  edge_intersection<ngll> intersection;
+template<typename edgequad, int datacapacity>
+edge_intersection<edge_storage<edgequad, datacapacity>::ngll> edge_storage<edgequad, datacapacity>::load_intersection(const int id) {
+  edge_intersection<edge_storage<edgequad, datacapacity>::ngll> intersection;
   const int a_ind = intersection_edge_a[id];
   const int b_ind = intersection_edge_b[id];
   intersection.a_ref_ind = a_ind;
@@ -773,8 +766,8 @@ edge_intersection<ngll> edge_storage<ngll, datacapacity>::load_intersection(cons
 #undef transfer_interface_vals
 
 }
-template<int ngll, int datacapacity>
-void edge_storage<ngll, datacapacity>::store_intersection(const int id, const edge_intersection<ngll>& intersection) {
+template<typename edgequad, int datacapacity>
+void edge_storage<edgequad, datacapacity>::store_intersection(const int id, const edge_intersection<edge_storage<edgequad, datacapacity>::ngll>& intersection) {
   const int a_ind = intersection.a_ref_ind;
   const int b_ind = intersection.b_ref_ind;
   const int sorted_ind = intersection_sorted_inds[id];
@@ -802,8 +795,8 @@ void edge_storage<ngll, datacapacity>::store_intersection(const int id, const ed
 #undef transfer_interface_vals
 }
 
-template<int ngll, int datacapacity>
-void edge_storage<ngll, datacapacity>::load_all_intersections() {
+template<typename edgequad, int datacapacity>
+void edge_storage<edgequad, datacapacity>::load_all_intersections() {
   if(!interface_structs_initialized){
     throw std::runtime_error("attempting to run edge_storage.load_all_intersections() prior to interface struct initialization.");
   }
@@ -811,8 +804,8 @@ void edge_storage<ngll, datacapacity>::load_all_intersections() {
     load_intersection(i);
   }
 }
-template<int ngll, int datacapacity>
-void edge_storage<ngll, datacapacity>::store_all_intersections() {
+template<typename edgequad, int datacapacity>
+void edge_storage<edgequad, datacapacity>::store_all_intersections() {
   if(!interface_structs_initialized){
     throw std::runtime_error("attempting to run edge_storage.store_all_intersections() prior to interface struct initialization.");
   }

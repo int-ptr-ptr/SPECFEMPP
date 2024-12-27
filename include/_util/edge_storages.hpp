@@ -29,12 +29,13 @@ struct quadrature_rule {
         w(std::vector<type_real>(other.w)), L(std::vector<type_real>(other.L)) {
   }
 
-  type_real integrate(type_real *f);
-  type_real deriv(type_real *f, type_real t);
-  type_real interpolate(type_real *f, type_real t);
+  type_real integrate(const type_real *f);
+  type_real deriv(const type_real *f, const type_real t);
+  type_real interpolate(const type_real *f, const type_real t);
 
   template <int ngllcapacity>
-  void sample_L(type_real buf[][ngllcapacity], type_real *t_vals, int t_size);
+  void sample_L(type_real buf[][ngllcapacity], const type_real *t_vals,
+                const int t_size);
 };
 
 quadrature_rule gen_GLL(int ngll);
@@ -59,8 +60,8 @@ template <int ngllcapacity> struct edge_intersection {
   edge_intersection()
       : ngll(0), a_ref_ind(-1), b_ref_ind(-1), a_ngll(0), b_ngll(0) {}
 
-  type_real a_to_mortar(int node_index, type_real *quantity);
-  type_real b_to_mortar(int node_index, type_real *quantity);
+  type_real a_to_mortar(const int node_index, const type_real *quantity);
+  type_real b_to_mortar(const int node_index, const type_real *quantity);
 };
 
 template <int ngllcapacity, int datacapacity> struct edge_data {
@@ -74,8 +75,9 @@ template <int ngllcapacity, int datacapacity> struct edge_data {
   // parent(other.parent), ngll(other.ngll) {}
 };
 
-template <int ngll, int datacapacity> struct edge_storage {
+template <typename edgequad, int datacapacity> struct edge_storage {
 public:
+  static constexpr int ngll = edgequad::NGLL;
   edge_storage(std::vector<edge> edges, specfem::compute::assembly &assembly);
 
   void foreach_edge_on_host(
@@ -117,20 +119,17 @@ public:
   bool interface_structs_initialized;
   specfem::compute::loose::interface_container<
       specfem::dimension::type::dim2, specfem::element::medium_tag::acoustic,
-      specfem::element::medium_tag::elastic,
-      specfem::enums::element::quadrature::static_quadrature_points<5>,
+      specfem::element::medium_tag::elastic, edgequad,
       specfem::coupled_interface::loose::flux::traction_continuity>
       acoustic_elastic_interface;
   specfem::compute::loose::interface_container<
       specfem::dimension::type::dim2, specfem::element::medium_tag::acoustic,
-      specfem::element::medium_tag::acoustic,
-      specfem::enums::element::quadrature::static_quadrature_points<5>,
+      specfem::element::medium_tag::acoustic, edgequad,
       specfem::coupled_interface::loose::flux::symmetric_flux>
       acoustic_acoustic_interface;
   specfem::compute::loose::interface_container<
       specfem::dimension::type::dim2, specfem::element::medium_tag::elastic,
-      specfem::element::medium_tag::elastic,
-      specfem::enums::element::quadrature::static_quadrature_points<5>,
+      specfem::element::medium_tag::elastic, edgequad,
       specfem::coupled_interface::loose::flux::symmetric_flux>
       elastic_elastic_interface;
 
@@ -150,7 +149,6 @@ private:
   //     h_edge_data_container;
 
   int n_intersections;
-  bool intersections_built;
   // specfem::kokkos::DeviceView1d<edge_intersection<ngll> >
   //     intersection_container;
   // specfem::kokkos::HostView1d<edge_intersection<ngll> >

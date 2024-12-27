@@ -81,11 +81,11 @@ static std::string tostr(specfem::element::boundary_tag tag) {
   }
 };
 
-template <int ngllcapacity, int datacapacity>
+template <typename edgequad, int datacapacity>
 void dump_edge_container(
     const std::string &filename,
-    _util::edge_manager::edge_storage<ngllcapacity, datacapacity>
-        &edge_storage) {
+    _util::edge_manager::edge_storage<edgequad, datacapacity> &edge_storage) {
+  constexpr int ngllcapacity = edge_storage.ngll;
   int nedge = edge_storage.num_edges();
   int nintersect = edge_storage.num_intersections();
 

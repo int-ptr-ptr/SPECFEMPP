@@ -59,6 +59,34 @@ public:
       }
     }
   }
+  mortar_transfer_container() = default;
+  // void operator=(const
+  // mortar_transfer_container<DimensionType,MediumTag1,MediumTag2,EdgeQuadrature,IntersectionQuadrature>
+  // &rhs) {
+  //   this->interface_medium1_mortar_transfer =
+  //   rhs.interface_medium1_mortar_transfer;
+  //   this->h_interface_medium1_mortar_transfer =
+  //   rhs.h_interface_medium1_mortar_transfer;
+  //   this->interface_medium2_mortar_transfer =
+  //   rhs.interface_medium2_mortar_transfer;
+  //   this->h_interface_medium2_mortar_transfer =
+  //   rhs.h_interface_medium2_mortar_transfer;
+  // }
+
+protected:
+  mortar_transfer_container(int num_interfaces)
+      : interface_medium1_mortar_transfer(
+            "specfem::coupled_interface::loose::quadrature::mortar_transfer_"
+            "container.interface_medium1_mortar_transfer",
+            num_interfaces),
+        h_interface_medium1_mortar_transfer(
+            Kokkos::create_mirror_view(interface_medium1_mortar_transfer)),
+        interface_medium2_mortar_transfer(
+            "specfem::coupled_interface::loose::quadrature::mortar_transfer_"
+            "container.interface_medium2_mortar_transfer",
+            num_interfaces),
+        h_interface_medium2_mortar_transfer(
+            Kokkos::create_mirror_view(interface_medium2_mortar_transfer)) {}
 };
 
 } // namespace quadrature
