@@ -33,6 +33,7 @@ int num_interfaces){
   init_views(container.interface_medium1_mortar_transfer,container.h_interface_medium1_mortar_transfer,num_interfaces,"interface_medium1_mortar_transfer");
   init_views(container.interface_medium2_mortar_transfer,container.h_interface_medium2_mortar_transfer,num_interfaces,"interface_medium2_mortar_transfer");
   init_views(container.interface_relax_param,container.h_interface_relax_param,num_interfaces,"interface_relax_param");
+  init_views(container.interface_surface_jacobian,container.h_interface_surface_jacobian,num_interfaces,"interface_surface_jacobian");
   container.num_interfaces = num_interfaces;
 }
 
@@ -140,6 +141,7 @@ void edge_storage<edgequad, datacapacity>::foreach_intersection_on_host(
                              edge_data<ngll, datacapacity> &)> &func) {
   for (int i = 0; i < n_intersections; i++) {
     edge_intersection<ngll> ei = load_intersection(i);
+    ei.id = i;
     edge_data<ngll, datacapacity> a_data = load_edge(ei.a_ref_ind);
     edge_data<ngll, datacapacity> b_data = load_edge(ei.b_ref_ind);
     func(ei, a_data, b_data);
@@ -161,6 +163,7 @@ void edge_storage<edgequad, datacapacity>::foreach_intersection_on_host(
   }
   for (int i = 0; i < n_intersections; i++) {
     edge_intersection<ngll> ei = load_intersection(i);
+    ei.id = i;
     edge_data<ngll, datacapacity> a_data = load_edge(ei.a_ref_ind);
     edge_data<ngll, datacapacity> b_data = load_edge(ei.b_ref_ind);
     func(ei, a_data, b_data, Kokkos::subview(h_intersection_data,i,Kokkos::ALL));
@@ -205,10 +208,10 @@ bool intersect(const specfem::edge::loose::positions<specfem::dimension::type::d
   type_real bz[subdivisions+1];
 
   for(int i = 0; i < subdivisions+1; i++){
-    ax[i] = gll.interpolate(a.x, i*h);
-    az[i] = gll.interpolate(a.z, i*h);
-    bx[i] = gll.interpolate(b.x, i*h);
-    bz[i] = gll.interpolate(b.z, i*h);
+    ax[i] = gll.interpolate(a.x, i*h-1.0);
+    az[i] = gll.interpolate(a.z, i*h-1.0);
+    bx[i] = gll.interpolate(b.x, i*h-1.0);
+    bz[i] = gll.interpolate(b.z, i*h-1.0);
   }
 
   const auto line_intersection = [&gll](type_real ax0, type_real az0, type_real ax1, type_real az1,
@@ -319,6 +322,9 @@ bool intersect(const specfem::edge::loose::positions<specfem::dimension::type::d
   intersection.b_param_start = b_param_start;
   intersection.b_param_end = b_param_end;
 
+  //TODO this is all wrong when param_start != -1 and param_end != -1.
+  //fix it.
+
   // populate mortar transfer functions by computing reference parameters for even spacing
   type_real t_samples[ngll];
 
@@ -329,12 +335,18 @@ bool intersect(const specfem::edge::loose::positions<specfem::dimension::type::d
   for(int i = 0; i < subdivisions; i++){
     type_real dx = ax[i+1] - ax[i];
     type_real dz = az[i+1] - az[i];
-    a_sublens[i] = h*sqrt(dx*dx + dz*dz);
+    a_sublens[i] = sqrt(dx*dx + dz*dz);
     a_len += a_sublens[i];
     dx = bx[i+1] - bx[i];
     dz = bz[i+1] - bz[i];
-    b_sublens[i] = h*sqrt(dx*dx + dz*dz);
+    b_sublens[i] = sqrt(dx*dx + dz*dz);
     b_len += b_sublens[i];
+  }
+
+
+  for (int i = 0; i < ngll; i++) {
+    // avg / 2, since parameter for quadrature ranges from -1 to 1 (len 2)
+    intersection.ds[i] = (a_len + b_len)/4;
   }
 
   //even spacing is len_desired = i * len * (t+1)/2
@@ -749,8 +761,11 @@ edge_intersection<edge_storage<edgequad, datacapacity>::ngll> edge_storage<edgeq
     intersection.relax_param = interface.h_interface_relax_param(sorted_ind);\
     intersection.a_ngll = interface.NGLL_EDGE;\
     intersection.b_ngll = interface.NGLL_EDGE;\
-    intersection.ngll = interface.NGLL_INTERSECTION;\
+    intersection.ngll = interface.NGLL_INTERFACE;\
     interface.to_edge_data_mortar_trans(sorted_ind,intersection.a_mortar_trans, intersection.b_mortar_trans);\
+    for(int igll = 0; igll < interface.NGLL_INTERFACE; igll++){\
+      intersection.ds[igll] = interface.h_interface_surface_jacobian(sorted_ind,igll);\
+    }\
   }
   if(edge_media[a_ind] == specfem::element::medium_tag::acoustic
   &&edge_media[b_ind] == specfem::element::medium_tag::acoustic){
@@ -780,6 +795,9 @@ void edge_storage<edgequad, datacapacity>::store_intersection(const int id, cons
     interface.h_interface_medium2_param_end(sorted_ind) = intersection.b_param_end;\
     interface.h_interface_relax_param(sorted_ind) = intersection.relax_param;\
     interface.from_edge_data_mortar_trans(sorted_ind,intersection.a_mortar_trans, intersection.b_mortar_trans);\
+    for(int igll = 0; igll < interface.NGLL_INTERFACE; igll++){\
+      interface.h_interface_surface_jacobian(sorted_ind,igll) = intersection.ds[igll];\
+    }\
   }
   if(edge_media[a_ind] == specfem::element::medium_tag::acoustic
   &&edge_media[b_ind] == specfem::element::medium_tag::acoustic){

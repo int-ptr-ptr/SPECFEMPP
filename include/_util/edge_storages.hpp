@@ -49,10 +49,12 @@ struct edge {
 };
 
 template <int ngllcapacity> struct edge_intersection {
+  int id;
   int a_ref_ind;
   int b_ref_ind;
   type_real a_mortar_trans[ngllcapacity][ngllcapacity];
   type_real b_mortar_trans[ngllcapacity][ngllcapacity];
+  type_real ds[ngllcapacity];
   type_real a_param_start, a_param_end;
   type_real b_param_start, b_param_end;
   int a_ngll, b_ngll, ngll;

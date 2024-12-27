@@ -11,7 +11,10 @@ struct specfem::coupled_interface::loose::flux::traction_continuity::container<
     : specfem::coupled_interface::loose::quadrature::mortar_transfer_container<
           DimensionType, specfem::element::medium_tag::acoustic,
           specfem::element::medium_tag::elastic, QuadratureType,
-          QuadratureType> {
+          QuadratureType>,
+      specfem::compute::loose::interface_normal_container<
+          DimensionType, specfem::element::medium_tag::acoustic,
+          specfem::element::medium_tag::elastic, QuadratureType, 2, true> {
 
 private:
 public:
@@ -39,7 +42,11 @@ protected:
                                       specfem::element::medium_tag::acoustic,
                                       specfem::element::medium_tag::elastic,
                                       QuadratureType, QuadratureType>(
-                num_interfaces) {}
+                num_interfaces),
+        specfem::compute::loose::interface_normal_container<
+            DimensionType, specfem::element::medium_tag::acoustic,
+            specfem::element::medium_tag::elastic, QuadratureType, 2, true>(
+            num_medium2_edges) {}
   template <int medium, bool on_device>
   KOKKOS_INLINE_FUNCTION void compute_edge_intermediate(int index) {}
 };

@@ -250,6 +250,27 @@ void execute(specfem::MPI::MPI *mpi) {
     specfem::compute::loose::compute_geometry<2, false, false>(
         *assembly, dg_edge_storage.acoustic_acoustic_interface, i);
   }
+  // for (int i = 0;
+  //      i < dg_edge_storage.acoustic_elastic_interface.num_medium1_edges; i++)
+  //      {
+  //   specfem::compute::loose::compute_geometry<1, false, false>(
+  //       *assembly, dg_edge_storage.acoustic_elastic_interface, i);
+  // }
+  for (int i = 0;
+       i < dg_edge_storage.acoustic_elastic_interface.num_medium2_edges; i++) {
+    specfem::compute::loose::compute_geometry<2, false, false>(
+        *assembly, dg_edge_storage.acoustic_elastic_interface, i);
+  }
+  for (int i = 0;
+       i < dg_edge_storage.elastic_elastic_interface.num_medium1_edges; i++) {
+    specfem::compute::loose::compute_geometry<1, false, false>(
+        *assembly, dg_edge_storage.elastic_elastic_interface, i);
+  }
+  for (int i = 0;
+       i < dg_edge_storage.elastic_elastic_interface.num_medium2_edges; i++) {
+    specfem::compute::loose::compute_geometry<2, false, false>(
+        *assembly, dg_edge_storage.elastic_elastic_interface, i);
+  }
   dg_edge_storage.foreach_edge_on_host(
       [&](_util::edge_manager::edge_data<edge_capacity, data_capacity> &e) {
         using PointPartialDerivativesType =
@@ -568,20 +589,20 @@ void execute(specfem::MPI::MPI *mpi) {
         point_boundary_composite;
     switch (assembly->boundaries.boundary_tags(index.ispec)) {
     case specfem::element::boundary_tag::acoustic_free_surface:
-      specfem::compute::load_on_device(index, assembly->boundaries,
-                                       point_boundary_afs);
+      specfem::compute::load_on_host(index, assembly->boundaries,
+                                     point_boundary_afs);
       return point_boundary_afs.tag == tag;
     case specfem::element::boundary_tag::none:
-      specfem::compute::load_on_device(index, assembly->boundaries,
-                                       point_boundary_none);
+      specfem::compute::load_on_host(index, assembly->boundaries,
+                                     point_boundary_none);
       return point_boundary_none.tag == tag;
     case specfem::element::boundary_tag::stacey:
-      specfem::compute::load_on_device(index, assembly->boundaries,
-                                       point_boundary_stacey);
+      specfem::compute::load_on_host(index, assembly->boundaries,
+                                     point_boundary_stacey);
       return point_boundary_stacey.tag == tag;
     case specfem::element::boundary_tag::composite_stacey_dirichlet:
-      specfem::compute::load_on_device(index, assembly->boundaries,
-                                       point_boundary_composite);
+      specfem::compute::load_on_host(index, assembly->boundaries,
+                                     point_boundary_composite);
       return point_boundary_composite.tag == tag;
     default:
       throw std::runtime_error(
@@ -699,7 +720,7 @@ void execute(specfem::MPI::MPI *mpi) {
                       //     index, accel, assembly->fields.forward);
                       data_view[INTERIND_ACCEL_INCLUDE_A + a_ishape] = 0;
                     } else {
-                      accel_arr[a_ishape].acceleration = 0;
+                      accel_arr[a_ishape].acceleration = (type_real)0.0;
                       data_view[INTERIND_ACCEL_INCLUDE_A + a_ishape] = 1;
                     }
                   }
@@ -826,240 +847,13 @@ void execute(specfem::MPI::MPI *mpi) {
 
   specfem::event_marching::arbitrary_call_event mortar_flux_elastic(
       [&]() {
-        dg_edge_storage.foreach_intersection_on_host(
-            [&](_util::edge_manager::edge_intersection<edge_capacity>
-                    &intersect,
-                _util::edge_manager::edge_data<edge_capacity, data_capacity> &a,
-                _util::edge_manager::edge_data<edge_capacity, data_capacity> &b,
-                decltype(Kokkos::subview(
-                    std::declval<specfem::kokkos::HostView2d<type_real> >(), 1u,
-                    Kokkos::ALL)) data_view) {
-              using PointAcoustic =
-                  specfem::point::field<specfem::dimension::type::dim2,
-                                        specfem::element::medium_tag::acoustic,
-                                        true, false, false, false, false>;
-              using PointElastic =
-                  specfem::point::field<specfem::dimension::type::dim2,
-                                        specfem::element::medium_tag::elastic,
-                                        true, false, false, false, false>;
-              using PointAcousticAccel =
-                  specfem::point::field<specfem::dimension::type::dim2,
-                                        specfem::element::medium_tag::acoustic,
-                                        false, false, true, false, false>;
-              using PointElasticAccel =
-                  specfem::point::field<specfem::dimension::type::dim2,
-                                        specfem::element::medium_tag::elastic,
-                                        false, false, true, false, false>;
-              _util::edge_manager::quadrature_rule gll =
-                  _util::edge_manager::gen_GLL(intersect.ngll);
-              int a_ispec = a.parent.id;
-              int b_ispec = b.parent.id;
-              specfem::element::medium_tag a_medium = a.parent.medium;
-              specfem::element::medium_tag b_medium = b.parent.medium;
-              if ((a_ispec == 88 || b_ispec == 88) &&
-                  timescheme_wrapper.get_istep() == 1000) {
-                intersect.a_to_mortar(
-                    1, a.data[EDGEIND_FIELDNDERIV]); // place breakpoint here
-              }
-              type_real a_scale_dS =
-                  0.5 * (intersect.a_param_end - intersect.a_param_start);
-              type_real b_scale_dS =
-                  0.5 * (intersect.b_param_end - intersect.b_param_start);
-              if (b_medium == specfem::element::medium_tag::elastic) {
-                if (a_medium == specfem::element::medium_tag::elastic) {
-                  throw std::runtime_error(
-                      "Mortar Flux: elastic-elastic not yet supported.");
-                  for (int a_ishape = 0; a_ishape < a.ngll; a_ishape++) {
-                    // flux += (
-                    //       np.einsum("j,j,j,ji->i",JW,u-u_,c/2,dv)
-                    //     + np.einsum("j,ji,j->i",JW,v,0.5*(c*du+c_*du_))
-                    //     - a*np.einsum("j,j,ji->i",JW,u-u_,v)
-                    // )
-                    type_real flux = 0;
-                    type_real f1 = 0;
-                    type_real f2 = 0;
-                    type_real f3 = 0;
-                    for (int iquad = 0; iquad < gll.nquad; iquad++) {
-                      type_real c = intersect.a_to_mortar(
-                          iquad, a.data[EDGEIND_SPEEDPARAM]);
-                      type_real u_jmp =
-                          intersect.a_to_mortar(iquad, a.data[EDGEIND_FIELD]) -
-                          intersect.b_to_mortar(iquad, b.data[EDGEIND_FIELD]);
-                      type_real cdu_avg =
-                          0.5 * (c * intersect.a_to_mortar(
-                                         iquad, a.data[EDGEIND_FIELDNDERIV]) -
-                                 intersect.b_to_mortar(
-                                     iquad, b.data[EDGEIND_SPEEDPARAM]) *
-                                     intersect.b_to_mortar(
-                                         iquad, b.data[EDGEIND_FIELDNDERIV]) *
-                                     (b_scale_dS / a_scale_dS));
-                      data_view[INTERIND_UJMP + iquad] = u_jmp;
-                      data_view[INTERIND_DU_AVG + iquad] = cdu_avg;
+        specfem::coupled_interface::loose::flux::traction_continuity::kernel<
+            specfem::dimension::type::dim2,
+            specfem::element::medium_tag::acoustic,
+            specfem::element::medium_tag::elastic, edge_storage_quad>::
+            acoustic_to_elastic_accel(
+                *assembly, dg_edge_storage.acoustic_elastic_interface);
 
-                      f1 += a_scale_dS * gll.w[iquad] * 0.5 *
-                            intersect.a_to_mortar(
-                                iquad, a.data[EDGEIND_SHAPENDERIV + a_ishape]) *
-                            c * u_jmp;
-                      f2 += a_scale_dS * gll.w[iquad] *
-                            intersect.a_mortar_trans[iquad][a_ishape] *
-                            (cdu_avg);
-                      f3 += a_scale_dS * gll.w[iquad] *
-                            intersect.a_to_mortar(iquad, a.data[EDGEIND_DS]) *
-                            intersect.a_mortar_trans[iquad][a_ishape] *
-                            (-intersect.relax_param * u_jmp);
-                      flux +=
-                          a_scale_dS * gll.w[iquad] *
-                          (0.5 *
-                               intersect.a_to_mortar(
-                                   iquad,
-                                   a.data[EDGEIND_SHAPENDERIV + a_ishape]) *
-                               c * u_jmp +
-                           intersect.a_mortar_trans[iquad][a_ishape] *
-                               (cdu_avg - intersect.a_to_mortar(
-                                              iquad, a.data[EDGEIND_DS]) *
-                                              intersect.relax_param * u_jmp));
-                    }
-                    data_view[INTERIND_FLUXTOTAL_A + a_ishape] = flux;
-                    data_view[INTERIND_FLUX1_A + a_ishape] = f1;
-                    data_view[INTERIND_FLUX2_A + a_ishape] = f2;
-                    data_view[INTERIND_FLUX3_A + a_ishape] = f3;
-                    PointAcousticAccel accel;
-                    specfem::point::index<specfem::dimension::type::dim2> index(
-                        a_ispec, 0, 0);
-                    point_from_id(index.ix, index.iz, a.parent.bdry, a_ishape);
-                    if (h_is_bdry_at_pt(index,
-                                        specfem::element::boundary_tag::none)) {
-                      accel.acceleration = flux;
-                      specfem::compute::atomic_add_on_device(
-                          index, accel, assembly->fields.forward);
-                      data_view[INTERIND_ACCEL_INCLUDE_A + a_ishape] = 0;
-                    } else {
-                      data_view[INTERIND_ACCEL_INCLUDE_A + a_ishape] = 1;
-                    }
-                  }
-                  for (int b_ishape = 0; b_ishape < b.ngll; b_ishape++) {
-                    // flux += (
-                    //       np.einsum("j,j,j,ji->i",JW,u-u_,c/2,dv)
-                    //     + np.einsum("j,ji,j->i",JW,v,0.5*(c*du+c_*du_))
-                    //     - a*np.einsum("j,j,ji->i",JW,u-u_,v)
-                    // )
-                    type_real flux = 0;
-                    type_real f1 = 0;
-                    type_real f2 = 0;
-                    type_real f3 = 0;
-                    for (int iquad = 0; iquad < gll.nquad; iquad++) {
-                      type_real c = intersect.b_to_mortar(
-                          iquad, b.data[EDGEIND_SPEEDPARAM]);
-                      type_real u_jmp =
-                          intersect.b_to_mortar(iquad, b.data[EDGEIND_FIELD]) -
-                          intersect.a_to_mortar(iquad, a.data[EDGEIND_FIELD]);
-                      type_real cdu_avg =
-                          0.5 * (c * intersect.b_to_mortar(
-                                         iquad, b.data[EDGEIND_FIELDNDERIV]) -
-                                 intersect.a_to_mortar(
-                                     iquad, a.data[EDGEIND_SPEEDPARAM]) *
-                                     intersect.a_to_mortar(
-                                         iquad, a.data[EDGEIND_FIELDNDERIV]) *
-                                     (a_scale_dS / b_scale_dS));
-                      f1 += b_scale_dS * gll.w[iquad] * 0.5 *
-                            intersect.b_to_mortar(
-                                iquad, b.data[EDGEIND_SHAPENDERIV + b_ishape]) *
-                            c * u_jmp;
-                      f2 += b_scale_dS * gll.w[iquad] *
-                            intersect.b_mortar_trans[iquad][b_ishape] *
-                            (cdu_avg);
-                      f3 += b_scale_dS * gll.w[iquad] *
-                            intersect.b_to_mortar(iquad, b.data[EDGEIND_DS]) *
-                            intersect.b_mortar_trans[iquad][b_ishape] *
-                            (-intersect.relax_param * u_jmp);
-                      flux +=
-                          b_scale_dS * gll.w[iquad] *
-                          (0.5 *
-                               intersect.b_to_mortar(
-                                   iquad,
-                                   b.data[EDGEIND_SHAPENDERIV + b_ishape]) *
-                               c * u_jmp +
-                           intersect.b_mortar_trans[iquad][b_ishape] *
-                               (cdu_avg - intersect.b_to_mortar(
-                                              iquad, b.data[EDGEIND_DS]) *
-                                              intersect.relax_param * u_jmp));
-                    }
-                    data_view[INTERIND_FLUXTOTAL_B + b_ishape] = flux;
-                    data_view[INTERIND_FLUX1_B + b_ishape] = f1;
-                    data_view[INTERIND_FLUX2_B + b_ishape] = f2;
-                    data_view[INTERIND_FLUX3_B + b_ishape] = f3;
-                    PointAcousticAccel accel;
-                    specfem::point::index<specfem::dimension::type::dim2> index(
-                        b_ispec, 0, 0);
-                    point_from_id(index.ix, index.iz, b.parent.bdry, b_ishape);
-                    if (h_is_bdry_at_pt(index,
-                                        specfem::element::boundary_tag::none)) {
-                      accel.acceleration = flux;
-                      specfem::compute::atomic_add_on_device(
-                          index, accel, assembly->fields.forward);
-                      data_view[INTERIND_ACCEL_INCLUDE_B + b_ishape] = 0;
-                    } else {
-                      data_view[INTERIND_ACCEL_INCLUDE_B + b_ishape] = 1;
-                    }
-                  }
-
-                } else if (a_medium == specfem::element::medium_tag::acoustic) {
-                  if (a_ispec == 82 && (a.data[EDGEIND_FIELD][0] > 0.001 ||
-                                        a.data[EDGEIND_FIELD][4] > 0.001)) {
-                    intersect.b_to_mortar(
-                        0, b.data[EDGEIND_FIELD]); // place breakpoint here
-                  }
-                  type_real a_accel[edge_capacity];
-                  PointAcousticAccel a_accel_f;
-                  specfem::point::index<specfem::dimension::type::dim2> index(
-                      a_ispec, 0, 0);
-                  for (int a_ishape = 0; a_ishape < a.ngll; a_ishape++) {
-                    point_from_id(index.ix, index.iz, a.parent.bdry, a_ishape);
-                    specfem::compute::load_on_device(
-                        index, assembly->fields.forward, a_accel_f);
-                    a_accel[a_ishape] = a_accel_f.acceleration(0);
-                  }
-                  for (int b_ishape = 0; b_ishape < b.ngll; b_ishape++) {
-                    // flux = JW * v * chi_tt
-                    type_real flux_x = 0;
-                    type_real flux_z = 0;
-                    for (int iquad = 0; iquad < gll.nquad; iquad++) {
-                      type_real chitt_v_Ja =
-                          -intersect.a_to_mortar(iquad, a.data[EDGEIND_DET]) *
-                          intersect.a_to_mortar(iquad, a_accel) *
-                          intersect.b_mortar_trans[iquad][b_ishape];
-                      flux_x +=
-                          a_scale_dS * gll.w[iquad] *
-                          intersect.a_to_mortar(iquad, a.data[EDGEIND_NX]) *
-                          chitt_v_Ja;
-                      flux_z +=
-                          a_scale_dS * gll.w[iquad] *
-                          intersect.a_to_mortar(iquad, a.data[EDGEIND_NZ]) *
-                          chitt_v_Ja;
-                    }
-                    data_view[INTERIND_FLUXTOTAL_B + b_ishape] = flux_z;
-                    PointElasticAccel accel;
-                    index =
-                        specfem::point::index<specfem::dimension::type::dim2>(
-                            b_ispec, 0, 0);
-                    point_from_id(index.ix, index.iz, b.parent.bdry, b_ishape);
-                    if (h_is_bdry_at_pt(index,
-                                        specfem::element::boundary_tag::none)) {
-                      accel.acceleration(0) = flux_x;
-                      accel.acceleration(1) = flux_z;
-                      specfem::compute::atomic_add_on_device(
-                          index, accel, assembly->fields.forward);
-                      data_view[INTERIND_ACCEL_INCLUDE_B + b_ishape] = 0;
-                    } else {
-                      data_view[INTERIND_ACCEL_INCLUDE_B + b_ishape] = 1;
-                    }
-                  }
-                } else {
-                  throw std::runtime_error(
-                      "Mortar Flux: medium combination not supported.");
-                }
-              }
-            });
         assembly->fields.forward.copy_to_device();
         return 0;
       },

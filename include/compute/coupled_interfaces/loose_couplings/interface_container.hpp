@@ -441,6 +441,17 @@ public:
     }
   }
 
+  template <bool on_device, typename internal_call>
+  void foreach_interface(internal_call kernel) {
+    if constexpr (on_device == true) {
+      static_assert(false, "on_device == true not yet supported.");
+    } else {
+      for (int interface = 0; interface < num_interfaces; interface++) {
+        kernel(interface);
+      }
+    }
+  }
+
 protected:
   template <int medium, bool on_device>
   KOKKOS_INLINE_FUNCTION void compute_edge_intermediate(int index) {
