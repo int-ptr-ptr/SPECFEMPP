@@ -452,8 +452,8 @@ void execute(specfem::MPI::MPI *mpi) {
 
   specfem::event_marching::arbitrary_call_event store_boundaryvals(
       [&]() {
-        // dg_edge_storage.acoustic_acoustic_interface.compute_edge_intermediates<1,false>();
-        // dg_edge_storage.acoustic_acoustic_interface.compute_edge_intermediates<2,false>();
+        dg_edge_storage.acoustic_elastic_interface
+            .compute_edge_intermediates<2, false>(*assembly);
         dg_edge_storage.foreach_edge_on_host([&](_util::edge_manager::edge_data<
                                                  edge_capacity, data_capacity>
                                                      &e) {
@@ -614,6 +614,12 @@ void execute(specfem::MPI::MPI *mpi) {
 
   specfem::event_marching::arbitrary_call_event mortar_flux_acoustic(
       [&]() {
+        specfem::coupled_interface::loose::flux::traction_continuity::kernel<
+            specfem::dimension::type::dim2,
+            specfem::element::medium_tag::acoustic,
+            specfem::element::medium_tag::elastic, edge_storage_quad>::
+            elastic_to_acoustic_accel(
+                *assembly, dg_edge_storage.acoustic_elastic_interface);
         dg_edge_storage.foreach_intersection_on_host(
             [&](_util::edge_manager::edge_intersection<edge_capacity>
                     &intersect,
@@ -794,45 +800,6 @@ void execute(specfem::MPI::MPI *mpi) {
                   }
 
                 } else if (b_medium == specfem::element::medium_tag::elastic) {
-                  // if(a_ispec == 82 && (a.data[EDGEIND_FIELD][0] > 0.001 ||
-                  // a.data[EDGEIND_FIELD][4] > 0.001)){
-                  if (a_ispec == 53 && timescheme_wrapper.get_istep() == 6) {
-                    intersect.b_to_mortar(
-                        0, b.data[EDGEIND_FIELD]); // place breakpoint here
-                  }
-                  for (int a_ishape = 0; a_ishape < a.ngll; a_ishape++) {
-                    // flux = JW * v * s.n
-                    type_real flux = 0;
-                    for (int iquad = 0; iquad < gll.nquad; iquad++) {
-                      type_real sn_dSb =
-                          -( // yes this is not optimized.
-                              intersect.b_to_mortar(iquad,
-                                                    b.data[EDGEIND_FIELD]) *
-                                  intersect.b_to_mortar(iquad,
-                                                        b.data[EDGEIND_NX]) +
-                              intersect.b_to_mortar(iquad,
-                                                    b.data[EDGEIND_FIELD + 1]) *
-                                  intersect.b_to_mortar(iquad,
-                                                        b.data[EDGEIND_NZ])) *
-                          intersect.b_to_mortar(iquad, b.data[EDGEIND_DET]);
-                      flux += b_scale_dS * gll.w[iquad] * sn_dSb *
-                              intersect.a_mortar_trans[iquad][a_ishape];
-                    }
-                    data_view[INTERIND_FLUXTOTAL_A + a_ishape] = flux;
-                    PointAcousticAccel accel;
-                    specfem::point::index<specfem::dimension::type::dim2> index(
-                        a_ispec, 0, 0);
-                    point_from_id(index.ix, index.iz, a.parent.bdry, a_ishape);
-                    if (h_is_bdry_at_pt(index,
-                                        specfem::element::boundary_tag::none)) {
-                      accel.acceleration = flux;
-                      specfem::compute::atomic_add_on_device(
-                          index, accel, assembly->fields.forward);
-                      data_view[INTERIND_ACCEL_INCLUDE_A + a_ishape] = 0;
-                    } else {
-                      data_view[INTERIND_ACCEL_INCLUDE_A + a_ishape] = 1;
-                    }
-                  }
                 } else {
                   throw std::runtime_error(
                       "Mortar Flux: medium combination not supported.");

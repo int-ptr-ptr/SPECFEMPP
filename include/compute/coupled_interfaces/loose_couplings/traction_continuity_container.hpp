@@ -29,11 +29,11 @@ public:
   //         specfem::element::medium_tag::elastic, QuadratureType,
   //         QuadratureType>::operator=(rhs);
   // }
-  // /// chi field normal derivative
-  // EdgeScalarView medium1_chi_nderiv;
-  // EdgeScalarView medium2_chi_nderiv;
-  // typename EdgeScalarView::HostMirror h_medium1_chi_nderiv;
-  // typename EdgeScalarView::HostMirror h_medium2_chi_nderiv;
+
+  using EdgeScalarView =
+      specfem::compute::loose::EdgeScalarView<QuadratureType>;
+  EdgeScalarView disp_dot_normal;
+  typename EdgeScalarView::HostMirror h_disp_dot_normal;
 
 protected:
   container(int num_medium1_edges, int num_medium2_edges, int num_interfaces)
@@ -46,7 +46,9 @@ protected:
         specfem::compute::loose::interface_normal_container<
             DimensionType, specfem::element::medium_tag::acoustic,
             specfem::element::medium_tag::elastic, QuadratureType, 2, true>(
-            num_medium2_edges) {}
-  template <int medium, bool on_device>
-  KOKKOS_INLINE_FUNCTION void compute_edge_intermediate(int index) {}
+            num_medium2_edges),
+        disp_dot_normal("specfem::coupled_interface::loose::flux::traction_"
+                        "continuity::container.disp_dot_normal",
+                        num_medium2_edges),
+        h_disp_dot_normal(Kokkos::create_mirror_view(disp_dot_normal)) {}
 };

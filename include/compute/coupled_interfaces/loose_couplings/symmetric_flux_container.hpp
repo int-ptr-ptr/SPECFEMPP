@@ -70,9 +70,6 @@ protected:
                                       specfem::element::medium_tag::acoustic,
                                       QuadratureType, QuadratureType>(
                 num_interfaces) {}
-
-  template <int medium, bool on_device>
-  KOKKOS_INLINE_FUNCTION void compute_edge_intermediate(int index) {}
 };
 
 template <specfem::dimension::type DimensionType, typename QuadratureType>
@@ -138,6 +135,4 @@ protected:
                                       specfem::element::medium_tag::acoustic,
                                       QuadratureType, QuadratureType>(
                 num_interfaces) {}
-  template <int medium, bool on_device>
-  KOKKOS_INLINE_FUNCTION void compute_edge_intermediate(int index) {}
 };

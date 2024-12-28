@@ -423,21 +423,27 @@ public:
 
   // these called before the intersection loop to store intermediate values
 
-  template <int medium, bool on_device> void compute_edge_intermediates() {
+  template <int medium, bool on_device>
+  void compute_edge_intermediates(specfem::compute::assembly &assembly) {
     if constexpr (on_device == true) {
       static_assert(false, "on_device == true not yet supported.");
     }
-
-    if constexpr (medium == 1) {
-      for (int i = 0; i < num_medium1_edges; i++) {
-        compute_edge_intermediate<medium, on_device>(i);
-      }
-    } else if constexpr (medium == 2) {
-      for (int i = 0; i < num_medium2_edges; i++) {
-        compute_edge_intermediate<medium, on_device>(i);
-      }
-    } else {
+    if constexpr (medium != 1 && medium != 2) {
       static_assert(false, "Medium can only be 1 or 2!");
+    }
+    for (int i = 0; i <
+                    [&] {
+                      if constexpr (medium == 1) {
+                        return num_medium1_edges;
+                      } else {
+                        return num_medium2_edges;
+                      }
+                    }();
+         i++) {
+      FluxScheme::template kernel<DimensionType, MediumTag1, MediumTag2,
+                                  QuadratureType>::
+          template compute_edge_intermediate<medium, on_device>(i, assembly,
+                                                                *this);
     }
   }
 
@@ -450,13 +456,6 @@ public:
         kernel(interface);
       }
     }
-  }
-
-protected:
-  template <int medium, bool on_device>
-  KOKKOS_INLINE_FUNCTION void compute_edge_intermediate(int index) {
-
-    super::template compute_edge_intermediate<medium, on_device>(index);
   }
 };
 

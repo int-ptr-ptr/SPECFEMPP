@@ -100,10 +100,8 @@ public:
                            const type_real *quantity) {
     type_real val = 0;
     for (int i = 0; i < EdgeQuadrature::NGLL; i++) {
-      if constexpr (medium == 1) {
-        val += mortar_trans(medium, on_device)(edge_index, mortar_index, i) *
-               quantity[i];
-      }
+      val += mortar_trans(medium, on_device)(edge_index, mortar_index, i) *
+             quantity[i];
     }
     return val;
   }
