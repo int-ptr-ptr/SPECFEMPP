@@ -435,6 +435,10 @@ void edge_storage<edgequad, datacapacity>::build_intersections_on_host() {
   init_interface_views(acoustic_acoustic_interface,intersections_acoustic_acoustic);
   init_interface_views(acoustic_elastic_interface,intersections_acoustic_elastic);
   init_interface_views(elastic_elastic_interface,intersections_elastic_elastic);
+
+  init_views(acoustic_acoustic_interface.interface_relaxation_parameter,acoustic_acoustic_interface.h_interface_relaxation_parameter,intersections_acoustic_acoustic,"relax_param");
+  init_views(acoustic_acoustic_interface.interface_medium1_mortar_transfer_deriv_times_n,acoustic_acoustic_interface.h_interface_medium1_mortar_transfer_deriv_times_n,intersections_acoustic_acoustic,"mortar_transfer1_deriv_times_n");
+  init_views(acoustic_acoustic_interface.interface_medium2_mortar_transfer_deriv_times_n,acoustic_acoustic_interface.h_interface_medium2_mortar_transfer_deriv_times_n,intersections_acoustic_acoustic,"mortar_transfer2_deriv_times_n");
   interface_structs_initialized = true;
 
   intersection_edge_a = std::vector<int>(n_intersections);

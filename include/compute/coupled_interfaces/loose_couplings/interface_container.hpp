@@ -42,6 +42,13 @@ using EdgeVectorView =
 template <typename QuadratureType>
 using EdgeScalarView = Kokkos::View<type_real * [QuadratureType::NGLL],
                                     Kokkos::DefaultExecutionSpace>;
+template <specfem::dimension::type DimensionType,
+          specfem::element::medium_tag MediumTag, typename QuadratureType>
+using EdgeFieldView =
+    Kokkos::View<type_real *
+                     [QuadratureType::NGLL][specfem::element::attributes<
+                         DimensionType, MediumTag>::components()],
+                 Kokkos::DefaultExecutionSpace>;
 
 template <specfem::dimension::type DimensionType,
           specfem::element::medium_tag MediumTag1,
@@ -69,6 +76,16 @@ public:
       MediumTag1; ///< Self medium of the interface
   static constexpr specfem::element::medium_tag medium2_type =
       MediumTag2; ///< Other medium of the interface
+
+  template <int medium>
+  static constexpr specfem::element::medium_tag medium_type = [] {
+    static_assert(medium == 1 || medium == 2, "Medium can only be 1 or 2!");
+    if constexpr (medium == 1) {
+      return MediumTag1;
+    } else {
+      return MediumTag2;
+    }
+  }();
   static constexpr int NGLL_EDGE = QuadratureType::NGLL;
   using EdgeQuadrature = QuadratureType;
 

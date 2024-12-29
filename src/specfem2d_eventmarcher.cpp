@@ -194,28 +194,6 @@ void execute(specfem::MPI::MPI *mpi) {
       return specfem::enums::edge::type::NONE;
     }
   };
-  auto point_from_id = [&](int &ix, int &iz, const int8_t id, const int iedge) {
-    switch (id) {
-    case specfem::enums::edge::type::RIGHT:
-      ix = qp5.NGLL - 1;
-      iz = iedge;
-      return;
-    case specfem::enums::edge::type::TOP:
-      ix = iedge;
-      iz = qp5.NGLL - 1;
-      return;
-    case specfem::enums::edge::type::LEFT:
-      ix = 0;
-      iz = iedge;
-      return;
-    case specfem::enums::edge::type::BOTTOM:
-      ix = iedge;
-      iz = 0;
-      return;
-    default:
-      return;
-    }
-  };
   std::vector<_util::edge_manager::edge> dg_edges(edge_removals.size());
   for (int i = 0; i < edge_removals.size(); i++) {
     dg_edges[i].id = edge_removals[i].elem;
@@ -250,6 +228,19 @@ void execute(specfem::MPI::MPI *mpi) {
     specfem::compute::loose::compute_geometry<2, false, false>(
         *assembly, dg_edge_storage.acoustic_acoustic_interface, i);
   }
+  for (int i = 0;
+       i < dg_edge_storage.acoustic_acoustic_interface.num_interfaces; i++) {
+    specfem::coupled_interface::loose::flux::symmetric_flux::kernel<
+        specfem::dimension::type::dim2, specfem::element::medium_tag::acoustic,
+        specfem::element::medium_tag::acoustic, edge_storage_quad>::
+        compute_relaxation_parameter<false>(
+            i, *assembly, dg_edge_storage.acoustic_acoustic_interface);
+    specfem::coupled_interface::loose::flux::symmetric_flux::kernel<
+        specfem::dimension::type::dim2, specfem::element::medium_tag::acoustic,
+        specfem::element::medium_tag::acoustic, edge_storage_quad>::
+        compute_mortar_trans_deriv<false>(
+            i, *assembly, dg_edge_storage.acoustic_acoustic_interface);
+  }
   // for (int i = 0;
   //      i < dg_edge_storage.acoustic_elastic_interface.num_medium1_edges; i++)
   //      {
@@ -271,346 +262,21 @@ void execute(specfem::MPI::MPI *mpi) {
     specfem::compute::loose::compute_geometry<2, false, false>(
         *assembly, dg_edge_storage.elastic_elastic_interface, i);
   }
-  dg_edge_storage.foreach_edge_on_host(
-      [&](_util::edge_manager::edge_data<edge_capacity, data_capacity> &e) {
-        using PointPartialDerivativesType =
-            specfem::point::partial_derivatives<specfem::dimension::type::dim2,
-                                                true, false>;
-        e.ngll = qp5.NGLL;
-        int ix, iz;
-        int ispec = e.parent.id;
-        for (int i = 0; i < qp5.NGLL; i++) {
-          point_from_id(ix, iz, e.parent.bdry, i);
-          specfem::point::index<specfem::dimension::type::dim2> index(ispec, iz,
-                                                                      ix);
-
-          PointPartialDerivativesType ppd;
-          specfem::compute::load_on_host(index, assembly->partial_derivatives,
-                                         ppd);
-          // type_real dvdxi = assembly->mesh.quadratures.h_hprime(ix,ix);
-          // type_real dvdga = assembly->mesh.quadratures.h_hprime(iz,iz);
-          // type_real dvdx = dvdxi * ppd.xix +
-          //                  dvdga * ppd.gammax;
-          // type_real dvdz = dvdxi * ppd.xiz +
-          //                  dvdga * ppd.gammaz;
-          type_real det = 1 / fabs(ppd.xix * ppd.gammaz - ppd.xiz * ppd.gammax);
-          type_real nx, nz;
-          switch (e.parent.bdry) {
-          case specfem::enums::edge::type::RIGHT:
-            nx = ppd.xix;
-            nz = ppd.xiz;
-            break;
-          case specfem::enums::edge::type::TOP:
-            nx = ppd.gammax;
-            nz = ppd.gammaz;
-            break;
-          case specfem::enums::edge::type::LEFT:
-            nx = -ppd.xix;
-            nz = -ppd.xiz;
-            break;
-          case specfem::enums::edge::type::BOTTOM:
-            nx = -ppd.gammax;
-            nz = -ppd.gammaz;
-            break;
-          }
-          e.data[EDGEIND_NX][i] = nx;
-          e.data[EDGEIND_NZ][i] = nz;
-          e.data[EDGEIND_DET][i] = det;
-          e.data[EDGEIND_DS][i] = sqrt(nx * nx + nz * nz) * det; // dS
-          for (int ishape = 0; ishape < e.ngll; ishape++) {
-            int ixshape, izshape;
-            point_from_id(ixshape, izshape, e.parent.bdry, ishape);
-            // v = L_{ixshape}(x) L_{izshape}(z);
-            // hprime(i,j) = L_j'(t_i)
-            type_real dvdxi =
-                assembly->mesh.quadratures.gll.h_hprime(ix, ixshape) *
-                (iz == izshape);
-            type_real dvdga =
-                assembly->mesh.quadratures.gll.h_hprime(iz, izshape) *
-                (ix == ixshape);
-            type_real dvdx = dvdxi * ppd.xix + dvdga * ppd.gammax;
-            type_real dvdz = dvdxi * ppd.xiz + dvdga * ppd.gammaz;
-            e.data[EDGEIND_SHAPENDERIV + ishape][i] =
-                (dvdx * nx + dvdz * nz) * det;
-          }
-        }
-      });
-  auto spec_charlen2 = [&](int ispec) {
-    type_real lx1 =
-        assembly->mesh.points.coord(0, ispec, 0, 0) -
-        assembly->mesh.points.coord(0, ispec, qp5.NGLL - 1, qp5.NGLL - 1);
-    type_real lz1 =
-        assembly->mesh.points.coord(1, ispec, 0, 0) -
-        assembly->mesh.points.coord(1, ispec, qp5.NGLL - 1, qp5.NGLL - 1);
-    type_real lx2 = assembly->mesh.points.coord(0, ispec, qp5.NGLL - 1, 0) -
-                    assembly->mesh.points.coord(0, ispec, 0, qp5.NGLL - 1);
-    type_real lz2 = assembly->mesh.points.coord(1, ispec, qp5.NGLL - 1, 0) -
-                    assembly->mesh.points.coord(1, ispec, 0, qp5.NGLL - 1);
-    return std::max(lx1 * lx1 + lz1 * lz1, lx2 * lx2 + lz2 * lz2);
-  };
-  dg_edge_storage.foreach_intersection_on_host(
-      [&](_util::edge_manager::edge_intersection<edge_capacity> &intersect,
-          _util::edge_manager::edge_data<edge_capacity, data_capacity> &a,
-          _util::edge_manager::edge_data<edge_capacity, data_capacity> &b) {
-        using AcousticProperties = specfem::point::properties<
-            specfem::dimension::type::dim2,
-            specfem::element::medium_tag::acoustic,
-            specfem::element::property_tag::isotropic, false>;
-        using ElasticProperties = specfem::point::properties<
-            specfem::dimension::type::dim2,
-            specfem::element::medium_tag::elastic,
-            specfem::element::property_tag::isotropic, false>;
-        int a_ispec = a.parent.id;
-        int b_ispec = b.parent.id;
-        specfem::element::medium_tag a_medium = a.parent.medium;
-        specfem::element::medium_tag b_medium = b.parent.medium;
-        if (a_medium == specfem::element::medium_tag::acoustic &&
-            b_medium == specfem::element::medium_tag::acoustic) {
-          type_real rho_inv_max = 0;
-          AcousticProperties props;
-          for (int iz = 0; iz < qp5.NGLL; iz++) {
-            for (int ix = 0; ix < qp5.NGLL; ix++) {
-              specfem::point::index<specfem::dimension::type::dim2> index(
-                  a_ispec, iz, ix);
-              specfem::compute::load_on_host(index, assembly->properties,
-                                             props);
-              rho_inv_max = std::max(rho_inv_max, props.rho_inverse);
-              index.ispec = b_ispec;
-              specfem::compute::load_on_host(index, assembly->properties,
-                                             props);
-              rho_inv_max = std::max(rho_inv_max, props.rho_inverse);
-            }
-          }
-          intersect.relax_param =
-              _RELAX_PARAM_COEF_ACOUSTIC_ * rho_inv_max /
-              sqrt(std::max(spec_charlen2(a_ispec), spec_charlen2(b_ispec)));
-
-        } else if (a_medium == specfem::element::medium_tag::elastic &&
-                   b_medium == specfem::element::medium_tag::acoustic) {
-          throw std::runtime_error(
-              "interface elastic-acoustic should have been swapped. This "
-              "should not have been reached.");
-          // swap a and b
-          int tmpi;
-          type_real tmpr;
-#define swpi(a, b)                                                             \
-  {                                                                            \
-    tmpi = a;                                                                  \
-    a = b;                                                                     \
-    b = tmpi;                                                                  \
-  }
-#define swpr(a, b)                                                             \
-  {                                                                            \
-    tmpr = a;                                                                  \
-    a = b;                                                                     \
-    b = tmpr;                                                                  \
-  }
-          swpi(intersect.a_ref_ind, intersect.b_ref_ind);
-          swpi(intersect.a_ngll, intersect.b_ngll);
-          swpr(intersect.a_param_start, intersect.b_param_start);
-          swpr(intersect.a_param_end, intersect.b_param_end);
-          for (int igll1 = 0; igll1 < edge_capacity; igll1++) {
-            for (int igll2 = 0; igll2 < edge_capacity; igll2++) {
-              swpr(intersect.a_mortar_trans[igll1][igll2],
-                   intersect.b_mortar_trans[igll1][igll2])
-            }
-          }
-
-#undef swpi
-#undef swpr
-        } else if (a_medium == specfem::element::medium_tag::acoustic &&
-                   b_medium == specfem::element::medium_tag::elastic) {
-          // this elif here just to branch away from the fail case
-        } else if (a_medium == specfem::element::medium_tag::elastic &&
-                   b_medium == specfem::element::medium_tag::elastic) {
-          ElasticProperties props;
-
-          type_real speed_param_max = 0;
-          for (int iz = 0; iz < qp5.NGLL; iz++) {
-            for (int ix = 0; ix < qp5.NGLL; ix++) {
-              specfem::point::index<specfem::dimension::type::dim2> index(
-                  a_ispec, iz, ix);
-              specfem::compute::load_on_host(index, assembly->properties,
-                                             props);
-              speed_param_max = std::max(speed_param_max, props.lambdaplus2mu);
-              index.ispec = b_ispec;
-              specfem::compute::load_on_host(index, assembly->properties,
-                                             props);
-              speed_param_max = std::max(speed_param_max, props.lambdaplus2mu);
-            }
-          }
-          intersect.relax_param =
-              _RELAX_PARAM_COEF_ELASTIC_ * speed_param_max /
-              sqrt(std::max(spec_charlen2(a_ispec), spec_charlen2(b_ispec)));
-        } else {
-          throw std::runtime_error(
-              "Mortar Flux: medium combination not supported.");
-        }
-      });
 
   dg_edge_storage.initialize_intersection_data(intersect_data_capacity);
 
   specfem::event_marching::arbitrary_call_event store_boundaryvals(
       [&]() {
+        dg_edge_storage.acoustic_acoustic_interface
+            .compute_edge_intermediates<1, false>(*assembly);
+        dg_edge_storage.acoustic_acoustic_interface
+            .compute_edge_intermediates<2, false>(*assembly);
         dg_edge_storage.acoustic_elastic_interface
             .compute_edge_intermediates<2, false>(*assembly);
-        dg_edge_storage.foreach_edge_on_host([&](_util::edge_manager::edge_data<
-                                                 edge_capacity, data_capacity>
-                                                     &e) {
-          using PointPartialDerivativesType =
-              specfem::point::partial_derivatives<
-                  specfem::dimension::type::dim2, true, false>;
-          using PointAcoustic =
-              specfem::point::field<specfem::dimension::type::dim2,
-                                    specfem::element::medium_tag::acoustic,
-                                    true, false, false, false, false>;
-          using PointElastic =
-              specfem::point::field<specfem::dimension::type::dim2,
-                                    specfem::element::medium_tag::elastic, true,
-                                    false, false, false, false>;
-
-          using AcousticProperties = specfem::point::properties<
-              specfem::dimension::type::dim2,
-              specfem::element::medium_tag::acoustic,
-              specfem::element::property_tag::isotropic, false>;
-          using ElasticProperties = specfem::point::properties<
-              specfem::dimension::type::dim2,
-              specfem::element::medium_tag::elastic,
-              specfem::element::property_tag::isotropic, false>;
-          int ix, iz;
-          int ispec = e.parent.id;
-          for (int i = 0; i < qp5.NGLL; i++) {
-            point_from_id(ix, iz, e.parent.bdry, i);
-            specfem::point::index<specfem::dimension::type::dim2> index(ispec,
-                                                                        iz, ix);
-
-            PointPartialDerivativesType ppd;
-            specfem::compute::load_on_host(index, assembly->partial_derivatives,
-                                           ppd);
-            int ncomp;
-            std::vector<type_real> dfdxi;
-            std::vector<type_real> dfdga;
-            specfem::element::medium_tag medium =
-                assembly->properties.h_element_types(ispec);
-            if (medium == specfem::element::medium_tag::acoustic) {
-              PointAcoustic disp;
-              AcousticProperties props;
-              constexpr int medium_ID =
-                  static_cast<int>(specfem::element::medium_tag::acoustic);
-              ncomp = 1;
-              dfdxi = std::vector<type_real>(ncomp, 0);
-              dfdga = std::vector<type_real>(ncomp, 0);
-              specfem::compute::load_on_host(index, assembly->properties,
-                                             props);
-              e.data[EDGEIND_SPEEDPARAM][i] = props.rho_inverse;
-              for (int k = 0; k < qp5.NGLL; k++) {
-                specfem::point::index<specfem::dimension::type::dim2> index_(
-                    ispec, iz, k);
-                specfem::compute::load_on_host(index_, assembly->fields.forward,
-                                               disp);
-                dfdxi[0] += assembly->mesh.quadratures.gll.h_hprime(ix, k) *
-                            disp.displacement(0);
-                index_ = specfem::point::index<specfem::dimension::type::dim2>(
-                    ispec, k, ix);
-                specfem::compute::load_on_host(index_, assembly->fields.forward,
-                                               disp);
-                dfdga[0] += assembly->mesh.quadratures.gll.h_hprime(iz, k) *
-                            disp.displacement(0);
-              }
-            } else if (medium == specfem::element::medium_tag::elastic) {
-              PointElastic disp;
-              ncomp = 2;
-              constexpr int medium_ID =
-                  static_cast<int>(specfem::element::medium_tag::elastic);
-              dfdxi = std::vector<type_real>(ncomp, 0);
-              dfdga = std::vector<type_real>(ncomp, 0);
-              for (int k = 0; k < qp5.NGLL; k++) {
-                specfem::point::index<specfem::dimension::type::dim2> index_(
-                    ispec, iz, k);
-                specfem::compute::load_on_host(index_, assembly->fields.forward,
-                                               disp);
-                dfdxi[0] += assembly->mesh.quadratures.gll.h_hprime(ix, k) *
-                            disp.displacement(0);
-                dfdxi[1] += assembly->mesh.quadratures.gll.h_hprime(ix, k) *
-                            disp.displacement(1);
-                index_ = specfem::point::index<specfem::dimension::type::dim2>(
-                    ispec, k, ix);
-                specfem::compute::load_on_host(index_, assembly->fields.forward,
-                                               disp);
-                dfdga[0] += assembly->mesh.quadratures.gll.h_hprime(iz, k) *
-                            disp.displacement(0);
-                dfdga[1] += assembly->mesh.quadratures.gll.h_hprime(iz, k) *
-                            disp.displacement(1);
-              }
-              e.data[EDGEIND_SPEEDPARAM][i] =
-                  assembly->properties.acoustic_isotropic.h_rho_inverse(ispec,
-                                                                        iz, ix);
-            } else {
-              throw std::runtime_error(
-                  "Flux edge-storage: medium not supported.");
-            }
-            std::vector<type_real> dfdx(ncomp, 0);
-            std::vector<type_real> dfdz(ncomp, 0);
-            for (int icomp = 0; icomp < ncomp; icomp++) {
-              dfdx[icomp] = dfdxi[icomp] * ppd.xix + dfdga[icomp] * ppd.gammax;
-              dfdz[icomp] = dfdxi[icomp] * ppd.xiz + dfdga[icomp] * ppd.gammaz;
-            }
-
-            type_real nx = e.data[EDGEIND_NX][i];
-            type_real nz = e.data[EDGEIND_NZ][i];
-            type_real det = e.data[EDGEIND_DET][i];
-            for (int icomp = 0; icomp < ncomp; icomp++) {
-              e.data[EDGEIND_FIELDNDERIV + icomp][i] =
-                  (dfdx[icomp] * nx + dfdz[icomp] * nz) * det;
-            }
-          }
-        });
         return 0;
       },
       0.9);
   timescheme_wrapper.time_stepper.register_event(&store_boundaryvals);
-
-  const auto h_is_bdry_at_pt =
-      [&](const specfem::point::index<specfem::dimension::type::dim2> index,
-          specfem::element::boundary_tag tag) -> bool {
-    specfem::point::boundary<
-        specfem::element::boundary_tag::acoustic_free_surface,
-        specfem::dimension::type::dim2, false>
-        point_boundary_afs;
-    specfem::point::boundary<specfem::element::boundary_tag::none,
-                             specfem::dimension::type::dim2, false>
-        point_boundary_none;
-    specfem::point::boundary<specfem::element::boundary_tag::stacey,
-                             specfem::dimension::type::dim2, false>
-        point_boundary_stacey;
-    specfem::point::boundary<
-        specfem::element::boundary_tag::composite_stacey_dirichlet,
-        specfem::dimension::type::dim2, false>
-        point_boundary_composite;
-    switch (assembly->boundaries.boundary_tags(index.ispec)) {
-    case specfem::element::boundary_tag::acoustic_free_surface:
-      specfem::compute::load_on_host(index, assembly->boundaries,
-                                     point_boundary_afs);
-      return point_boundary_afs.tag == tag;
-    case specfem::element::boundary_tag::none:
-      specfem::compute::load_on_host(index, assembly->boundaries,
-                                     point_boundary_none);
-      return point_boundary_none.tag == tag;
-    case specfem::element::boundary_tag::stacey:
-      specfem::compute::load_on_host(index, assembly->boundaries,
-                                     point_boundary_stacey);
-      return point_boundary_stacey.tag == tag;
-    case specfem::element::boundary_tag::composite_stacey_dirichlet:
-      specfem::compute::load_on_host(index, assembly->boundaries,
-                                     point_boundary_composite);
-      return point_boundary_composite.tag == tag;
-    default:
-      throw std::runtime_error(
-          "h_is_bdry_at_pt: unknown assembly->boundaries.boundary_tags(ispec) "
-          "value!");
-      return false;
-    }
-  };
 
   specfem::event_marching::arbitrary_call_event mortar_flux_acoustic(
       [&]() {
@@ -620,192 +286,12 @@ void execute(specfem::MPI::MPI *mpi) {
             specfem::element::medium_tag::elastic, edge_storage_quad>::
             elastic_to_acoustic_accel(
                 *assembly, dg_edge_storage.acoustic_elastic_interface);
-        dg_edge_storage.foreach_intersection_on_host(
-            [&](_util::edge_manager::edge_intersection<edge_capacity>
-                    &intersect,
-                _util::edge_manager::edge_data<edge_capacity, data_capacity> &a,
-                _util::edge_manager::edge_data<edge_capacity, data_capacity> &b,
-                decltype(Kokkos::subview(
-                    std::declval<specfem::kokkos::HostView2d<type_real> >(), 1u,
-                    Kokkos::ALL)) data_view) {
-              using PointAcoustic =
-                  specfem::point::field<specfem::dimension::type::dim2,
-                                        specfem::element::medium_tag::acoustic,
-                                        true, false, false, false, false>;
-              using PointElastic =
-                  specfem::point::field<specfem::dimension::type::dim2,
-                                        specfem::element::medium_tag::elastic,
-                                        true, false, false, false, false>;
-              using PointAcousticAccel =
-                  specfem::point::field<specfem::dimension::type::dim2,
-                                        specfem::element::medium_tag::acoustic,
-                                        false, false, true, false, false>;
-              using PointElasticAccel =
-                  specfem::point::field<specfem::dimension::type::dim2,
-                                        specfem::element::medium_tag::elastic,
-                                        false, false, true, false, false>;
-              _util::edge_manager::quadrature_rule gll =
-                  _util::edge_manager::gen_GLL(intersect.ngll);
-              int a_ispec = a.parent.id;
-              int b_ispec = b.parent.id;
-              specfem::element::medium_tag a_medium = a.parent.medium;
-              specfem::element::medium_tag b_medium = b.parent.medium;
-              type_real a_scale_dS =
-                  0.5 * (intersect.a_param_end - intersect.a_param_start);
-              type_real b_scale_dS =
-                  0.5 * (intersect.b_param_end - intersect.b_param_start);
-              // currently, edge_manager assumes any acoustic - x boundaries
-              // have acoustic on the a-side.
-              if (a_medium == specfem::element::medium_tag::acoustic) {
-                if (b_medium == specfem::element::medium_tag::acoustic) {
-                  PointAcousticAccel accel_arr
-                      [dg_edge_storage.acoustic_acoustic_interface.NGLL_EDGE];
-                  for (int a_ishape = 0; a_ishape < a.ngll; a_ishape++) {
-                    // flux += (
-                    //       np.einsum("j,j,j,ji->i",JW,u-u_,c/2,dv)
-                    //     + np.einsum("j,ji,j->i",JW,v,0.5*(c*du+c_*du_))
-                    //     - a*np.einsum("j,j,ji->i",JW,u-u_,v)
-                    // )
-                    type_real flux = 0;
-                    type_real f1 = 0;
-                    type_real f2 = 0;
-                    type_real f3 = 0;
-                    for (int iquad = 0; iquad < gll.nquad; iquad++) {
-                      type_real c = intersect.a_to_mortar(
-                          iquad, a.data[EDGEIND_SPEEDPARAM]);
-                      type_real u_jmp =
-                          intersect.a_to_mortar(iquad, a.data[EDGEIND_FIELD]) -
-                          intersect.b_to_mortar(iquad, b.data[EDGEIND_FIELD]);
-                      type_real cdu_avg =
-                          0.5 * (c * intersect.a_to_mortar(
-                                         iquad, a.data[EDGEIND_FIELDNDERIV]) -
-                                 intersect.b_to_mortar(
-                                     iquad, b.data[EDGEIND_SPEEDPARAM]) *
-                                     intersect.b_to_mortar(
-                                         iquad, b.data[EDGEIND_FIELDNDERIV]) *
-                                     (b_scale_dS / a_scale_dS));
-                      data_view[INTERIND_UJMP + iquad] = u_jmp;
-                      data_view[INTERIND_DU_AVG + iquad] = cdu_avg;
-
-                      f1 += a_scale_dS * gll.w[iquad] * 0.5 *
-                            intersect.a_to_mortar(
-                                iquad, a.data[EDGEIND_SHAPENDERIV + a_ishape]) *
-                            c * u_jmp;
-                      f2 += a_scale_dS * gll.w[iquad] *
-                            intersect.a_mortar_trans[iquad][a_ishape] *
-                            (cdu_avg);
-                      f3 += a_scale_dS * gll.w[iquad] *
-                            intersect.a_to_mortar(iquad, a.data[EDGEIND_DS]) *
-                            intersect.a_mortar_trans[iquad][a_ishape] *
-                            (-intersect.relax_param * u_jmp);
-                      flux +=
-                          a_scale_dS * gll.w[iquad] *
-                          (0.5 *
-                               intersect.a_to_mortar(
-                                   iquad,
-                                   a.data[EDGEIND_SHAPENDERIV + a_ishape]) *
-                               c * u_jmp +
-                           intersect.a_mortar_trans[iquad][a_ishape] *
-                               (cdu_avg - intersect.a_to_mortar(
-                                              iquad, a.data[EDGEIND_DS]) *
-                                              intersect.relax_param * u_jmp));
-                    }
-                    data_view[INTERIND_FLUXTOTAL_A + a_ishape] = flux;
-                    data_view[INTERIND_FLUX1_A + a_ishape] = f1;
-                    data_view[INTERIND_FLUX2_A + a_ishape] = f2;
-                    data_view[INTERIND_FLUX3_A + a_ishape] = f3;
-                    PointAcousticAccel accel;
-                    specfem::point::index<specfem::dimension::type::dim2> index(
-                        a_ispec, 0, 0);
-                    point_from_id(index.ix, index.iz, a.parent.bdry, a_ishape);
-                    if (h_is_bdry_at_pt(index,
-                                        specfem::element::boundary_tag::none)) {
-                      accel_arr[a_ishape].acceleration = flux;
-                      accel.acceleration = flux;
-                      // specfem::compute::atomic_add_on_device(
-                      //     index, accel, assembly->fields.forward);
-                      data_view[INTERIND_ACCEL_INCLUDE_A + a_ishape] = 0;
-                    } else {
-                      accel_arr[a_ishape].acceleration = (type_real)0.0;
-                      data_view[INTERIND_ACCEL_INCLUDE_A + a_ishape] = 1;
-                    }
-                  }
-                  dg_edge_storage.acoustic_acoustic_interface
-                      .atomic_add_to_field<1, false>(intersect.a_ref_ind,
-                                                     *assembly, accel_arr);
-                  for (int b_ishape = 0; b_ishape < b.ngll; b_ishape++) {
-                    // flux += (
-                    //       np.einsum("j,j,j,ji->i",JW,u-u_,c/2,dv)
-                    //     + np.einsum("j,ji,j->i",JW,v,0.5*(c*du+c_*du_))
-                    //     - a*np.einsum("j,j,ji->i",JW,u-u_,v)
-                    // )
-                    type_real flux = 0;
-                    type_real f1 = 0;
-                    type_real f2 = 0;
-                    type_real f3 = 0;
-                    for (int iquad = 0; iquad < gll.nquad; iquad++) {
-                      type_real c = intersect.b_to_mortar(
-                          iquad, b.data[EDGEIND_SPEEDPARAM]);
-                      type_real u_jmp =
-                          intersect.b_to_mortar(iquad, b.data[EDGEIND_FIELD]) -
-                          intersect.a_to_mortar(iquad, a.data[EDGEIND_FIELD]);
-                      type_real cdu_avg =
-                          0.5 * (c * intersect.b_to_mortar(
-                                         iquad, b.data[EDGEIND_FIELDNDERIV]) -
-                                 intersect.a_to_mortar(
-                                     iquad, a.data[EDGEIND_SPEEDPARAM]) *
-                                     intersect.a_to_mortar(
-                                         iquad, a.data[EDGEIND_FIELDNDERIV]) *
-                                     (a_scale_dS / b_scale_dS));
-                      f1 += b_scale_dS * gll.w[iquad] * 0.5 *
-                            intersect.b_to_mortar(
-                                iquad, b.data[EDGEIND_SHAPENDERIV + b_ishape]) *
-                            c * u_jmp;
-                      f2 += b_scale_dS * gll.w[iquad] *
-                            intersect.b_mortar_trans[iquad][b_ishape] *
-                            (cdu_avg);
-                      f3 += b_scale_dS * gll.w[iquad] *
-                            intersect.b_to_mortar(iquad, b.data[EDGEIND_DS]) *
-                            intersect.b_mortar_trans[iquad][b_ishape] *
-                            (-intersect.relax_param * u_jmp);
-                      flux +=
-                          b_scale_dS * gll.w[iquad] *
-                          (0.5 *
-                               intersect.b_to_mortar(
-                                   iquad,
-                                   b.data[EDGEIND_SHAPENDERIV + b_ishape]) *
-                               c * u_jmp +
-                           intersect.b_mortar_trans[iquad][b_ishape] *
-                               (cdu_avg - intersect.b_to_mortar(
-                                              iquad, b.data[EDGEIND_DS]) *
-                                              intersect.relax_param * u_jmp));
-                    }
-                    data_view[INTERIND_FLUXTOTAL_B + b_ishape] = flux;
-                    data_view[INTERIND_FLUX1_B + b_ishape] = f1;
-                    data_view[INTERIND_FLUX2_B + b_ishape] = f2;
-                    data_view[INTERIND_FLUX3_B + b_ishape] = f3;
-                    PointAcousticAccel accel;
-                    specfem::point::index<specfem::dimension::type::dim2> index(
-                        b_ispec, 0, 0);
-                    point_from_id(index.ix, index.iz, b.parent.bdry, b_ishape);
-                    if (h_is_bdry_at_pt(index,
-                                        specfem::element::boundary_tag::none)) {
-                      accel.acceleration = flux;
-                      specfem::compute::atomic_add_on_device(
-                          index, accel, assembly->fields.forward);
-                      data_view[INTERIND_ACCEL_INCLUDE_B + b_ishape] = 0;
-                    } else {
-                      data_view[INTERIND_ACCEL_INCLUDE_B + b_ishape] = 1;
-                    }
-                  }
-
-                } else if (b_medium == specfem::element::medium_tag::elastic) {
-                } else {
-                  throw std::runtime_error(
-                      "Mortar Flux: medium combination not supported.");
-                }
-              }
-            });
+        specfem::coupled_interface::loose::flux::symmetric_flux::kernel<
+            specfem::dimension::type::dim2,
+            specfem::element::medium_tag::acoustic,
+            specfem::element::medium_tag::acoustic, edge_storage_quad>::
+            compute_fluxes(*assembly,
+                           dg_edge_storage.acoustic_acoustic_interface);
         assembly->fields.forward.copy_to_device();
         return 0;
       },

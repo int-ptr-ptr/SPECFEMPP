@@ -38,6 +38,7 @@ def compare_sims(sim, queue_out, queue_in):
         queue_out.put(f"[COMPARE {sname} - {m:4d}:{s:02d}] " + st)
 
     should_continue = True
+    stop_requested = False
     dumpnum = -1
     dumpfol = os.path.join(sim["workspace"], "dump/simfield")
     tlast = tstart
@@ -48,7 +49,7 @@ def compare_sims(sim, queue_out, queue_in):
         while not queue_in.empty():
             v = queue_in.get()
             if isinstance(v, str) and v == STOPKEY:
-                should_continue = False
+                stop_requested = True
 
         # take all of the integer-named files, retrieve the lowest one > dumpnum
         files_to_check = dict()
@@ -57,6 +58,16 @@ def compare_sims(sim, queue_out, queue_in):
             if match and (index := int(match.group(0))) > dumpnum:
                 files_to_check[index] = fname
         if not files_to_check:
+            # if we received a stopkey, then we have exhausted all files
+            if stop_requested:
+                log(
+                    "Dump comparisons complete! errors are "
+                    + " ".join(
+                        f" {fieldname}: {maxerr[fieldname]:10.6e} @ dump #{dump_of_maxerr[fieldname]}"
+                        for fieldname in maxerr
+                    )
+                )
+                return
             # no files, just wait some time
             time.sleep(5)
             continue
