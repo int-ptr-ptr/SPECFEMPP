@@ -72,34 +72,18 @@ static void compute_field_nderiv(int index,
   }()
 #define _normal                                                                \
   [&] {                                                                        \
-    if constexpr (medium == 1) {                                               \
-      if constexpr (on_device) {                                               \
-        return container.medium1_edge_contravariant_normal;                    \
-      } else {                                                                 \
-        return container.h_medium1_edge_contravariant_normal;                  \
-      }                                                                        \
+    if constexpr (on_device) {                                                 \
+      return container.medium1_edge_contravariant_normal;                      \
     } else {                                                                   \
-      if constexpr (on_device) {                                               \
-        return container.medium2_edge_contravariant_normal;                    \
-      } else {                                                                 \
-        return container.h_medium2_edge_contravariant_normal;                  \
-      }                                                                        \
+      return container.h_medium1_edge_contravariant_normal;                    \
     }                                                                          \
   }()
 #define _field_nderiv                                                          \
   [&] {                                                                        \
-    if constexpr (medium == 1) {                                               \
-      if constexpr (on_device) {                                               \
-        return container.medium1_field_nderiv;                                 \
-      } else {                                                                 \
-        return container.h_medium1_field_nderiv;                               \
-      }                                                                        \
+    if constexpr (on_device) {                                                 \
+      return container.medium1_field_nderiv;                                   \
     } else {                                                                   \
-      if constexpr (on_device) {                                               \
-        return container.medium2_field_nderiv;                                 \
-      } else {                                                                 \
-        return container.h_medium2_field_nderiv;                               \
-      }                                                                        \
+      return container.h_medium1_field_nderiv;                                 \
     }                                                                          \
   }()
   int ispec = _ispec;
@@ -251,7 +235,7 @@ struct symmetric_flux::kernel<
         accel2[igll_edge].acceleration(0) = 0;
         chi2[igll_edge] = chi_get[igll_edge].displacement(0);
         dchidn2[igll_edge] =
-            container.h_medium2_field_nderiv(edge2_index, igll_edge, 0);
+            container.h_medium1_field_nderiv(edge2_index, igll_edge, 0);
 
         specfem::compute::loose::point_from_edge<ContainerType::NGLL_EDGE>(
             index.iz, index.ix, edge2_type, igll_edge);
@@ -318,7 +302,7 @@ struct symmetric_flux::kernel<
                 + container.h_interface_medium2_mortar_transfer(
                       iinterface, igll_interface, igll_edge) // against-edge
                                                              // component
-                      * container.h_medium2_edge_contravariant_normal(
+                      * container.h_medium1_edge_contravariant_normal(
                             edge2_index, igll_edge, against_edge2_component)
                       // hprime(i,j) = L_j'(t_i)
                       * assembly.mesh.quadratures.gll.h_hprime(
@@ -513,7 +497,7 @@ struct symmetric_flux::kernel<
               assembly.mesh.quadratures.gll.h_hprime(jedge, iedge) *
               container.h_interface_medium2_mortar_transfer(iinterface, igll,
                                                             jedge) *
-              container.h_medium2_edge_contravariant_normal(
+              container.h_medium1_edge_contravariant_normal(
                   edge2_index, jedge, along_edge2_component);
         }
       }

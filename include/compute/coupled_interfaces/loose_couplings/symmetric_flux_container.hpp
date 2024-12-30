@@ -9,16 +9,10 @@ struct specfem::coupled_interface::loose::flux::symmetric_flux::container<
     DimensionType, specfem::element::medium_tag::acoustic,
     specfem::element::medium_tag::acoustic, QuadratureType>
     : specfem::coupled_interface::loose::quadrature::mortar_transfer_container<
-          DimensionType, specfem::element::medium_tag::acoustic,
-          specfem::element::medium_tag::acoustic, QuadratureType,
-          QuadratureType>,
+          QuadratureType, QuadratureType>,
       specfem::compute::loose::interface_contravariant_normal_container<
-          DimensionType, specfem::element::medium_tag::acoustic,
-          specfem::element::medium_tag::acoustic, QuadratureType, 1, true>,
-      specfem::compute::loose::interface_contravariant_normal_container<
-          DimensionType, specfem::element::medium_tag::acoustic,
-          specfem::element::medium_tag::acoustic, QuadratureType, 2, true> {
-
+          DimensionType, QuadratureType, 1, true>,
+      specfem::compute::loose::single_medium_interface_container {
 private:
   using IntersectionQuadrature = QuadratureType;
   using EdgeQuadrature = QuadratureType;
@@ -60,9 +54,7 @@ public:
 
   /// chi field normal derivative
   EdgeField1View medium1_field_nderiv;
-  EdgeField2View medium2_field_nderiv;
   typename EdgeField1View::HostMirror h_medium1_field_nderiv;
-  typename EdgeField2View::HostMirror h_medium2_field_nderiv;
 
   RealView interface_relaxation_parameter;
   typename RealView::HostMirror h_interface_relaxation_parameter;
@@ -77,29 +69,15 @@ public:
 protected:
   container(int num_medium1_edges, int num_medium2_edges, int num_interfaces)
       : specfem::compute::loose::interface_contravariant_normal_container<
-            DimensionType, specfem::element::medium_tag::acoustic,
-            specfem::element::medium_tag::acoustic, QuadratureType, 1, true>(
-            num_medium1_edges),
-        specfem::compute::loose::interface_contravariant_normal_container<
-            DimensionType, specfem::element::medium_tag::acoustic,
-            specfem::element::medium_tag::acoustic, QuadratureType, 2, true>(
-            num_medium2_edges),
+            DimensionType, QuadratureType, 1, true>(num_medium1_edges),
         specfem::coupled_interface::loose::quadrature::
-            mortar_transfer_container<DimensionType,
-                                      specfem::element::medium_tag::acoustic,
-                                      specfem::element::medium_tag::acoustic,
-                                      QuadratureType, QuadratureType>(
+            mortar_transfer_container<QuadratureType, QuadratureType>(
                 num_interfaces),
         medium1_field_nderiv("specfem::coupled_interface::loose::flux::"
                              "symmetric_flux::container.medium1_field_nderiv",
                              num_medium1_edges),
         h_medium1_field_nderiv(
             Kokkos::create_mirror_view(medium1_field_nderiv)),
-        medium2_field_nderiv("specfem::coupled_interface::loose::flux::"
-                             "symmetric_flux::container.medium2_field_nderiv",
-                             num_medium2_edges),
-        h_medium2_field_nderiv(
-            Kokkos::create_mirror_view(medium2_field_nderiv)),
         interface_relaxation_parameter(
             "specfem::coupled_interface::loose::flux::symmetric_flux::"
             "container.interface_relaxation_parameter",
@@ -127,15 +105,12 @@ struct specfem::coupled_interface::loose::flux::symmetric_flux::container<
     DimensionType, specfem::element::medium_tag::elastic,
     specfem::element::medium_tag::elastic, QuadratureType>
     : specfem::coupled_interface::loose::quadrature::mortar_transfer_container<
-          DimensionType, specfem::element::medium_tag::acoustic,
-          specfem::element::medium_tag::acoustic, QuadratureType,
-          QuadratureType>,
+          QuadratureType, QuadratureType>,
       specfem::compute::loose::interface_contravariant_normal_container<
-          DimensionType, specfem::element::medium_tag::elastic,
-          specfem::element::medium_tag::elastic, QuadratureType, 1, true>,
+          DimensionType, QuadratureType, 1, true>,
       specfem::compute::loose::interface_contravariant_normal_container<
-          DimensionType, specfem::element::medium_tag::elastic,
-          specfem::element::medium_tag::elastic, QuadratureType, 2, true> {
+          DimensionType, QuadratureType, 2, true>,
+      specfem::compute::loose::single_medium_interface_container {
 
 private:
   using EdgeScalarView =
@@ -172,17 +147,10 @@ public:
 protected:
   container(int num_medium1_edges, int num_medium2_edges, int num_interfaces)
       : specfem::compute::loose::interface_contravariant_normal_container<
-            DimensionType, specfem::element::medium_tag::elastic,
-            specfem::element::medium_tag::elastic, QuadratureType, 1, true>(
-            num_medium1_edges),
+            DimensionType, QuadratureType, 1, true>(num_medium1_edges),
         specfem::compute::loose::interface_contravariant_normal_container<
-            DimensionType, specfem::element::medium_tag::elastic,
-            specfem::element::medium_tag::elastic, QuadratureType, 2, true>(
-            num_medium2_edges),
+            DimensionType, QuadratureType, 2, true>(num_medium2_edges),
         specfem::coupled_interface::loose::quadrature::
-            mortar_transfer_container<DimensionType,
-                                      specfem::element::medium_tag::acoustic,
-                                      specfem::element::medium_tag::acoustic,
-                                      QuadratureType, QuadratureType>(
+            mortar_transfer_container<QuadratureType, QuadratureType>(
                 num_interfaces) {}
 };

@@ -5,10 +5,7 @@ namespace coupled_interface {
 namespace loose {
 namespace quadrature {
 
-template <specfem::dimension::type DimensionType,
-          specfem::element::medium_tag MediumTag1,
-          specfem::element::medium_tag MediumTag2, typename EdgeQuadrature,
-          typename IntersectionQuadrature>
+template <typename EdgeQuadrature, typename IntersectionQuadrature>
 struct mortar_transfer_container {
 protected:
   using TransferTensorView =

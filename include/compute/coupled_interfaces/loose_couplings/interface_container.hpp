@@ -50,6 +50,24 @@ using EdgeFieldView =
                          DimensionType, MediumTag>::components()],
                  Kokkos::DefaultExecutionSpace>;
 
+/*
+this is effectively a compile-time flag for if a container should use the same
+medium. medium1/2 variables will point to the same view, but interface_medium1/2
+will still exist, as to refer to either side of the interface.
+
+Additionally, any edge foreach (compute_edge_intermediates()) on medium2 will do
+nothing.
+*/
+struct single_medium_interface_container {
+  template <typename ContainerType> static constexpr bool includes() {
+    // second clause is for passing includes<decltype(this)>
+    return std::is_base_of<single_medium_interface_container,
+                           ContainerType>() ||
+           std::is_base_of<single_medium_interface_container,
+                           typename std::remove_pointer<ContainerType>::type>();
+  }
+};
+
 template <specfem::dimension::type DimensionType,
           specfem::element::medium_tag MediumTag1,
           specfem::element::medium_tag MediumTag2, typename QuadratureType,
@@ -160,12 +178,66 @@ public:
                               num_medium1_edges),
         h_medium1_index_mapping(
             Kokkos::create_mirror_view(medium1_index_mapping)),
-        medium2_index_mapping("specfem::compute::loose::interface_container."
-                              "medium2_index_mapping",
-                              num_medium2_edges),
-        h_medium2_index_mapping(
-            Kokkos::create_mirror_view(medium2_index_mapping)),
-        super(num_medium1_edges, num_medium2_edges, num_interfaces) {}
+        medium1_edge_type("specfem::compute::loose::interface_container."
+                          "medium1_edge_type",
+                          num_medium1_edges),
+        h_medium1_edge_type(Kokkos::create_mirror_view(medium1_edge_type)),
+        interface_medium1_index("specfem::compute::loose::interface_container."
+                                "interface_medium1_index",
+                                num_interfaces),
+        h_interface_medium1_index(
+            Kokkos::create_mirror_view(interface_medium1_index)),
+        interface_medium2_index("specfem::compute::loose::interface_container."
+                                "interface_medium2_index",
+                                num_interfaces),
+        h_interface_medium2_index(
+            Kokkos::create_mirror_view(interface_medium2_index)),
+        interface_medium1_param_start(
+            "specfem::compute::loose::interface_container."
+            "interface_medium1_param_start",
+            num_interfaces),
+        h_interface_medium1_param_start(
+            Kokkos::create_mirror_view(interface_medium1_param_start)),
+        interface_medium2_param_start(
+            "specfem::compute::loose::interface_container."
+            "interface_medium2_param_start",
+            num_interfaces),
+        h_interface_medium2_param_start(
+            Kokkos::create_mirror_view(interface_medium2_param_start)),
+        interface_medium1_param_end(
+            "specfem::compute::loose::interface_container."
+            "interface_medium1_param_end",
+            num_interfaces),
+        h_interface_medium1_param_end(
+            Kokkos::create_mirror_view(interface_medium1_param_end)),
+        interface_medium2_param_end(
+            "specfem::compute::loose::interface_container."
+            "interface_medium2_param_end",
+            num_interfaces),
+        h_interface_medium2_param_end(
+            Kokkos::create_mirror_view(interface_medium2_param_end)),
+
+        super(num_medium1_edges, num_medium2_edges, num_interfaces) {
+    if constexpr (single_medium_interface_container::includes<decltype(
+                      this)>()) {
+      medium2_index_mapping = medium1_index_mapping;
+      h_medium2_index_mapping = h_medium1_index_mapping;
+      medium2_edge_type = medium1_edge_type;
+      h_medium2_edge_type = h_medium1_edge_type;
+    } else {
+      medium2_index_mapping =
+          IndexView("specfem::compute::loose::interface_container."
+                    "medium2_index_mapping",
+                    num_medium2_edges);
+      h_medium2_index_mapping =
+          Kokkos::create_mirror_view(medium2_index_mapping);
+      medium2_edge_type =
+          EdgeTypeView("specfem::compute::loose::interface_container."
+                       "medium2_edge_type",
+                       num_medium2_edges),
+      h_medium2_edge_type = Kokkos::create_mirror_view(medium2_edge_type);
+    }
+  }
 
   int num_medium1_edges;
   int num_medium2_edges;
@@ -206,43 +278,6 @@ public:
   RealView::HostMirror h_interface_medium1_param_end;
   RealView::HostMirror h_interface_medium2_param_start;
   RealView::HostMirror h_interface_medium2_param_end;
-
-  // These are temporary until we figure out where to put them all
-  using EdgeScalarView =
-      specfem::compute::loose::EdgeScalarView<QuadratureType>;
-  using EdgeVectorView =
-      specfem::compute::loose::EdgeVectorView<DimensionType, QuadratureType>;
-  using EdgeQuadView =
-      Kokkos::View<type_real * [QuadratureType::NGLL][QuadratureType::NGLL],
-                   Kokkos::DefaultExecutionSpace>;
-
-  EdgeVectorView a_NORMAL;
-  EdgeVectorView b_NORMAL;
-  typename EdgeVectorView::HostMirror h_a_NORMAL;
-  typename EdgeVectorView::HostMirror h_b_NORMAL;
-  EdgeScalarView a_DET;
-  EdgeScalarView b_DET;
-  typename EdgeScalarView::HostMirror h_a_DET;
-  typename EdgeScalarView::HostMirror h_b_DET;
-  EdgeScalarView a_DS;
-  EdgeScalarView b_DS;
-  typename EdgeScalarView::HostMirror h_a_DS;
-  typename EdgeScalarView::HostMirror h_b_DS;
-  EdgeVectorView a_FIELDNDERIV;
-  EdgeVectorView b_FIELDNDERIV;
-  typename EdgeVectorView::HostMirror h_a_FIELDNDERIV;
-  typename EdgeVectorView::HostMirror h_b_FIELDNDERIV;
-  EdgeScalarView a_SPEEDPARAM;
-  EdgeScalarView b_SPEEDPARAM;
-  typename EdgeScalarView::HostMirror h_a_SPEEDPARAM;
-  typename EdgeScalarView::HostMirror h_b_SPEEDPARAM;
-  EdgeQuadView a_SHAPENDERIV;
-  EdgeQuadView b_SHAPENDERIV;
-  typename EdgeQuadView::HostMirror h_a_SHAPENDERIV;
-  typename EdgeQuadView::HostMirror h_b_SHAPENDERIV;
-
-  RealView interface_relax_param;
-  RealView::HostMirror h_interface_relax_param;
 
   // TODO change out the design to fit closer to specfem?
   // TODO include UseSIMD=true case.
@@ -448,15 +483,21 @@ public:
     if constexpr (medium != 1 && medium != 2) {
       static_assert(false, "Medium can only be 1 or 2!");
     }
-    for (int i = 0; i <
-                    [&] {
-                      if constexpr (medium == 1) {
-                        return num_medium1_edges;
-                      } else {
-                        return num_medium2_edges;
-                      }
-                    }();
-         i++) {
+    if constexpr (single_medium_interface_container::includes<decltype(
+                      this)>() &&
+                  medium == 2) {
+      // if medium1/2 views are the same, then we only need to use
+      // compute_edge_intermediates for one medium.
+      return;
+    }
+    const int num_edges = [&] {
+      if constexpr (medium == 1) {
+        return num_medium1_edges;
+      } else {
+        return num_medium2_edges;
+      }
+    }();
+    for (int i = 0; i < num_edges; i++) {
       FluxScheme::template kernel<DimensionType, MediumTag1, MediumTag2,
                                   QuadratureType>::
           template compute_edge_intermediate<medium, on_device>(i, assembly,

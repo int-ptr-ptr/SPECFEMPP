@@ -85,100 +85,101 @@ template <typename edgequad, int datacapacity>
 void dump_edge_container(
     const std::string &filename,
     _util::edge_manager::edge_storage<edgequad, datacapacity> &edge_storage) {
-  constexpr int ngllcapacity = edge_storage.ngll;
-  int nedge = edge_storage.num_edges();
-  int nintersect = edge_storage.num_intersections();
+  // constexpr int ngllcapacity = edge_storage.ngll;
+  // int nedge = edge_storage.num_edges();
+  // int nintersect = edge_storage.num_intersections();
 
-  Kokkos::View<int *[3], Kokkos::LayoutLeft, specfem::kokkos::HostMemSpace>
-      edge_intdat("_util::dump_edge_storage::edge_intdat", nedge);
-  Kokkos::View<type_real *[ngllcapacity][2], Kokkos::LayoutLeft,
-               specfem::kokkos::HostMemSpace>
-      pos("_util::dump_edge_storage::pos", nedge);
-  Kokkos::View<type_real *[datacapacity][ngllcapacity], Kokkos::LayoutLeft,
-               specfem::kokkos::HostMemSpace>
-      edgedata("_util::dump_edge_storage::edgedata", nedge);
+  // Kokkos::View<int *[3], Kokkos::LayoutLeft, specfem::kokkos::HostMemSpace>
+  //     edge_intdat("_util::dump_edge_storage::edge_intdat", nedge);
+  // Kokkos::View<type_real *[ngllcapacity][2], Kokkos::LayoutLeft,
+  //              specfem::kokkos::HostMemSpace>
+  //     pos("_util::dump_edge_storage::pos", nedge);
+  // Kokkos::View<type_real *[datacapacity][ngllcapacity], Kokkos::LayoutLeft,
+  //              specfem::kokkos::HostMemSpace>
+  //     edgedata("_util::dump_edge_storage::edgedata", nedge);
 
-  Kokkos::View<int *[5], Kokkos::LayoutLeft, specfem::kokkos::HostMemSpace>
-      intersect_intdat("_util::dump_edge_storage::intersect_intdat",
-                       nintersect);
-  Kokkos::View<type_real *[5], Kokkos::LayoutLeft,
-               specfem::kokkos::HostMemSpace>
-      intersect_floatdat("_util::dump_edge_storage::intersect_floatdat",
-                         nintersect);
-  Kokkos::View<type_real *[2][ngllcapacity][ngllcapacity], Kokkos::LayoutLeft,
-               specfem::kokkos::HostMemSpace>
-      mortar_trans("_util::dump_edge_storage::mortar_trans", nintersect);
-  for (int i = 0; i < nedge; i++) {
-    _util::edge_manager::edge_data<ngllcapacity, datacapacity> edge_data =
-        edge_storage.get_edge_on_host(i);
-    edge_intdat(i, 0) = edge_data.parent.id;
-    switch (edge_data.parent.bdry) {
-    case specfem::enums::edge::type::RIGHT:
-      edge_intdat(i, 1) = 0;
-      break;
-    case specfem::enums::edge::type::TOP:
-      edge_intdat(i, 1) = 1;
-      break;
-    case specfem::enums::edge::type::LEFT:
-      edge_intdat(i, 1) = 2;
-      break;
-    case specfem::enums::edge::type::BOTTOM:
-      edge_intdat(i, 1) = 3;
-      break;
-    default:
-      edge_intdat(i, 1) = -1;
-      break;
-    }
-    edge_intdat(i, 2) = edge_data.ngll;
-    for (int j = 0; j < edge_data.ngll; j++) {
-      pos(i, j, 0) = edge_data.x[j];
-      pos(i, j, 1) = edge_data.z[j];
-      for (int k = 0; k < datacapacity; k++) {
-        edgedata(i, k, j) = edge_data.data[k][j];
-      }
-    }
-  }
-  for (int i = 0; i < nintersect; i++) {
-    _util::edge_manager::edge_intersection<ngllcapacity> intersect =
-        edge_storage.get_intersection_on_host(i);
-    intersect_intdat(i, 0) = intersect.a_ref_ind;
-    intersect_intdat(i, 1) = intersect.b_ref_ind;
-    intersect_intdat(i, 2) = intersect.ngll;
-    intersect_intdat(i, 3) = intersect.a_ngll;
-    intersect_intdat(i, 4) = intersect.b_ngll;
-    intersect_floatdat(i, 0) = intersect.a_param_start;
-    intersect_floatdat(i, 1) = intersect.a_param_end;
-    intersect_floatdat(i, 2) = intersect.b_param_start;
-    intersect_floatdat(i, 3) = intersect.b_param_end;
-    intersect_floatdat(i, 4) = intersect.relax_param;
+  // Kokkos::View<int *[5], Kokkos::LayoutLeft, specfem::kokkos::HostMemSpace>
+  //     intersect_intdat("_util::dump_edge_storage::intersect_intdat",
+  //                      nintersect);
+  // Kokkos::View<type_real *[5], Kokkos::LayoutLeft,
+  //              specfem::kokkos::HostMemSpace>
+  //     intersect_floatdat("_util::dump_edge_storage::intersect_floatdat",
+  //                        nintersect);
+  // Kokkos::View<type_real *[2][ngllcapacity][ngllcapacity],
+  // Kokkos::LayoutLeft,
+  //              specfem::kokkos::HostMemSpace>
+  //     mortar_trans("_util::dump_edge_storage::mortar_trans", nintersect);
+  // for (int i = 0; i < nedge; i++) {
+  //   _util::edge_manager::edge_data<ngllcapacity, datacapacity> edge_data =
+  //       edge_storage.get_edge_on_host(i);
+  //   edge_intdat(i, 0) = edge_data.parent.id;
+  //   switch (edge_data.parent.bdry) {
+  //   case specfem::enums::edge::type::RIGHT:
+  //     edge_intdat(i, 1) = 0;
+  //     break;
+  //   case specfem::enums::edge::type::TOP:
+  //     edge_intdat(i, 1) = 1;
+  //     break;
+  //   case specfem::enums::edge::type::LEFT:
+  //     edge_intdat(i, 1) = 2;
+  //     break;
+  //   case specfem::enums::edge::type::BOTTOM:
+  //     edge_intdat(i, 1) = 3;
+  //     break;
+  //   default:
+  //     edge_intdat(i, 1) = -1;
+  //     break;
+  //   }
+  //   edge_intdat(i, 2) = edge_data.ngll;
+  //   for (int j = 0; j < edge_data.ngll; j++) {
+  //     pos(i, j, 0) = edge_data.x[j];
+  //     pos(i, j, 1) = edge_data.z[j];
+  //     for (int k = 0; k < datacapacity; k++) {
+  //       edgedata(i, k, j) = edge_data.data[k][j];
+  //     }
+  //   }
+  // }
+  // for (int i = 0; i < nintersect; i++) {
+  //   _util::edge_manager::edge_intersection<ngllcapacity> intersect =
+  //       edge_storage.get_intersection_on_host(i);
+  //   intersect_intdat(i, 0) = intersect.a_ref_ind;
+  //   intersect_intdat(i, 1) = intersect.b_ref_ind;
+  //   intersect_intdat(i, 2) = intersect.ngll;
+  //   intersect_intdat(i, 3) = intersect.a_ngll;
+  //   intersect_intdat(i, 4) = intersect.b_ngll;
+  //   intersect_floatdat(i, 0) = intersect.a_param_start;
+  //   intersect_floatdat(i, 1) = intersect.a_param_end;
+  //   intersect_floatdat(i, 2) = intersect.b_param_start;
+  //   intersect_floatdat(i, 3) = intersect.b_param_end;
+  //   intersect_floatdat(i, 4) = intersect.relax_param;
 
-    for (int j = 0; j < intersect.ngll; j++) {
-      for (int k = 0; k < intersect.a_ngll; k++) {
-        mortar_trans(i, 0, j, k) = intersect.a_mortar_trans[j][k];
-      }
-      for (int k = 0; k < intersect.b_ngll; k++) {
-        mortar_trans(i, 1, j, k) = intersect.b_mortar_trans[j][k];
-      }
-    }
-  }
-  std::ofstream dump;
-  dump.open(filename);
-  dump << "edge_intdat";
-  _stream_view<int, 2>(dump, edge_intdat);
-  dump << "edge_pos";
-  _stream_view<type_real, 3>(dump, pos);
-  dump << "edge_data";
-  _stream_view<type_real, 3>(dump, edgedata);
-  dump << "intersect_intdat";
-  _stream_view<int, 2>(dump, intersect_intdat);
-  dump << "intersect_floatdat";
-  _stream_view<type_real, 2>(dump, intersect_floatdat);
-  dump << "intersect_mortartrans";
-  _stream_view<type_real, 4>(dump, mortar_trans);
-  dump << "intersect_data";
-  _stream_view<type_real, 2>(dump,
-                             edge_storage.get_intersection_data_on_host());
-  dump.close();
+  //   for (int j = 0; j < intersect.ngll; j++) {
+  //     for (int k = 0; k < intersect.a_ngll; k++) {
+  //       mortar_trans(i, 0, j, k) = intersect.a_mortar_trans[j][k];
+  //     }
+  //     for (int k = 0; k < intersect.b_ngll; k++) {
+  //       mortar_trans(i, 1, j, k) = intersect.b_mortar_trans[j][k];
+  //     }
+  //   }
+  // }
+  // std::ofstream dump;
+  // dump.open(filename);
+  // dump << "edge_intdat";
+  // _stream_view<int, 2>(dump, edge_intdat);
+  // dump << "edge_pos";
+  // _stream_view<type_real, 3>(dump, pos);
+  // dump << "edge_data";
+  // _stream_view<type_real, 3>(dump, edgedata);
+  // dump << "intersect_intdat";
+  // _stream_view<int, 2>(dump, intersect_intdat);
+  // dump << "intersect_floatdat";
+  // _stream_view<type_real, 2>(dump, intersect_floatdat);
+  // dump << "intersect_mortartrans";
+  // _stream_view<type_real, 4>(dump, mortar_trans);
+  // dump << "intersect_data";
+  // _stream_view<type_real, 2>(dump,
+  //                            edge_storage.get_intersection_data_on_host());
+  // dump.close();
 }
 
 template <int num_sides>

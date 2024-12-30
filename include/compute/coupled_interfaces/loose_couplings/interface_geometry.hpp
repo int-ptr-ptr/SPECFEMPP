@@ -12,9 +12,7 @@ if normalize, then the vectors are set to magnitude 1. otherwise, they have
 length dS (the 1d (2d) Jacobian along the edge (surface)). Global coordinates
 are used.
 */
-template <specfem::dimension::type DimensionType,
-          specfem::element::medium_tag MediumTag1,
-          specfem::element::medium_tag MediumTag2, typename QuadratureType,
+template <specfem::dimension::type DimensionType, typename QuadratureType,
           int medium, bool normalize>
 struct interface_normal_container;
 
@@ -27,9 +25,7 @@ of the deformation gradient. These vectors can be contracted with the
 derivatives of the Lagrange polynomials, without needing to multiply by the
 deformation gradient to bring them into global coordinates.
 */
-template <specfem::dimension::type DimensionType,
-          specfem::element::medium_tag MediumTag1,
-          specfem::element::medium_tag MediumTag2, typename QuadratureType,
+template <specfem::dimension::type DimensionType, typename QuadratureType,
           int medium, bool normalize>
 struct interface_contravariant_normal_container;
 
@@ -103,13 +99,11 @@ compute_geometry(specfem::compute::assembly &assembly, ContainerType &container,
     nx *= det;
     nz *= det;
     type_real inv_mag = 1 / sqrt(nx * nx + nz * nz);
-    if constexpr (std::is_base_of<
-                      interface_normal_container<
-                          ContainerType::dim_type, ContainerType::medium1_type,
-                          ContainerType::medium2_type,
-                          typename ContainerType::EdgeQuadrature, medium,
-                          false>,
-                      ContainerType>()) {
+    if constexpr (std::is_base_of<interface_normal_container<
+                                      ContainerType::dim_type,
+                                      typename ContainerType::EdgeQuadrature,
+                                      medium, false>,
+                                  ContainerType>()) {
       if constexpr (medium == 1) {
         if constexpr (on_device == true) {
           container.medium1_edge_normal(edge_index, i, 0) = nx;
@@ -130,8 +124,7 @@ compute_geometry(specfem::compute::assembly &assembly, ContainerType &container,
     }
     if constexpr (std::is_base_of<
                       interface_normal_container<
-                          ContainerType::dim_type, ContainerType::medium1_type,
-                          ContainerType::medium2_type,
+                          ContainerType::dim_type,
                           typename ContainerType::EdgeQuadrature, medium, true>,
                       ContainerType>()) {
       if constexpr (medium == 1) {
@@ -155,13 +148,11 @@ compute_geometry(specfem::compute::assembly &assembly, ContainerType &container,
     // these should be compiled out if not used, right?
     type_real contra_nxi = nx * ppd.xix + nz * ppd.xiz;
     type_real contra_nga = nx * ppd.gammax + nz * ppd.gammaz;
-    if constexpr (std::is_base_of<
-                      interface_contravariant_normal_container<
-                          ContainerType::dim_type, ContainerType::medium1_type,
-                          ContainerType::medium2_type,
-                          typename ContainerType::EdgeQuadrature, medium,
-                          false>,
-                      ContainerType>()) {
+    if constexpr (std::is_base_of<interface_contravariant_normal_container<
+                                      ContainerType::dim_type,
+                                      typename ContainerType::EdgeQuadrature,
+                                      medium, false>,
+                                  ContainerType>()) {
       if constexpr (medium == 1) {
         if constexpr (on_device == true) {
           container.medium1_edge_contravariant_normal(edge_index, i, 0) =
@@ -190,8 +181,7 @@ compute_geometry(specfem::compute::assembly &assembly, ContainerType &container,
     }
     if constexpr (std::is_base_of<
                       interface_contravariant_normal_container<
-                          ContainerType::dim_type, ContainerType::medium1_type,
-                          ContainerType::medium2_type,
+                          ContainerType::dim_type,
                           typename ContainerType::EdgeQuadrature, medium, true>,
                       ContainerType>()) {
       if constexpr (medium == 1) {
@@ -243,12 +233,9 @@ compute_geometry(specfem::compute::assembly &assembly, ContainerType &container,
   }
 }
 
-template <specfem::dimension::type DimensionType,
-          specfem::element::medium_tag MediumTag1,
-          specfem::element::medium_tag MediumTag2, typename QuadratureType,
+template <specfem::dimension::type DimensionType, typename QuadratureType,
           bool normalize>
-struct interface_normal_container<DimensionType, MediumTag1, MediumTag2,
-                                  QuadratureType, 1, normalize> {
+struct interface_normal_container<DimensionType, QuadratureType, 1, normalize> {
 public:
   EdgeVectorView<DimensionType, QuadratureType> medium1_edge_normal;
   typename EdgeVectorView<DimensionType, QuadratureType>::HostMirror
@@ -271,12 +258,9 @@ protected:
   }
 };
 
-template <specfem::dimension::type DimensionType,
-          specfem::element::medium_tag MediumTag1,
-          specfem::element::medium_tag MediumTag2, typename QuadratureType,
+template <specfem::dimension::type DimensionType, typename QuadratureType,
           bool normalize>
-struct interface_normal_container<DimensionType, MediumTag1, MediumTag2,
-                                  QuadratureType, 2, normalize> {
+struct interface_normal_container<DimensionType, QuadratureType, 2, normalize> {
 public:
   EdgeVectorView<DimensionType, QuadratureType> medium2_edge_normal;
   typename EdgeVectorView<DimensionType, QuadratureType>::HostMirror
@@ -298,12 +282,10 @@ protected:
   }
 };
 
-template <specfem::dimension::type DimensionType,
-          specfem::element::medium_tag MediumTag1,
-          specfem::element::medium_tag MediumTag2, typename QuadratureType,
+template <specfem::dimension::type DimensionType, typename QuadratureType,
           bool normalize>
-struct interface_contravariant_normal_container<
-    DimensionType, MediumTag1, MediumTag2, QuadratureType, 1, normalize> {
+struct interface_contravariant_normal_container<DimensionType, QuadratureType,
+                                                1, normalize> {
 public:
   EdgeVectorView<DimensionType, QuadratureType>
       medium1_edge_contravariant_normal;
@@ -330,12 +312,10 @@ protected:
             Kokkos::create_mirror_view(medium1_edge_contravariant_normal)) {}
 };
 
-template <specfem::dimension::type DimensionType,
-          specfem::element::medium_tag MediumTag1,
-          specfem::element::medium_tag MediumTag2, typename QuadratureType,
+template <specfem::dimension::type DimensionType, typename QuadratureType,
           bool normalize>
-struct interface_contravariant_normal_container<
-    DimensionType, MediumTag1, MediumTag2, QuadratureType, 2, normalize> {
+struct interface_contravariant_normal_container<DimensionType, QuadratureType,
+                                                2, normalize> {
 public:
   EdgeVectorView<DimensionType, QuadratureType>
       medium2_edge_contravariant_normal;

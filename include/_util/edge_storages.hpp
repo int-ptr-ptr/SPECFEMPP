@@ -66,44 +66,21 @@ template <int ngllcapacity> struct edge_intersection {
   type_real b_to_mortar(const int node_index, const type_real *quantity);
 };
 
-template <int ngllcapacity, int datacapacity> struct edge_data {
-  edge parent;
-  int ngll;
-  type_real x[ngllcapacity];
-  type_real z[ngllcapacity];
-  type_real data[datacapacity][ngllcapacity];
-  edge_data() : ngll(0) {}
-  // edge_data(const edge_data<ngllcapacity, datacapacity>& other) :
-  // parent(other.parent), ngll(other.ngll) {}
-};
-
 template <typename edgequad, int datacapacity> struct edge_storage {
 public:
   static constexpr int ngll = edgequad::NGLL;
   edge_storage(std::vector<edge> edges, specfem::compute::assembly &assembly);
 
-  void foreach_edge_on_host(
-      const std::function<void(edge_data<ngll, datacapacity> &)> &func);
-  void foreach_intersection_on_host(
-      const std::function<void(edge_intersection<ngll> &,
-                               edge_data<ngll, datacapacity> &,
-                               edge_data<ngll, datacapacity> &)> &func);
-  void foreach_intersection_on_host(
-      const std::function<
-          void(edge_intersection<ngll> &, edge_data<ngll, datacapacity> &,
-               edge_data<ngll, datacapacity> &,
-               decltype(Kokkos::subview(
-                   std::declval<specfem::kokkos::HostView2d<type_real> >(), 1u,
-                   Kokkos::ALL)))> &func);
   void build_intersections_on_host();
-  edge_data<ngll, datacapacity> get_edge_on_host(int edge);
   edge_intersection<ngll> get_intersection_on_host(int intersection);
 
-  edge_data<ngll, datacapacity> load_edge(const int edgeID);
-  void store_edge(const int edgeID, const edge_data<ngll, datacapacity> &edge);
   edge_intersection<ngll> load_intersection(const int intersectionID);
   void store_intersection(const int intersectionID,
                           const edge_intersection<ngll> &intersection);
+
+  bool intersect(const int a, const int b,
+                 edge_intersection<ngll> &intersection);
+
   void load_all_intersections();
   void store_all_intersections();
 
