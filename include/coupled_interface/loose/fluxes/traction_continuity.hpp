@@ -109,11 +109,10 @@ struct traction_continuity::kernel<
       }
       for (int igll_interface = 0;
            igll_interface < ContainerType::NGLL_INTERFACE; igll_interface++) {
-        type_real sn_w_dS =
-            -container.template edge_to_mortar<2, false>(edge2_index,
-                                                         igll_interface, sn) *
-            container.h_interface_surface_jacobian(iinterface, igll_interface) *
-            assembly.mesh.quadratures.gll.h_weights(igll_interface);
+        type_real sn_w_dS = -container.template edge_to_mortar<2, false>(
+                                edge2_index, igll_interface, sn) *
+                            container.h_interface_surface_jacobian_times_weight(
+                                iinterface, igll_interface);
         for (int igll_edge = 0; igll_edge < ContainerType::NGLL_EDGE;
              igll_edge++) {
           acoustic[igll_edge].acceleration(0) +=
@@ -218,8 +217,8 @@ struct traction_continuity::kernel<
         type_real chitt_w_dS =
             container.template edge_to_mortar<1, false>(edge1_index,
                                                         igll_interface, accel) *
-            container.h_interface_surface_jacobian(iinterface, igll_interface) *
-            assembly.mesh.quadratures.gll.h_weights(igll_interface);
+            container.h_interface_surface_jacobian_times_weight(iinterface,
+                                                                igll_interface);
         for (int igll_edge = 0; igll_edge < ContainerType::NGLL_EDGE;
              igll_edge++) {
           type_real chitt_wv_dS =

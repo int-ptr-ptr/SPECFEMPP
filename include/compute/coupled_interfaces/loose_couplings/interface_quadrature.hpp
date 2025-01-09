@@ -22,8 +22,8 @@ public:
   typename TransferTensorView::HostMirror h_interface_medium1_mortar_transfer;
   TransferTensorView interface_medium2_mortar_transfer;
   typename TransferTensorView::HostMirror h_interface_medium2_mortar_transfer;
-  EdgeScalarView interface_surface_jacobian;
-  typename EdgeScalarView::HostMirror h_interface_surface_jacobian;
+  EdgeScalarView interface_surface_jacobian_times_weight;
+  typename EdgeScalarView::HostMirror h_interface_surface_jacobian_times_weight;
 
   // TODO remove when edge_storages scheme is deprecated
   template <int ngllcapacity>
@@ -117,12 +117,12 @@ protected:
             num_interfaces),
         h_interface_medium2_mortar_transfer(
             Kokkos::create_mirror_view(interface_medium2_mortar_transfer)),
-        interface_surface_jacobian(
+        interface_surface_jacobian_times_weight(
             "specfem::coupled_interface::loose::quadrature::mortar_transfer_"
-            "container.interface_surface_jacobian",
+            "container.interface_surface_jacobian_times_weight",
             num_interfaces),
-        h_interface_surface_jacobian(
-            Kokkos::create_mirror_view(interface_surface_jacobian)) {}
+        h_interface_surface_jacobian_times_weight(Kokkos::create_mirror_view(
+            interface_surface_jacobian_times_weight)) {}
 };
 
 } // namespace quadrature

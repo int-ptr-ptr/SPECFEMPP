@@ -59,6 +59,7 @@ template <int ngllcapacity> struct edge_intersection {
   type_real b_param_start, b_param_end;
   int a_ngll, b_ngll, ngll;
   type_real relax_param;
+  type_real quad_weight[ngllcapacity];
   edge_intersection()
       : ngll(0), a_ref_ind(-1), b_ref_ind(-1), a_ngll(0), b_ngll(0) {}
 

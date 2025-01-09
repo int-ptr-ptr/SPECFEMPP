@@ -96,6 +96,7 @@ bool edge_storage<edgequad, datacapacity>::intersect(const int a_edge_index,
     specfem::compute::loose::point_from_edge<ngll>(iz,ix,edges[b_edge_index].bdry,igll);
     bnodex[igll] = assembly.mesh.points.coord(0, edges[b_edge_index].id, iz, ix);
     bnodez[igll] = assembly.mesh.points.coord(1, edges[b_edge_index].id, iz, ix);
+    intersection.quad_weight[igll] = gll.w[igll];
   }
 
   //approximate edges as linear segments
@@ -560,7 +561,7 @@ void edge_storage<edgequad, datacapacity>::store_intersection(const int id, cons
     interface.h_interface_medium2_param_end(sorted_ind) = intersection.b_param_end;\
     interface.from_edge_data_mortar_trans(sorted_ind,intersection.a_mortar_trans, intersection.b_mortar_trans);\
     for(int igll = 0; igll < interface.NGLL_INTERFACE; igll++){\
-      interface.h_interface_surface_jacobian(sorted_ind,igll) = intersection.ds[igll];\
+      interface.h_interface_surface_jacobian_times_weight(sorted_ind,igll) = intersection.ds[igll] * intersection.quad_weight[igll];\
     }\
   }
   if(edge_media[a_ind] == specfem::element::medium_tag::acoustic

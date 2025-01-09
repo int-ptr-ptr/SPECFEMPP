@@ -263,10 +263,9 @@ struct symmetric_flux::kernel<
         type_real cdu_avg =
             (half_c1 * du1 - half_c2 * du2); // subtract, since we want w.r.t.
                                              // edge1 out-facing normal
-        type_real Jw =
-            container.h_interface_surface_jacobian(iinterface, igll_interface) *
-            assembly.mesh.quadratures.gll.h_weights(
-                igll_interface); // jacobian (1d) times quadrature weight
+        type_real Jw = container.h_interface_surface_jacobian_times_weight(
+            iinterface,
+            igll_interface); // jacobian (1d) times quadrature weight
         for (int igll_edge = 0; igll_edge < ContainerType::NGLL_EDGE;
              igll_edge++) {
           type_real dv =
