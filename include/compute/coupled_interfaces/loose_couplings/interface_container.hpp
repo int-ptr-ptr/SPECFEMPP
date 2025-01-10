@@ -1,6 +1,5 @@
 #pragma once
 
-#include "edge/loose/edge_access.hpp"
 #include "kokkos_abstractions.h"
 
 namespace specfem {
@@ -68,15 +67,31 @@ struct single_medium_interface_container {
   }
 };
 
+} // namespace loose
+} // namespace compute
+} // namespace specfem
+
+#include "edge/loose/edge_access.hpp"
+#include "enumerations/flux_scheme.hpp"
+
+namespace specfem {
+namespace compute {
+namespace loose {
+
 template <specfem::dimension::type DimensionType,
           specfem::element::medium_tag MediumTag1,
           specfem::element::medium_tag MediumTag2, typename QuadratureType,
-          typename FluxScheme>
-struct interface_container : FluxScheme::container<DimensionType, MediumTag1,
-                                                   MediumTag2, QuadratureType> {
+          specfem::coupled_interface::loose::flux::type FluxSchemeType>
+struct interface_container
+    : specfem::coupled_interface::loose::flux::FluxScheme<FluxSchemeType>::
+          ContainerType<DimensionType, MediumTag1, MediumTag2, QuadratureType> {
 private:
-  using super = typename FluxScheme::container<DimensionType, MediumTag1,
-                                               MediumTag2, QuadratureType>;
+  using FluxScheme =
+      typename specfem::coupled_interface::loose::flux::FluxScheme<
+          FluxSchemeType>::orig_flux_scheme;
+  using super = typename specfem::coupled_interface::loose::flux::FluxScheme<
+      FluxSchemeType>::ContainerType<DimensionType, MediumTag1, MediumTag2,
+                                     QuadratureType>;
 
   using IndexView =
       Kokkos::View<int *, Kokkos::DefaultExecutionSpace>; ///< Underlying view
@@ -520,3 +535,5 @@ public:
 } // namespace loose
 } // namespace compute
 } // namespace specfem
+#include "compute/kernels/loosely_coupled_interface/symmetric_flux.hpp"
+#include "compute/kernels/loosely_coupled_interface/traction_continuity.hpp"

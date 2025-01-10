@@ -100,17 +100,17 @@ public:
   specfem::compute::loose::interface_container<
       specfem::dimension::type::dim2, specfem::element::medium_tag::acoustic,
       specfem::element::medium_tag::elastic, edgequad,
-      specfem::coupled_interface::loose::flux::traction_continuity>
+      specfem::coupled_interface::loose::flux::type::traction_continuity>
       acoustic_elastic_interface;
   specfem::compute::loose::interface_container<
       specfem::dimension::type::dim2, specfem::element::medium_tag::acoustic,
       specfem::element::medium_tag::acoustic, edgequad,
-      specfem::coupled_interface::loose::flux::symmetric_flux>
+      specfem::coupled_interface::loose::flux::type::symmetric_flux>
       acoustic_acoustic_interface;
   specfem::compute::loose::interface_container<
       specfem::dimension::type::dim2, specfem::element::medium_tag::elastic,
       specfem::element::medium_tag::elastic, edgequad,
-      specfem::coupled_interface::loose::flux::symmetric_flux>
+      specfem::coupled_interface::loose::flux::type::symmetric_flux>
       elastic_elastic_interface;
 
 private:

@@ -4,8 +4,17 @@
 #include "interface_geometry.hpp"
 #include "interface_quadrature.hpp"
 
+namespace specfem {
+namespace compute {
+namespace loosely_coupled_interface {
+
+template <specfem::dimension::type DimensionType,
+          specfem::element::medium_tag MediumTag1,
+          specfem::element::medium_tag MediumTag2, typename QuadratureType>
+struct symmetric_flux_container;
+
 template <specfem::dimension::type DimensionType, typename QuadratureType>
-struct specfem::coupled_interface::loose::flux::symmetric_flux::container<
+struct symmetric_flux_container<
     DimensionType, specfem::element::medium_tag::acoustic,
     specfem::element::medium_tag::acoustic, QuadratureType>
     : specfem::coupled_interface::loose::quadrature::mortar_transfer_container<
@@ -27,7 +36,7 @@ private:
                    Kokkos::DefaultExecutionSpace>;
 
 public:
-  container() = default;
+  symmetric_flux_container() = default;
   //   void operator=(
   //       const
   //       specfem::coupled_interface::loose::flux::symmetric_flux::container<
@@ -67,7 +76,8 @@ public:
       h_interface_medium2_mortar_transfer_deriv_times_n;
 
 protected:
-  container(int num_medium1_edges, int num_medium2_edges, int num_interfaces)
+  symmetric_flux_container(int num_medium1_edges, int num_medium2_edges,
+                           int num_interfaces)
       : specfem::compute::loose::interface_contravariant_normal_container<
             DimensionType, QuadratureType, 1, true>(num_medium1_edges),
         specfem::coupled_interface::loose::quadrature::
@@ -101,7 +111,7 @@ protected:
 };
 
 template <specfem::dimension::type DimensionType, typename QuadratureType>
-struct specfem::coupled_interface::loose::flux::symmetric_flux::container<
+struct symmetric_flux_container<
     DimensionType, specfem::element::medium_tag::elastic,
     specfem::element::medium_tag::elastic, QuadratureType>
     : specfem::coupled_interface::loose::quadrature::mortar_transfer_container<
@@ -119,7 +129,7 @@ private:
       specfem::compute::loose::EdgeVectorView<DimensionType, QuadratureType>;
 
 public:
-  container() = default;
+  symmetric_flux_container() = default;
   // void operator=(const
   // specfem::coupled_interface::loose::flux::symmetric_flux::container<
   //         DimensionType, specfem::element::medium_tag::elastic,
@@ -145,7 +155,8 @@ public:
   // typename EdgeVectorView::HostMirror h_medium2_disp_nderiv;
 
 protected:
-  container(int num_medium1_edges, int num_medium2_edges, int num_interfaces)
+  symmetric_flux_container(int num_medium1_edges, int num_medium2_edges,
+                           int num_interfaces)
       : specfem::compute::loose::interface_contravariant_normal_container<
             DimensionType, QuadratureType, 1, true>(num_medium1_edges),
         specfem::compute::loose::interface_contravariant_normal_container<
@@ -154,3 +165,7 @@ protected:
             mortar_transfer_container<QuadratureType, QuadratureType>(
                 num_interfaces) {}
 };
+
+} // namespace loosely_coupled_interface
+} // namespace compute
+} // namespace specfem

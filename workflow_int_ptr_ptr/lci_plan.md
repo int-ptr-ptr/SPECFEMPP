@@ -102,18 +102,20 @@ classDiagram
 #### <a id=interfacedoc_interface_container href="https://github.com/int-ptr-ptr/SPECFEMPP/blob/dg-phase2/include/compute/coupled_interfaces/loose_couplings/interface_container.hpp">`interface_container`</a>
 
 ```C++
+
 template <specfem::dimension::type DimensionType,
           specfem::element::medium_tag MediumTag1,
           specfem::element::medium_tag MediumTag2,
           typename QuadratureType,
-          typename FluxScheme>
-struct specfem::compute::loose::interface_container :
-            FluxScheme::container<DimensionType, MediumTag1, MediumTag2, QuadratureType>
+          specfem::coupled_interface::loose::flux::type FluxSchemeType>
+struct interface_container :
+            specfem::coupled_interface::loose::flux::FluxScheme<FluxSchemeType>
+          ::ContainerType<DimensionType, MediumTag1, MediumTag2, QuadratureType>
 ```
 
-This is the "base" container. All containers are of this type, but the `FluxScheme` template parameter sets the base class. This choice to have the "base" container as a derived class allows for the visibility of everything through a single templated type without the need for static casts, which may or may not be needed. The variables that are necessary for every interface are stored here. As an exception, if `specfem::compute::loose::single_medium_interface_container` is a base class, `medium2_index_mapping`, `medium2_edge_type`, etc. are technically not needed, but instead of removing them, the views are set the their medium-1 counterparts, so they point to the same data.
+This is the "base" container. All containers are of this type, but the `FluxSchemeType` template parameter sets the base class. This choice to have the "base" container as a derived class allows for the visibility of everything through a single templated type without the need for static casts, which may or may not be needed. The variables that are necessary for every interface are stored here. As an exception, if `specfem::compute::loose::single_medium_interface_container` is a base class, `medium2_index_mapping`, `medium2_edge_type`, etc. are technically not needed, but instead of removing them, the views are set to their medium-1 counterparts, so they point to the same data.
 
-- [ ] Consider using an enum for `FluxScheme`. Should we do that?
+- [x] Consider using an enum for `FluxScheme`. ~~Should we do that?~~ *swapped to en enum*
 - [ ] "This choice to have the "base" container as a derived class allows for the visibility of everything through a single templated type without the need for static casts, which may or may not be needed" -- confirm if this design choice was a good idea.
 - [ ] The way `single_medium_interface_container` is implemented is a bit awkward. Should it be changed?
 - [ ] Finalize file path
@@ -179,7 +181,7 @@ As for now, the edge quadrature and interface quadrature are the same, but we ma
 
 ```C++
 template <specfem::dimension::type DimensionType, typename QuadratureType>
-struct specfem::coupled_interface::loose::flux::symmetric_flux::container<
+struct specfem::compute::loosely_coupled_interface::symmetric_flux_container<
           DimensionType,
           {acoustic/elastic},
           {acoustic/elastic},
@@ -187,19 +189,6 @@ struct specfem::coupled_interface::loose::flux::symmetric_flux::container<
       specfem::coupled_interface::loose::quadrature::mortar_transfer_container<QuadratureType, QuadratureType>,
       specfem::compute::loose::interface_contravariant_normal_container<DimensionType, QuadratureType, 1, true>,
       specfem::compute::loose::single_medium_interface_container
-```
-
-Populates the template member type of the following struct ([link](https://github.com/int-ptr-ptr/SPECFEMPP/blob/dg-phase2/include/coupled_interface/loose/fluxes/symmetric_flux.hpp)).
-
-```C++
-struct specfem::coupled_interface::loose::flux::symmetric_flux {
-
-  template <specfem::dimension::type DimensionType,
-            specfem::element::medium_tag MediumTag1,
-            specfem::element::medium_tag MediumTag2, typename QuadratureType>
-  struct container;
-  ...
-}
 ```
 
 This is the Grote flux that was used in the initial dG implementation. This is used when `MediumTag1 == MediumTag2`, but since the template of `FluxScheme::container` must always be of a certain format, the above is fixed. The word "symmetric" refers not to the medium1-medium2 symmetry, but the symmetry of the bilinear form that makes up the mass matrix.
@@ -215,26 +204,13 @@ The extension of `specfem::compute::loose::single_medium_interface_container` ([
 
 ```C++
 template <specfem::dimension::type DimensionType, typename QuadratureType>
-struct specfem::coupled_interface::loose::flux::traction_continuity::container<
+struct specfem::compute::loosely_coupled_interface::traction_continuity_container<
           DimensionType,
           specfem::element::medium_tag::acoustic,
           specfem::element::medium_tag::elastic,
           QuadratureType> :
     specfem::coupled_interface::loose::quadrature::mortar_transfer_container<QuadratureType, QuadratureType>,
     specfem::compute::loose::interface_normal_container<DimensionType, QuadratureType, 2, true>
-```
-
-Populates the template member type of the following struct ([link](https://github.com/int-ptr-ptr/SPECFEMPP/blob/dg-phase2/include/coupled_interface/loose/fluxes/traction_continuity.hpp)).
-
-```C++
-struct specfem::coupled_interface::loose::flux::traction_continuity {
-
-  template <specfem::dimension::type DimensionType,
-            specfem::element::medium_tag MediumTag1,
-            specfem::element::medium_tag MediumTag2, typename QuadratureType>
-  struct container;
-  ...
-}
 ```
 
 `traction_continuity` follows the rules of Komatitsch & Tromp (cit) for the fluid-solid interface. In the traditional formulation, the boundary integrals are replaced with the corresponding traction values on the other side. This does not require conformal nodes, but the current SPECFEM implementation of it does. This implements those boundary integrals for non-conforming nodes configurations.
