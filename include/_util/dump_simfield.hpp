@@ -220,14 +220,56 @@ template <specfem::wavefield::simulation_field WavefieldType>
 void dump_simfield(
     const std::string &filename,
     const specfem::compute::simulation_field<WavefieldType> &simfield,
-    const specfem::compute::points &points) {
+    const specfem::compute::points &points, bool skip_statics = false) {
+  std::ofstream dump;
+  dump.open(filename);
+  // dump points
+  if (!skip_statics) {
+    dump << "pts";
+    _stream_view<type_real, 4>(dump, points.h_coord);
+    dump << "index_mapping";
+    _stream_view<unsigned int, 3>(dump, simfield.h_index_mapping);
+    dump << "assembly_index_mapping";
+    _stream_view<int, 2>(dump, simfield.h_assembly_index_mapping);
+    dump << "acoustic_mass_inverse";
+    _stream_view<type_real, 2>(dump, simfield.acoustic.h_mass_inverse);
+    dump << "elastic_mass_inverse";
+    _stream_view<type_real, 2>(dump, simfield.elastic.h_mass_inverse);
+  }
+  // //dump mesh adjacency
+  // dump << "mesh_adj";
+  // _stream_view<int,3>(dump,simfield.h_mesh_adjacency);
+  // //dump ispec map
+  // dump << "ispec_map";
+  // _stream_view<int,2>(dump,simfield.h_assembly_ispec_mapping);
+  // dump acoustic, elastic
+  dump << "acoustic_field";
+  _stream_view<type_real, 2>(dump, simfield.acoustic.h_field);
+  dump << "elastic_field";
+  _stream_view<type_real, 2>(dump, simfield.elastic.h_field);
+  dump << "acoustic_field_ddot";
+  _stream_view<type_real, 2>(dump, simfield.acoustic.h_field_dot_dot);
+  dump << "elastic_field_ddot";
+  _stream_view<type_real, 2>(dump, simfield.elastic.h_field_dot_dot);
+  // //dump edge values
+  // dump << "edge_values_x";
+  // _stream_view<type_real,4>(dump,simfield.h_edge_values_x);
+  // dump << "edge_values_z";
+  // _stream_view<type_real,4>(dump,simfield.h_edge_values_z);
+
+  dump.close();
+}
+
+void dump_simfield_statics(const std::string &filename,
+                           specfem::compute::assembly &assembly) {
+  const auto &simfield = assembly.fields.forward;
   std::ofstream dump;
   dump.open(filename);
   // dump points
   dump << "pts";
-  _stream_view<type_real, 4>(dump, points.h_coord);
+  _stream_view<type_real, 4>(dump, assembly.mesh.points.h_coord);
   dump << "index_mapping";
-  _stream_view<int, 3>(dump, simfield.h_index_mapping);
+  _stream_view<unsigned int, 3>(dump, simfield.h_index_mapping);
   // //dump mesh adjacency
   // dump << "mesh_adj";
   // _stream_view<int,3>(dump,simfield.h_mesh_adjacency);
@@ -237,14 +279,6 @@ void dump_simfield(
   // dump acoustic, elastic
   dump << "assembly_index_mapping";
   _stream_view<int, 2>(dump, simfield.h_assembly_index_mapping);
-  dump << "acoustic_field";
-  _stream_view<type_real, 2>(dump, simfield.acoustic.h_field);
-  dump << "elastic_field";
-  _stream_view<type_real, 2>(dump, simfield.elastic.h_field);
-  dump << "acoustic_field_ddot";
-  _stream_view<type_real, 2>(dump, simfield.acoustic.h_field_dot_dot);
-  dump << "elastic_field_ddot";
-  _stream_view<type_real, 2>(dump, simfield.elastic.h_field_dot_dot);
   dump << "acoustic_mass_inverse";
   _stream_view<type_real, 2>(dump, simfield.acoustic.h_mass_inverse);
   dump << "elastic_mass_inverse";
@@ -257,12 +291,14 @@ void dump_simfield(
 
   dump.close();
 }
-template <specfem::wavefield::simulation_field WavefieldType>
-void dump_simfield_per_step(
-    const int istep, const std::string &filename,
-    const specfem::compute::simulation_field<WavefieldType> &simfield,
-    const specfem::compute::points &points) {
-  dump_simfield(filename + std::to_string(istep) + ".dat", simfield, points);
+
+void dump_simfield_per_step(const int istep, const std::string &filename,
+                            specfem::compute::assembly &assembly) {
+  dump_simfield(filename + std::to_string(istep) + ".dat",
+                assembly.fields.forward, assembly.mesh.points, true);
+  if (istep == 0) {
+    dump_simfield_statics(filename + "statics.dat", assembly);
+  }
 }
 
 void init_dirs(const boost::filesystem::path &dirname, bool clear = true) {

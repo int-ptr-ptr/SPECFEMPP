@@ -47,3 +47,17 @@ def test_against_provenance(session):
     session.install("numpy", "matplotlib")
     session.cd(os.path.join(workspace_root, "runnables"))
     session.run("python", "-m", "util.validate_against_dump")
+
+
+@nox.session
+def init_cgcompare_workspace(session):
+    session.install("numpy", "matplotlib")
+    session.cd(os.path.join(workspace_root, "runnables"))
+    session.run("python", "-m", "cg_compare.load_workspaces")
+
+
+@nox.session
+def test_cgcompare(session):
+    session.install("numpy", "matplotlib")
+    session.cd(os.path.join(workspace_root, "runnables"))
+    session.run("python", "-m", "cg_compare.validate")

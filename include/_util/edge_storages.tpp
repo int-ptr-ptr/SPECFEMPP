@@ -47,7 +47,7 @@ edge_storage<edgequad, datacapacity>::edge_storage(std::vector<edge> edges,
   }
   build_intersections_on_host();
 
-
+  edge_storage_instance<edgequad,datacapacity> = this;
 }
 
 template <typename edgequad, int datacapacity>
@@ -524,17 +524,17 @@ edge_intersection<edge_storage<edgequad, datacapacity>::ngll> edge_storage<edgeq
     intersection.b_param_start = interface.h_interface_medium2_param_start(sorted_ind);\
     intersection.a_param_end = interface.h_interface_medium1_param_end(sorted_ind);\
     intersection.b_param_end = interface.h_interface_medium2_param_end(sorted_ind);\
-    intersection.relax_param = interface.h_interface_relax_param(sorted_ind);\
     intersection.a_ngll = interface.NGLL_EDGE;\
     intersection.b_ngll = interface.NGLL_EDGE;\
     intersection.ngll = interface.NGLL_INTERFACE;\
     interface.to_edge_data_mortar_trans(sorted_ind,intersection.a_mortar_trans, intersection.b_mortar_trans);\
     for(int igll = 0; igll < interface.NGLL_INTERFACE; igll++){\
-      intersection.ds[igll] = interface.h_interface_surface_jacobian(sorted_ind,igll);\
+      intersection.ds[igll] = interface.h_interface_surface_jacobian_times_weight(sorted_ind,igll);\
     }\
   }
   if(edge_media[a_ind] == specfem::element::medium_tag::acoustic
   &&edge_media[b_ind] == specfem::element::medium_tag::acoustic){
+      intersection.relax_param = acoustic_acoustic_interface.h_interface_relaxation_parameter(sorted_ind);
       transfer_interface_vals(acoustic_acoustic_interface);
   }else if(edge_media[a_ind] == specfem::element::medium_tag::elastic
   &&edge_media[b_ind] == specfem::element::medium_tag::elastic){

@@ -1,6 +1,17 @@
 #ifndef __UTIL_EDGE_STORAGES_HPP_
 #define __UTIL_EDGE_STORAGES_HPP_
 
+namespace _util {
+namespace edge_manager {
+struct edge;
+template <int ngllcapacity> struct edge_intersection;
+
+template <typename edgequad, int datacapacity> struct edge_storage;
+
+template <typename edgequad, int datacapacity>
+edge_storage<edgequad, datacapacity> *edge_storage_instance;
+} // namespace edge_manager
+} // namespace _util
 #include "compute/coupled_interfaces/loose_couplings/interface_container.hpp"
 #include "compute/coupled_interfaces/loose_couplings/symmetric_flux_container.hpp"
 #include "compute/coupled_interfaces/loose_couplings/traction_continuity_container.hpp"

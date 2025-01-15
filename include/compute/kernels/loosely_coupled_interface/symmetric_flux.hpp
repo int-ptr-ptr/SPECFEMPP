@@ -144,224 +144,429 @@ struct symmetric_flux::kernel<
         DimensionType, specfem::element::medium_tag::acoustic,
         specfem::element::property_tag::isotropic, UseSIMD>;
     // we already computed displacement dot normal
-    container.template foreach_interface<false>([&](const int iinterface) {
-      // setters
-      AcousticAccelType accel1[ContainerType::NGLL_EDGE];
-      AcousticAccelType accel2[ContainerType::NGLL_EDGE];
+    container
+        .template foreach_interface<false>(
+            [&](const int iinterface) {
+              // setters
+              AcousticAccelType accel1[ContainerType::NGLL_EDGE];
+              AcousticAccelType accel2[ContainerType::NGLL_EDGE];
 
-      // accessor
-      AcousticDispType chi_get[ContainerType::NGLL_EDGE];
+              // accessor
+              AcousticDispType chi_get[ContainerType::NGLL_EDGE];
 
-      // compute storage
-      type_real chi1[ContainerType::NGLL_EDGE];
-      type_real chi2[ContainerType::NGLL_EDGE];
-      type_real speed_param1[ContainerType::NGLL_EDGE]; // rho inverse
-      type_real speed_param2[ContainerType::NGLL_EDGE];
-      type_real dchidn1[ContainerType::NGLL_EDGE];
-      type_real dchidn2[ContainerType::NGLL_EDGE];
+              // compute storage
+              type_real chi1[ContainerType::NGLL_EDGE];
+              type_real chi2[ContainerType::NGLL_EDGE];
+              type_real speed_param1[ContainerType::NGLL_EDGE]; // rho inverse
+              type_real speed_param2[ContainerType::NGLL_EDGE];
+              type_real dchidn1[ContainerType::NGLL_EDGE];
+              type_real dchidn2[ContainerType::NGLL_EDGE];
 
-      const int edge1_index = container.h_interface_medium1_index(iinterface);
-      const int edge2_index = container.h_interface_medium2_index(iinterface);
+              const int edge1_index =
+                  container.h_interface_medium1_index(iinterface);
+              const int edge2_index =
+                  container.h_interface_medium2_index(iinterface);
 
-      const int edge1_ispec = container.h_medium1_index_mapping(edge1_index);
-      const auto edge1_type = container.h_medium1_edge_type(edge1_index);
-      const int edge2_ispec = container.h_medium2_index_mapping(edge2_index);
-      const auto edge2_type = container.h_medium2_edge_type(edge2_index);
-      const int against_edge1_component =
-          (edge1_type == specfem::enums::edge::type::RIGHT ||
-           edge1_type == specfem::enums::edge::type::LEFT)
-              ? 0
-              : 1;
-      const int against_edge2_component =
-          (edge2_type == specfem::enums::edge::type::RIGHT ||
-           edge2_type == specfem::enums::edge::type::LEFT)
-              ? 0
-              : 1;
+              const int edge1_ispec =
+                  container.h_medium1_index_mapping(edge1_index);
+              const auto edge1_type =
+                  container.h_medium1_edge_type(edge1_index);
+              const int edge2_ispec =
+                  container.h_medium2_index_mapping(edge2_index);
+              const auto edge2_type =
+                  container.h_medium2_edge_type(edge2_index);
+              const int against_edge1_component =
+                  (edge1_type == specfem::enums::edge::type::RIGHT ||
+                   edge1_type == specfem::enums::edge::type::LEFT)
+                      ? 0
+                      : 1;
+              const int against_edge2_component =
+                  (edge2_type == specfem::enums::edge::type::RIGHT ||
+                   edge2_type == specfem::enums::edge::type::LEFT)
+                      ? 0
+                      : 1;
 
-      const int against_edge1_index =
-          (edge1_type == specfem::enums::edge::type::RIGHT ||
-           edge1_type == specfem::enums::edge::type::TOP)
-              ? (ContainerType::NGLL_EDGE - 1)
-              : 0;
-      const int against_edge2_index =
-          (edge2_type == specfem::enums::edge::type::RIGHT ||
-           edge2_type == specfem::enums::edge::type::TOP)
-              ? (ContainerType::NGLL_EDGE - 1)
-              : 0;
-      specfem::point::index<specfem::dimension::type::dim2> index(edge1_ispec,
-                                                                  0, 0);
+              const int against_edge1_index =
+                  (edge1_type == specfem::enums::edge::type::RIGHT ||
+                   edge1_type == specfem::enums::edge::type::TOP)
+                      ? (ContainerType::NGLL_EDGE - 1)
+                      : 0;
+              const int against_edge2_index =
+                  (edge2_type == specfem::enums::edge::type::RIGHT ||
+                   edge2_type == specfem::enums::edge::type::TOP)
+                      ? (ContainerType::NGLL_EDGE - 1)
+                      : 0;
+              specfem::point::index<specfem::dimension::type::dim2> index(
+                  edge1_ispec, 0, 0);
 
-      AcousticProperties props;
+              AcousticProperties props;
 
-      container.template load_field<1, false>(edge1_index, assembly, chi_get);
-      for (int igll_edge = 0; igll_edge < ContainerType::NGLL_EDGE;
-           igll_edge++) {
-        accel1[igll_edge].acceleration(0) = 0;
-        chi1[igll_edge] = chi_get[igll_edge].displacement(0);
-        dchidn1[igll_edge] =
-            container.h_medium1_field_nderiv(edge1_index, igll_edge, 0);
+              container.template load_field<1, false>(edge1_index, assembly,
+                                                      chi_get);
+              for (int igll_edge = 0; igll_edge < ContainerType::NGLL_EDGE;
+                   igll_edge++) {
+                accel1[igll_edge].acceleration(0) = 0;
+                chi1[igll_edge] = chi_get[igll_edge].displacement(0);
+                dchidn1[igll_edge] =
+                    container.h_medium1_field_nderiv(edge1_index, igll_edge, 0);
 
-        specfem::compute::loose::point_from_edge<ContainerType::NGLL_EDGE>(
-            index.iz, index.ix, edge1_type, igll_edge);
-        specfem::compute::load_on_host(index, assembly.properties, props);
-        speed_param1[igll_edge] = props.rho_inverse;
-      }
+                specfem::compute::loose::point_from_edge<
+                    ContainerType::NGLL_EDGE>(index.iz, index.ix, edge1_type,
+                                              igll_edge);
+                specfem::compute::load_on_host(index, assembly.properties,
+                                               props);
+                speed_param1[igll_edge] = props.rho_inverse;
+              }
 
-      index.ispec = edge2_ispec;
-      container.template load_field<2, false>(edge2_index, assembly, chi_get);
-      for (int igll_edge = 0; igll_edge < ContainerType::NGLL_EDGE;
-           igll_edge++) {
-        accel2[igll_edge].acceleration(0) = 0;
-        chi2[igll_edge] = chi_get[igll_edge].displacement(0);
-        dchidn2[igll_edge] =
-            container.h_medium1_field_nderiv(edge2_index, igll_edge, 0);
+              index.ispec = edge2_ispec;
+              container.template load_field<2, false>(edge2_index, assembly,
+                                                      chi_get);
+              for (int igll_edge = 0; igll_edge < ContainerType::NGLL_EDGE;
+                   igll_edge++) {
+                accel2[igll_edge].acceleration(0) = 0;
+                chi2[igll_edge] = chi_get[igll_edge].displacement(0);
+                dchidn2[igll_edge] =
+                    container.h_medium1_field_nderiv(edge2_index, igll_edge, 0);
 
-        specfem::compute::loose::point_from_edge<ContainerType::NGLL_EDGE>(
-            index.iz, index.ix, edge2_type, igll_edge);
-        specfem::compute::load_on_host(index, assembly.properties, props);
-        speed_param2[igll_edge] = props.rho_inverse;
-      }
+                specfem::compute::loose::point_from_edge<
+                    ContainerType::NGLL_EDGE>(index.iz, index.ix, edge2_type,
+                                              igll_edge);
+                specfem::compute::load_on_host(index, assembly.properties,
+                                               props);
+                speed_param2[igll_edge] = props.rho_inverse;
+              }
 
-      for (int igll_interface = 0;
-           igll_interface < ContainerType::NGLL_INTERFACE; igll_interface++) {
-        type_real half_c1 = container.template edge_to_mortar<1, false>(
-                                edge1_index, igll_interface, speed_param1) /
-                            2;
-        type_real half_c2 = container.template edge_to_mortar<2, false>(
-                                edge2_index, igll_interface, speed_param2) /
-                            2;
-        type_real u1 = container.template edge_to_mortar<1, false>(
-            edge1_index, igll_interface, chi1);
-        type_real u2 = container.template edge_to_mortar<2, false>(
-            edge2_index, igll_interface, chi2);
-        type_real du1 = container.template edge_to_mortar<1, false>(
-            edge1_index, igll_interface, dchidn1);
-        type_real du2 = container.template edge_to_mortar<2, false>(
-            edge2_index, igll_interface, dchidn2);
-        type_real ujmp = u1 - u2;
-        type_real cdu_avg =
-            (half_c1 * du1 - half_c2 * du2); // subtract, since we want w.r.t.
-                                             // edge1 out-facing normal
-        type_real Jw = container.h_interface_surface_jacobian_times_weight(
-            iinterface,
-            igll_interface); // jacobian (1d) times quadrature weight
-        for (int igll_edge = 0; igll_edge < ContainerType::NGLL_EDGE;
-             igll_edge++) {
-          type_real dv =
-              (container.h_interface_medium1_mortar_transfer_deriv_times_n(
-                   iinterface, igll_interface, igll_edge) // along-edge
-                                                          // direction
-               + container.h_interface_medium1_mortar_transfer(
-                     iinterface, igll_interface, igll_edge) // against-edge
-                                                            // component
-                     * container.h_medium1_edge_contravariant_normal(
-                           edge1_index, igll_edge, against_edge1_component)
-                     // hprime(i,j) = L_j'(t_i)
-                     * assembly.mesh.quadratures.gll.h_hprime(
-                           against_edge1_index, against_edge1_index));
-          // copy down edge fluxes
-          //  flux += (
-          //        np.einsum("j,j,j,ji->i",JW,u-u_,c/2,dv)
-          //      + np.einsum("j,ji,j->i",JW,v,0.5*(c*du+c_*du_))
-          //      - a*np.einsum("j,j,ji->i",JW,u-u_,v)
-          //  )
-          accel1[igll_edge].acceleration(0) +=
-              Jw *
-              (ujmp * half_c1 * dv +
-               0.5 *
-                   container.h_interface_medium1_mortar_transfer(
-                       iinterface, igll_interface, igll_edge) *
-                   (cdu_avg + ujmp * container.h_interface_relaxation_parameter(
-                                         iinterface)));
+              for (int igll_interface = 0;
+                   igll_interface < ContainerType::NGLL_INTERFACE;
+                   igll_interface++) {
+                type_real half_c1 =
+                    container.template edge_to_mortar<1, false>(
+                        iinterface, igll_interface, speed_param1) /
+                    2;
+                type_real half_c2 =
+                    container.template edge_to_mortar<2, false>(
+                        iinterface, igll_interface, speed_param2) /
+                    2;
+                type_real u1 = container.template edge_to_mortar<1, false>(
+                    iinterface, igll_interface, chi1);
+                type_real u2 = container.template edge_to_mortar<2, false>(
+                    iinterface, igll_interface, chi2);
+                type_real du1 = container.template edge_to_mortar<1, false>(
+                    iinterface, igll_interface, dchidn1);
+                type_real du2 = container.template edge_to_mortar<2, false>(
+                    iinterface, igll_interface, dchidn2);
+                type_real ujmp = u1 - u2;
+                type_real cdu_avg =
+                    (half_c1 * du1 - half_c2 * du2); // subtract, since we want
+                                                     // w.r.t. edge1 out-facing
+                                                     // normal
+                type_real Jw =
+                    container.h_interface_surface_jacobian_times_weight(
+                        iinterface,
+                        igll_interface); // jacobian (1d) times quadrature
+                                         // weight
+                for (int igll_edge = 0; igll_edge < ContainerType::NGLL_EDGE;
+                     igll_edge++) {
+                  type_real dv =
+                      (container
+                           .h_interface_medium1_mortar_transfer_deriv_times_n(
+                               iinterface, igll_interface,
+                               igll_edge) // along-edge
+                                          // direction
+                       + container.h_interface_medium1_mortar_transfer(
+                             iinterface, igll_interface,
+                             igll_edge) // against-edge
+                                        // component
+                             * container.h_medium1_edge_normal(
+                                   edge1_index, igll_edge,
+                                   against_edge1_component)
+                             // hprime(i,j) = L_j'(t_i)
+                             * assembly.mesh.quadratures.gll.h_hprime(
+                                   against_edge1_index, against_edge1_index));
+                  // dv = 0;
+                  // copy down edge fluxes
+                  //  flux += (
+                  //        np.einsum("j,j,j,ji->i",JW,u-u_,c/2,dv)
+                  //      + np.einsum("j,ji,j->i",JW,v,0.5*(c*du+c_*du_))
+                  //      - a*np.einsum("j,j,ji->i",JW,u-u_,v)
+                  //  )
+                  accel1[igll_edge].acceleration(0) +=
+                      Jw *
+                      (ujmp * half_c1 * dv +
+                       0.5 *
+                           container.h_interface_medium1_mortar_transfer(
+                               iinterface, igll_interface, igll_edge) *
+                           (cdu_avg -
+                            ujmp * container.h_interface_relaxation_parameter(
+                                       iinterface)));
 
-          dv = (container.h_interface_medium2_mortar_transfer_deriv_times_n(
-                    iinterface, igll_interface, igll_edge) // along-edge
-                                                           // direction
-                + container.h_interface_medium2_mortar_transfer(
-                      iinterface, igll_interface, igll_edge) // against-edge
-                                                             // component
-                      * container.h_medium1_edge_contravariant_normal(
-                            edge2_index, igll_edge, against_edge2_component)
-                      // hprime(i,j) = L_j'(t_i)
-                      * assembly.mesh.quadratures.gll.h_hprime(
-                            against_edge2_index, against_edge2_index));
-          accel2[igll_edge].acceleration(0) +=
-              Jw *
-              (-ujmp * half_c2 * dv -
-               0.5 *
-                   container.h_interface_medium2_mortar_transfer(
-                       iinterface, igll_interface, igll_edge) *
-                   (cdu_avg + ujmp * container.h_interface_relaxation_parameter(
-                                         iinterface)));
-        }
-      }
+                  dv = (container
+                            .h_interface_medium2_mortar_transfer_deriv_times_n(
+                                iinterface, igll_interface,
+                                igll_edge) // along-edge
+                                           // direction
+                        + container.h_interface_medium2_mortar_transfer(
+                              iinterface, igll_interface,
+                              igll_edge) // against-edge
+                                         // component
+                              * container.h_medium1_edge_normal(
+                                    edge2_index, igll_edge,
+                                    against_edge2_component)
+                              // hprime(i,j) = L_j'(t_i)
+                              * assembly.mesh.quadratures.gll.h_hprime(
+                                    against_edge2_index, against_edge2_index));
+                  // dv = 0;
+                  accel2[igll_edge].acceleration(0) +=
+                      Jw *
+                      (-ujmp * half_c2 * dv -
+                       0.5 *
+                           container.h_interface_medium2_mortar_transfer(
+                               iinterface, igll_interface, igll_edge) *
+                           (cdu_avg -
+                            ujmp * container.h_interface_relaxation_parameter(
+                                       iinterface)));
+                }
+              }
+              for (int igll_edge = 0; igll_edge < ContainerType::NGLL_EDGE;
+                   igll_edge++) {
+                if (std::isnan((type_real)accel1[igll_edge].acceleration(0)) ||
+                    std::isnan((type_real)accel2[igll_edge].acceleration(0)) ||
+                    fabs(chi1[2] - chi2[2]) > 1) {
+                  _util::edge_manager::edge_intersection<5> inter = _util::edge_manager::edge_storage_instance<QuadratureType,20> -> load_intersection(iinterface);
 
-      const auto h_is_bdry_at_pt =
-          [&](const specfem::point::index<specfem::dimension::type::dim2> index,
-              specfem::element::boundary_tag tag) -> bool {
-        specfem::point::boundary<
-            specfem::element::boundary_tag::acoustic_free_surface,
-            specfem::dimension::type::dim2, false>
-            point_boundary_afs;
-        specfem::point::boundary<specfem::element::boundary_tag::none,
-                                 specfem::dimension::type::dim2, false>
-            point_boundary_none;
-        specfem::point::boundary<specfem::element::boundary_tag::stacey,
-                                 specfem::dimension::type::dim2, false>
-            point_boundary_stacey;
-        specfem::point::boundary<
-            specfem::element::boundary_tag::composite_stacey_dirichlet,
-            specfem::dimension::type::dim2, false>
-            point_boundary_composite;
-        switch (assembly.boundaries.boundary_tags(index.ispec)) {
-        case specfem::element::boundary_tag::acoustic_free_surface:
-          specfem::compute::load_on_host(index, assembly.boundaries,
-                                         point_boundary_afs);
-          return point_boundary_afs.tag == tag;
-        case specfem::element::boundary_tag::none:
-          specfem::compute::load_on_host(index, assembly.boundaries,
-                                         point_boundary_none);
-          return point_boundary_none.tag == tag;
-        case specfem::element::boundary_tag::stacey:
-          specfem::compute::load_on_host(index, assembly.boundaries,
-                                         point_boundary_stacey);
-          return point_boundary_stacey.tag == tag;
-        case specfem::element::boundary_tag::composite_stacey_dirichlet:
-          specfem::compute::load_on_host(index, assembly.boundaries,
-                                         point_boundary_composite);
-          return point_boundary_composite.tag == tag;
-        default:
-          throw std::runtime_error("h_is_bdry_at_pt: unknown "
-                                   "assembly->boundaries.boundary_tags(ispec) "
-                                   "value!");
-          return false;
-        }
-      };
+                  type_real mt_derivs1[ContainerType::NGLL_INTERFACE]
+                                      [ContainerType::NGLL_INTERFACE];
+                  type_real mt_derivs2[ContainerType::NGLL_INTERFACE]
+                                      [ContainerType::NGLL_INTERFACE];
+                  type_real flux1[ContainerType::NGLL_EDGE]
+                                 [ContainerType::NGLL_INTERFACE];
+                  type_real flux2[ContainerType::NGLL_EDGE]
+                                 [ContainerType::NGLL_INTERFACE];
+                  type_real flux3[ContainerType::NGLL_EDGE]
+                                 [ContainerType::NGLL_INTERFACE];
+                  type_real flux1a[5];
+                  type_real flux1b[5];
+                  type_real flux2a[5];
+                  type_real flux2b[5];
+                  type_real flux3a[5];
+                  type_real flux3b[5];
+                  for (int igll_interface = 0;
+                       igll_interface < ContainerType::NGLL_INTERFACE;
+                       igll_interface++) {
+                    type_real half_c1 =
+                        container.template edge_to_mortar<1, false>(
+                            iinterface, igll_interface, speed_param1) /
+                        2;
+                    type_real half_c2 =
+                        container.template edge_to_mortar<2, false>(
+                            iinterface, igll_interface, speed_param2) /
+                        2;
+                    type_real u1 = container.template edge_to_mortar<1, false>(
+                        iinterface, igll_interface, chi1);
+                    type_real u2 = container.template edge_to_mortar<2, false>(
+                        iinterface, igll_interface, chi2);
+                    type_real du1 = container.template edge_to_mortar<1, false>(
+                        iinterface, igll_interface, dchidn1);
+                    type_real du2 = container.template edge_to_mortar<2, false>(
+                        iinterface, igll_interface, dchidn2);
+                    type_real ujmp = u1 - u2;
+                    type_real cdu_avg =
+                        (half_c1 * du1 - half_c2 * du2); // subtract, since we
+                                                         // want w.r.t. edge1
+                                                         // out-facing normal
+                    type_real Jw =
+                        container.h_interface_surface_jacobian_times_weight(
+                            iinterface,
+                            igll_interface); // jacobian (1d) times quadrature
+                                             // weight
+                    for (int igll_edge = 0;
+                         igll_edge < ContainerType::NGLL_EDGE; igll_edge++) {
+                      mt_derivs1[igll_edge][igll_interface] =
+                          container
+                              .h_interface_medium1_mortar_transfer_deriv_times_n(
+                                  iinterface, igll_interface, igll_edge);
+                      mt_derivs2[igll_edge][igll_interface] =
+                          container
+                              .h_interface_medium2_mortar_transfer_deriv_times_n(
+                                  iinterface, igll_interface, igll_edge);
+                      type_real hprime = assembly.mesh.quadratures.gll.h_hprime(
+                          against_edge1_index, against_edge1_index);
+                      type_real contranorm = container.h_medium1_edge_normal(
+                          edge1_index, igll_edge, against_edge1_component);
+                      type_real dv =
+                          (container
+                               .h_interface_medium1_mortar_transfer_deriv_times_n(
+                                   iinterface, igll_interface,
+                                   igll_edge) // along-edge
+                                              // direction
+                           +
+                           container.h_interface_medium1_mortar_transfer(
+                               iinterface, igll_interface,
+                               igll_edge) // against-edge
+                                          // component
+                               * container.h_medium1_edge_normal(
+                                     edge1_index, igll_edge,
+                                     against_edge1_component)
+                               // hprime(i,j) = L_j'(t_i)
+                               * assembly.mesh.quadratures.gll.h_hprime(
+                                     against_edge1_index, against_edge1_index));
+                      type_real dv1 = dv;
+                      // copy down edge fluxes
+                      //  flux += (
+                      //        np.einsum("j,j,j,ji->i",JW,u-u_,c/2,dv)
+                      //      + np.einsum("j,ji,j->i",JW,v,0.5*(c*du+c_*du_))
+                      //      - a*np.einsum("j,j,ji->i",JW,u-u_,v)
+                      //  )
+                      accel1[igll_edge].acceleration(0) +=
+                          Jw *
+                          (ujmp * half_c1 * dv +
+                           0.5 *
+                               container.h_interface_medium1_mortar_transfer(
+                                   iinterface, igll_interface, igll_edge) *
+                               (cdu_avg -
+                                ujmp *
+                                    container.h_interface_relaxation_parameter(
+                                        iinterface)));
+                      flux1[igll_edge][igll_interface] = ujmp * half_c1 * dv;
+                      flux2[igll_edge][igll_interface] =
+                          0.5 *
+                          container.h_interface_medium1_mortar_transfer(
+                              iinterface, igll_interface, igll_edge) *
+                          cdu_avg;
+                      flux3[igll_edge][igll_interface] =
+                          -0.5 *
+                          container.h_interface_medium1_mortar_transfer(
+                              iinterface, igll_interface, igll_edge) *
+                          ujmp *
+                          container.h_interface_relaxation_parameter(
+                              iinterface);
+                      if (igll_edge == igll_interface) {
+                        flux1a[igll_edge] = flux1[igll_edge][igll_interface];
+                        flux2a[igll_edge] = flux2[igll_edge][igll_interface];
+                        flux3a[igll_edge] = flux3[igll_edge][igll_interface];
+                      }
+                      dv =
+                          (container
+                               .h_interface_medium2_mortar_transfer_deriv_times_n(
+                                   iinterface, igll_interface,
+                                   igll_edge) // along-edge
+                                              // direction
+                           +
+                           container.h_interface_medium2_mortar_transfer(
+                               iinterface, igll_interface,
+                               igll_edge) // against-edge
+                                          // component
+                               * container.h_medium1_edge_normal(
+                                     edge2_index, igll_edge,
+                                     against_edge2_component)
+                               // hprime(i,j) = L_j'(t_i)
+                               * assembly.mesh.quadratures.gll.h_hprime(
+                                     against_edge2_index, against_edge2_index));
+                      accel2[igll_edge].acceleration(0) +=
+                          Jw *
+                          (-ujmp * half_c2 * dv -
+                           0.5 *
+                               container.h_interface_medium2_mortar_transfer(
+                                   iinterface, igll_interface, igll_edge) *
+                               (cdu_avg -
+                                ujmp *
+                                    container.h_interface_relaxation_parameter(
+                                        iinterface)));
+                      if (igll_edge == igll_interface) {
+                        flux1b[igll_edge] = -ujmp * half_c1 * dv;
+                        flux2b[igll_edge] =
+                            -0.5 *
+                            container.h_interface_medium2_mortar_transfer(
+                                iinterface, igll_interface, igll_edge) *
+                            cdu_avg;
+                        flux3b[igll_edge] =
+                            0.5 *
+                            container.h_interface_medium2_mortar_transfer(
+                                iinterface, igll_interface, igll_edge) *
+                            ujmp *
+                            container.h_interface_relaxation_parameter(
+                                iinterface);
+                      }
+                    }
+                  }
 
-      index.ispec = edge1_ispec;
-      for (int igll_edge = 0; igll_edge < ContainerType::NGLL_EDGE;
-           igll_edge++) {
-        specfem::compute::loose::point_from_edge<ContainerType::NGLL_EDGE>(
-            index.iz, index.ix, edge1_type, igll_edge);
-        if (!h_is_bdry_at_pt(index, specfem::element::boundary_tag::none)) {
-          accel1[igll_edge].acceleration(0) = 0;
-        }
-      }
-      container.template atomic_add_to_field<1, false>(edge1_index, assembly,
-                                                       accel1);
+                  container.h_interface_relaxation_parameter(iinterface);
+                }
+              }
 
-      index.ispec = edge2_ispec;
-      for (int igll_edge = 0; igll_edge < ContainerType::NGLL_EDGE;
-           igll_edge++) {
-        specfem::compute::loose::point_from_edge<ContainerType::NGLL_EDGE>(
-            index.iz, index.ix, edge2_type, igll_edge);
-        if (!h_is_bdry_at_pt(index, specfem::element::boundary_tag::none)) {
-          accel2[igll_edge].acceleration(0) = 0;
-        }
-      }
-      container.template atomic_add_to_field<2, false>(edge2_index, assembly,
-                                                       accel2);
-    });
+              const auto h_is_bdry_at_pt =
+                  [&](const specfem::point::index<
+                          specfem::dimension::type::dim2>
+                          index,
+                      specfem::element::boundary_tag tag) -> bool {
+                specfem::point::boundary<
+                    specfem::element::boundary_tag::acoustic_free_surface,
+                    specfem::dimension::type::dim2, false>
+                    point_boundary_afs;
+                specfem::point::boundary<specfem::element::boundary_tag::none,
+                                         specfem::dimension::type::dim2, false>
+                    point_boundary_none;
+                specfem::point::boundary<specfem::element::boundary_tag::stacey,
+                                         specfem::dimension::type::dim2, false>
+                    point_boundary_stacey;
+                specfem::point::boundary<
+                    specfem::element::boundary_tag::composite_stacey_dirichlet,
+                    specfem::dimension::type::dim2, false>
+                    point_boundary_composite;
+                switch (assembly.boundaries.boundary_tags(index.ispec)) {
+                case specfem::element::boundary_tag::acoustic_free_surface:
+                  specfem::compute::load_on_host(index, assembly.boundaries,
+                                                 point_boundary_afs);
+                  return point_boundary_afs.tag == tag;
+                case specfem::element::boundary_tag::none:
+                  specfem::compute::load_on_host(index, assembly.boundaries,
+                                                 point_boundary_none);
+                  return point_boundary_none.tag == tag;
+                case specfem::element::boundary_tag::stacey:
+                  specfem::compute::load_on_host(index, assembly.boundaries,
+                                                 point_boundary_stacey);
+                  return point_boundary_stacey.tag == tag;
+                case specfem::element::boundary_tag::composite_stacey_dirichlet:
+                  specfem::compute::load_on_host(index, assembly.boundaries,
+                                                 point_boundary_composite);
+                  return point_boundary_composite.tag == tag;
+                default:
+                  throw std::runtime_error(
+                      "h_is_bdry_at_pt: unknown "
+                      "assembly->boundaries.boundary_tags(ispec) "
+                      "value!");
+                  return false;
+                }
+              };
+
+              index.ispec = edge1_ispec;
+              for (int igll_edge = 0; igll_edge < ContainerType::NGLL_EDGE;
+                   igll_edge++) {
+                specfem::compute::loose::point_from_edge<
+                    ContainerType::NGLL_EDGE>(index.iz, index.ix, edge1_type,
+                                              igll_edge);
+                if (!h_is_bdry_at_pt(index,
+                                     specfem::element::boundary_tag::none)) {
+                  accel1[igll_edge].acceleration(0) = 0;
+                }
+              }
+              container.template atomic_add_to_field<1, false>(
+                  edge1_index, assembly, accel1);
+
+              index.ispec = edge2_ispec;
+              for (int igll_edge = 0; igll_edge < ContainerType::NGLL_EDGE;
+                   igll_edge++) {
+                specfem::compute::loose::point_from_edge<
+                    ContainerType::NGLL_EDGE>(index.iz, index.ix, edge2_type,
+                                              igll_edge);
+                if (!h_is_bdry_at_pt(index,
+                                     specfem::element::boundary_tag::none)) {
+                  accel2[igll_edge].acceleration(0) = 0;
+                }
+              }
+              container.template atomic_add_to_field<2, false>(
+                  edge2_index, assembly, accel2);
+            });
   }
 
   template <int medium, bool on_device>

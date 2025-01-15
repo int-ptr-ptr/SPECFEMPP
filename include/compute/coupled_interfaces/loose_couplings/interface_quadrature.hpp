@@ -93,11 +93,11 @@ public:
     }                                                                          \
   }()
   template <int medium, bool on_device>
-  type_real edge_to_mortar(const int edge_index, const int mortar_index,
+  type_real edge_to_mortar(const int iinterface, const int mortar_index,
                            const type_real *quantity) {
     type_real val = 0;
     for (int i = 0; i < EdgeQuadrature::NGLL; i++) {
-      val += mortar_trans(medium, on_device)(edge_index, mortar_index, i) *
+      val += mortar_trans(medium, on_device)(iinterface, mortar_index, i) *
              quantity[i];
     }
     return val;

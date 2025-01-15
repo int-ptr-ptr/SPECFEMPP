@@ -88,7 +88,7 @@ struct traction_continuity::kernel<
       for (int igll_interface = 0;
            igll_interface < ContainerType::NGLL_INTERFACE; igll_interface++) {
         type_real sn_w_dS = -container.template edge_to_mortar<2, false>(
-                                edge2_index, igll_interface, sn) *
+                                iinterface, igll_interface, sn) *
                             container.h_interface_surface_jacobian_times_weight(
                                 iinterface, igll_interface);
         for (int igll_edge = 0; igll_edge < ContainerType::NGLL_EDGE;
@@ -97,6 +97,17 @@ struct traction_continuity::kernel<
               sn_w_dS * container.h_interface_medium1_mortar_transfer(
                             igll_interface, igll_interface, igll_edge);
         }
+      }
+
+      if (iinterface == 15 && ISTEP >= 5) {
+        type_real jw[5];
+        for (int igll_interface = 0;
+             igll_interface < ContainerType::NGLL_INTERFACE; igll_interface++) {
+          jw[igll_interface] =
+              container.h_interface_surface_jacobian_times_weight(
+                  iinterface, igll_interface);
+        }
+        container.h_medium1_index_mapping(edge1_index);
       }
 
       const auto h_is_bdry_at_pt =
@@ -193,7 +204,7 @@ struct traction_continuity::kernel<
       for (int igll_interface = 0;
            igll_interface < ContainerType::NGLL_INTERFACE; igll_interface++) {
         type_real chitt_w_dS =
-            container.template edge_to_mortar<1, false>(edge1_index,
+            container.template edge_to_mortar<1, false>(iinterface,
                                                         igll_interface, accel) *
             container.h_interface_surface_jacobian_times_weight(iinterface,
                                                                 igll_interface);
@@ -204,11 +215,30 @@ struct traction_continuity::kernel<
                                igll_interface, igll_interface, igll_edge);
           elastic[igll_edge].acceleration(0) +=
               chitt_wv_dS *
-              container.h_medium2_edge_normal(edge1_index, igll_edge, 0);
+              container.h_medium2_edge_normal(edge2_index, igll_edge, 0);
           elastic[igll_edge].acceleration(1) +=
               chitt_wv_dS *
-              container.h_medium2_edge_normal(edge1_index, igll_edge, 1);
+              container.h_medium2_edge_normal(edge2_index, igll_edge, 1);
         }
+      }
+
+      if (iinterface == 15 && ISTEP >= 5) {
+        type_real jw[5];
+        type_real normal[5][2];
+        for (int igll_interface = 0;
+             igll_interface < ContainerType::NGLL_INTERFACE; igll_interface++) {
+          jw[igll_interface] =
+              container.h_interface_surface_jacobian_times_weight(
+                  iinterface, igll_interface);
+        }
+        for (int igll_edge = 0; igll_edge < ContainerType::NGLL_EDGE;
+             igll_edge++) {
+          normal[igll_edge][0] =
+              container.h_medium2_edge_normal(edge2_index, igll_edge, 0);
+          normal[igll_edge][1] =
+              container.h_medium2_edge_normal(edge2_index, igll_edge, 1);
+        }
+        container.h_medium1_index_mapping(edge1_index);
       }
 
       const auto h_is_bdry_at_pt =

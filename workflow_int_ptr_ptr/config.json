@@ -14,6 +14,7 @@
     "live":{
       "build": "${specfem.root}/build",
       "exe": "${specfem.live.build}/specfem2d_eventmarcher",
+      "cg_exe": "${specfem.live.build}/specfem2d",
       "cmake_build_options": "-DKokkos_ENABLE_SERIAL=ON -DCMAKE_BUILD_TYPE=Debug -DVTK_CXX_BUILD=OFF"
     }
   },
@@ -40,5 +41,53 @@
         "topography": "${root_dir}/run_configs/topography_twolayer.dat"
       }
     }
-  ]
+  ],
+  "cg_compare":{
+    "config_files": {
+      "dir":"${root_dir}/runnables/cg_compare",
+      "meshfem_parfile": "${cg_compare.config_files.dir}/PAR_FILE",
+      "meshfem_parfile_bottom": "${cg_compare.config_files.dir}/PAR_FILE_DOUBLE1",
+      "meshfem_parfile_top": "${cg_compare.config_files.dir}/PAR_FILE_DOUBLE2",
+      "specfem_parfile": "${cg_compare.config_files.dir}/specfem_config.yaml",
+      "specfem_parfile_double": "${cg_compare.config_files.dir}/specfem_config_double.yaml",
+      "source": "${cg_compare.config_files.dir}/source_config.yaml",
+      "topography": "${cg_compare.config_files.dir}/topography_file.dat",
+      "topography_bottom": "${cg_compare.config_files.dir}/topo_bot.dat",
+      "topography_top": "${cg_compare.config_files.dir}/topo_top.dat"
+    },
+    "workspace_folder":"${root_dir}/data/cg_compare",
+    "dump_test_resolution":"50",
+    "workspace_files": {
+      "meshfem_parfile": "PAR_FILE",
+      "meshfem_parfile_bottom": "PAR_FILE_DOUBLE1",
+      "meshfem_parfile_top": "PAR_FILE_DOUBLE2",
+      "specfem_parfile": "specfem_config.yaml",
+      "specfem_parfile_double": "specfem_config_double.yaml",
+      "meshfem_stations_out": "mesh_stations",
+      "source": "source_config.yaml",
+      "topography": "topography_file.dat",
+      "topography_bottom": "topo_bot.dat",
+      "topography_top": "topo_top.dat",
+      "dump_prefix": "dump/simfield/d",
+      "seismo_folder_name": "seismo",
+      "out_seismo": "specfem_out/${cg_compare.workspace_files.seismo_folder_name}",
+      "provenance_fol": "provenance",
+      "provenance_dump": "${cg_compare.workspace_files.provenance_fol}/dump.dat",
+      "provenance_seismo": "${cg_compare.workspace_files.provenance_fol}/${cg_compare.workspace_files.seismo_folder_name}"
+    },
+    "tests": [
+      {
+        "name": "FF1",
+        "mat1": "1 1 1.5 0 0 0 9999 9999 0 0 0 0 0 0",
+        "mat2": "1 1 1 0 0 0 9999 9999 0 0 0 0 0 0",
+        "class": "doublemesh"
+      },
+      {
+        "name": "FS1",
+        "mat1": "1 1 1.5 0.6 0 0 9999 9999 0 0 0 0 0 0",
+        "mat2": "1 1 1 0 0 0 9999 9999 0 0 0 0 0 0",
+        "class": "doublemesh"
+      }
+    ]
+  }
 }

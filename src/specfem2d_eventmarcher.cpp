@@ -27,15 +27,22 @@
 
 #define intersect_data_capacity (qp5.NGLL * (12))
 
+int ISTEP;
 #include "_util/build_demo_assembly.hpp"
 #include "compute/assembly/assembly.hpp"
 #include "kernels/kernels.hpp"
 #include "solver/time_marching.hpp"
 #include "timescheme/newmark.hpp"
 
-// #define FORCE_INTO_CONTINUOUS
+bool FORCE_INTO_CONTINUOUS;
+bool USE_DOUBLEMESH;
+
+// #define DEFAULT_USE_DOUBLEMESH
 // #define USE_DEMO_MESH
 // #define SET_INITIAL_CONDITION
+
+#define KILL_NONNEUMANN_BDRYS
+
 #define _RELAX_PARAM_COEF_ACOUSTIC_ 40
 #define _RELAX_PARAM_COEF_ELASTIC_ 40
 
@@ -43,8 +50,11 @@
 #define _stepwise_simfield_dump_ std::string("dump/simfield")
 #define _index_change_dump_ std::string("dump/indexchange")
 #define _stepwise_edge_dump_ std::string("dump/edgedata")
+
+#define _PARAMETER_FILENAME_DOUBLE_ std::string("specfem_config_double.yaml")
 #define _PARAMETER_FILENAME_ std::string("specfem_config.yaml")
 
+#include "_util/doublemesh.hpp"
 #include "_util/dump_simfield.hpp"
 #include "_util/edge_storages.hpp"
 #include "_util/rewrite_simfield.hpp"
@@ -64,23 +74,23 @@ void execute(specfem::MPI::MPI *mpi) {
   // https://specfem2d-kokkos.readthedocs.io/en/adjoint-simulations/developer_documentation/tutorials/tutorial1/Chapter2/index.html
 
   std::vector<specfem::adjacency_graph::adjacency_pointer> edge_removals;
+  FORCE_INTO_CONTINUOUS = !USE_DOUBLEMESH;
 #ifdef USE_DEMO_MESH
-#ifdef FORCE_INTO_CONTINUOUS
+#define MATERIAL_MODE 0b0100
+#define GRID_MODE 0b0001
   auto params =
       _util::demo_assembly::simulation_params().dt(1e-3).tmax(5).use_demo_mesh(
-          0,
-          edge_removals); // construct-mode == 0 (no shifts)
-  edge_removals.clear();
+          MATERIAL_MODE + (FORCE_INTO_CONTINUOUS ? 0 : GRID_MODE),
+          edge_removals);
+  if (FORCE_INTO_CONTINUOUS) {
+    edge_removals.clear();
+  }
 #else
-  auto params =
-      _util::demo_assembly::simulation_params().dt(1e-3).tmax(5).use_demo_mesh(
-          1,
-          edge_removals); // construct-mode == 1
-#endif
-#else
-  auto params = load_parameters(_PARAMETER_FILENAME_, mpi);
+  auto params = load_parameters(
+      USE_DOUBLEMESH ? _PARAMETER_FILENAME_DOUBLE_ : _PARAMETER_FILENAME_, mpi);
 
 #endif
+
   std::shared_ptr<specfem::compute::assembly> assembly = params.get_assembly();
 
 #ifdef _EVENT_MARCHER_DUMPS_
@@ -97,9 +107,30 @@ void execute(specfem::MPI::MPI *mpi) {
     edge_removals[i].elem =
         assembly->mesh.mapping.mesh_to_compute(edge_removals[i].elem);
   }
-#ifndef FORCE_INTO_CONTINUOUS
-  remap_with_disconts(*assembly, params, edge_removals, true);
-#endif
+
+  if (USE_DOUBLEMESH) {
+    // add all edges along z = 0.5
+    for (int ispec = 0; ispec < assembly->mesh.nspec; ispec++) {
+      for (int ix = 0; ix < assembly->mesh.ngllx; ix++) {
+        if (fabs(assembly->mesh.points.coord(1, ispec, 0, ix) - 0.5) < 1e-6) {
+          edge_removals.push_back(
+              specfem::adjacency_graph::adjacency_pointer(ispec, 3, 0));
+          break;
+        }
+        if (fabs(assembly->mesh.points.coord(1, ispec, assembly->mesh.ngllz - 1,
+                                             ix) -
+                 0.5) < 1e-6) {
+          edge_removals.push_back(
+              specfem::adjacency_graph::adjacency_pointer(ispec, 1, 0));
+          break;
+        }
+      }
+    }
+  }
+
+  if (!FORCE_INTO_CONTINUOUS) {
+    remap_with_disconts(*assembly, params, edge_removals, true);
+  }
 
 #ifdef _EVENT_MARCHER_DUMPS_
   _util::dump_simfield(_index_change_dump_ + "/post_remap.dat",
@@ -141,6 +172,7 @@ void execute(specfem::MPI::MPI *mpi) {
 
   specfem::event_marching::arbitrary_call_event reset_timer(
       [&]() {
+        ISTEP = timescheme_wrapper.get_istep();
         if (timescheme_wrapper.get_istep() < timescheme.get_max_timestep())
           event_system.set_current_precedence(
               specfem::event_marching::PRECEDENCE_BEFORE_INIT);
@@ -153,8 +185,7 @@ void execute(specfem::MPI::MPI *mpi) {
         int istep = timescheme_wrapper.get_istep();
         if (istep % _DUMP_INTERVAL_ == 0) {
           _util::dump_simfield_per_step(istep, _stepwise_simfield_dump_ + "/d",
-                                        assembly->fields.forward,
-                                        assembly->mesh.points);
+                                        *assembly);
         }
         return 0;
       },
@@ -383,7 +414,23 @@ load_parameters(const std::string &parameter_file, specfem::MPI::MPI *mpi) {
   //                   Read mesh and materials
   // --------------------------------------------------------------
   const auto quadrature = setup.instantiate_quadrature();
-  const auto mesh = specfem::IO::read_mesh(database_filename, mpi);
+
+  auto mesh = USE_DOUBLEMESH ? _util::read_mesh(database_filename,
+                                                database_filename + "_", mpi)
+                             : specfem::IO::read_mesh(database_filename, mpi);
+
+#ifdef KILL_NONNEUMANN_BDRYS
+
+  specfem::mesh::absorbing_boundary<specfem::dimension::type::dim2> bdry_abs(0);
+  specfem::mesh::acoustic_free_surface<specfem::dimension::type::dim2> bdry_afs(
+      0);
+  specfem::mesh::forcing_boundary<specfem::dimension::type::dim2> bdry_forcing(
+      0);
+  mesh.boundaries = specfem::mesh::boundaries<specfem::dimension::type::dim2>(
+      bdry_abs, bdry_afs, bdry_forcing);
+  mesh.tags = specfem::mesh::tags<specfem::dimension::type::dim2>(
+      mesh.materials, mesh.boundaries);
+#endif
   // --------------------------------------------------------------
 
   // --------------------------------------------------------------
@@ -478,11 +525,30 @@ load_parameters(const std::string &parameter_file, specfem::MPI::MPI *mpi) {
   return params;
 }
 int main(int argc, char **argv) {
+#ifdef DEFAULT_USE_DOUBLEMESH
+  USE_DOUBLEMESH = true;
+#else
+  USE_DOUBLEMESH = false;
+#endif
 
+  for (int iarg = 0; iarg < argc; iarg++) {
+    if (argv[iarg][0] == '%' && argv[iarg][1] == 'N' && argv[iarg][2] == 'O' &&
+        argv[iarg][3] == 'D') {
+      USE_DOUBLEMESH = false;
+    }
+    if (argv[iarg][0] == '%' && argv[iarg][1] == 'D') {
+      USE_DOUBLEMESH = true;
+    }
+  }
   // Initialize MPI
   specfem::MPI::MPI *mpi = new specfem::MPI::MPI(&argc, &argv);
   // Initialize Kokkos
   Kokkos::initialize(argc, argv);
+  if (USE_DOUBLEMESH) {
+    mpi->cout("Using doublemesh\n");
+  } else {
+    mpi->cout("Standard single-mesh\n");
+  }
   { execute(mpi); }
   // Finalize Kokkos
   Kokkos::finalize();

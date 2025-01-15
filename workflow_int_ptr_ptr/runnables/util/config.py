@@ -49,7 +49,10 @@ def get(name: str) -> Any:
             raise ValueError(
                 f"config path {name} reached a None entry. Cannot resolve at {resnav}."
             )
-        found = found[resnav]  # type: ignore
+        elif isinstance(found, list):
+            found = found[int(resnav)]  # type: ignore
+        else:
+            found = found[resnav]  # type: ignore
     return found  # type: ignore
 
 

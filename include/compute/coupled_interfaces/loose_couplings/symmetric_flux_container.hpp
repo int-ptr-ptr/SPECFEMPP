@@ -21,6 +21,8 @@ struct symmetric_flux_container<
           QuadratureType, QuadratureType>,
       specfem::compute::loose::interface_contravariant_normal_container<
           DimensionType, QuadratureType, 1, true>,
+      specfem::compute::loose::interface_normal_container<
+          DimensionType, QuadratureType, 1, true>,
       specfem::compute::loose::single_medium_interface_container {
 private:
   using IntersectionQuadrature = QuadratureType;
@@ -80,6 +82,8 @@ protected:
                            int num_interfaces)
       : specfem::compute::loose::interface_contravariant_normal_container<
             DimensionType, QuadratureType, 1, true>(num_medium1_edges),
+        specfem::compute::loose::interface_normal_container<
+            DimensionType, QuadratureType, 1, true>(num_medium1_edges),
         specfem::coupled_interface::loose::quadrature::
             mortar_transfer_container<QuadratureType, QuadratureType>(
                 num_interfaces),
@@ -118,8 +122,8 @@ struct symmetric_flux_container<
           QuadratureType, QuadratureType>,
       specfem::compute::loose::interface_contravariant_normal_container<
           DimensionType, QuadratureType, 1, true>,
-      specfem::compute::loose::interface_contravariant_normal_container<
-          DimensionType, QuadratureType, 2, true>,
+      specfem::compute::loose::interface_normal_container<
+          DimensionType, QuadratureType, 1, true>,
       specfem::compute::loose::single_medium_interface_container {
 
 private:
@@ -159,8 +163,8 @@ protected:
                            int num_interfaces)
       : specfem::compute::loose::interface_contravariant_normal_container<
             DimensionType, QuadratureType, 1, true>(num_medium1_edges),
-        specfem::compute::loose::interface_contravariant_normal_container<
-            DimensionType, QuadratureType, 2, true>(num_medium2_edges),
+        specfem::compute::loose::interface_normal_container<
+            DimensionType, QuadratureType, 1, true>(num_medium2_edges),
         specfem::coupled_interface::loose::quadrature::
             mortar_transfer_container<QuadratureType, QuadratureType>(
                 num_interfaces) {}
