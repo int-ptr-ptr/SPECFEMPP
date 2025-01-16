@@ -2,7 +2,7 @@ import json
 import sys
 import os
 import re
-from typing import Any
+from typing import Any, Iterable
 
 # loaded configuration
 config = None
@@ -41,33 +41,55 @@ if config is None:
     sys.exit(1)
 
 
-def get(name: str) -> Any:
+def get(name: str, search_path: None | Iterable = None) -> Any:
+    """Finds the config entry by name.
+    Namespaces are separated by dots (.)
+
+    Args:
+        name (str): The name of the config entry
+        search_path (None | Iterable, optional): A list of entry points. Defaults to None, which
+            resolves to [config_root,]. Each entry is checked in order, with the first complete
+            resolution returning the value.
+
+    Raises:
+        ValueError: If resolution fails
+
+    Returns:
+        Any: The entry corresponding to the given name.
+    """
+    if search_path is None:
+        search_path = [config]
+    namespaces = name.split(".")
     # resolve the name; ${A.B.C} should be config[A][B][C]
-    found = config
-    for resnav in name.split("."):
-        if found is None:
-            raise ValueError(
-                f"config path {name} reached a None entry. Cannot resolve at {resnav}."
-            )
-        elif isinstance(found, list):
-            found = found[int(resnav)]  # type: ignore
-        else:
-            found = found[resnav]  # type: ignore
-    return found  # type: ignore
+    for search_root in search_path:
+        found = search_root
+        try:
+            for resnav in namespaces:
+                if found is None:
+                    raise ValueError()
+                elif isinstance(found, list):
+                    found = found[int(resnav)]  # type: ignore
+                else:
+                    found = found[resnav]  # type: ignore
+            return found  # type: ignore
+        except Exception:
+            ...
+    raise ValueError(f'Unable to resolve name "{name}"')
 
 
-def convert_entries(entry):
+def convert_entries(entry, parent_stack):
+    parent_stack.append(entry)
     was_changed = False
     is_complete = True
     if isinstance(entry, dict):
         for key, value in entry.items():
-            if (out := convert_entries(value))[0] is not None:
+            if (out := convert_entries(value, parent_stack.copy()))[0] is not None:
                 entry[key] = out[0]
                 was_changed = True
             is_complete = out[1]
     if isinstance(entry, list):
         for key, value in enumerate(entry):
-            if (out := convert_entries(value))[0] is not None:
+            if (out := convert_entries(value, parent_stack.copy()))[0] is not None:
                 entry[key] = out[0]
                 was_changed = True
             is_complete = out[1]
@@ -81,7 +103,7 @@ def convert_entries(entry):
                 replcode = m.group(2)
             try:
                 # resolve the name; ${A.B.C} should be config[A][B][C]
-                found = get(replcode)
+                found = get(replcode, reversed(parent_stack))
                 assert isinstance(found, str)
                 if not re.search(r"\$(?:\{([\.\w]+)\}|(\w+))", found):
                     # variable fully resolved, so we can use it
@@ -99,7 +121,7 @@ try:
     # keep resolving until everything is complete
     is_done = False
     while not is_done:
-        c, is_done = convert_entries(config)
+        c, is_done = convert_entries(config, [])
         if c is not None:
             config = c
         elif not is_done:
@@ -108,3 +130,6 @@ try:
             )
 except Exception as e:
     raise ValueError("Cannot process config entries!") from e
+
+if __name__ == "__main__":
+    print(get("cg_compare.workspace_files.provenance_seismo"))

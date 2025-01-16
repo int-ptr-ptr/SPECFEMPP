@@ -4,7 +4,15 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-def compare_seismos(test_folder, ref_folder, stations_file, tlim=(None, None)):
+def compare_seismos(
+    test_folder,
+    ref_folder,
+    stations_file,
+    tlim=(None, None),
+    show: bool = False,
+    save_filename: str | None = None,
+    verbose=False,
+):
     stations = []
     with open(stations_file, "r") as f:
         while line := f.readline():
@@ -19,13 +27,15 @@ def compare_seismos(test_folder, ref_folder, stations_file, tlim=(None, None)):
                 z = float(m.group(4))
                 vx = float(m.group(5))
                 vz = float(m.group(6))
-                print(f"Station found: {sname} @({x},{z}) with vel ({vx},{vz})")
+                if verbose:
+                    print(f"Station found: {sname} @({x},{z}) with vel ({vx},{vz})")
                 stations.append((sname, sname_sf2d, x, z, vx, vz))
                 continue
             # no match
-            print(
-                f"mesh_stations: line does not match given formats:\n    {repr(line)}"
-            )
+            if verbose:
+                print(
+                    f"mesh_stations: line does not match given formats:\n    {repr(line)}"
+                )
 
     STATION_IND_POS_OFFSET = 2
     foldernames = [ref_folder, test_folder]
@@ -103,12 +113,17 @@ def compare_seismos(test_folder, ref_folder, stations_file, tlim=(None, None)):
             a.set_xlim(tlim)
     # ax[0,-1].legend()
     fig.suptitle("Seismogram Comparison (dG: green, cG: red)")
-    plt.show()
+    if show:
+        plt.show()
+    if save_filename is not None:
+        fol = os.path.dirname(save_filename)
+        if not os.path.exists(fol):
+            os.makedirs(fol)
+        plt.savefig(save_filename)
 
 
 if __name__ == "__main__":
     import config
-    import os
 
     test = config.get("cg_compare.tests.0")
     folder = os.path.join(config.get("cg_compare.workspace_folder"), test["name"])

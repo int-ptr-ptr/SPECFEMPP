@@ -22,15 +22,17 @@ class field_remapper:
 
         ispec_closest = np.empty((nspecy, ngllzy, ngllxy), dtype=int)
         # batch all y points in each element: find the closest x-element for each.
-        # we assume y is in an x-element if lerp(spec_point_x,spec_center_x, eps) is minimized
+        # we assume y is in an x-element if distance to lerp(spec_point,spec_center, eps) is minimized
         x_centers = np.mean(pts_x, axis=(1, 2))
+        y_centers = np.mean(pts_y, axis=(1, 2))
         shft = 1e-2
         x_shft = shft * x_centers[:, None, None, :] + (1 - shft) * pts_x
+        y_shft = shft * y_centers[:, None, None, :] + (1 - shft) * pts_y
         for i in range(nspecy):
             ispec_closest[i, ...] = np.argmin(
                 np.min(
                     np.linalg.norm(
-                        pts_y[i, np.newaxis, np.newaxis, np.newaxis, :, :, :]
+                        y_shft[i, np.newaxis, np.newaxis, np.newaxis, :, :, :]
                         - x_shft[:, :, :, np.newaxis, np.newaxis, :],
                         ord=2,
                         axis=-1,

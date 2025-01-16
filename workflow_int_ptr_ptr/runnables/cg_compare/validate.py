@@ -2,11 +2,14 @@ import util.config as config
 import util.runjob
 import util.dump_reader
 import util.dump_reader_aux
+import util.seismo_reader
+import cg_compare.frame_compare
 
 import time
 import os
 import re
 import numpy as np
+import shutil
 
 PRINT_TIME_INTERVAL = 5
 
@@ -42,6 +45,14 @@ class cg_compare_validation:
             fol = os.path.join(self.folder, of)
             if not os.path.exists(fol):
                 os.makedirs(fol)
+
+        self.dt = float(config.get("cg_compare.dt"))
+        self.tmpdir = os.path.join(
+            self.folder, config.get("cg_compare.workspace_files.analysis.tmp")
+        )
+        if not os.path.exists(self.tmpdir):
+            os.makedirs(self.tmpdir)
+        self.plotnum = 0
 
     def consume_dumps(self):
         while True:
@@ -82,6 +93,18 @@ class cg_compare_validation:
             err = np.linalg.norm(disp_err) / (disp_err.size**0.5)
             self.errs[self.dumpnum] = err
 
+            cg_compare.frame_compare.compare_frames(
+                thisdump,
+                prov,
+                mapper,
+                self.dt * self.dumpnum,
+                show=False,
+                save_filename=os.path.join(self.tmpdir, f"comp{self.plotnum:05d}.png"),
+                clear_on_completion=True,
+            )
+
+            self.plotnum += 1
+
             if err > self.max_err:
                 self.max_err = err
                 self.max_err_dumpnum = self.dumpnum
@@ -95,12 +118,44 @@ class cg_compare_validation:
                     f"(dump {self.max_err_dumpnum})"
                 )
 
+    def write_seismos(self):
+        util.seismo_reader.compare_seismos(
+            os.path.join(
+                self.folder, config.get("cg_compare.workspace_files.out_seismo")
+            ),
+            os.path.join(
+                self.folder, config.get("cg_compare.workspace_files.provenance_seismo")
+            ),
+            os.path.join(
+                self.folder,
+                config.get("cg_compare.workspace_files.meshfem_stations_out"),
+            ),
+            show=False,
+            tlim=(0, 1),
+            save_filename=os.path.join(
+                self.folder, config.get("cg_compare.workspace_files.analysis.seismo")
+            ),
+        )
+
     def finalize(self):
         print(
             f"[{self.test['name']}]: COMPLETE!\n"
             f"   l2 displacement error maximized at {self.max_err:.6e} "
             f"(dump {self.max_err_dumpnum})"
         )
+        self.write_seismos()
+        print(f"[{self.test['name']}]: seismograms written.")
+        framerate = config.get(
+            "cg_compare.workspace_files.analysis.animation_framerate"
+        )
+        anim_out_file = config.get("cg_compare.workspace_files.analysis.animation_out")
+        os.system(
+            f"ffmpeg -pattern_type glob -r {framerate}"
+            f' -i "{os.path.join(self.tmpdir, "comp*.png")}" -r {framerate} '
+            f"{os.path.join(self.folder, anim_out_file)} -y"
+        )
+        shutil.rmtree(self.tmpdir)
+        print(f"[{self.test['name']}]: animation written.")
 
 
 if __name__ == "__main__":
