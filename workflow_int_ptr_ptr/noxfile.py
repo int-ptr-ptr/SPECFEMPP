@@ -16,7 +16,8 @@ nox.options.reuse_existing_virtualenvs = True
 def reconfigure_build(session):
     session.cd(config.get("specfem.root"))
     build_dir = config.get("specfem.live.build")
-    shutil.rmtree(build_dir)
+    if os.path.exists(build_dir):
+        shutil.rmtree(build_dir)
     os.system(
         f"cmake -S . -B {build_dir} {config.get('specfem.live.cmake_build_options')}"
     )

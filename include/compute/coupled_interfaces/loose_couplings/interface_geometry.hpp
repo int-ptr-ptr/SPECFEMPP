@@ -56,7 +56,7 @@ compute_geometry(specfem::compute::assembly &assembly, ContainerType &container,
       edge = container.h_medium2_edge_type(edge_index);
     }
   } else {
-    static_assert(false, "Medium can only be 1 or 2!");
+    static_assert(medium==1 || medium==2, "Medium can only be 1 or 2!");
   }
 
   using PointPartialDerivativesType =

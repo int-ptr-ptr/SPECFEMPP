@@ -60,7 +60,7 @@ static void _stream_view(std::ofstream &stream, const ViewType &view) {
       }
     }
   } else {
-    static_assert(false, "dim not supported!");
+    static_assert(dim > 0 && dim <= 4, "dim not supported!");
   }
 }
 

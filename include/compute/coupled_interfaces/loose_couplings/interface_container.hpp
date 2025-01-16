@@ -84,13 +84,13 @@ template <specfem::dimension::type DimensionType,
           specfem::coupled_interface::loose::flux::type FluxSchemeType>
 struct interface_container
     : specfem::coupled_interface::loose::flux::FluxScheme<FluxSchemeType>::
-          ContainerType<DimensionType, MediumTag1, MediumTag2, QuadratureType> {
+          template ContainerType<DimensionType, MediumTag1, MediumTag2, QuadratureType> {
 private:
   using FluxScheme =
       typename specfem::coupled_interface::loose::flux::FluxScheme<
           FluxSchemeType>::orig_flux_scheme;
   using super = typename specfem::coupled_interface::loose::flux::FluxScheme<
-      FluxSchemeType>::ContainerType<DimensionType, MediumTag1, MediumTag2,
+      FluxSchemeType>::template ContainerType<DimensionType, MediumTag1, MediumTag2,
                                      QuadratureType>;
 
   using IndexView =
@@ -323,7 +323,7 @@ public:
         edge = h_medium2_edge_type(edge_index);
       }
     } else {
-      static_assert(false, "Medium can only be 1 or 2!");
+      static_assert(medium==1 || medium==2, "Medium can only be 1 or 2!");
     }
     int ix, iz;
 #pragma unroll
@@ -369,7 +369,7 @@ public:
   //         edge = h_medium2_edge_type(edge_index);
   //       }
   //     }else{
-  //       static_assert(false,"Medium can only be 1 or 2!");
+  //       static_assert(medium==1 || medium==2, "Medium can only be 1 or 2!");
   //     }
   //     int ix, iz;
   // #pragma unroll
@@ -425,7 +425,7 @@ public:
         edge = h_medium2_edge_type(edge_index);
       }
     } else {
-      static_assert(false, "Medium can only be 1 or 2!");
+      static_assert(medium==1 || medium==2, "Medium can only be 1 or 2!");
     }
     int ix, iz;
 #pragma unroll
@@ -492,12 +492,8 @@ public:
 
   template <int medium, bool on_device>
   void compute_edge_intermediates(specfem::compute::assembly &assembly) {
-    if constexpr (on_device == true) {
-      static_assert(false, "on_device == true not yet supported.");
-    }
-    if constexpr (medium != 1 && medium != 2) {
-      static_assert(false, "Medium can only be 1 or 2!");
-    }
+    static_assert(on_device == false, "on_device == true not yet supported.");
+    static_assert(medium==1 || medium==2, "Medium can only be 1 or 2!");
     if constexpr (single_medium_interface_container::includes<decltype(
                       this)>() &&
                   medium == 2) {
@@ -522,12 +518,9 @@ public:
 
   template <bool on_device, typename internal_call>
   void foreach_interface(internal_call kernel) {
-    if constexpr (on_device == true) {
-      static_assert(false, "on_device == true not yet supported.");
-    } else {
-      for (int interface = 0; interface < num_interfaces; interface++) {
-        kernel(interface);
-      }
+    static_assert(on_device == false, "on_device == true not yet supported.");
+    for (int interface = 0; interface < num_interfaces; interface++) {
+      kernel(interface);
     }
   }
 };

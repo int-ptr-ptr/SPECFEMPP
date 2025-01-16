@@ -89,7 +89,7 @@ public:
         return h_interface_medium2_mortar_transfer;                            \
       }                                                                        \
     } else {                                                                   \
-      static_assert(false, "Medium can only be 1 or 2!");                      \
+    static_assert(medium==1 || medium==2, "Medium can only be 1 or 2!");       \
     }                                                                          \
   }()
   template <int medium, bool on_device>

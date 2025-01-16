@@ -14,6 +14,7 @@
     "live":{
       "build": "${specfem.root}/build",
       "exe": "${specfem.live.build}/specfem2d_eventmarcher",
+      "meshfem": "${build}/xmeshfem2D",
       "cg_exe": "${specfem.live.build}/specfem2d",
       "cmake_build_options": "-DKokkos_ENABLE_SERIAL=ON -DCMAKE_BUILD_TYPE=Debug -DVTK_CXX_BUILD=OFF"
     }

@@ -582,7 +582,7 @@ struct symmetric_flux::kernel<
                                specfem::compute::assembly &assembly,
                                ContainerType &container) {
     if constexpr (on_device) {
-      static_assert(false,
+      static_assert(on_device == false,
                     "on_device not written for compute_relaxation_paramter");
     }
     constexpr bool UseSIMD = false;
@@ -638,7 +638,7 @@ struct symmetric_flux::kernel<
                              specfem::compute::assembly &assembly,
                              ContainerType &container) {
     if constexpr (on_device) {
-      static_assert(false,
+      static_assert(on_device == false,
                     "on_device not written for compute_relaxation_paramter");
     }
     constexpr bool UseSIMD = false;

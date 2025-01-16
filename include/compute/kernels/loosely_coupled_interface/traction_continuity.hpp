@@ -23,7 +23,7 @@ struct traction_continuity::kernel<
     if constexpr (medium == 1) {
       return;
     } else if constexpr (medium != 2) {
-      static_assert(false, "Medium can only be 1 or 2!");
+      static_assert(medium==1 || medium==2, "Medium can only be 1 or 2!");
     }
     constexpr bool UseSIMD = false;
     using ElasticDispType =

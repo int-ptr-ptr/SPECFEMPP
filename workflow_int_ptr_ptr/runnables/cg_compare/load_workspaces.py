@@ -93,7 +93,7 @@ def init_workspace_folder(test):
 
         def run_xmeshfem(parfile):
             res = subprocess.run(
-                [config.get("specfem.reference.meshfem"), "-p", parfile],
+                [config.get("specfem.live.meshfem"), "-p", parfile],
                 stdout=subprocess.PIPE,
             )
             if res.returncode != 0:
