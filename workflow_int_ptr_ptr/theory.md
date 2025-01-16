@@ -15,9 +15,9 @@ $$B(\tilde u,u) = \int_{\Sigma_{LC}} b(\tilde u,u)~dS$$
 for some pointwise form $b$, defined on the loosely coupled surface $\Sigma_{LC}$. Here $u$ is the field and $\tilde u$ is the test function.
 By pointwise, we mean that $b$, at a point $\gamma\in \Sigma_{LC}$ is of the form
 
-$$\big(b(\tilde u, u)\big)|_\gamma =: \tilde b_\gamma(\tilde u|_{\Sigma_{LC}}(\gamma),u|_{\Sigma_{LC}}(\gamma))$$
+$$\big(b(\tilde u, u)\big)| _{\gamma} =: {\tilde b} _{\gamma}({\tilde u}| _{\Sigma _{LC}}(\gamma),u| _{\Sigma _{LC}}(\gamma))$$
 
-It should be noted that the discontinuity across $\Sigma_{LC}$ admits two traces $(u|_{\Omega_1})|_{\Sigma_{LC}}$ and $(u|_{\Omega_2})|_{\Sigma_{LC}}$, where $\Omega_1$ and $\Omega_2$ represent the domains on either side of the interface, with $(\cdot)|_{\Sigma_{LC}}$ representing their corresponding trace operators. Depending on the choice of flux scheme (and consequently integrand $b$), either or both traces may be used.
+It should be noted that the discontinuity across $\Sigma_{LC}$ admits two traces $(u| _ {\Omega_1})| _ {\Sigma _ {LC}}$ and $(u| _ {\Omega _ 2})| _ {\Sigma _ {LC}}$, where $\Omega_1$ and $\Omega_2$ represent the domains on either side of the interface, with $(\cdot)| _ {\Sigma_{LC}}$ representing their corresponding trace operators. Depending on the choice of flux scheme (and consequently integrand $b$), either or both traces may be used.
 
 In the case of an acoustic-elastic interface as given by Komatitsch et al. (2000)[^1^](#komatitsch2000), this takes the form
 
@@ -25,7 +25,7 @@ $$b_{S\to F}(\tilde \chi,s) = \tilde \chi~(s\cdot \hat n)$$
 
 $$b_{F\to S}(\tilde s,\chi) = -\tilde s \cdot (p \hat n) = -\tilde s \cdot (-\ddot\chi \hat n)$$
 
-for pressure $p$, where we use a fluid potential formulation $s|_{\Omega_F} = \rho^{-1}\nabla \chi$. We write $b_{S\to F}$ to represent the integrand of the interface surface integral for the fluid domain, and $b_{F\to S}$ to represent that of the solid domain.
+for pressure $p$, where we use a fluid potential formulation $s| _ {\Omega_F} = \rho^{-1}\nabla \chi$. We write $b _ {S\to F}$ to represent the integrand of the interface surface integral for the fluid domain, and $b_{F\to S}$ to represent that of the solid domain.
 Splitting the domain into an elastic (solid) regime $\Omega_S$ and acoustic (fluid) regime $\Omega_F$ equates to defining $V$ as the direct sum of test functions in each regime:
 
 $$V = V_S \oplus V_F\subseteq\\{\tilde s:\Omega_S \to \mathbb R^d\\}\oplus \\{\tilde \chi:\Omega_F \to \mathbb R\\}$$
@@ -34,7 +34,7 @@ From this formulation, the corresponding integrand is
 
 $$b(\tilde s +\tilde \chi,s+\chi) = \tilde \chi~(s\cdot \hat n) - \tilde s \cdot (-\ddot\chi \hat n)$$
 
-where the trace operators $((\chi+s)|_{\Omega_S})|_{\Sigma_{LC}} = s$ and $((\chi+s)|_{\Omega_F})|_{\Sigma_{LC}} = \chi$ are implied.
+where the trace operators $((\chi+s)| _ {\Omega _ S})| _ {\Sigma _ {LC}} = s$ and $((\chi+s)| _ {\Omega _ F})| _ {\Sigma _ {LC}} = \chi$ are implied.
 
 ![basis_traces](doc_res/basis_traces.png)
 
@@ -60,7 +60,7 @@ $$v_I \in \\{v_A\\}_{A\in \mathcal A}$$
 (over some indexing set $\mathcal A$) has nonzero integral over a section
 $\Gamma \subseteq \Sigma_{LC}$ of the interface, we compute the entries
 
-$$B(v_I,u) = \sum_{k=1}^{N_{quad}} w_k J(\gamma_k) b(v_I|_{\Gamma}(\gamma_k),u|_{\Gamma}(\gamma_k))$$
+$$B(v _ I,u) = \sum _ {k=1}^{N _ {quad}} w _ k J(\gamma _ k) b(v _ I| _ {\Gamma}(\gamma _ k),u| _ {\Gamma}(\gamma_k))$$
 
 for weights $w_k$, knots $\gamma_k$, and surface (1d) Jacobian $J$.
 
@@ -86,9 +86,9 @@ We assume the trace of a field $f$ on a given element to its relevant edge is a 
 
 $$f_\Gamma = {f_\Gamma}^i L_i. ~~~~~~~~~(*)$$
 
-In the case of a basis defined by a tensor product of Lagrange polynomials with a knot on the endpoints (for example, SEM[^1^](#komatitsch2000)), this is simply the Lagrange polynomials in the along-edge coordinate for endpoint (on the edge) nodes. For example, if index $i=1$ correspond to the edge that we want to map onto $\Gamma$, the trace of the basis function $L_i \otimes L_j$ will be
+In the case of a basis defined by a tensor product $(L_i \otimes L_j)(x,y) = L_i(x)L_j(y)$ of Lagrange polynomials with a knot on the endpoints (for example, SEM[^1^](#komatitsch2000)), this is simply the Lagrange polynomials in the along-edge coordinate for endpoint (on the edge) nodes. For example, if index $i=1$ correspond to the edge that we want to map onto $\Gamma$, the trace of the basis function $L_i \otimes L_j$ will be
 
-$$(L_i \otimes L_j)|_{\Gamma} = \delta_{i1} L_j,$$
+$$(L _ i \otimes L _ j)| _ {\Gamma} = \delta _ {i1} L _ j,$$
 
 which allows any field $f$ to be represented as (\*) in a trivial way.
 In general, every basis function may have a nonzero trace, but the trace mapping can always be represented as a linear surjection (to an equal or lower dimension) into the form (\*). As illustrated by Chan et al (2021)[^2^](#chan2021), this is particularly important to make explicit the trace operator for Gauss-Legendre quadrature, where basis functions are still of the form $L_i \otimes L_j$, but there are no endpoint nodes. Interpolating the basis functions at the mortar knots explicitly means interpolating $N_{quad}^2$ functions. If instead the trace was performed first, then we would only interpolate $N_{quad}$ functions.
