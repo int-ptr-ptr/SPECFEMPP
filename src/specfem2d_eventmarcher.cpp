@@ -49,7 +49,6 @@ bool USE_DOUBLEMESH;
 #define _EVENT_MARCHER_DUMPS_
 #define _stepwise_simfield_dump_ std::string("dump/simfield")
 #define _index_change_dump_ std::string("dump/indexchange")
-#define _stepwise_edge_dump_ std::string("dump/edgedata")
 
 #define _PARAMETER_FILENAME_DOUBLE_ std::string("specfem_config_double.yaml")
 #define _PARAMETER_FILENAME_ std::string("specfem_config.yaml")
@@ -74,7 +73,6 @@ void execute(specfem::MPI::MPI *mpi) {
   // https://specfem2d-kokkos.readthedocs.io/en/adjoint-simulations/developer_documentation/tutorials/tutorial1/Chapter2/index.html
 
   std::vector<specfem::adjacency_graph::adjacency_pointer> edge_removals;
-  FORCE_INTO_CONTINUOUS = !USE_DOUBLEMESH;
 #ifdef USE_DEMO_MESH
 #define MATERIAL_MODE 0b0100
 #define GRID_MODE 0b0001
@@ -96,7 +94,6 @@ void execute(specfem::MPI::MPI *mpi) {
 #ifdef _EVENT_MARCHER_DUMPS_
   _util::init_dirs(_stepwise_simfield_dump_);
   _util::init_dirs(_index_change_dump_);
-  _util::init_dirs(_stepwise_edge_dump_);
 
   _util::dump_simfield(_index_change_dump_ + "/prior_remap.dat",
                        assembly->fields.forward, assembly->mesh.points);
@@ -180,19 +177,6 @@ void execute(specfem::MPI::MPI *mpi) {
       },
       1);
   event_system.register_event(&reset_timer);
-  specfem::event_marching::arbitrary_call_event output_fields(
-      [&]() {
-        int istep = timescheme_wrapper.get_istep();
-        if (istep % _DUMP_INTERVAL_ == 0) {
-          _util::dump_simfield_per_step(istep, _stepwise_simfield_dump_ + "/d",
-                                        *assembly);
-        }
-        return 0;
-      },
-      -0.1);
-#ifdef _EVENT_MARCHER_DUMPS_
-  event_system.register_event(&output_fields);
-#endif
 
 #ifdef SET_INITIAL_CONDITION
 #define _IC_SIG 0.05
@@ -234,19 +218,18 @@ void execute(specfem::MPI::MPI *mpi) {
   _util::edge_manager::edge_storage<edge_storage_quad, data_capacity>
       dg_edge_storage(dg_edges, *assembly);
 
-  specfem::event_marching::arbitrary_call_event output_edges(
+  specfem::event_marching::arbitrary_call_event output_fields(
       [&]() {
         int istep = timescheme_wrapper.get_istep();
         if (istep % _DUMP_INTERVAL_ == 0) {
-          _util::dump_edge_container(_stepwise_edge_dump_ + "/d" +
-                                         std::to_string(istep) + ".dat",
-                                     dg_edge_storage);
+          _util::dump_simfield_per_step(istep, _stepwise_simfield_dump_ + "/d",
+                                        *assembly, dg_edge_storage);
         }
         return 0;
       },
       -0.1);
 #ifdef _EVENT_MARCHER_DUMPS_
-  event_system.register_event(&output_edges);
+  event_system.register_event(&output_fields);
 #endif
   // geometric props
   for (int i = 0;
@@ -531,6 +514,8 @@ int main(int argc, char **argv) {
   USE_DOUBLEMESH = false;
 #endif
 
+  bool continuity_state_requested = false;
+  bool continuity_desired = false;
   for (int iarg = 0; iarg < argc; iarg++) {
     if (argv[iarg][0] == '%' && argv[iarg][1] == 'N' && argv[iarg][2] == 'O' &&
         argv[iarg][3] == 'D') {
@@ -539,7 +524,22 @@ int main(int argc, char **argv) {
     if (argv[iarg][0] == '%' && argv[iarg][1] == 'D') {
       USE_DOUBLEMESH = true;
     }
+    if (argv[iarg][0] == '%' && argv[iarg][1] == 'N' && argv[iarg][2] == 'O' &&
+        argv[iarg][3] == 'C') {
+      continuity_state_requested = true;
+      continuity_desired = false;
+    }
+    if (argv[iarg][0] == '%' && argv[iarg][1] == 'C') {
+      continuity_state_requested = true;
+      continuity_desired = true;
+    }
   }
+  if (continuity_state_requested) {
+    FORCE_INTO_CONTINUOUS = continuity_desired;
+  } else {
+    FORCE_INTO_CONTINUOUS = !USE_DOUBLEMESH;
+  }
+
   // Initialize MPI
   specfem::MPI::MPI *mpi = new specfem::MPI::MPI(&argc, &argv);
   // Initialize Kokkos
@@ -547,7 +547,12 @@ int main(int argc, char **argv) {
   if (USE_DOUBLEMESH) {
     mpi->cout("Using doublemesh\n");
   } else {
-    mpi->cout("Standard single-mesh\n");
+    mpi->cout("Using standard single-mesh\n");
+  }
+  if (FORCE_INTO_CONTINUOUS) {
+    mpi->cout("Forcing into continuous domain\n");
+  } else {
+    mpi->cout("Using discontinuous domain\n");
   }
   { execute(mpi); }
   // Finalize Kokkos

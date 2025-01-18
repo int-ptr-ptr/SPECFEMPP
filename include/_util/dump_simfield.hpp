@@ -83,103 +83,202 @@ static std::string tostr(specfem::element::boundary_tag tag) {
 
 template <typename edgequad, int datacapacity>
 void dump_edge_container(
+    std::ofstream &dump,
+    _util::edge_manager::edge_storage<edgequad, datacapacity> &edge_storage) {
+
+  // FF dynamics
+  dump << "acoustic_acoustic_nderiv";
+  _stream_view<type_real, 3>(
+      dump, edge_storage.acoustic_acoustic_interface.h_medium1_field_nderiv);
+
+  // FS dynamics
+  dump << "acoustic_elastic_sn";
+  _stream_view<type_real, 2>(
+      dump, edge_storage.acoustic_elastic_interface.h_disp_dot_normal);
+}
+template <typename edgequad, int datacapacity>
+void dump_edge_container(
     const std::string &filename,
     _util::edge_manager::edge_storage<edgequad, datacapacity> &edge_storage) {
-  // constexpr int ngllcapacity = edge_storage.ngll;
-  // int nedge = edge_storage.num_edges();
-  // int nintersect = edge_storage.num_intersections();
 
-  // Kokkos::View<int *[3], Kokkos::LayoutLeft, specfem::kokkos::HostMemSpace>
-  //     edge_intdat("_util::dump_edge_storage::edge_intdat", nedge);
-  // Kokkos::View<type_real *[ngllcapacity][2], Kokkos::LayoutLeft,
-  //              specfem::kokkos::HostMemSpace>
-  //     pos("_util::dump_edge_storage::pos", nedge);
-  // Kokkos::View<type_real *[datacapacity][ngllcapacity], Kokkos::LayoutLeft,
-  //              specfem::kokkos::HostMemSpace>
-  //     edgedata("_util::dump_edge_storage::edgedata", nedge);
+  std::ofstream dump;
+  dump.open(filename);
+  dump_edge_container(dump, edge_storage);
+  dump.close();
+}
 
-  // Kokkos::View<int *[5], Kokkos::LayoutLeft, specfem::kokkos::HostMemSpace>
-  //     intersect_intdat("_util::dump_edge_storage::intersect_intdat",
-  //                      nintersect);
-  // Kokkos::View<type_real *[5], Kokkos::LayoutLeft,
-  //              specfem::kokkos::HostMemSpace>
-  //     intersect_floatdat("_util::dump_edge_storage::intersect_floatdat",
-  //                        nintersect);
-  // Kokkos::View<type_real *[2][ngllcapacity][ngllcapacity],
-  // Kokkos::LayoutLeft,
-  //              specfem::kokkos::HostMemSpace>
-  //     mortar_trans("_util::dump_edge_storage::mortar_trans", nintersect);
-  // for (int i = 0; i < nedge; i++) {
-  //   _util::edge_manager::edge_data<ngllcapacity, datacapacity> edge_data =
-  //       edge_storage.get_edge_on_host(i);
-  //   edge_intdat(i, 0) = edge_data.parent.id;
-  //   switch (edge_data.parent.bdry) {
-  //   case specfem::enums::edge::type::RIGHT:
-  //     edge_intdat(i, 1) = 0;
-  //     break;
-  //   case specfem::enums::edge::type::TOP:
-  //     edge_intdat(i, 1) = 1;
-  //     break;
-  //   case specfem::enums::edge::type::LEFT:
-  //     edge_intdat(i, 1) = 2;
-  //     break;
-  //   case specfem::enums::edge::type::BOTTOM:
-  //     edge_intdat(i, 1) = 3;
-  //     break;
-  //   default:
-  //     edge_intdat(i, 1) = -1;
-  //     break;
-  //   }
-  //   edge_intdat(i, 2) = edge_data.ngll;
-  //   for (int j = 0; j < edge_data.ngll; j++) {
-  //     pos(i, j, 0) = edge_data.x[j];
-  //     pos(i, j, 1) = edge_data.z[j];
-  //     for (int k = 0; k < datacapacity; k++) {
-  //       edgedata(i, k, j) = edge_data.data[k][j];
-  //     }
-  //   }
-  // }
-  // for (int i = 0; i < nintersect; i++) {
-  //   _util::edge_manager::edge_intersection<ngllcapacity> intersect =
-  //       edge_storage.get_intersection_on_host(i);
-  //   intersect_intdat(i, 0) = intersect.a_ref_ind;
-  //   intersect_intdat(i, 1) = intersect.b_ref_ind;
-  //   intersect_intdat(i, 2) = intersect.ngll;
-  //   intersect_intdat(i, 3) = intersect.a_ngll;
-  //   intersect_intdat(i, 4) = intersect.b_ngll;
-  //   intersect_floatdat(i, 0) = intersect.a_param_start;
-  //   intersect_floatdat(i, 1) = intersect.a_param_end;
-  //   intersect_floatdat(i, 2) = intersect.b_param_start;
-  //   intersect_floatdat(i, 3) = intersect.b_param_end;
-  //   intersect_floatdat(i, 4) = intersect.relax_param;
+template <typename edgequad, int datacapacity>
+void dump_edge_container_statics(
+    std::ofstream &dump,
+    _util::edge_manager::edge_storage<edgequad, datacapacity> &edge_storage) {
+  dump << "acoustic_acoustic_ispecs";
+  _stream_view<unsigned int, 1>(
+      dump, edge_storage.acoustic_acoustic_interface.h_medium1_index_mapping);
+  dump << "elastic_elastic_ispecs";
+  _stream_view<unsigned int, 1>(
+      dump, edge_storage.elastic_elastic_interface.h_medium1_index_mapping);
+  dump << "acoustic_elastic_ispecs1";
+  _stream_view<unsigned int, 1>(
+      dump, edge_storage.acoustic_elastic_interface.h_medium1_index_mapping);
+  dump << "acoustic_elastic_ispecs2";
+  _stream_view<unsigned int, 1>(
+      dump, edge_storage.acoustic_elastic_interface.h_medium2_index_mapping);
 
-  //   for (int j = 0; j < intersect.ngll; j++) {
-  //     for (int k = 0; k < intersect.a_ngll; k++) {
-  //       mortar_trans(i, 0, j, k) = intersect.a_mortar_trans[j][k];
-  //     }
-  //     for (int k = 0; k < intersect.b_ngll; k++) {
-  //       mortar_trans(i, 1, j, k) = intersect.b_mortar_trans[j][k];
-  //     }
-  //   }
-  // }
-  // std::ofstream dump;
-  // dump.open(filename);
-  // dump << "edge_intdat";
-  // _stream_view<int, 2>(dump, edge_intdat);
-  // dump << "edge_pos";
-  // _stream_view<type_real, 3>(dump, pos);
-  // dump << "edge_data";
-  // _stream_view<type_real, 3>(dump, edgedata);
-  // dump << "intersect_intdat";
-  // _stream_view<int, 2>(dump, intersect_intdat);
-  // dump << "intersect_floatdat";
-  // _stream_view<type_real, 2>(dump, intersect_floatdat);
-  // dump << "intersect_mortartrans";
-  // _stream_view<type_real, 4>(dump, mortar_trans);
-  // dump << "intersect_data";
-  // _stream_view<type_real, 2>(dump,
-  //                            edge_storage.get_intersection_data_on_host());
-  // dump.close();
+  dump << "edge_type_refs";
+  Kokkos::View<specfem::enums::edge::type[4], Kokkos::DefaultExecutionSpace>
+      edge_type_refs("dump_edge_container_statics:edge_type_refs");
+  edge_type_refs(0) = specfem::enums::edge::type::RIGHT;
+  edge_type_refs(1) = specfem::enums::edge::type::TOP;
+  edge_type_refs(2) = specfem::enums::edge::type::LEFT;
+  edge_type_refs(3) = specfem::enums::edge::type::BOTTOM;
+  _stream_view<unsigned int, 1>(dump, edge_type_refs);
+
+  dump << "acoustic_acoustic_edgetypes";
+  _stream_view<unsigned int, 1>(
+      dump, edge_storage.acoustic_acoustic_interface.h_medium1_edge_type);
+  dump << "elastic_elastic_edgetypes";
+  _stream_view<unsigned int, 1>(
+      dump, edge_storage.elastic_elastic_interface.h_medium1_edge_type);
+  dump << "acoustic_elastic_edgetypes1";
+  _stream_view<unsigned int, 1>(
+      dump, edge_storage.acoustic_elastic_interface.h_medium1_edge_type);
+  dump << "acoustic_elastic_edgetypes2";
+  _stream_view<unsigned int, 1>(
+      dump, edge_storage.acoustic_elastic_interface.h_medium2_edge_type);
+
+  dump << "acoustic_acoustic_interface_inds1";
+  _stream_view<unsigned int, 1>(
+      dump, edge_storage.acoustic_acoustic_interface.h_interface_medium1_index);
+  dump << "elastic_elastic_interface_inds1";
+  _stream_view<unsigned int, 1>(
+      dump, edge_storage.elastic_elastic_interface.h_interface_medium1_index);
+  dump << "acoustic_elastic_interface_inds1";
+  _stream_view<unsigned int, 1>(
+      dump, edge_storage.acoustic_elastic_interface.h_interface_medium1_index);
+  dump << "acoustic_acoustic_interface_inds2";
+  _stream_view<unsigned int, 1>(
+      dump, edge_storage.acoustic_acoustic_interface.h_interface_medium2_index);
+  dump << "elastic_elastic_interface_inds2";
+  _stream_view<unsigned int, 1>(
+      dump, edge_storage.elastic_elastic_interface.h_interface_medium2_index);
+  dump << "acoustic_elastic_interface_inds2";
+  _stream_view<unsigned int, 1>(
+      dump, edge_storage.acoustic_elastic_interface.h_interface_medium2_index);
+
+  dump << "acoustic_acoustic_interface_paramstart1";
+  _stream_view<type_real, 1>(
+      dump,
+      edge_storage.acoustic_acoustic_interface.h_interface_medium1_param_start);
+  dump << "elastic_elastic_interface_paramstart1";
+  _stream_view<type_real, 1>(
+      dump,
+      edge_storage.elastic_elastic_interface.h_interface_medium1_param_start);
+  dump << "acoustic_elastic_interface_paramstart1";
+  _stream_view<type_real, 1>(
+      dump,
+      edge_storage.acoustic_elastic_interface.h_interface_medium1_param_start);
+  dump << "acoustic_acoustic_interface_paramstart2";
+  _stream_view<type_real, 1>(
+      dump,
+      edge_storage.acoustic_acoustic_interface.h_interface_medium2_param_start);
+  dump << "elastic_elastic_interface_paramstart2";
+  _stream_view<type_real, 1>(
+      dump,
+      edge_storage.elastic_elastic_interface.h_interface_medium2_param_start);
+  dump << "acoustic_elastic_interface_paramstart2";
+  _stream_view<type_real, 1>(
+      dump,
+      edge_storage.acoustic_elastic_interface.h_interface_medium2_param_start);
+
+  dump << "acoustic_acoustic_interface_paramend1";
+  _stream_view<type_real, 1>(
+      dump,
+      edge_storage.acoustic_acoustic_interface.h_interface_medium1_param_end);
+  dump << "elastic_elastic_interface_paramend1";
+  _stream_view<type_real, 1>(
+      dump,
+      edge_storage.elastic_elastic_interface.h_interface_medium1_param_end);
+  dump << "acoustic_elastic_interface_paramend1";
+  _stream_view<type_real, 1>(
+      dump,
+      edge_storage.acoustic_elastic_interface.h_interface_medium1_param_end);
+  dump << "acoustic_acoustic_interface_paramend2";
+  _stream_view<type_real, 1>(
+      dump,
+      edge_storage.acoustic_acoustic_interface.h_interface_medium2_param_end);
+  dump << "elastic_elastic_interface_paramend2";
+  _stream_view<type_real, 1>(
+      dump,
+      edge_storage.elastic_elastic_interface.h_interface_medium2_param_end);
+  dump << "acoustic_elastic_interface_paramend2";
+  _stream_view<type_real, 1>(
+      dump,
+      edge_storage.acoustic_elastic_interface.h_interface_medium2_param_end);
+
+  dump << "acoustic_acoustic_interface_mortartrans1";
+  _stream_view<type_real, 3>(dump, edge_storage.acoustic_acoustic_interface
+                                       .h_interface_medium1_mortar_transfer);
+  dump << "elastic_elastic_interface_mortartrans1";
+  _stream_view<type_real, 3>(dump, edge_storage.elastic_elastic_interface
+                                       .h_interface_medium1_mortar_transfer);
+  dump << "acoustic_elastic_interface_mortartrans1";
+  _stream_view<type_real, 3>(dump, edge_storage.acoustic_elastic_interface
+                                       .h_interface_medium1_mortar_transfer);
+  dump << "acoustic_acoustic_interface_mortartrans2";
+  _stream_view<type_real, 3>(dump, edge_storage.acoustic_acoustic_interface
+                                       .h_interface_medium2_mortar_transfer);
+  dump << "elastic_elastic_interface_mortartrans2";
+  _stream_view<type_real, 3>(dump, edge_storage.elastic_elastic_interface
+                                       .h_interface_medium2_mortar_transfer);
+  dump << "acoustic_elastic_interface_mortartrans2";
+  _stream_view<type_real, 3>(dump, edge_storage.acoustic_elastic_interface
+                                       .h_interface_medium2_mortar_transfer);
+
+  dump << "acoustic_acoustic_interface_jw";
+  _stream_view<type_real, 2>(dump,
+                             edge_storage.acoustic_acoustic_interface
+                                 .h_interface_surface_jacobian_times_weight);
+  dump << "elastic_elastic_interface_jw";
+  _stream_view<type_real, 2>(dump,
+                             edge_storage.elastic_elastic_interface
+                                 .h_interface_surface_jacobian_times_weight);
+  dump << "acoustic_elastic_interface_jw";
+  _stream_view<type_real, 2>(dump,
+                             edge_storage.acoustic_elastic_interface
+                                 .h_interface_surface_jacobian_times_weight);
+
+  // FF specific statics
+  dump << "acoustic_acoustic_normal";
+  _stream_view<type_real, 3>(
+      dump, edge_storage.acoustic_acoustic_interface.h_medium1_edge_normal);
+  dump << "acoustic_acoustic_contranormal";
+  _stream_view<type_real, 3>(dump, edge_storage.acoustic_acoustic_interface
+                                       .h_medium1_edge_contravariant_normal);
+  dump << "acoustic_acoustic_relaxparam";
+  _stream_view<type_real, 1>(dump, edge_storage.acoustic_acoustic_interface
+                                       .h_interface_relaxation_parameter);
+  dump << "acoustic_acoustic_dLn1";
+  _stream_view<type_real, 3>(
+      dump, edge_storage.acoustic_acoustic_interface
+                .h_interface_medium1_mortar_transfer_deriv_times_n);
+  dump << "acoustic_acoustic_dLn2";
+  _stream_view<type_real, 3>(
+      dump, edge_storage.acoustic_acoustic_interface
+                .h_interface_medium2_mortar_transfer_deriv_times_n);
+
+  // FS specific statics
+  dump << "acoustic_elastic_normal";
+  _stream_view<type_real, 3>(
+      dump, edge_storage.acoustic_elastic_interface.h_medium2_edge_normal);
+}
+template <typename edgequad, int datacapacity>
+void dump_edge_container_statics(
+    const std::string &filename,
+    _util::edge_manager::edge_storage<edgequad, datacapacity> &edge_storage) {
+  std::ofstream dump;
+  dump.open(filename);
+  dump_edge_container_statics(dump, edge_storage);
+  dump.close();
 }
 
 template <int num_sides>
@@ -218,12 +317,10 @@ void dump_adjacency_graph(
 
 template <specfem::wavefield::simulation_field WavefieldType>
 void dump_simfield(
-    const std::string &filename,
+    std::ofstream &dump,
     const specfem::compute::simulation_field<WavefieldType> &simfield,
     const specfem::compute::points &points, bool skip_statics = false) {
-  std::ofstream dump;
-  dump.open(filename);
-  // dump points
+
   if (!skip_statics) {
     dump << "pts";
     _stream_view<type_real, 4>(dump, points.h_coord);
@@ -256,15 +353,22 @@ void dump_simfield(
   // _stream_view<type_real,4>(dump,simfield.h_edge_values_x);
   // dump << "edge_values_z";
   // _stream_view<type_real,4>(dump,simfield.h_edge_values_z);
-
+}
+template <specfem::wavefield::simulation_field WavefieldType>
+void dump_simfield(
+    const std::string &filename,
+    const specfem::compute::simulation_field<WavefieldType> &simfield,
+    const specfem::compute::points &points, bool skip_statics = false) {
+  std::ofstream dump;
+  dump.open(filename);
+  dump_simfield(dump, simfield, points, skip_statics);
   dump.close();
 }
 
-void dump_simfield_statics(const std::string &filename,
+void dump_simfield_statics(std::ofstream &dump,
                            specfem::compute::assembly &assembly) {
   const auto &simfield = assembly.fields.forward;
-  std::ofstream dump;
-  dump.open(filename);
+
   // dump points
   dump << "pts";
   _stream_view<type_real, 4>(dump, assembly.mesh.points.h_coord);
@@ -289,6 +393,19 @@ void dump_simfield_statics(const std::string &filename,
   // dump << "edge_values_z";
   // _stream_view<type_real,4>(dump,simfield.h_edge_values_z);
 
+  dump << "medium_type_refs";
+  Kokkos::View<int[2], Kokkos::DefaultExecutionSpace> medium_type_refs(
+      "dump_simfield_statics:medium_type_refs");
+  medium_type_refs(0) =
+      static_cast<int>(specfem::element::medium_tag::acoustic);
+  medium_type_refs(1) = static_cast<int>(specfem::element::medium_tag::elastic);
+  _stream_view<int, 1>(dump, medium_type_refs);
+}
+void dump_simfield_statics(const std::string &filename,
+                           specfem::compute::assembly &assembly) {
+  std::ofstream dump;
+  dump.open(filename);
+  dump_simfield_statics(dump, assembly);
   dump.close();
 }
 
@@ -298,6 +415,23 @@ void dump_simfield_per_step(const int istep, const std::string &filename,
                 assembly.fields.forward, assembly.mesh.points, true);
   if (istep == 0) {
     dump_simfield_statics(filename + "statics.dat", assembly);
+  }
+}
+template <typename edgequad, int datacapacity>
+void dump_simfield_per_step(
+    const int istep, const std::string &filename,
+    specfem::compute::assembly &assembly,
+    _util::edge_manager::edge_storage<edgequad, datacapacity> &edge_storage) {
+  std::ofstream dump;
+  dump.open(filename + std::to_string(istep) + ".dat");
+  dump_simfield(dump, assembly.fields.forward, assembly.mesh.points, true);
+  dump_edge_container(dump, edge_storage);
+  dump.close();
+  if (istep == 0) {
+    dump.open(filename + "statics.dat");
+    dump_simfield_statics(dump, assembly);
+    dump_edge_container_statics(dump, edge_storage);
+    dump.close();
   }
 }
 

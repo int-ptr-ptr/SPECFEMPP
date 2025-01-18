@@ -233,6 +233,12 @@ class dump_frame:
 
         elastic_medium_id = 0
         acoustic_medium_id = 1
+        if "medium_type_refs" in data_simfield:
+            medium_type_refs = data_simfield["medium_type_refs"]
+            acoustic_medium_id = medium_type_refs[0]
+            elastic_medium_id = medium_type_refs[1]
+        self.elastic_medium_id = elastic_medium_id
+        self.acoustic_medium_id = acoustic_medium_id
 
         nglob_acoustic = data_simfield["acoustic_field"].shape[0]
         nglob_elastic = data_simfield["elastic_field"].shape[0]
@@ -359,6 +365,7 @@ class dump_frame:
         # displacement[self.is_fully_medium[:,acoustic_medium_id],...] = displacement_elastic[self.is_fully_medium[:,acoustic_medium_id],...]
         # displacement_ddot[self.is_fully_medium[:,acoustic_medium_id],...] = displacement_elastic_ddot[self.is_fully_medium[:,acoustic_medium_id],...]
 
+        assert ngllga == ngllxi, "we are only supporting when ngllx==ngllz"
         self.nspec = nspec
         self.ngllx = ngllxi
         self.ngllz = ngllga
@@ -406,155 +413,312 @@ class dump_frame:
         self.data_polys = types.SimpleNamespace(P_poly=P_poly, X_poly=chi_poly)
         self.cell_centers = np.mean(pts, axis=(1, 2))
 
-        if data_edges is None:
-            return
+        lci_parts = types.SimpleNamespace()
+        to_add_media = []
+        to_add_interfaces = []
+        if "acoustic_acoustic_ispecs" in data_simfield:
+            lci_parts.FF = types.SimpleNamespace(
+                medium=types.SimpleNamespace(),
+                interface=types.SimpleNamespace(),
+            )
+            lci_parts.FF.medium.ispec = data_simfield["acoustic_acoustic_ispecs"]
+            edge_refs = np.empty(
+                (np.max(data_simfield["edge_type_refs"]) + 1,), dtype=int
+            )
+            for i, v in enumerate(data_simfield["edge_type_refs"]):
+                edge_refs[v] = i
+            lci_parts.FF.medium.edge_type = data_simfield["acoustic_acoustic_edgetypes"]
+            to_add_media.append(lci_parts.FF.medium)
+            to_add_interfaces.append(lci_parts.FF.interface)
+            lci_parts.FF.interface.label_prefix = "acoustic_acoustic"
 
-        self.data_capacity = data_edges["edge_data"].shape[1]
+            lci_parts.FF.medium.normal = data_simfield["acoustic_acoustic_normal"]
+            lci_parts.FF.medium.contravariant_normal = data_simfield[
+                "acoustic_acoustic_contranormal"
+            ]
+            lci_parts.FF.medium.relax_param = data_simfield[
+                "acoustic_acoustic_relaxparam"
+            ]
+            lci_parts.FF.interface.medium1_dLn = data_simfield["acoustic_acoustic_dLn1"]
+            lci_parts.FF.interface.medium2_dLn = data_simfield["acoustic_acoustic_dLn2"]
 
-        self.edges = types.SimpleNamespace(
-            count=data_edges["edge_intdat"].shape[0],
-            specID=data_edges["edge_intdat"][:, 0],
-            edgeID=data_edges["edge_intdat"][:, 1],
-            ngll=data_edges["edge_intdat"][:, 2],
-            pos=data_edges["edge_pos"],
-            data=data_edges["edge_data"],
-            data_inds=types.SimpleNamespace(
-                NX=0,
-                NZ=1,
-                DET=2,
-                DS=3,
-                FIELD=4,
-                FIELDNDERIV=6,
-                SPEEDPARAM=8,
-                SHAPENDERIV=slice(9, 9 + ngll_capacity),
-            ),
-        )
+        if "acoustic_elastic_ispecs1" in data_simfield:
+            lci_parts.FS = types.SimpleNamespace(
+                medium1=types.SimpleNamespace(),
+                medium2=types.SimpleNamespace(),
+                interface=types.SimpleNamespace(),
+            )
+            lci_parts.FS.medium1.ispec = data_simfield["acoustic_elastic_ispecs1"]
+            lci_parts.FS.medium2.ispec = data_simfield["acoustic_elastic_ispecs2"]
+            if "edge_refs" not in locals():
+                edge_refs = np.empty(
+                    (np.max(data_simfield["edge_type_refs"]) + 1,), dtype=int
+                )
+                for i, v in enumerate(data_simfield["edge_type_refs"]):
+                    edge_refs[v] = i
+            lci_parts.FS.medium1.edge_type = data_simfield[
+                "acoustic_elastic_edgetypes1"
+            ]
+            lci_parts.FS.medium2.edge_type = data_simfield[
+                "acoustic_elastic_edgetypes2"
+            ]
+            to_add_media.append(lci_parts.FS.medium1)
+            to_add_media.append(lci_parts.FS.medium2)
+            to_add_interfaces.append(lci_parts.FS.interface)
+            lci_parts.FS.interface.label_prefix = "acoustic_elastic"
 
-        self.edges.pos_polys = np.einsum(
-            "eid,eik->ekd", self.edges.pos, self.GLL.L[self.edges.ngll, :, :]
-        )
+            lci_parts.FS.medium2.normal = data_simfield["acoustic_elastic_normal"]
+        if "elastic_elastic_ispecs" in data_simfield:
+            lci_parts.SS = types.SimpleNamespace(
+                medium=types.SimpleNamespace(),
+                interface=types.SimpleNamespace(),
+            )
+            lci_parts.SS.medium.ispec = data_simfield["elastic_elastic_ispecs"]
+            if "edge_refs" not in locals():
+                edge_refs = np.empty(
+                    (np.max(data_simfield["edge_type_refs"]) + 1,), dtype=int
+                )
+                for i, v in enumerate(data_simfield["edge_type_refs"]):
+                    edge_refs[v] = i
+            lci_parts.SS.medium.edge_type = data_simfield["elastic_elastic_edgetypes"]
+            to_add_media.append(lci_parts.SS.medium)
+            to_add_interfaces.append(lci_parts.SS.interface)
+            lci_parts.SS.interface.label_prefix = "elastic_elastic"
 
-        def edges_interp_pos(t, e_inds=None):
-            if not isinstance(t, np.ndarray):
-                t = np.array(t)
-            if e_inds is None:
+        for ns in to_add_media:
+            ns.ngll = ngllxi
+            ns.global_field_at_edge = lambda field, ns=ns: recover_edgevals(
+                field[ns.ispec, ...],
+                ns.edge_type[:, *[np.newaxis for _ in field.shape[2:]]],
+            )
+
+            def interp_edge(efield, t, ns):
+                if not isinstance(t, np.ndarray):
+                    t = np.array(t)
+                fieldinds = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[: (len(efield.shape) - 2)]
                 return np.einsum(
-                    "eid,eik,...k->...ed",
-                    self.edges.pos,
-                    self.GLL.L[self.edges.ngll, :, :],
+                    f"ei{fieldinds},ik,...k->...e{fieldinds}",
+                    efield,
+                    self.GLL.L[ns.ngll, :, :],
                     t[..., np.newaxis] ** np.arange(ngll_capacity),
                 )
-            else:
-                return np.einsum(
-                    "...id,...ik,...k->...d",
-                    self.edges.pos[e_inds, ...],
-                    self.GLL.L[self.edges.ngll[e_inds], :, :],
-                    t[..., np.newaxis] ** np.arange(ngll_capacity),
-                )
 
-        self.edges.interp_pos = edges_interp_pos
+            ns.interpolate_edge_field = lambda efield, t, ns=ns: interp_edge(
+                efield, t, ns
+            )
+            ns.pts = ns.global_field_at_edge(self.pts)
 
-        self.edges.normals = np.where(
-            self.edges.edgeID[:, np.newaxis, np.newaxis] == 0,
-            dP[self.edges.specID, :, -1, :, 1],
-            np.where(
-                self.edges.edgeID[:, np.newaxis, np.newaxis] == 1,
-                -dP[self.edges.specID, -1, :, :, 0],
-                np.where(
-                    self.edges.edgeID[:, np.newaxis, np.newaxis] == 2,
-                    -dP[self.edges.specID, :, 0, :, 1],
-                    dP[self.edges.specID, 0, :, :, 0],
+        for ns in to_add_interfaces:
+            ns.medium1_ind = data_simfield[f"{ns.label_prefix}_interface_inds1"]
+            ns.medium2_ind = data_simfield[f"{ns.label_prefix}_interface_inds2"]
+            ns.medium1_param_start = data_simfield[
+                f"{ns.label_prefix}_interface_paramstart1"
+            ]
+            ns.medium2_param_start = data_simfield[
+                f"{ns.label_prefix}_interface_paramstart2"
+            ]
+            ns.medium1_param_end = data_simfield[
+                f"{ns.label_prefix}_interface_paramend1"
+            ]
+            ns.medium2_param_end = data_simfield[
+                f"{ns.label_prefix}_interface_paramend2"
+            ]
+            ns.medium1_mortar_trans = data_simfield[
+                f"{ns.label_prefix}_interface_mortartrans1"
+            ]
+            ns.medium2_mortar_trans = data_simfield[
+                f"{ns.label_prefix}_interface_mortartrans2"
+            ]
+            ns.Jw = data_simfield[f"{ns.label_prefix}_interface_jw"]
+            ns.nquad = ns.medium1_mortar_trans.shape[1]
+            ns.nedge1quad = ns.medium1_mortar_trans.shape[2]
+            ns.nedge2quad = ns.medium2_mortar_trans.shape[2]
+            ns.edge1_to_mortar = lambda efield, ns=ns: np.einsum(
+                "ei...,ik->ek...",
+                efield[ns.medium1_ind, ...],
+                ns.medium1_mortar_trans,
+            )
+            ns.edge2_to_mortar = lambda efield, ns=ns: np.einsum(
+                "ei...,ik->ek...",
+                efield[ns.medium2_ind, ...],
+                ns.medium2_mortar_trans,
+            )
+            ns.edge1_to_param_start = lambda efield, ns=ns: np.einsum(
+                "ei...,ik,ek->e...",
+                efield[ns.medium1_ind, ...],
+                self.GLL.L[ns.nedge1quad, :, :],
+                ns.medium1_param_start[:, np.newaxis] ** np.arange(ngll_capacity),
+            )
+            ns.edge1_to_param_end = lambda efield, ns=ns: np.einsum(
+                "ei...,ik,ek->e...",
+                efield[ns.medium1_ind, ...],
+                self.GLL.L[ns.nedge1quad, :, :],
+                ns.medium1_param_end[:, np.newaxis] ** np.arange(ngll_capacity),
+            )
+            ns.edge2_to_param_start = lambda efield, ns=ns: np.einsum(
+                "ei...,ik,ek->e...",
+                efield[ns.medium2_ind, ...],
+                self.GLL.L[ns.nedge2quad, :, :],
+                ns.medium2_param_start[:, np.newaxis] ** np.arange(ngll_capacity),
+            )
+            ns.edge2_to_param_end = lambda efield, ns=ns: np.einsum(
+                "ei...,ik,ek->e...",
+                efield[ns.medium2_ind, ...],
+                self.GLL.L[ns.nedge2quad, :, :],
+                ns.medium2_param_end[:, np.newaxis] ** np.arange(ngll_capacity),
+            )
+
+        self.LCI = lci_parts
+
+        if data_edges is not None:
+            self.data_capacity = data_edges["edge_data"].shape[1]
+
+            self.edges = types.SimpleNamespace(
+                count=data_edges["edge_intdat"].shape[0],
+                specID=data_edges["edge_intdat"][:, 0],
+                edgeID=data_edges["edge_intdat"][:, 1],
+                ngll=data_edges["edge_intdat"][:, 2],
+                pos=data_edges["edge_pos"],
+                data=data_edges["edge_data"],
+                data_inds=types.SimpleNamespace(
+                    NX=0,
+                    NZ=1,
+                    DET=2,
+                    DS=3,
+                    FIELD=4,
+                    FIELDNDERIV=6,
+                    SPEEDPARAM=8,
+                    SHAPENDERIV=slice(9, 9 + ngll_capacity),
                 ),
-            ),
-        )  # 90 degrees off from normals
-        self.edges.tangentials = np.where(
-            self.edges.edgeID[:, np.newaxis, np.newaxis] == 0,
-            dP[self.edges.specID, :, -1, :, 1],
-            np.where(
-                self.edges.edgeID[:, np.newaxis, np.newaxis] == 1,
-                dP[self.edges.specID, -1, :, :, 0],
+            )
+
+            self.edges.pos_polys = np.einsum(
+                "eid,eik->ekd", self.edges.pos, self.GLL.L[self.edges.ngll, :, :]
+            )
+
+            def edges_interp_pos(t, e_inds=None):
+                if not isinstance(t, np.ndarray):
+                    t = np.array(t)
+                if e_inds is None:
+                    return np.einsum(
+                        "eid,eik,...k->...ed",
+                        self.edges.pos,
+                        self.GLL.L[self.edges.ngll, :, :],
+                        t[..., np.newaxis] ** np.arange(ngll_capacity),
+                    )
+                else:
+                    return np.einsum(
+                        "...id,...ik,...k->...d",
+                        self.edges.pos[e_inds, ...],
+                        self.GLL.L[self.edges.ngll[e_inds], :, :],
+                        t[..., np.newaxis] ** np.arange(ngll_capacity),
+                    )
+
+            self.edges.interp_pos = edges_interp_pos
+
+            self.edges.normals = np.where(
+                self.edges.edgeID[:, np.newaxis, np.newaxis] == 0,
+                dP[self.edges.specID, :, -1, :, 1],
                 np.where(
-                    self.edges.edgeID[:, np.newaxis, np.newaxis] == 2,
-                    dP[self.edges.specID, :, 0, :, 1],
-                    dP[self.edges.specID, 0, :, :, 0],
+                    self.edges.edgeID[:, np.newaxis, np.newaxis] == 1,
+                    -dP[self.edges.specID, -1, :, :, 0],
+                    np.where(
+                        self.edges.edgeID[:, np.newaxis, np.newaxis] == 2,
+                        -dP[self.edges.specID, :, 0, :, 1],
+                        dP[self.edges.specID, 0, :, :, 0],
+                    ),
                 ),
-            ),
-        )
-        self.edges.normals = np.einsum(
-            "ij,...j->...i", np.array([[0, 1], [-1, 0]]), self.edges.normals
-        )
-        self.edges.normals /= np.linalg.norm(self.edges.normals, ord=2, axis=-1)[
-            :, :, np.newaxis
-        ]
+            )  # 90 degrees off from normals
+            self.edges.tangentials = np.where(
+                self.edges.edgeID[:, np.newaxis, np.newaxis] == 0,
+                dP[self.edges.specID, :, -1, :, 1],
+                np.where(
+                    self.edges.edgeID[:, np.newaxis, np.newaxis] == 1,
+                    dP[self.edges.specID, -1, :, :, 0],
+                    np.where(
+                        self.edges.edgeID[:, np.newaxis, np.newaxis] == 2,
+                        dP[self.edges.specID, :, 0, :, 1],
+                        dP[self.edges.specID, 0, :, :, 0],
+                    ),
+                ),
+            )
+            self.edges.normals = np.einsum(
+                "ij,...j->...i", np.array([[0, 1], [-1, 0]]), self.edges.normals
+            )
+            self.edges.normals /= np.linalg.norm(self.edges.normals, ord=2, axis=-1)[
+                :, :, np.newaxis
+            ]
 
-        self.intersections = types.SimpleNamespace(
-            count=data_edges["intersect_intdat"].shape[0],
-            a_ref_ind=data_edges["intersect_intdat"][:, 0],
-            b_ref_ind=data_edges["intersect_intdat"][:, 1],
-            ngll=data_edges["intersect_intdat"][:, 2],
-            a_ngll=data_edges["intersect_intdat"][:, 3],
-            b_ngll=data_edges["intersect_intdat"][:, 4],
-            a_param_start=data_edges["intersect_floatdat"][:, 0],
-            a_param_end=data_edges["intersect_floatdat"][:, 1],
-            b_param_start=data_edges["intersect_floatdat"][:, 2],
-            b_param_end=data_edges["intersect_floatdat"][:, 3],
-            relax_param=data_edges["intersect_floatdat"][:, 4],
-            a_mortar_trans=data_edges["intersect_mortartrans"][:, 0, ...],
-            b_mortar_trans=data_edges["intersect_mortartrans"][:, 1, ...],
-            data=data_edges["intersect_data"],
-            data_inds=types.SimpleNamespace(
-                FLUX_TOTAL_A=slice(ngll_capacity * 0, ngll_capacity * (0 + 1)),
-                FLUX1_A=slice(ngll_capacity * 1, ngll_capacity * (1 + 1)),
-                FLUX2_A=slice(ngll_capacity * 2, ngll_capacity * (2 + 1)),
-                FLUX3_A=slice(ngll_capacity * 3, ngll_capacity * (3 + 1)),
-                FLUX_TOTAL_B=slice(ngll_capacity * 4, ngll_capacity * (4 + 1)),
-                FLUX1_B=slice(ngll_capacity * 5, ngll_capacity * (5 + 1)),
-                FLUX2_B=slice(ngll_capacity * 6, ngll_capacity * (6 + 1)),
-                FLUX3_B=slice(ngll_capacity * 7, ngll_capacity * (7 + 1)),
-                UJMP=slice(ngll_capacity * 8, ngll_capacity * (8 + 1)),
-                CDU_AVG=slice(ngll_capacity * 9, ngll_capacity * (9 + 1)),
-                IS_ON_BDRY_A=slice(ngll_capacity * 10, ngll_capacity * (10 + 1)),
-                IS_ON_BDRY_B=slice(ngll_capacity * 11, ngll_capacity * (11 + 1)),
-            ),
-        )
-        self.edges.net_fluxes = np.zeros((self.edges.count, ngll_capacity))
-        self.edges.net_fluxes[self.intersections.a_ref_ind, :] += (
-            self.intersections.data[:, self.intersections.data_inds.FLUX_TOTAL_A]
-        )
-        self.edges.net_fluxes[self.intersections.b_ref_ind, :] += (
-            self.intersections.data[:, self.intersections.data_inds.FLUX_TOTAL_B]
-        )
+            self.intersections = types.SimpleNamespace(
+                count=data_edges["intersect_intdat"].shape[0],
+                a_ref_ind=data_edges["intersect_intdat"][:, 0],
+                b_ref_ind=data_edges["intersect_intdat"][:, 1],
+                ngll=data_edges["intersect_intdat"][:, 2],
+                a_ngll=data_edges["intersect_intdat"][:, 3],
+                b_ngll=data_edges["intersect_intdat"][:, 4],
+                a_param_start=data_edges["intersect_floatdat"][:, 0],
+                a_param_end=data_edges["intersect_floatdat"][:, 1],
+                b_param_start=data_edges["intersect_floatdat"][:, 2],
+                b_param_end=data_edges["intersect_floatdat"][:, 3],
+                relax_param=data_edges["intersect_floatdat"][:, 4],
+                a_mortar_trans=data_edges["intersect_mortartrans"][:, 0, ...],
+                b_mortar_trans=data_edges["intersect_mortartrans"][:, 1, ...],
+                data=data_edges["intersect_data"],
+                data_inds=types.SimpleNamespace(
+                    FLUX_TOTAL_A=slice(ngll_capacity * 0, ngll_capacity * (0 + 1)),
+                    FLUX1_A=slice(ngll_capacity * 1, ngll_capacity * (1 + 1)),
+                    FLUX2_A=slice(ngll_capacity * 2, ngll_capacity * (2 + 1)),
+                    FLUX3_A=slice(ngll_capacity * 3, ngll_capacity * (3 + 1)),
+                    FLUX_TOTAL_B=slice(ngll_capacity * 4, ngll_capacity * (4 + 1)),
+                    FLUX1_B=slice(ngll_capacity * 5, ngll_capacity * (5 + 1)),
+                    FLUX2_B=slice(ngll_capacity * 6, ngll_capacity * (6 + 1)),
+                    FLUX3_B=slice(ngll_capacity * 7, ngll_capacity * (7 + 1)),
+                    UJMP=slice(ngll_capacity * 8, ngll_capacity * (8 + 1)),
+                    CDU_AVG=slice(ngll_capacity * 9, ngll_capacity * (9 + 1)),
+                    IS_ON_BDRY_A=slice(ngll_capacity * 10, ngll_capacity * (10 + 1)),
+                    IS_ON_BDRY_B=slice(ngll_capacity * 11, ngll_capacity * (11 + 1)),
+                ),
+            )
+            self.edges.net_fluxes = np.zeros((self.edges.count, ngll_capacity))
+            self.edges.net_fluxes[self.intersections.a_ref_ind, :] += (
+                self.intersections.data[:, self.intersections.data_inds.FLUX_TOTAL_A]
+            )
+            self.edges.net_fluxes[self.intersections.b_ref_ind, :] += (
+                self.intersections.data[:, self.intersections.data_inds.FLUX_TOTAL_B]
+            )
 
-        # since the knots are from GLL (known), we can recover mortar_trans parameters: x_iL_i = id, for knots x_i
-        self.intersections.a_mortar_trans_knots = np.einsum(
-            "ei,eki->ek",
-            self.GLL.knots[self.intersections.a_ngll, ...],
-            self.intersections.a_mortar_trans,
-        )
-        self.intersections.b_mortar_trans_knots = np.einsum(
-            "ei,eki->ek",
-            self.GLL.knots[self.intersections.b_ngll, ...],
-            self.intersections.b_mortar_trans,
-        )
-
-        self.mortar_data = types.SimpleNamespace(
-            a=np.einsum(
-                "sdp,smp->sdm",
-                self.edges.data[self.intersections.a_ref_ind, ...],
+            # since the knots are from GLL (known), we can recover mortar_trans parameters: x_iL_i = id, for knots x_i
+            self.intersections.a_mortar_trans_knots = np.einsum(
+                "ei,eki->ek",
+                self.GLL.knots[self.intersections.a_ngll, ...],
                 self.intersections.a_mortar_trans,
-            ),
-            b=np.einsum(
-                "sdp,smp->sdm",
-                self.edges.data[self.intersections.b_ref_ind, ...],
+            )
+            self.intersections.b_mortar_trans_knots = np.einsum(
+                "ei,eki->ek",
+                self.GLL.knots[self.intersections.b_ngll, ...],
                 self.intersections.b_mortar_trans,
-            ),
-        )
+            )
+
+            self.mortar_data = types.SimpleNamespace(
+                a=np.einsum(
+                    "sdp,smp->sdm",
+                    self.edges.data[self.intersections.a_ref_ind, ...],
+                    self.intersections.a_mortar_trans,
+                ),
+                b=np.einsum(
+                    "sdp,smp->sdm",
+                    self.edges.data[self.intersections.b_ref_ind, ...],
+                    self.intersections.b_mortar_trans,
+                ),
+            )
 
     def edge_vals_of_fields(self, field):
-        return recover_edgevals(
-            field[self.edges.specID, ...],
-            self.edges.edgeID[:, *[np.newaxis for _ in field.shape[2:]]],
-        )
+        if hasattr(self, "edges"):
+            return recover_edgevals(
+                field[self.edges.specID, ...],
+                self.edges.edgeID[:, *[np.newaxis for _ in field.shape[2:]]],
+            )
+        return None
 
     def plot_field(
         self,
@@ -613,7 +777,8 @@ class dump_frame:
         if figsize is not None:
             plt.figure(figsize=figsize)
         plt.scatter(pts_plt[..., 0], pts_plt[..., 1], 1)
-        plt.scatter(pts_plt_edge[..., 0], pts_plt_edge[..., 1], None, field)
+        if pts_plt_edge is not None:
+            plt.scatter(pts_plt_edge[..., 0], pts_plt_edge[..., 1], None, field)
         if title is not None:
             plt.title(title)
         if show:
@@ -795,12 +960,16 @@ def load_series(simfield_dump_prefix: str):
 
 if __name__ == "__main__":
     pass
-    # import config
-    # test = config.get("cg_compare.tests.0")
-    # folder = os.path.join(config.get("cg_compare.workspace_folder"),test["name"])
+    import config
 
-    # d = read_dump_file(os.path.join(folder, config.get("cg_compare.workspace_files.dump_prefix"))+"350.dat")
-    # d.plot_field(np.linalg.norm(d.displacement,axis=-1),mode="contour")
+    test = config.get("cg_compare.tests.3")
+    folder = os.path.join(config.get("cg_compare.workspace_folder"), test["name"])
+
+    d = read_dump_file(
+        os.path.join(folder, config.get("cg_compare.workspace_files.dump_prefix"))
+        + "350.dat"
+    )
+    d.plot_field(np.linalg.norm(d.displacement, axis=-1), mode="contour")
 
     # ser = load_series(os.path.join(folder, config.get("cg_compare.workspace_files.dump_prefix")))
 

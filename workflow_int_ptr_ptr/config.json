@@ -89,13 +89,13 @@
         "name": "FF0",
         "mat1": "1 1 1 0 0 0 9999 9999 0 0 0 0 0 0",
         "mat2": "1 1 1 0 0 0 9999 9999 0 0 0 0 0 0",
-        "class": "doublemesh"
+        "class": "samemesh"
       },
       {
         "name": "FS0",
         "mat1": "1 1 1 0.6 0 0 9999 9999 0 0 0 0 0 0",
         "mat2": "1 1 1 0 0 0 9999 9999 0 0 0 0 0 0",
-        "class": "doublemesh"
+        "class": "samemesh"
       },
       {
         "name": "FF1",

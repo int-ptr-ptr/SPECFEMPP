@@ -54,6 +54,9 @@ def test_against_provenance(session):
 def init_cgcompare_workspace(session):
     session.install("numpy", "matplotlib")
     session.cd(os.path.join(workspace_root, "runnables"))
+    cg_workspace = config.get("cg_compare.workspace_folder")
+    if os.path.exists(cg_workspace):
+        shutil.rmtree(cg_workspace)
     session.run("python", "-m", "cg_compare.load_workspaces")
 
 

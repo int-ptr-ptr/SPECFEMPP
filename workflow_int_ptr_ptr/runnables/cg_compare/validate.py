@@ -58,6 +58,9 @@ class cg_compare_validation:
         while True:
             # take all of the integer-named files, retrieve the lowest one > dumpnum
             files_to_check = dict()
+            if not os.path.exists(self.dumpfol):
+                # the dump folder hasn't even been made yet; hold off.
+                break
             for fname in os.listdir(self.dumpfol):
                 # did we find the statics file?
                 if fname.endswith("statics.dat"):
@@ -114,7 +117,7 @@ class cg_compare_validation:
                 self.lastprint = t
                 print(
                     f"[{self.test['name']}]: dump {self.dumpnum}; "
-                    f"l2 displacement error maximized at {self.max_err} "
+                    f"l2 displacement error maximized at {self.max_err :.6e} "
                     f"(dump {self.max_err_dumpnum})"
                 )
 
@@ -166,10 +169,16 @@ if __name__ == "__main__":
     for test in tests:
         c = cg_compare_validation(test)
         compares.append(c)
+        if test["class"] == "samemesh":
+            args = "%NOC %NOD"
+        elif test["class"] == "doublemesh":
+            args = "%NOC %D"
+        else:
+            raise ValueError(f'Unknown test class {test["class"]}')
         i = util.runjob.queue_job(
             util.runjob.RunJob(
                 name=f"cg_compare: {test['name']}",
-                cmd=f"cd {c.folder} && " + config.get("specfem.live.exe") + " %D",
+                cmd=f"cd {c.folder} && " + config.get("specfem.live.exe") + f" {args}",
                 min_update_interval=4,
                 linebuf_size=10,
                 print_updates=False,
