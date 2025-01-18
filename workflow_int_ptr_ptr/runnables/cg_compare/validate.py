@@ -12,6 +12,7 @@ import numpy as np
 import shutil
 
 PRINT_TIME_INTERVAL = 5
+SWITCH_INTERVAL = 2
 
 
 class cg_compare_validation:
@@ -54,12 +55,17 @@ class cg_compare_validation:
             os.makedirs(self.tmpdir)
         self.plotnum = 0
 
+        # set to true if we timeout on the consume_dumps
+        self.was_paused = False
+
     def consume_dumps(self):
+        t_method_start = time.time()
         while True:
             # take all of the integer-named files, retrieve the lowest one > dumpnum
             files_to_check = dict()
             if not os.path.exists(self.dumpfol):
                 # the dump folder hasn't even been made yet; hold off.
+                self.was_paused = False
                 break
             for fname in os.listdir(self.dumpfol):
                 # did we find the statics file?
@@ -80,6 +86,7 @@ class cg_compare_validation:
                     )
             if (not files_to_check) or (self.statics is None):
                 # no more files to check, or we don't have the statics reference yet
+                self.was_paused = False
                 break
             self.dumpnum = min(files_to_check.keys())
             self.provind = files_to_check[self.dumpnum][1]
@@ -120,6 +127,9 @@ class cg_compare_validation:
                     f"l2 displacement error maximized at {self.max_err :.6e} "
                     f"(dump {self.max_err_dumpnum})"
                 )
+            if time.time() - t_method_start > SWITCH_INTERVAL:
+                self.was_paused = True
+                break
 
     def write_seismos(self):
         util.seismo_reader.compare_seismos(
@@ -155,7 +165,7 @@ class cg_compare_validation:
         os.system(
             f"ffmpeg -pattern_type glob -r {framerate}"
             f' -i "{os.path.join(self.tmpdir, "comp*.png")}" -r {framerate} '
-            f"{os.path.join(self.folder, anim_out_file)} -y"
+            f"{os.path.join(self.folder, anim_out_file)} -y &> /dev/null"
         )
         shutil.rmtree(self.tmpdir)
         print(f"[{self.test['name']}]: animation written.")
@@ -179,7 +189,7 @@ if __name__ == "__main__":
             util.runjob.RunJob(
                 name=f"cg_compare: {test['name']}",
                 cmd=f"cd {c.folder} && " + config.get("specfem.live.exe") + f" {args}",
-                min_update_interval=4,
+                min_update_interval=30,
                 linebuf_size=10,
                 print_updates=False,
             )
@@ -192,7 +202,7 @@ if __name__ == "__main__":
         time.sleep(2)
         for c in compares:
             c.consume_dumps()
-            if c.job not in run_jobs:
+            if c.job not in run_jobs and not c.was_paused:
                 c.finalize()
                 compares.remove(c)
 
@@ -200,4 +210,5 @@ if __name__ == "__main__":
             for line in util.runjob.consume_queue(i):
                 print(line)
             if not util.runjob.is_job_running(i):
+                print(f"[{test_from_job[i]['name']}]: simulation complete.")
                 run_jobs.remove(i)

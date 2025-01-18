@@ -74,12 +74,14 @@ void edge_storage<edgequad, datacapacity>::initialize_intersection_data(int capa
  * @return false if no nonzero intersection occurs between these two edges
  */
 template <typename edgequad, int datacapacity>
+template <int intersection_nquad>
 bool edge_storage<edgequad, datacapacity>::intersect(const int a_edge_index,
                const int b_edge_index,
-               edge_intersection<ngll> &intersection) {
+               edge_intersection<intersection_nquad> &intersection) {
 #define intersect_eps 1e-3
 #define intersect_eps2 (intersect_eps * intersect_eps)
   quadrature_rule gll = gen_GLL(ngll);
+  quadrature_rule interquad = gen_GLL(intersection_nquad);
 
   //maybe do an AABB check for performance? the box can be precomputed per edge.
 
@@ -227,63 +229,156 @@ bool edge_storage<edgequad, datacapacity>::intersect(const int a_edge_index,
   //fix it.
 
   // populate mortar transfer functions by computing reference parameters for even spacing
-  type_real t_samples[ngll];
+  type_real t_samples[intersection_nquad];
 
   //this uses the linear approximations, but we should consider a different scheme (locate_point?)
-  type_real a_len = 0, b_len = 0;
+
+  type_real a_len = 0, b_len = 0;//length of intersection as measured on either side
   type_real a_sublens[subdivisions];
   type_real b_sublens[subdivisions];
-  for(int i = 0; i < subdivisions; i++){
+
+  // subdivision on which intersection starts. since we are in positive range, casting floors
+  //start at greatest int where (ih-1 <= param_start)
+  //recall 2/h == subdivisions
+  int a_ind_start = std::max(0,static_cast<int>((a_param_start + 1) * subdivisions * 0.5));
+  type_real a_subind_start = 0.5*subdivisions*(a_param_start + 1) - a_ind_start;
+  int b_ind_start = std::max(0,static_cast<int>((b_param_start + 1) * subdivisions * 0.5));
+  type_real b_subind_start = 0.5*subdivisions*(b_param_start + 1) - b_ind_start;
+
+  //end at smallest int where ((i+1)h-1 >= param_end).
+  int a_ind_end = std::min(subdivisions-1,subdivisions-1-static_cast<int>(subdivisions-(a_param_end + 1) * subdivisions * 0.5));
+  type_real a_subind_end = 0.5*subdivisions*(a_param_end + 1) - a_ind_end;
+  int b_ind_end = std::min(subdivisions-1,subdivisions-1-static_cast<int>(subdivisions-(b_param_end + 1) * subdivisions * 0.5));
+  type_real b_subind_end = 0.5*subdivisions*(b_param_end + 1) - b_ind_end;
+  for(int i = a_ind_start; i <= a_ind_end; i++){
     type_real dx = ax[i+1] - ax[i];
     type_real dz = az[i+1] - az[i];
     a_sublens[i] = sqrt(dx*dx + dz*dz);
     a_len += a_sublens[i];
-    dx = bx[i+1] - bx[i];
-    dz = bz[i+1] - bz[i];
+  }
+  //for a_len, we overcounted on the endpoints
+  a_len -= a_sublens[a_ind_start] * a_subind_start;
+  a_len -= a_sublens[a_ind_end] * (1-a_subind_end);
+
+  for(int i = b_ind_start; i <= b_ind_end; i++){
+    type_real dx = bx[i+1] - bx[i];
+    type_real dz = bz[i+1] - bz[i];
     b_sublens[i] = sqrt(dx*dx + dz*dz);
     b_len += b_sublens[i];
   }
+  b_len -= b_sublens[b_ind_start] * b_subind_start;
+  b_len -= b_sublens[b_ind_end] * (1-b_subind_end);
 
+#ifdef ___DEBUG___
+  ASSERT(0 <= a_subind_start && a_subind_start <= 1+1e-6, "start: "+std::to_string(a_param_start)+" ("+std::to_string(a_ind_start)+","+std::to_string(a_subind_start)+")");
+  ASSERT(0 <= a_subind_end && a_subind_end <= 1+1e-6, "end: "+std::to_string(a_param_end)+" ("+std::to_string(a_ind_end)+","+std::to_string(a_subind_end)+")");
+  ASSERT(0 <= b_subind_start && b_subind_start <= 1+1e-6, "start: "+std::to_string(b_param_start)+" ("+std::to_string(b_ind_start)+","+std::to_string(b_subind_start)+")");
+  ASSERT(0 <= b_subind_end && b_subind_end <= 1+1e-6, "end: "+std::to_string(b_param_end)+" ("+std::to_string(b_ind_end)+","+std::to_string(b_subind_end)+")");
+#endif
 
-  for (int i = 0; i < ngll; i++) {
+  for (int i = 0; i < intersection_nquad; i++) {
     // avg / 2, since parameter for quadrature ranges from -1 to 1 (len 2)
+    //the goal is to space nodes so ds is constant.
     intersection.ds[i] = (a_len + b_len)/4;
   }
 
-  //even spacing is len_desired = i * len * (t+1)/2
-  //find parameters int_-1^{t_desired} |dr|  = len_desired
-  type_real len_inc = a_sublens[0];
-  int segment = 1;
-  for (int i = 0; i < ngll; i++) {
+  //even spacing is len_desired = (igll/(nquad-1) - 1) * len(intersection)    igll = 0:nquad
+  //find parameters int_{param_start}^{t_desired} |dr|  = len_desired
+
+
+  //this is the length at the end of this segment. We know t lies on this segment if len_inc >= len_desired
+  // [parameter space] (index*h - 1)
+  //       param_start                           t_desired (want)
+  // |----------+--------------|--------|-------------------------------|
+  //
+  // [segment index space] ((parameter + 1)/h)
+  //  ---------- <- subind_start                                     segment
+  // |----------+--------------|--------|---------------+---------------|
+  // ind_start                                           --------------- <- delta / sublens[segment-1]
+  //
+  // [length space] (sum_start^index sublen )
+  //            0                            len_desired (known)       len_inc
+  // |----------+--------------|--------|---------------+---------------|
+  //                                     ------------------------------- <- sublens[segment-1]
+  //                                                     --------------- <- delta = len_inc - len_desired
+  //                                        (ratio by linear approx)
+
+  // indexwise   ---  (segment+1) = t_desired/h + delta
+  // lengthwise  ---  len_inc                   = len_desired + delta*sublen[segment-1]
+  type_real len_inc = a_sublens[a_ind_start] * (1-a_subind_start);
+
+  int segment = a_ind_start+1;
+#ifdef ___DEBUG___
+  std::string compute_log = "  init(seg="+std::to_string(segment)+",inc="+std::to_string(len_inc)+")";
+#endif
+  for (int i = 0; i < intersection_nquad; i++) {
     type_real len_desired = 0.5*(1+gll.t[i])*a_len;
-    while(len_inc < len_desired){
+#ifdef ___DEBUG___
+  compute_log += "\n  newtarget(len_desired="+std::to_string(len_desired)+")";
+#endif
+    while(len_inc < len_desired && segment <= a_ind_end){
       len_inc += a_sublens[segment];
       segment++;
+#ifdef ___DEBUG___
+  compute_log += "\n  inc(seg="+std::to_string(segment)+",inc="+std::to_string(len_inc)+")";
+#endif
     }
-    // len_inc = len_desired + delta
-    // t_desired = h*segment - delta/sublen[segment-1] - 1
-    // since h * segment -> len_inc, and we use linear approx
     t_samples[i] = h*(segment + (len_desired - len_inc)/a_sublens[segment-1]) - 1;
+#ifdef ___DEBUG___
+  compute_log += "\n  select(t["+std::to_string(i)+"]="+std::to_string(t_samples[i])+")";
+#endif
   }
-  gll.sample_L(intersection.a_mortar_trans, t_samples, ngll);
+#ifdef ___DEBUG___
+  const auto stringify_arr = [](type_real* arr, int size){
+    std::string st = "[" + std::to_string(arr[0]);
+    for(int i = 1; i < size; i++){
+      st += ", " + std::to_string(arr[i]);
+    }
+    st += "]";
+    return st;
+  };
+  ASSERT(-1-1e-6 <= t_samples[0] && t_samples[intersection_nquad-1] <= 1+1e-6,
+    "bad t-samples\ntsamples (side1): log\n"+compute_log+"\nlen = "+std::to_string(a_len)
+    +"\nstart: "+std::to_string(a_param_start)+" ("+std::to_string(a_ind_start)+","+std::to_string(a_subind_start)+") "
+    +"end: "+std::to_string(a_param_end)+" ("+std::to_string(a_ind_end)+","+std::to_string(a_subind_end)+")"
+    +"\nsublens = "+stringify_arr(a_sublens,subdivisions));
+#endif
+  gll.sample_L(intersection.a_mortar_trans, t_samples, intersection_nquad);
 
 
-  len_inc = b_sublens[0];
-  segment = 1;
-  for (int i = 0; i < ngll; i++) {
+  segment = b_ind_start+1;
+  len_inc = b_sublens[b_ind_start] * (1-b_subind_start);
+#ifdef ___DEBUG___
+  compute_log = "  init(seg="+std::to_string(segment)+",inc="+std::to_string(len_inc)+")";
+#endif
+  for (int i = 0; i < intersection_nquad; i++) {
     type_real len_desired = 0.5*(1+gll.t[i])*b_len;
-    while(len_inc < len_desired){
+#ifdef ___DEBUG___
+  compute_log += "\n  newtarget(len_desired="+std::to_string(len_desired)+")";
+#endif
+    while(len_inc < len_desired && segment <= b_ind_end){
       len_inc += b_sublens[segment];
       segment++;
+#ifdef ___DEBUG___
+  compute_log += "\n  inc(seg="+std::to_string(segment)+",inc="+std::to_string(len_inc)+")";
+#endif
     }
-    // len_inc = len_desired + delta
-    // t_desired = h*segment + delta/sublen[segment-1]
     t_samples[i] = h*(segment + (len_desired - len_inc)/b_sublens[segment-1]) - 1;
+#ifdef ___DEBUG___
+  compute_log += "\n  select(t["+std::to_string(i)+"]="+std::to_string(t_samples[i])+")";
+#endif
   }
-  gll.sample_L(intersection.b_mortar_trans, t_samples, ngll);
-  intersection.ngll = ngll;
-  intersection.a_ngll = ngll;
-  intersection.b_ngll = ngll;
+#ifdef ___DEBUG___
+  ASSERT(-1-1e-6 <= t_samples[0] && t_samples[intersection_nquad-1] <= 1+1e-6,
+    "bad t-samples\ntsamples (side2): log\n"+compute_log+"\nlen = "+std::to_string(b_len)
+    +"\nstart: "+std::to_string(b_param_start)+" ("+std::to_string(b_ind_start)+","+std::to_string(b_subind_start)+") "
+    +"end: "+std::to_string(b_param_end)+" ("+std::to_string(b_ind_end)+","+std::to_string(b_subind_end)+")"
+    +"\nsublens = "+stringify_arr(b_sublens,subdivisions));
+#endif
+  gll.sample_L(intersection.b_mortar_trans, t_samples, intersection_nquad);
+  intersection.ngll = intersection_nquad;
+  intersection.a_ngll = edgequad::NGLL;
+  intersection.b_ngll = edgequad::NGLL;
   return true;
 #undef intersect_eps2
 #undef intersect_eps

@@ -1,3 +1,4 @@
+#define ___DEBUG___
 #define EDGEIND_NX 0
 #define EDGEIND_NZ 1
 #define EDGEIND_DET 2
@@ -38,6 +39,7 @@ bool FORCE_INTO_CONTINUOUS;
 bool USE_DOUBLEMESH;
 
 // #define DEFAULT_USE_DOUBLEMESH
+#define DEFAULT_SET_CONTINUOUS false
 // #define USE_DEMO_MESH
 // #define SET_INITIAL_CONDITION
 
@@ -539,20 +541,23 @@ int main(int argc, char **argv) {
   } else {
     FORCE_INTO_CONTINUOUS = !USE_DOUBLEMESH;
   }
+#ifdef DEFAULT_SET_CONTINUOUS
+  FORCE_INTO_CONTINUOUS = DEFAULT_SET_CONTINUOUS;
+#endif
 
   // Initialize MPI
   specfem::MPI::MPI *mpi = new specfem::MPI::MPI(&argc, &argv);
   // Initialize Kokkos
   Kokkos::initialize(argc, argv);
   if (USE_DOUBLEMESH) {
-    mpi->cout("Using doublemesh\n");
+    mpi->cout("Using doublemesh");
   } else {
-    mpi->cout("Using standard single-mesh\n");
+    mpi->cout("Using standard single-mesh");
   }
   if (FORCE_INTO_CONTINUOUS) {
-    mpi->cout("Forcing into continuous domain\n");
+    mpi->cout("Forcing into continuous domain");
   } else {
-    mpi->cout("Using discontinuous domain\n");
+    mpi->cout("Using discontinuous domain");
   }
   { execute(mpi); }
   // Finalize Kokkos

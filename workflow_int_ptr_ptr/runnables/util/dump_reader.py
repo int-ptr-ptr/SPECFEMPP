@@ -416,157 +416,154 @@ class dump_frame:
         lci_parts = types.SimpleNamespace()
         to_add_media = []
         to_add_interfaces = []
-        if "acoustic_acoustic_ispecs" in data_simfield:
-            lci_parts.FF = types.SimpleNamespace(
-                medium=types.SimpleNamespace(),
-                interface=types.SimpleNamespace(),
-            )
-            lci_parts.FF.medium.ispec = data_simfield["acoustic_acoustic_ispecs"]
+        if "edge_type_refs" in data_simfield:
             edge_refs = np.empty(
                 (np.max(data_simfield["edge_type_refs"]) + 1,), dtype=int
             )
             for i, v in enumerate(data_simfield["edge_type_refs"]):
                 edge_refs[v] = i
-            lci_parts.FF.medium.edge_type = data_simfield["acoustic_acoustic_edgetypes"]
-            to_add_media.append(lci_parts.FF.medium)
-            to_add_interfaces.append(lci_parts.FF.interface)
-            lci_parts.FF.interface.label_prefix = "acoustic_acoustic"
-
-            lci_parts.FF.medium.normal = data_simfield["acoustic_acoustic_normal"]
-            lci_parts.FF.medium.contravariant_normal = data_simfield[
-                "acoustic_acoustic_contranormal"
-            ]
-            lci_parts.FF.medium.relax_param = data_simfield[
-                "acoustic_acoustic_relaxparam"
-            ]
-            lci_parts.FF.interface.medium1_dLn = data_simfield["acoustic_acoustic_dLn1"]
-            lci_parts.FF.interface.medium2_dLn = data_simfield["acoustic_acoustic_dLn2"]
-
-        if "acoustic_elastic_ispecs1" in data_simfield:
-            lci_parts.FS = types.SimpleNamespace(
-                medium1=types.SimpleNamespace(),
-                medium2=types.SimpleNamespace(),
-                interface=types.SimpleNamespace(),
-            )
-            lci_parts.FS.medium1.ispec = data_simfield["acoustic_elastic_ispecs1"]
-            lci_parts.FS.medium2.ispec = data_simfield["acoustic_elastic_ispecs2"]
-            if "edge_refs" not in locals():
-                edge_refs = np.empty(
-                    (np.max(data_simfield["edge_type_refs"]) + 1,), dtype=int
+            if "acoustic_acoustic_ispecs" in data_simfield:
+                lci_parts.FF = types.SimpleNamespace(
+                    medium=types.SimpleNamespace(),
+                    interface=types.SimpleNamespace(),
                 )
-                for i, v in enumerate(data_simfield["edge_type_refs"]):
-                    edge_refs[v] = i
-            lci_parts.FS.medium1.edge_type = data_simfield[
-                "acoustic_elastic_edgetypes1"
-            ]
-            lci_parts.FS.medium2.edge_type = data_simfield[
-                "acoustic_elastic_edgetypes2"
-            ]
-            to_add_media.append(lci_parts.FS.medium1)
-            to_add_media.append(lci_parts.FS.medium2)
-            to_add_interfaces.append(lci_parts.FS.interface)
-            lci_parts.FS.interface.label_prefix = "acoustic_elastic"
+                lci_parts.FF.medium.ispec = data_simfield["acoustic_acoustic_ispecs"]
+                lci_parts.FF.medium.edge_type = edge_refs[
+                    data_simfield["acoustic_acoustic_edgetypes"]
+                ]
+                to_add_media.append(lci_parts.FF.medium)
+                to_add_interfaces.append(lci_parts.FF.interface)
+                lci_parts.FF.interface.label_prefix = "acoustic_acoustic"
 
-            lci_parts.FS.medium2.normal = data_simfield["acoustic_elastic_normal"]
-        if "elastic_elastic_ispecs" in data_simfield:
-            lci_parts.SS = types.SimpleNamespace(
-                medium=types.SimpleNamespace(),
-                interface=types.SimpleNamespace(),
-            )
-            lci_parts.SS.medium.ispec = data_simfield["elastic_elastic_ispecs"]
-            if "edge_refs" not in locals():
-                edge_refs = np.empty(
-                    (np.max(data_simfield["edge_type_refs"]) + 1,), dtype=int
+                lci_parts.FF.medium.normal = data_simfield["acoustic_acoustic_normal"]
+                lci_parts.FF.medium.contravariant_normal = data_simfield[
+                    "acoustic_acoustic_contranormal"
+                ]
+                lci_parts.FF.interface.relax_param = data_simfield[
+                    "acoustic_acoustic_relaxparam"
+                ]
+                lci_parts.FF.interface.medium1_dLn = data_simfield[
+                    "acoustic_acoustic_dLn1"
+                ]
+                lci_parts.FF.interface.medium2_dLn = data_simfield[
+                    "acoustic_acoustic_dLn2"
+                ]
+
+            if "acoustic_elastic_ispecs1" in data_simfield:
+                lci_parts.FS = types.SimpleNamespace(
+                    medium1=types.SimpleNamespace(),
+                    medium2=types.SimpleNamespace(),
+                    interface=types.SimpleNamespace(),
                 )
-                for i, v in enumerate(data_simfield["edge_type_refs"]):
-                    edge_refs[v] = i
-            lci_parts.SS.medium.edge_type = data_simfield["elastic_elastic_edgetypes"]
-            to_add_media.append(lci_parts.SS.medium)
-            to_add_interfaces.append(lci_parts.SS.interface)
-            lci_parts.SS.interface.label_prefix = "elastic_elastic"
+                lci_parts.FS.medium1.ispec = data_simfield["acoustic_elastic_ispecs1"]
+                lci_parts.FS.medium2.ispec = data_simfield["acoustic_elastic_ispecs2"]
+                lci_parts.FS.medium1.edge_type = edge_refs[
+                    data_simfield["acoustic_elastic_edgetypes1"]
+                ]
+                lci_parts.FS.medium2.edge_type = edge_refs[
+                    data_simfield["acoustic_elastic_edgetypes2"]
+                ]
+                to_add_media.append(lci_parts.FS.medium1)
+                to_add_media.append(lci_parts.FS.medium2)
+                to_add_interfaces.append(lci_parts.FS.interface)
+                lci_parts.FS.interface.label_prefix = "acoustic_elastic"
 
-        for ns in to_add_media:
-            ns.ngll = ngllxi
-            ns.global_field_at_edge = lambda field, ns=ns: recover_edgevals(
-                field[ns.ispec, ...],
-                ns.edge_type[:, *[np.newaxis for _ in field.shape[2:]]],
-            )
+                lci_parts.FS.medium2.normal = data_simfield["acoustic_elastic_normal"]
+            if "elastic_elastic_ispecs" in data_simfield:
+                lci_parts.SS = types.SimpleNamespace(
+                    medium=types.SimpleNamespace(),
+                    interface=types.SimpleNamespace(),
+                )
+                lci_parts.SS.medium.ispec = data_simfield["elastic_elastic_ispecs"]
+                lci_parts.SS.medium.edge_type = edge_refs[
+                    data_simfield["elastic_elastic_edgetypes"]
+                ]
+                to_add_media.append(lci_parts.SS.medium)
+                to_add_interfaces.append(lci_parts.SS.interface)
+                lci_parts.SS.interface.label_prefix = "elastic_elastic"
 
-            def interp_edge(efield, t, ns):
-                if not isinstance(t, np.ndarray):
-                    t = np.array(t)
-                fieldinds = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[: (len(efield.shape) - 2)]
-                return np.einsum(
-                    f"ei{fieldinds},ik,...k->...e{fieldinds}",
-                    efield,
-                    self.GLL.L[ns.ngll, :, :],
-                    t[..., np.newaxis] ** np.arange(ngll_capacity),
+            for ns in to_add_media:
+                ns.ngll = ngllxi
+                ns.global_field_at_edge = lambda field, ns=ns: recover_edgevals(
+                    field[ns.ispec, ...],
+                    ns.edge_type[:, *[np.newaxis for _ in field.shape[2:]]],
                 )
 
-            ns.interpolate_edge_field = lambda efield, t, ns=ns: interp_edge(
-                efield, t, ns
-            )
-            ns.pts = ns.global_field_at_edge(self.pts)
+                def interp_edge(efield, t, ns):
+                    if not isinstance(t, np.ndarray):
+                        t = np.array(t)
+                    fieldinds = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"[: (len(efield.shape) - 2)]
+                    return np.einsum(
+                        f"ei{fieldinds},ik,...k->...e{fieldinds}",
+                        efield,
+                        self.GLL.L[ns.ngll, :, :],
+                        t[..., np.newaxis] ** np.arange(ngll_capacity),
+                    )
 
-        for ns in to_add_interfaces:
-            ns.medium1_ind = data_simfield[f"{ns.label_prefix}_interface_inds1"]
-            ns.medium2_ind = data_simfield[f"{ns.label_prefix}_interface_inds2"]
-            ns.medium1_param_start = data_simfield[
-                f"{ns.label_prefix}_interface_paramstart1"
-            ]
-            ns.medium2_param_start = data_simfield[
-                f"{ns.label_prefix}_interface_paramstart2"
-            ]
-            ns.medium1_param_end = data_simfield[
-                f"{ns.label_prefix}_interface_paramend1"
-            ]
-            ns.medium2_param_end = data_simfield[
-                f"{ns.label_prefix}_interface_paramend2"
-            ]
-            ns.medium1_mortar_trans = data_simfield[
-                f"{ns.label_prefix}_interface_mortartrans1"
-            ]
-            ns.medium2_mortar_trans = data_simfield[
-                f"{ns.label_prefix}_interface_mortartrans2"
-            ]
-            ns.Jw = data_simfield[f"{ns.label_prefix}_interface_jw"]
-            ns.nquad = ns.medium1_mortar_trans.shape[1]
-            ns.nedge1quad = ns.medium1_mortar_trans.shape[2]
-            ns.nedge2quad = ns.medium2_mortar_trans.shape[2]
-            ns.edge1_to_mortar = lambda efield, ns=ns: np.einsum(
-                "ei...,ik->ek...",
-                efield[ns.medium1_ind, ...],
-                ns.medium1_mortar_trans,
-            )
-            ns.edge2_to_mortar = lambda efield, ns=ns: np.einsum(
-                "ei...,ik->ek...",
-                efield[ns.medium2_ind, ...],
-                ns.medium2_mortar_trans,
-            )
-            ns.edge1_to_param_start = lambda efield, ns=ns: np.einsum(
-                "ei...,ik,ek->e...",
-                efield[ns.medium1_ind, ...],
-                self.GLL.L[ns.nedge1quad, :, :],
-                ns.medium1_param_start[:, np.newaxis] ** np.arange(ngll_capacity),
-            )
-            ns.edge1_to_param_end = lambda efield, ns=ns: np.einsum(
-                "ei...,ik,ek->e...",
-                efield[ns.medium1_ind, ...],
-                self.GLL.L[ns.nedge1quad, :, :],
-                ns.medium1_param_end[:, np.newaxis] ** np.arange(ngll_capacity),
-            )
-            ns.edge2_to_param_start = lambda efield, ns=ns: np.einsum(
-                "ei...,ik,ek->e...",
-                efield[ns.medium2_ind, ...],
-                self.GLL.L[ns.nedge2quad, :, :],
-                ns.medium2_param_start[:, np.newaxis] ** np.arange(ngll_capacity),
-            )
-            ns.edge2_to_param_end = lambda efield, ns=ns: np.einsum(
-                "ei...,ik,ek->e...",
-                efield[ns.medium2_ind, ...],
-                self.GLL.L[ns.nedge2quad, :, :],
-                ns.medium2_param_end[:, np.newaxis] ** np.arange(ngll_capacity),
-            )
+                ns.interpolate_edge_field = lambda efield, t, ns=ns: interp_edge(
+                    efield, t, ns
+                )
+                ns.pts = ns.global_field_at_edge(self.pts)
+
+            for ns in to_add_interfaces:
+                ns.medium1_ind = data_simfield[f"{ns.label_prefix}_interface_inds1"]
+                ns.medium2_ind = data_simfield[f"{ns.label_prefix}_interface_inds2"]
+                ns.medium1_param_start = data_simfield[
+                    f"{ns.label_prefix}_interface_paramstart1"
+                ]
+                ns.medium2_param_start = data_simfield[
+                    f"{ns.label_prefix}_interface_paramstart2"
+                ]
+                ns.medium1_param_end = data_simfield[
+                    f"{ns.label_prefix}_interface_paramend1"
+                ]
+                ns.medium2_param_end = data_simfield[
+                    f"{ns.label_prefix}_interface_paramend2"
+                ]
+                ns.medium1_mortar_trans = data_simfield[
+                    f"{ns.label_prefix}_interface_mortartrans1"
+                ]
+                ns.medium2_mortar_trans = data_simfield[
+                    f"{ns.label_prefix}_interface_mortartrans2"
+                ]
+                ns.Jw = data_simfield[f"{ns.label_prefix}_interface_jw"]
+                ns.nquad = ns.medium1_mortar_trans.shape[1]
+                ns.nedge1quad = ns.medium1_mortar_trans.shape[2]
+                ns.nedge2quad = ns.medium2_mortar_trans.shape[2]
+                ns.edge1_to_mortar = lambda efield, ns=ns: np.einsum(
+                    "ei...,eik->ek...",
+                    efield[ns.medium1_ind, ...],
+                    ns.medium1_mortar_trans,
+                )
+                ns.edge2_to_mortar = lambda efield, ns=ns: np.einsum(
+                    "ei...,eik->ek...",
+                    efield[ns.medium2_ind, ...],
+                    ns.medium2_mortar_trans,
+                )
+                ns.edge1_to_param_start = lambda efield, ns=ns: np.einsum(
+                    "ei...,ik,ek->e...",
+                    efield[ns.medium1_ind, ...],
+                    self.GLL.L[ns.nedge1quad, :, :],
+                    ns.medium1_param_start[:, np.newaxis] ** np.arange(ngll_capacity),
+                )
+                ns.edge1_to_param_end = lambda efield, ns=ns: np.einsum(
+                    "ei...,ik,ek->e...",
+                    efield[ns.medium1_ind, ...],
+                    self.GLL.L[ns.nedge1quad, :, :],
+                    ns.medium1_param_end[:, np.newaxis] ** np.arange(ngll_capacity),
+                )
+                ns.edge2_to_param_start = lambda efield, ns=ns: np.einsum(
+                    "ei...,ik,ek->e...",
+                    efield[ns.medium2_ind, ...],
+                    self.GLL.L[ns.nedge2quad, :, :],
+                    ns.medium2_param_start[:, np.newaxis] ** np.arange(ngll_capacity),
+                )
+                ns.edge2_to_param_end = lambda efield, ns=ns: np.einsum(
+                    "ei...,ik,ek->e...",
+                    efield[ns.medium2_ind, ...],
+                    self.GLL.L[ns.nedge2quad, :, :],
+                    ns.medium2_param_end[:, np.newaxis] ** np.arange(ngll_capacity),
+                )
 
         self.LCI = lci_parts
 
@@ -756,13 +753,23 @@ class dump_frame:
                     pts_mesh[:, 0], pts_mesh[:, 1]
                 )
             tri = self.full_domain_triangulation
-            plt.tricontourf(
-                tri,
-                field.reshape((self.nspec * self.ngllz * self.ngllx,)),
-                100,
-                vmin=vmin,
-                vmax=vmax,
-            )
+            try:
+                plt.tricontourf(
+                    tri,
+                    field.reshape((self.nspec * self.ngllz * self.ngllx,)),
+                    100,
+                    vmin=vmin,
+                    vmax=vmax,
+                )
+            except ValueError:
+                # probably because we have NaN or inf values
+                global_mean = np.mean(pt_centers, axis=(0, 1, 2))
+                plt.text(
+                    global_mean[0],
+                    global_mean[1],
+                    "non-finite value;\n cannot contour.",
+                    color="red",
+                )
         if title is not None:
             plt.title(title)
         if show:
@@ -967,9 +974,9 @@ if __name__ == "__main__":
 
     d = read_dump_file(
         os.path.join(folder, config.get("cg_compare.workspace_files.dump_prefix"))
-        + "350.dat"
+        + "5.dat"
     )
-    d.plot_field(np.linalg.norm(d.displacement, axis=-1), mode="contour")
+    d.plot_field(np.linalg.norm(d.displacement, axis=-1), mode="scatter")
 
     # ser = load_series(os.path.join(folder, config.get("cg_compare.workspace_files.dump_prefix")))
 

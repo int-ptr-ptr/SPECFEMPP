@@ -90,8 +90,9 @@ public:
   void store_intersection(const int intersectionID,
                           const edge_intersection<ngll> &intersection);
 
+  template <int intersection_nquad>
   bool intersect(const int a, const int b,
-                 edge_intersection<ngll> &intersection);
+                 edge_intersection<intersection_nquad> &intersection);
 
   void load_all_intersections();
   void store_all_intersections();

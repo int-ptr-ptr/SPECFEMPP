@@ -23,7 +23,7 @@ struct traction_continuity::kernel<
     if constexpr (medium == 1) {
       return;
     } else if constexpr (medium != 2) {
-      static_assert(medium==1 || medium==2, "Medium can only be 1 or 2!");
+      static_assert(medium == 1 || medium == 2, "Medium can only be 1 or 2!");
     }
     constexpr bool UseSIMD = false;
     using ElasticDispType =
@@ -95,7 +95,7 @@ struct traction_continuity::kernel<
              igll_edge++) {
           acoustic[igll_edge].acceleration(0) +=
               sn_w_dS * container.h_interface_medium1_mortar_transfer(
-                            igll_interface, igll_interface, igll_edge);
+                            iinterface, igll_interface, igll_edge);
         }
       }
 
@@ -212,7 +212,7 @@ struct traction_continuity::kernel<
              igll_edge++) {
           type_real chitt_wv_dS =
               chitt_w_dS * container.h_interface_medium2_mortar_transfer(
-                               igll_interface, igll_interface, igll_edge);
+                               iinterface, igll_interface, igll_edge);
           elastic[igll_edge].acceleration(0) +=
               chitt_wv_dS *
               container.h_medium2_edge_normal(edge2_index, igll_edge, 0);
