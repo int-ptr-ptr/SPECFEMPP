@@ -125,7 +125,7 @@ def init_workspace_folder(test):
             run_xmeshfem("PAR_FILE_DOUBLE2")
 
         return util.runjob.queue_job(
-            util.runjob.RunJob(
+            util.runjob.SystemCommandJob(
                 name=f"cg_compare: {test['name']}",
                 cmd=f"cd {folder} && " + config.get("specfem.live.exe") + " %C %NOD",
                 min_update_interval=0,
@@ -190,7 +190,14 @@ def handle_dump(test, log: Callable[[str], None]):
 if __name__ == "__main__":
     import util.curse_monitor as disp
 
-    with disp.TestMonitor() as mon:
+    def msg_strip_name(msg: str, keep_timestamp: bool = True) -> str:
+        if m := re.match(r"\[(.+):\s*(\d+:\d\d)\](\s?)", msg):
+            msg = msg[m.end() :]
+            if keep_timestamp:
+                msg = f"[{m.group(2)}]{m.group(3)}{msg}"
+        return msg
+
+    with disp.TestMonitor(dummy_gui=False, close_with_key=False) as mon:
         disp_tests = dict()
         tests = config.get("cg_compare.tests")
         run_jobs = list()
@@ -214,7 +221,9 @@ if __name__ == "__main__":
 
             for i in run_jobs:
                 for line in util.runjob.consume_queue(i):
-                    disp_tests[i].tasks[0].messages.append(line)
+                    disp_tests[i].tasks[0].messages.append(msg_strip_name(line))
+                    if mon.dummy_gui:
+                        print(line)
                     if m := re.search(r"(\d+)\s*/\s*(\d+)", line):
                         prog = int(m.group(1)) / int(m.group(2))
                         disp_tests[i].tasks[0].progress = prog
@@ -222,7 +231,7 @@ if __name__ == "__main__":
                 if not util.runjob.is_job_running(i):
                     run_jobs.remove(i)
                     clean_jobs[i] = util.runjob.queue_job(
-                        util.runjob.RunJob(
+                        util.runjob.FunctionJob(
                             name=f"clean workspace: {test_from_job[i]['name']}",
                             func=lambda logfunc: handle_dump(test_from_job[i], logfunc),
                         )

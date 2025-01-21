@@ -2,3 +2,4 @@ data/**
 .nox/**
 reference/**
 **/__pycache__/**
+outputs/**

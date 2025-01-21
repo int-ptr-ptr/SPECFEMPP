@@ -188,7 +188,7 @@ public:
       return 1;
     }
     if (istep % 10 == 0) {
-      std::cout << "step " << istep << " / " << nstep << "\n";
+      std::cout << "step " << istep << " / " << nstep << std::endl;
     }
     time_stepper.set_current_precedence(
         specfem::event_marching::PRECEDENCE_BEFORE_INIT);

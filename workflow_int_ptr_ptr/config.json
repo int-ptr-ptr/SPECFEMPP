@@ -1,4 +1,6 @@
 {
+  "output_dir": "${root_dir}/outputs",
+  "data_dir": "${root_dir}/data",
   "specfem": {
     "root": "${root_dir}/..",
     "reference": {
@@ -22,8 +24,8 @@
   "tests": [
     {
       "name": "acoustic-elastic-conforming",
-      "prov_dir": "${root_dir}/data/conforming/provenance_acoustic_elastic",
-      "workspace": "${root_dir}/data/conforming/workspace_acoustic_elastic",
+      "prov_dir": "${data_dir}/conforming/provenance_acoustic_elastic",
+      "workspace": "${data_dir}/conforming/workspace_acoustic_elastic",
       "config": {
         "meshfem_parfile": "${root_dir}/run_configs/PAR_FILE_acoustic_elastic",
         "specfem_parfile": "${root_dir}/run_configs/specfem_config.yaml",
@@ -33,8 +35,8 @@
     },
     {
       "name": "acoustic-acoustic-conforming",
-      "prov_dir": "${root_dir}/data/conforming/provenance_acoustic_acoustic",
-      "workspace": "${root_dir}/data/conforming/workspace_acoustic_acoustic",
+      "prov_dir": "${data_dir}/conforming/provenance_acoustic_acoustic",
+      "workspace": "${data_dir}/conforming/workspace_acoustic_acoustic",
       "config": {
         "meshfem_parfile": "${root_dir}/run_configs/PAR_FILE_acoustic_acoustic",
         "specfem_parfile": "${root_dir}/run_configs/specfem_config.yaml",
@@ -46,19 +48,21 @@
   "cg_compare":{
     "config_files": {
       "dir":"${root_dir}/runnables/cg_compare",
-      "meshfem_parfile": "${dir}/PAR_FILE",
+      "meshfem_parfile": "${dir}/PAR_FILE_hires",
       "meshfem_parfile_bottom": "${dir}/PAR_FILE_DOUBLE1",
       "meshfem_parfile_top": "${dir}/PAR_FILE_DOUBLE2",
       "specfem_parfile": "${dir}/specfem_config.yaml",
       "specfem_parfile_double": "${dir}/specfem_config_double.yaml",
       "source": "${dir}/source_config.yaml",
-      "topography": "${dir}/topography_file.dat",
+      "topography": "${dir}/topography_file_hires.dat",
       "topography_bottom": "${dir}/topo_bot.dat",
       "topography_top": "${dir}/topo_top.dat"
     },
-    "workspace_folder":"${root_dir}/data/cg_compare",
+    "workspace_folder":"${data_dir}/cg_compare",
+    "output_folder": "${output_dir}/cg_compare",
     "dump_test_resolution":"50",
     "dt": "0.001",
+    "maxsteps": "5000",
     "workspace_files": {
       "meshfem_parfile": "PAR_FILE",
       "meshfem_parfile_bottom": "PAR_FILE_DOUBLE1",
@@ -78,11 +82,13 @@
       "provenance_seismo": "${provenance_fol}/${seismo_folder_name}",
       "analysis": {
         "folder": "analysis",
-        "seismo": "${folder}/seismo_compare.png",
         "tmp": "${folder}/tmp",
-        "animation_out": "${folder}/disp_compare.mp4",
         "animation_framerate": "5"
       }
+    },
+    "outputs":{
+      "seismo": "seismo_compare.png",
+      "animation_out": "disp_compare.mp4"
     },
     "tests": [
       {

@@ -1,18 +1,24 @@
+from multiprocessing import Queue
+from typing import Callable
 import util.config as config
 import util.runjob
 import util.dump_reader
 import util.dump_reader_aux
 import util.seismo_reader
 import cg_compare.frame_compare
+import util.curse_monitor
 
 import time
 import os
 import re
 import numpy as np
 import shutil
+import collections
 
-PRINT_TIME_INTERVAL = 5
+PRINT_TIME_INTERVAL = 0.1
 SWITCH_INTERVAL = 2
+
+SIM_COMPLETE_CODE = "/% SIM_COMPLETE"
 
 
 class cg_compare_validation:
@@ -20,6 +26,9 @@ class cg_compare_validation:
         self.test = test
         self.folder = os.path.join(
             config.get("cg_compare.workspace_folder"), test["name"]
+        )
+        self.out_folder = os.path.join(
+            config.get("cg_compare.output_folder"), test["name"]
         )
         self.job = -1
 
@@ -55,16 +64,35 @@ class cg_compare_validation:
             os.makedirs(self.tmpdir)
         self.plotnum = 0
 
+        # if the sim thread was completed
+        self.simulation_done = False
+
         # set to true if we timeout on the consume_dumps
         self.was_paused = False
+        self.max_num_steps = 1
 
-    def consume_dumps(self):
+    def consume_dumps(
+        self,
+        run_to_completion: bool = True,
+        queue_in: "Queue | None" = None,
+        queue_out: "Queue | None" = None,
+        logfunc: Callable | None = None,
+    ):
         t_method_start = time.time()
+        if logfunc is None:
+            logfunc = print
         while True:
+            if queue_in is not None:
+                while not queue_in.empty():
+                    if queue_in.get() == SIM_COMPLETE_CODE:
+                        self.simulation_done = True
             # take all of the integer-named files, retrieve the lowest one > dumpnum
             files_to_check = dict()
             if not os.path.exists(self.dumpfol):
                 # the dump folder hasn't even been made yet; hold off.
+                if run_to_completion:
+                    time.sleep(1)
+                    continue
                 self.was_paused = False
                 break
             for fname in os.listdir(self.dumpfol):
@@ -86,6 +114,11 @@ class cg_compare_validation:
                     )
             if (not files_to_check) or (self.statics is None):
                 # no more files to check, or we don't have the statics reference yet
+                if run_to_completion:
+                    if self.simulation_done:
+                        break
+                    time.sleep(1)
+                    continue
                 self.was_paused = False
                 break
             self.dumpnum = min(files_to_check.keys())
@@ -122,14 +155,21 @@ class cg_compare_validation:
             t = time.time()
             if t - self.lastprint > PRINT_TIME_INTERVAL:
                 self.lastprint = t
-                print(
-                    f"[{self.test['name']}]: dump {self.dumpnum}; "
-                    f"l2 displacement error maximized at {self.max_err :.6e} "
+                logfunc(
+                    f"dump {self.dumpnum}; "
+                    f"l2 displacement error maximized at {self.max_err:.6e} "
                     f"(dump {self.max_err_dumpnum})"
                 )
-            if time.time() - t_method_start > SWITCH_INTERVAL:
+                if queue_out is not None:
+                    queue_out.put(f"step {self.dumpnum} / {self.max_num_steps}")
+                    queue_out.put(f"maxerr {self.max_err:.6e}")
+            if (
+                not run_to_completion
+            ) and time.time() - t_method_start > SWITCH_INTERVAL:
                 self.was_paused = True
                 break
+        if run_to_completion:
+            self.finalize(logfunc=logfunc)
 
     def write_seismos(self):
         util.seismo_reader.compare_seismos(
@@ -146,69 +186,149 @@ class cg_compare_validation:
             show=False,
             subplot_configuration="individual_rows",
             save_filename=os.path.join(
-                self.folder, config.get("cg_compare.workspace_files.analysis.seismo")
+                self.out_folder, config.get("cg_compare.outputs.seismo")
             ),
         )
 
-    def finalize(self):
-        print(
-            f"[{self.test['name']}]: COMPLETE!\n"
+    def finalize(self, logfunc=print):
+        logfunc(
+            "COMPLETE!\n"
             f"   l2 displacement error maximized at {self.max_err:.6e} "
             f"(dump {self.max_err_dumpnum})"
         )
+        if os.path.exists(self.out_folder):
+            shutil.rmtree(self.out_folder)
+
+        os.makedirs(self.out_folder)
+
         self.write_seismos()
-        print(f"[{self.test['name']}]: seismograms written.")
+        logfunc("seismograms written.")
         framerate = config.get(
             "cg_compare.workspace_files.analysis.animation_framerate"
         )
-        anim_out_file = config.get("cg_compare.workspace_files.analysis.animation_out")
+        anim_out_file = config.get("cg_compare.outputs.animation_out")
         os.system(
             f"ffmpeg -pattern_type glob -r {framerate}"
             f' -i "{os.path.join(self.tmpdir, "comp*.png")}" -r {framerate} '
-            f"{os.path.join(self.folder, anim_out_file)} -y &> /dev/null"
+            f"{os.path.join(self.out_folder, anim_out_file)} -y &> /dev/null"
         )
         shutil.rmtree(self.tmpdir)
-        print(f"[{self.test['name']}]: animation written.")
+        logfunc("animation written.")
 
 
 if __name__ == "__main__":
-    tests = config.get("cg_compare.tests")
-    compares = list()
-    run_jobs = list()
-    test_from_job = dict()
-    for test in tests:
-        c = cg_compare_validation(test)
-        compares.append(c)
-        if test["class"] == "samemesh":
-            args = "%NOC %NOD"
-        elif test["class"] == "doublemesh":
-            args = "%NOC %D"
-        else:
-            raise ValueError(f'Unknown test class {test["class"]}')
-        i = util.runjob.queue_job(
-            util.runjob.RunJob(
-                name=f"cg_compare: {test['name']}",
-                cmd=f"cd {c.folder} && " + config.get("specfem.live.exe") + f" {args}",
-                min_update_interval=30,
-                linebuf_size=10,
-                print_updates=False,
-            )
+
+    def msg_strip_name(msg: str, keep_timestamp: bool = True) -> str:
+        if m := re.match(r"\[(.+):\s*(\d+:\d\d)\](\s?)", msg):
+            msg = msg[m.end() :]
+            if keep_timestamp:
+                msg = f"[{m.group(2)}]{m.group(3)}{msg}"
+        return msg
+
+    with util.curse_monitor.TestMonitor(dummy_gui=False, close_with_key=False) as mon:
+        tests = config.get("cg_compare.tests")
+        compares = dict()
+        compare_queues = dict()
+        test_disp = dict()
+        run_jobs = list()
+        compare_jobs = dict()
+        test_from_job = dict()
+        global_completion_broadcast_task = util.curse_monitor.TestContainer.Task(
+            "All dG-cG comparisons", messages=list()
         )
-        run_jobs.append(i)
-        test_from_job[i] = test
-        c.job = i
+        num_jobs = 0
+        for test in tests:
+            num_jobs += 1
+            c = cg_compare_validation(test)
 
-    while compares:
-        time.sleep(2)
-        for c in compares:
-            c.consume_dumps()
-            if c.job not in run_jobs and not c.was_paused:
-                c.finalize()
-                compares.remove(c)
+            # ====== start the simulation
+            if test["class"] == "samemesh":
+                args = "%NOC %NOD"
+            elif test["class"] == "doublemesh":
+                args = "%NOC %D"
+            else:
+                raise ValueError(f"Unknown test class {test['class']}")
+            i = util.runjob.queue_job(
+                util.runjob.SystemCommandJob(
+                    name=f"run: {test['name']}",
+                    cmd=f"cd {c.folder} && "
+                    + config.get("specfem.live.exe")
+                    + f" {args}",
+                    min_update_interval=0,
+                    linebuf_size=100,
+                    print_updates=True,
+                )
+            )
+            run_jobs.append(i)
+            compares[i] = c
+            test_from_job[i] = test
+            c.job = i
+            c.max_num_steps = config.get("cg_compare.maxsteps")
+            # ====== initialize comparison process
+            j = util.runjob.queue_job(
+                util.runjob.CommunicationQueuedFunctionJob(
+                    name=f"compare: {test['name']}",
+                    func=lambda log, qin, qout: c.consume_dumps(
+                        run_to_completion=True,
+                        logfunc=log,
+                        queue_in=qin,
+                        queue_out=qout,
+                    ),
+                    min_update_interval=0,
+                )
+            )
+            test_disp[i] = util.curse_monitor.TestContainer(test["name"])
+            test_disp[i].tasks = [
+                util.curse_monitor.TestContainer.Task(
+                    f"{test["name"]} dG simulation",
+                    messages=collections.deque(maxlen=100),
+                ),
+                util.curse_monitor.TestContainer.Task(
+                    f"{test["name"]} dG-cG comparison",
+                    messages=collections.deque(maxlen=100),
+                ),
+                global_completion_broadcast_task,
+            ]
+            mon.add_tab(test_disp[i])
+            compare_queues[i] = util.runjob.get_job_queues(j)
+            compare_jobs[i] = j
+            mon.manage_inputs()
+            mon.redraw_display()
 
-        for i in run_jobs:
-            for line in util.runjob.consume_queue(i):
-                print(line)
-            if not util.runjob.is_job_running(i):
-                print(f"[{test_from_job[i]['name']}]: simulation complete.")
-                run_jobs.remove(i)
+        while compare_jobs:
+            mon.manage_inputs()
+            mon.redraw_display()
+            time.sleep(0.1)
+
+            for i in run_jobs:
+                for line in util.runjob.consume_queue(i):
+                    test_disp[i].tasks[0].messages.append(msg_strip_name(line))
+                    if m := re.search(r"step\s*(\d+)\s*/\s*(\d+)", line):
+                        prog = int(m.group(1)) / int(m.group(2))
+                        test_disp[i].tasks[0].progress = prog
+                if not util.runjob.is_job_running(i):
+                    test_disp[i].tasks[0].messages.append("[!]: simulation complete.")
+                    compare_queues[i]["to_job"].put(SIM_COMPLETE_CODE)
+                    run_jobs.remove(i)
+
+            for i, j in list(compare_jobs.items()):
+                for line in util.runjob.consume_queue(j):
+                    test_disp[i].tasks[1].messages.append(msg_strip_name(line))
+
+                while not compare_queues[i]["from_job"].empty():
+                    line = compare_queues[i]["from_job"].get()
+                    if m := re.search(r"step\s*(\d+)\s*/\s*(\d+)", line):
+                        prog = int(m.group(1)) / int(m.group(2))
+                        test_disp[i].tasks[1].progress = prog
+                        test_disp[i].progress = prog
+                    if line.startswith("maxerr"):
+                        err = line.replace("maxerr", "")
+                        test_disp[i].message = f"max error:{err}"
+
+                if not util.runjob.is_job_running(j):
+                    del compare_jobs[i]
+                    mon.remove_tab(test_disp[i])
+                    global_completion_broadcast_task.messages.append(  # type: ignore
+                        f"[{test_from_job[i]['name']}]: {test_disp[i].message}"
+                    )
+                    global_completion_broadcast_task.progress += 1 / num_jobs

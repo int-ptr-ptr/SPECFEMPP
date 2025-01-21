@@ -40,8 +40,8 @@ class TestMonitor:
     which can be highlighted for a more detailed view.
     """
 
-    NAME_OFFSET_RIGHT = 4
-    NAME_OFFSET_LEFT = 2
+    NAME_OFFSET_RIGHT = 3
+    NAME_OFFSET_LEFT = 3
     PROGRESSBAR_OFFSET_RIGHT = 3
 
     active: bool
@@ -54,18 +54,29 @@ class TestMonitor:
     sidebar_progressbar_offset_start: int
     hovering_sidebar: bool
 
+    close_with_key: bool
+
     @staticmethod
     def default_sidebar_width() -> int:
         return curses.COLS // 4
 
     def sidebar_width(self):
         return (
-            TestMonitor.default_sidebar_width()
-            if self._sidebar_width < 0
-            else self._sidebar_width
+            (
+                TestMonitor.default_sidebar_width()
+                if self._sidebar_width < 0
+                else self._sidebar_width
+            )
+            if self.active
+            else -1
         )
 
-    def __init__(self, sidebar_width: int = -1):
+    def __init__(
+        self,
+        sidebar_width: int = -1,
+        dummy_gui: bool = False,
+        close_with_key: bool = True,
+    ):
         self.tests = dict()
         self._tab_windows = dict()
         self.active = False
@@ -75,8 +86,12 @@ class TestMonitor:
         self.width = -1
         self.height = -1
         self.sidebar_progressbar_offset_start = -1
+        self.dummy_gui = dummy_gui
+        self.close_with_key = close_with_key
 
     def redraw_tab(self, name: str):
+        if not self.active:
+            return
         win = self._tab_windows[name].window()
         container = self.tests[name]
         win.erase()
@@ -115,6 +130,8 @@ class TestMonitor:
                     win.addch(my - 1, xstart - 1, curses.ACS_SSBS)
 
     def update_sidebar_progressbar(self):
+        if not self.active:
+            return
         # initialize progress bar
         name_pad = (
             max(len(test.name) for test in self.tests.values())
@@ -134,84 +151,84 @@ class TestMonitor:
         self.sidebar_progress_template = ProgressBar(progressbarsize)
 
     def _load_tab(self, name: str):
-        if self.active:
-            if name not in self._tab_windows:
-                # initialize curses.window
+        if not self.active:
+            return
+        if name not in self._tab_windows:
+            # initialize curses.window
 
-                sidebar = self.sidebar_width()
-                win = curses.newwin(curses.LINES, curses.COLS - sidebar, 0, sidebar)
-                self._tab_windows[name] = curses.panel.new_panel(win)
-                self.redraw_tab(name)
+            sidebar = self.sidebar_width()
+            win = curses.newwin(curses.LINES, curses.COLS - sidebar, 0, sidebar)
+            self._tab_windows[name] = curses.panel.new_panel(win)
+            self.redraw_tab(name)
 
-                def draw(parent, inc, highlight, testind):
-                    testname = self.tests[testind].name
+            def draw(parent, inc, highlight, testind):
+                testname = self.tests[testind].name
 
-                    sidebar_width = self.sidebar_width()
-                    parent.addstr(
-                        inc,
-                        self.sidebar_progressbar_offset_start,
-                        ProgressBar.START_CHAR,
-                        (curses.A_BOLD * highlight),
-                    )
-                    parent.addstr(
-                        self.sidebar_progress_template.get_str(
-                            self.tests[testind].progress
-                        ),
-                        (curses.A_BOLD * highlight)
-                        | curses.color_pair(curses.COLOR_GREEN),
-                    )
-                    parent.addstr(
-                        ProgressBar.END_CHAR,
-                        (curses.A_BOLD * highlight),
-                    )
-                    parent.addstr(
-                        inc,
-                        self.NAME_OFFSET_LEFT,
-                        testname,
-                        (curses.A_BOLD | (curses.A_UNDERLINE * self.hovering_sidebar))
-                        * highlight,
-                    )
-                    parent.addstr(
-                        inc + 1,
-                        self.NAME_OFFSET_LEFT,
-                        self.tests[testind].message,
-                        curses.A_BOLD,
-                    )
-
-                    # mark start and end of progress bar, since unfilled has no indicator
-
-                    # markers for tab entries
-                    parent.addch(inc, 2, "▔")
-                    parent.addch(inc + 1, 2, "▁")
-                    parent.addch(inc, sidebar_width - 3, "▔")
-                    parent.addch(inc + 1, sidebar_width - 3, "▁")
-                    if highlight:
-                        if self.hovering_sidebar:
-                            parent.addstr(inc, 0, "▐██")
-                            parent.addstr(inc + 1, 0, "▐██")
-                            parent.addstr(inc, sidebar_width - 3, "██▌")
-                            parent.addstr(inc + 1, sidebar_width - 3, "██▌")
-                        else:
-                            parent.addstr(inc, 0, "▐▔")
-                            parent.addstr(inc + 1, 0, "▐▁")
-                            parent.addstr(inc, sidebar_width - 2, "▔▌")
-                            parent.addstr(inc + 1, sidebar_width - 2, "▁▌")
-
-                    else:
-                        parent.addch(inc, 1, "▐")
-                        parent.addch(inc + 1, 1, "▐")
-                        parent.addch(inc, sidebar_width - 2, "▌")
-                        parent.addch(inc + 1, sidebar_width - 2, "▌")
-
-                self.sidebar.add_entry(
-                    name,
-                    ScrollableList.ListEntry(
-                        2,
-                        lambda parent, inc, highlight, ind=name: draw(
-                            parent, inc, highlight, ind
-                        ),
-                    ),
+                sidebar_width = self.sidebar_width()
+                parent.addstr(
+                    inc,
+                    self.sidebar_progressbar_offset_start,
+                    ProgressBar.START_CHAR,
+                    (curses.A_BOLD * highlight),
                 )
+                parent.addstr(
+                    self.sidebar_progress_template.get_str(
+                        self.tests[testind].progress
+                    ),
+                    (curses.A_BOLD * highlight) | curses.color_pair(curses.COLOR_GREEN),
+                )
+                parent.addstr(
+                    ProgressBar.END_CHAR,
+                    (curses.A_BOLD * highlight),
+                )
+                parent.addstr(
+                    inc,
+                    self.NAME_OFFSET_LEFT,
+                    testname,
+                    (curses.A_BOLD | (curses.A_UNDERLINE * self.hovering_sidebar))
+                    * highlight,
+                )
+                parent.addstr(
+                    inc + 1,
+                    self.NAME_OFFSET_LEFT,
+                    self.tests[testind].message,
+                    curses.A_BOLD,
+                )
+
+                # mark start and end of progress bar, since unfilled has no indicator
+
+                # markers for tab entries
+                parent.addch(inc, 2, "▔")
+                parent.addch(inc + 1, 2, "▁")
+                parent.addch(inc, sidebar_width - 3, "▔")
+                parent.addch(inc + 1, sidebar_width - 3, "▁")
+                if highlight:
+                    if self.hovering_sidebar:
+                        parent.addstr(inc, 0, "▐██")
+                        parent.addstr(inc + 1, 0, "▐██")
+                        parent.addstr(inc, sidebar_width - 3, "██▌")
+                        parent.addstr(inc + 1, sidebar_width - 3, "██▌")
+                    else:
+                        parent.addstr(inc, 0, "▐▔")
+                        parent.addstr(inc + 1, 0, "▐▁")
+                        parent.addstr(inc, sidebar_width - 2, "▔▌")
+                        parent.addstr(inc + 1, sidebar_width - 2, "▁▌")
+
+                else:
+                    parent.addch(inc, 1, "▐")
+                    parent.addch(inc + 1, 1, "▐")
+                    parent.addch(inc, sidebar_width - 2, "▌")
+                    parent.addch(inc + 1, sidebar_width - 2, "▌")
+
+            self.sidebar.add_entry(
+                name,
+                ScrollableList.ListEntry(
+                    2,
+                    lambda parent, inc, highlight, ind=name: draw(
+                        parent, inc, highlight, ind
+                    ),
+                ),
+            )
 
     def _unload_tab(self, name: str):
         if name in self._tab_windows:
@@ -219,6 +236,8 @@ class TestMonitor:
         self.sidebar.remove_entry(name)
 
     def __enter__(self):
+        if self.dummy_gui:
+            return self
         self.stdscr = curses.initscr()
         curses.noecho()
         curses.cbreak()
@@ -243,6 +262,8 @@ class TestMonitor:
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
+        if self.dummy_gui:
+            return
         curses.nocbreak()
         if self.stdscr:
             self.stdscr.keypad(False)
@@ -270,7 +291,7 @@ class TestMonitor:
 
     def draw_sidebar(self, do_update: bool = True):
         if not self.active:
-            raise Exception("curses has not been initialized.")
+            return
         self.sidebar.refresh(do_update=do_update)
 
     def on_resize(self):
@@ -287,12 +308,14 @@ class TestMonitor:
                 # self.redraw_tab(name)
 
     def manage_inputs(self, error_out_on_close: bool = False):
+        if not self.active:
+            return
         if self.stdscr is not None:
             while (c := self.stdscr.getch()) != curses.ERR:
                 # handle key c
                 if c == curses.KEY_RESIZE:
                     self.on_resize()
-                elif c == ord("q") or c == ord("Q"):
+                elif self.close_with_key and (c == ord("q") or c == ord("Q")):
                     self.active = False
                     if error_out_on_close:
                         raise StopIteration
@@ -305,14 +328,15 @@ class TestMonitor:
                     self.sidebar.manage_inputs(c)
 
     def redraw_display(self):
-        if self.active:
-            self.draw_sidebar(do_update=False)
-            sel = self.sidebar.selected
-            if sel is not None:
-                self._tab_windows[sel].top()
-                self.redraw_tab(sel)
-            curses.panel.update_panels()
-            curses.doupdate()
+        if not self.active:
+            return
+        self.draw_sidebar(do_update=False)
+        sel = self.sidebar.selected
+        if sel is not None:
+            self._tab_windows[sel].top()
+            self.redraw_tab(sel)
+        curses.panel.update_panels()
+        curses.doupdate()
 
 
 if __name__ == "__main__":

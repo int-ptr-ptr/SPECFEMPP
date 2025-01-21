@@ -9,24 +9,75 @@ class RunJob:
     def __init__(
         self,
         name: str,
-        cmd: str | None = None,
-        func: Callable | None = None,
         min_update_interval: int = 2,
         linebuf_size: int = 10,
         print_updates: bool = False,
     ):
         self.name = name
-        self.cmd = cmd
         self.min_update_interval = min_update_interval
         self.linebuf_size = linebuf_size
         self.print_updates = print_updates
         self.is_complete = False
+
+
+class FunctionJob(RunJob):
+    func: Callable
+
+    def __init__(
+        self,
+        name: str,
+        func: Callable[[Callable], None | bool],
+        min_update_interval: int = 2,
+        linebuf_size: int = 10,
+        print_updates: bool = False,
+    ):
+        super().__init__(
+            name=name,
+            min_update_interval=min_update_interval,
+            linebuf_size=linebuf_size,
+            print_updates=print_updates,
+        )
         self.func = func
-        if (func is None) == (cmd is None):
-            raise ValueError("Either `func` or `cmd` must be specified, and not both.")
 
 
-def _run(job: RunJob, queue: Queue):
+class CommunicationQueuedFunctionJob(FunctionJob):
+    def __init__(
+        self,
+        name: str,
+        func: Callable[[Callable, Queue, Queue], None | bool],
+        min_update_interval: int = 2,
+        linebuf_size: int = 10,
+        print_updates: bool = False,
+    ):
+        super().__init__(
+            name=name,
+            func=lambda x: None,
+            min_update_interval=min_update_interval,
+            linebuf_size=linebuf_size,
+            print_updates=print_updates,
+        )
+        self.func = func
+
+
+class SystemCommandJob(RunJob):
+    def __init__(
+        self,
+        name: str,
+        cmd: str,
+        min_update_interval: int = 2,
+        linebuf_size: int = 10,
+        print_updates: bool = False,
+    ):
+        super().__init__(
+            name=name,
+            min_update_interval=min_update_interval,
+            linebuf_size=linebuf_size,
+            print_updates=print_updates,
+        )
+        self.cmd = cmd
+
+
+def _run(job: RunJob, queue: Queue, **kwargs) -> bool:
     tstart = time.time()
     tlast = tstart
 
@@ -34,44 +85,53 @@ def _run(job: RunJob, queue: Queue):
         m, s = divmod(int(round(time.time() - tstart)), 50)
         queue.put(f"[{job.name}: {m:4d}:{s:02d}] " + st)
 
-    if job.cmd is None:
+    if isinstance(job, FunctionJob):
         try:
-            # XOR on initialization, so we assume func is not None. (if it is, its a func fail)
-            job.func(log)  # type: ignore
+            if isinstance(job, CommunicationQueuedFunctionJob):
+                ret = job.func(log, kwargs["comm_to_job"], kwargs["comm_from_job"])
+            else:
+                ret = job.func(log)
+
+            if (ret is None) or (isinstance(ret, bool) and ret):
+                return True
+            else:
+                return False
         except Exception:
             return False
+    elif isinstance(job, SystemCommandJob):
+        with subprocess.Popen(
+            job.cmd,
+            stderr=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            shell=True,
+            bufsize=1,
+            universal_newlines=True,
+        ) as popen:
+            output_queue = collections.deque(maxlen=job.linebuf_size)
+
+            # capture outputs until the end of the program
+            if popen.stdout is not None:
+                for line in popen.stdout:
+                    output_queue.append(line)
+                    t = time.time()
+                    if t - tlast > job.min_update_interval:
+                        if job.print_updates:
+                            log(line)
+                        tlast = t
+
+            if popen.stderr is not None:
+                for line in popen.stderr:
+                    output_queue.append(line)
+            retcode = popen.wait()
+
+        if retcode != 0:
+            log(f"subprocess ({job.name}) failed! Output:\n" + "".join(output_queue))
+            return False
+        elif job.print_updates:
+            log(f"subprocess ({job.name}) completed!")
         return True
-    with subprocess.Popen(
-        job.cmd,
-        stderr=subprocess.PIPE,
-        stdout=subprocess.PIPE,
-        shell=True,
-        bufsize=1,
-        universal_newlines=True,
-    ) as popen:
-        output_queue = collections.deque(maxlen=job.linebuf_size)
 
-        # capture outputs until the end of the program
-        if popen.stdout is not None:
-            for line in popen.stdout:
-                output_queue.append(line)
-                t = time.time()
-                if t - tlast > job.min_update_interval:
-                    if job.print_updates:
-                        log(line)
-                    tlast = t
-
-        if popen.stderr is not None:
-            for line in popen.stderr:
-                output_queue.append(line)
-        retcode = popen.wait()
-
-    if retcode != 0:
-        log(f"subprocess ({job.name}) failed! Output:\n" + "".join(output_queue))
-        return False
-    elif job.print_updates:
-        log(f"subprocess ({job.name}) completed!")
-    return True
+    return False
 
 
 jobs = dict()
@@ -80,12 +140,25 @@ _queue = Queue()
 
 def queue_job(job: RunJob):
     q = Queue()
-    p = Process(target=_run, args=(job, q))
-    p.start()
+
+    # new jobID
     i = 0
     while i in jobs:
         i += 1
-    jobs[i] = (job, p, q)
+
+    if isinstance(job, CommunicationQueuedFunctionJob):
+        tojob = Queue()
+        fromjob = Queue()
+        p = Process(
+            target=_run,
+            args=(job, q),
+            kwargs={"comm_to_job": tojob, "comm_from_job": fromjob},
+        )
+        jobs[i] = (job, p, q, tojob, fromjob)
+    else:
+        p = Process(target=_run, args=(job, q))
+        jobs[i] = (job, p, q)
+    p.start()
 
     return i
 
@@ -128,3 +201,19 @@ def is_job_running(jid: int):
     L = consume_queue(jid)
     if jid in jobs:
         jobs[jid] = (jobs[jid][0], jobs[jid][1], L)
+
+
+def get_job_queues(jid: int) -> dict[str, Queue]:
+    if jid in jobs:
+        job_tuple = jobs[jid]
+        if isinstance(job_tuple[0], FunctionJob):
+            return {
+                "log": job_tuple[2],
+                "to_job": job_tuple[3],
+                "from_job": job_tuple[4],
+            }
+        else:
+            return {
+                "log": job_tuple[2],
+            }
+    return dict()
