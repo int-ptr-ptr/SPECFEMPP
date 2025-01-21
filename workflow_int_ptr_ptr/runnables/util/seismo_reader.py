@@ -1,5 +1,6 @@
 import os
 import re
+from typing import Literal
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -12,6 +13,9 @@ def compare_seismos(
     show: bool = False,
     save_filename: str | None = None,
     verbose=False,
+    subplot_configuration: Literal["matrix", "individual_rows"] = "matrix",
+    seismo_aspect: float | None = None,
+    fig_len=10,
 ):
     stations = []
     with open(stations_file, "r") as f:
@@ -62,13 +66,38 @@ def compare_seismos(
                 row_suffixes.append(suffix)
                 break
 
-    figlen = 20
-    fig, ax = plt.subplots(
-        nrows=len(row_suffixes),
-        ncols=num_stations,
-        figsize=(figlen, figlen / num_stations * len(row_suffixes)),
-        sharex=True,
-    )
+    if subplot_configuration == "matrix":
+        if seismo_aspect is None:
+            seismo_aspect = 2
+        fig, ax = plt.subplots(
+            nrows=len(row_suffixes),
+            ncols=num_stations,
+            figsize=(
+                fig_len,
+                (fig_len / num_stations) / seismo_aspect * len(row_suffixes),
+            ),
+            sharex=True,
+        )
+
+        def get_ax(row_suff_ind, station_ind):
+            return ax[row_suff_ind, station_ind]
+    elif subplot_configuration == "individual_rows":
+        if seismo_aspect is None:
+            seismo_aspect = 5
+        fig, ax = plt.subplots(
+            nrows=len(row_suffixes) * num_stations,
+            ncols=1,
+            figsize=(
+                fig_len,
+                fig_len / seismo_aspect * len(row_suffixes) * num_stations,
+            ),
+            sharex=True,
+        )
+
+        def get_ax(row_suff_ind, station_ind):
+            return ax[station_ind * len(row_suffixes) + row_suff_ind]
+    else:
+        raise ValueError(f"Unknown subplot configuration {subplot_configuration}")
 
     data_matrix = [
         [
@@ -83,7 +112,7 @@ def compare_seismos(
         for j, suffix in enumerate(row_suffixes):
             stationname_sfpp = f"{station[0]}{suffix}"
             stationname_sf2d = f"{station[1]}{suffix}"
-            a = ax[j, i]
+            a = get_ax(j, i)
             for k, folseq in enumerate(zip(foldernames, colors)):
                 foldername, color = folseq
                 data = None
@@ -136,5 +165,7 @@ if __name__ == "__main__":
         os.path.join(
             folder, config.get("cg_compare.workspace_files.meshfem_stations_out")
         ),
-        tlim=(0, 1),
+        # tlim=(0, 1),
+        subplot_configuration="individual_rows",
+        show=True,
     )

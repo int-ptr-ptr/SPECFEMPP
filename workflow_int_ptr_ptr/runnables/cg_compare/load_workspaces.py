@@ -1,9 +1,11 @@
+from typing import Callable
 import util.config as config
 import os
 import shutil
 import subprocess
 import time
 import numpy as np
+import re
 
 import util.runjob
 import util.dump_reader
@@ -126,8 +128,8 @@ def init_workspace_folder(test):
             util.runjob.RunJob(
                 name=f"cg_compare: {test['name']}",
                 cmd=f"cd {folder} && " + config.get("specfem.live.exe") + " %C %NOD",
-                min_update_interval=4,
-                linebuf_size=10,
+                min_update_interval=0,
+                linebuf_size=30,
                 print_updates=True,
             )
         )
@@ -135,18 +137,21 @@ def init_workspace_folder(test):
         raise ValueError(f"Unknown test class '{test["class"]}'")
 
 
-def handle_dump(test):
+def handle_dump(test, log: Callable[[str], None]):
     folder = os.path.join(config.get("cg_compare.workspace_folder"), test["name"])
     provfol = os.path.join(
         folder, config.get("cg_compare.workspace_files.provenance_fol")
     )
 
     if os.path.exists(provfol):
+        log("Found already existing provenance folder. Deleting.")
         shutil.rmtree(provfol)
+        log("Deleted.")
 
     dump_prefix = os.path.join(
         folder, config.get("cg_compare.workspace_files.dump_prefix")
     )
+    log("Compiling dump files into one series file.")
     series = util.dump_reader.load_series(dump_prefix)
 
     provfile = os.path.join(
@@ -166,33 +171,66 @@ def handle_dump(test):
         thresh = inds[sub_inds[-1]] + resolution - 1
 
     series.get_subseries(sub_inds).save_to_file(provfile)
+    log("Done")
 
     if not os.path.exists(provfol):
         os.makedirs(provfol)
 
+    log("Copying other outputs (seismos) into provenance folder.")
     shutil.move(
         os.path.join(folder, config.get("cg_compare.workspace_files.out_seismo")),
         provfol,
     )
+    log("Done. Cleaning dump folder")
 
     shutil.rmtree(os.path.dirname(dump_prefix))
+    log("Complete.")
 
 
 if __name__ == "__main__":
-    tests = config.get("cg_compare.tests")
-    run_jobs = list()
-    test_from_job = dict()
-    for test in tests:
-        i = init_workspace_folder(test)
-        run_jobs.append(i)
-        test_from_job[i] = test
+    import util.curse_monitor as disp
 
-    while run_jobs:
-        time.sleep(2)
+    with disp.TestMonitor() as mon:
+        disp_tests = dict()
+        tests = config.get("cg_compare.tests")
+        run_jobs = list()
+        clean_jobs = dict()
+        test_from_job = dict()
+        for test in tests:
+            i = init_workspace_folder(test)
+            run_jobs.append(i)
+            test_from_job[i] = test
 
-        for i in run_jobs:
-            for line in util.runjob.consume_queue(i):
-                print(line)
-            if not util.runjob.is_job_running(i):
-                run_jobs.remove(i)
-                handle_dump(test_from_job[i])
+            disp_tests[i] = disp.TestContainer(test["name"])
+            mon.add_tab(disp_tests[i])
+            disp_tests[i].tasks.append(
+                disp.TestContainer.Task("specfem provenance (cG) run")
+            )
+
+        while run_jobs or clean_jobs:
+            mon.manage_inputs()
+            mon.redraw_display()
+            time.sleep(0.1)
+
+            for i in run_jobs:
+                for line in util.runjob.consume_queue(i):
+                    disp_tests[i].tasks[0].messages.append(line)
+                    if m := re.search(r"(\d+)\s*/\s*(\d+)", line):
+                        prog = int(m.group(1)) / int(m.group(2))
+                        disp_tests[i].tasks[0].progress = prog
+                        disp_tests[i].progress = prog
+                if not util.runjob.is_job_running(i):
+                    run_jobs.remove(i)
+                    clean_jobs[i] = util.runjob.queue_job(
+                        util.runjob.RunJob(
+                            name=f"clean workspace: {test_from_job[i]['name']}",
+                            func=lambda logfunc: handle_dump(test_from_job[i], logfunc),
+                        )
+                    )
+
+            for i, j in list(clean_jobs.items()):
+                for line in util.runjob.consume_queue(j):
+                    disp_tests[i].tasks[0].messages.append(line)
+                if not util.runjob.is_job_running(j):
+                    del clean_jobs[i]
+                    mon.remove_tab(disp_tests[i])

@@ -2,13 +2,15 @@ import time
 from multiprocessing import Process, Queue
 import subprocess
 import collections
+from typing import Callable
 
 
 class RunJob:
     def __init__(
         self,
         name: str,
-        cmd: str,
+        cmd: str | None = None,
+        func: Callable | None = None,
         min_update_interval: int = 2,
         linebuf_size: int = 10,
         print_updates: bool = False,
@@ -19,6 +21,9 @@ class RunJob:
         self.linebuf_size = linebuf_size
         self.print_updates = print_updates
         self.is_complete = False
+        self.func = func
+        if (func is None) == (cmd is None):
+            raise ValueError("Either `func` or `cmd` must be specified, and not both.")
 
 
 def _run(job: RunJob, queue: Queue):
@@ -29,6 +34,13 @@ def _run(job: RunJob, queue: Queue):
         m, s = divmod(int(round(time.time() - tstart)), 50)
         queue.put(f"[{job.name}: {m:4d}:{s:02d}] " + st)
 
+    if job.cmd is None:
+        try:
+            # XOR on initialization, so we assume func is not None. (if it is, its a func fail)
+            job.func(log)  # type: ignore
+        except Exception:
+            return False
+        return True
     with subprocess.Popen(
         job.cmd,
         stderr=subprocess.PIPE,
@@ -46,7 +58,7 @@ def _run(job: RunJob, queue: Queue):
                 t = time.time()
                 if t - tlast > job.min_update_interval:
                     if job.print_updates:
-                        log(f"Update on subprocess ({job.name}): \n{line}")
+                        log(line)
                     tlast = t
 
         if popen.stderr is not None:

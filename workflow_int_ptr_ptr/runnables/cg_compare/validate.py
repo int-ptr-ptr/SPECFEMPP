@@ -144,7 +144,7 @@ class cg_compare_validation:
                 config.get("cg_compare.workspace_files.meshfem_stations_out"),
             ),
             show=False,
-            tlim=(0, 1),
+            subplot_configuration="individual_rows",
             save_filename=os.path.join(
                 self.folder, config.get("cg_compare.workspace_files.analysis.seismo")
             ),
