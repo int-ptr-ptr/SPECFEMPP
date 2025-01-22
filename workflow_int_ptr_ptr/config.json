@@ -48,13 +48,15 @@
   "cg_compare":{
     "config_files": {
       "dir":"${root_dir}/runnables/cg_compare",
-      "meshfem_parfile": "${dir}/PAR_FILE_hires",
+      "meshfem_parfile": "${dir}/PAR_FILE",
+      "meshfem_parfile_hires": "${dir}/PAR_FILE_hires",
       "meshfem_parfile_bottom": "${dir}/PAR_FILE_DOUBLE1",
       "meshfem_parfile_top": "${dir}/PAR_FILE_DOUBLE2",
       "specfem_parfile": "${dir}/specfem_config.yaml",
       "specfem_parfile_double": "${dir}/specfem_config_double.yaml",
       "source": "${dir}/source_config.yaml",
-      "topography": "${dir}/topography_file_hires.dat",
+      "topography": "${dir}/topography_file.dat",
+      "topography_hires": "${dir}/topography_file_hires.dat",
       "topography_bottom": "${dir}/topo_bot.dat",
       "topography_top": "${dir}/topo_top.dat"
     },
