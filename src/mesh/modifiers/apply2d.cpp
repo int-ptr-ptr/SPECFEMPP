@@ -295,6 +295,11 @@ static void subdivide(
 template <>
 void specfem::mesh::modifiers<specfem::dimension::type::dim2>::apply(
     specfem::mesh::mesh<specfem::dimension::type::dim2> &mesh) const {
+  if (!does_any_modifications) {
+    // default case: no modifications. this is important for not recomputing
+    // certain things.
+    return;
+  }
   subdivide(mesh, *this);
 
   // forcing boundary skipped

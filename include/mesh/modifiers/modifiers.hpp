@@ -30,7 +30,7 @@ template <specfem::dimension::type DimensionType> class modifiers {
 public:
   static constexpr int dim = specfem::dimension::dimension<DimensionType>::dim;
   using subdiv_tuple = typename dimtuple<int, dim>::type;
-  modifiers() {}
+  modifiers() : does_any_modifications(false) {}
 
   //===== application =====
   void apply(specfem::mesh::mesh<DimensionType> &mesh) const;
@@ -46,6 +46,7 @@ public:
   get_subdivision(const int material) const;
 
 private:
+  bool does_any_modifications;
   std::unordered_map<int, subdiv_tuple> subdivisions; ///< map
                                                       ///< materialID ->
                                                       ///< (subdivide_z,

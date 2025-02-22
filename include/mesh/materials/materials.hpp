@@ -23,7 +23,7 @@ struct materials {
      * @brief Default constructor
      *
      */
-    material_specification() = default;
+    material_specification() : database_index(0) {}
 
     /**
      * @brief Constructor used to assign values
@@ -70,6 +70,11 @@ struct materials {
   specfem::mesh::materials::material<specfem::element::medium_tag::acoustic,
                                      specfem::element::property_tag::isotropic>
       acoustic_isotropic; ///< Acoustic isotropic material properties
+  specfem::kokkos::HostView1d<int>
+      material_continuity_partitions; ///< two materials with the same value
+                                      ///< will be marked as continuous. The
+                                      ///< materials are indexed by
+                                      ///< database_index.
 
   /**
    * @name Constructors
@@ -88,8 +93,9 @@ struct materials {
    */
   materials(const int nspec, const int numat)
       : n_materials(numat),
-        material_index_mapping("specfem::mesh::material_index_mapping",
-                               nspec){};
+        material_index_mapping("specfem::mesh::material_index_mapping", nspec),
+        material_continuity_partitions(
+            "specfem::mesh::material_continuity_partitions", numat){};
 
   ///@}
 

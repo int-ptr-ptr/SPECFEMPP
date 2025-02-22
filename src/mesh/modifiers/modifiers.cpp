@@ -33,6 +33,7 @@ template <specfem::dimension::type DimensionType>
 void specfem::mesh::modifiers<DimensionType>::set_subdivision(
     const int material, subdiv_tuple subdivs) {
   subdivisions.insert(std::make_pair(0, subdivs));
+  does_any_modifications = true;
 }
 //===== getting modifiers =====
 template <specfem::dimension::type DimensionType>
