@@ -1,9 +1,10 @@
 #pragma once
 
 // #include "compute/compute_quadrature.hpp"
-#include "compute/adjacency_map.hpp"
+#include "compute/adjacencies/adjacency_map.hpp"
 #include "element/quadrature.hpp"
 #include "kokkos_abstractions.h"
+#include "mesh/boundaries/boundaries.hpp"
 #include "mesh/materials/materials.hpp"
 #include "mesh/mesh.hpp"
 #include "point/interface.hpp"
@@ -204,13 +205,17 @@ struct mesh {
        const specfem::mesh::control_nodes<specfem::dimension::type::dim2>
            &control_nodes,
        const specfem::quadrature::quadratures &quadratures,
-       const specfem::mesh::materials &materials);
+       const specfem::mesh::materials &materials,
+       const specfem::mesh::boundaries<specfem::dimension::type::dim2>
+           &boundaries);
 
   specfem::compute::points
   assemble(specfem::kokkos::HostView1d<
                specfem::mesh::materials::material_specification>
                material_index_mapping,
-           specfem::kokkos::HostView1d<int> material_continuity_partitions);
+           specfem::kokkos::HostView1d<int> material_continuity_partitions,
+           const specfem::mesh::boundaries<specfem::dimension::type::dim2>
+               &boundaries);
   specfem::compute::points assemble();
 
   /**

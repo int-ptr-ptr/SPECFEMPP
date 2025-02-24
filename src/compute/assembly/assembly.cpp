@@ -14,7 +14,8 @@ specfem::compute::assembly::assembly(
     const int max_sig_step, const int nsteps_between_samples,
     const specfem::simulation::type simulation,
     const std::shared_ptr<specfem::IO::reader> &property_reader) {
-  this->mesh = { mesh.tags, mesh.control_nodes, quadratures, mesh.materials };
+  this->mesh = { mesh.tags, mesh.control_nodes, quadratures, mesh.materials,
+                 mesh.boundaries };
   this->element_types = { this->mesh.nspec, this->mesh.ngllz, this->mesh.ngllx,
                           this->mesh.mapping, mesh.tags };
   this->partial_derivatives = { this->mesh };

@@ -418,6 +418,7 @@ target_link_libraries(
 
 add_library(
         compute
+        src/compute/adjacencies/adjacency_map.cpp
         src/compute/compute_mesh.cpp
         src/compute/element_types/element_types.cpp
         src/compute/compute_partial_derivatives.cpp
