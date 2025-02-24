@@ -3,6 +3,8 @@
 #include <deque>
 #include <list>
 
+#include "intersection_check.cpp"
+
 static bool are_elements_intersecting(
     const specfem::kokkos::HostView4d<double> &global_coordinates,
     const int ispec1, const specfem::enums::edge::type edge1, const int ispec2,

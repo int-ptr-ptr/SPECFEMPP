@@ -10,11 +10,9 @@ namespace compute {
 namespace adjacencies {
 
 struct nonconforming_edge {
-  int ispecL, ispecR;
-  specfem::enums::edge::type edgeL, edgeR;
+  int edgeL, edgeR;
   type_real param_startL, param_startR;
   type_real param_endL, param_endR;
-  bool polarityL, polarityR;
 
   nonconforming_edge();
 };
