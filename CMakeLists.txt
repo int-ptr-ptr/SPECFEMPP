@@ -649,7 +649,7 @@ target_link_libraries(
 # target_link_libraries(
 #         event_marching
 #         quadrature
-#         kernels
+#         kokkos_kernels
 #         domain
 #         solver
 # )
@@ -674,10 +674,8 @@ target_link_libraries(
         source_class
         receiver_class
         compute
-        domain
         coupled_interface
-        frechet_derivatives
-        kernels
+        kokkos_kernels
         timescheme
         solver
         writer
@@ -695,8 +693,6 @@ target_link_libraries(
         adjacency_graph
         mesh
         compute
-        domain
-        kernels
 )
 
 add_executable(
@@ -719,13 +715,11 @@ target_link_libraries(
         parameter_reader
         receiver_class
         writer
-        plotter
+        periodic_tasks
         reader
         coupled_interface
-        frechet_derivatives
         timescheme
-        kernels
-        domain
+        kokkos_kernels
         solver
         Boost::program_options
         _util

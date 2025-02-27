@@ -40,6 +40,9 @@
 #include "compute/assembly/assembly.hpp"
 
 #include "quadrature/quadrature.hpp"
+
+#include "mesh/materials/materials.tpp"
+
 #include "specfem_setup.hpp"
 #include <cmath>
 #include <iostream>
@@ -125,8 +128,8 @@ void construct_demo_mesh(
   type_real compaction_grad = 0.0;
   type_real Qkappa = 9999;
   type_real Qmu = 9999;
-  specfem::material::material<specfem::element::medium_tag::acoustic,
-                              specfem::element::property_tag::isotropic>
+  specfem::medium::material<specfem::element::medium_tag::acoustic,
+                            specfem::element::property_tag::isotropic>
       acoustic_holder(density, cp, Qkappa, Qmu, compaction_grad);
 
   // elastic material
@@ -136,8 +139,8 @@ void construct_demo_mesh(
   compaction_grad = 0.0;
   Qkappa = 9999;
   Qmu = 9999;
-  specfem::material::material<specfem::element::medium_tag::elastic,
-                              specfem::element::property_tag::isotropic>
+  specfem::medium::material<specfem::element::medium_tag::elastic,
+                            specfem::element::property_tag::isotropic>
       elastic_holder(density, cs, cp, Qkappa, Qmu, compaction_grad);
 
   acoustic_holder.print();
@@ -151,18 +154,18 @@ void construct_demo_mesh(
       mesh.nspec); // will be populated with matspec on populate loop
   specfem::mesh::materials::material_specification matspecF(
       specfem::element::medium_tag::acoustic,
-      specfem::element::property_tag::isotropic, 0);
+      specfem::element::property_tag::isotropic, 0, 0);
   specfem::mesh::materials::material_specification matspecS(
       specfem::element::medium_tag::elastic,
-      specfem::element::property_tag::isotropic, 0);
+      specfem::element::property_tag::isotropic, 1, 1);
 
   std::vector<
-      specfem::material::material<specfem::element::medium_tag::elastic,
-                                  specfem::element::property_tag::isotropic> >
+      specfem::medium::material<specfem::element::medium_tag::elastic,
+                                specfem::element::property_tag::isotropic> >
       l_elastic_isotropic(1);
   std::vector<
-      specfem::material::material<specfem::element::medium_tag::acoustic,
-                                  specfem::element::property_tag::isotropic> >
+      specfem::medium::material<specfem::element::medium_tag::acoustic,
+                                specfem::element::property_tag::isotropic> >
       l_acoustic_isotropic(1);
   l_acoustic_isotropic[0] = acoustic_holder;
   l_elastic_isotropic[0] = elastic_holder;

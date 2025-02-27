@@ -128,9 +128,9 @@ void remap_with_disconts(
   auto simulation = params.get_simulation_type();
 
   assembly.partial_derivatives = { assembly.mesh };
-  assembly.properties = { assembly.mesh.nspec, assembly.mesh.ngllz,
-                          assembly.mesh.ngllx, assembly.mesh.mapping,
-                          mesh.tags,           mesh.materials };
+  assembly.properties = { assembly.mesh.nspec,   assembly.mesh.ngllz,
+                          assembly.mesh.ngllx,   assembly.mesh.mapping,
+                          assembly.mesh.mapping, mesh.materials };
   assembly.kernels = { assembly.mesh.nspec, assembly.mesh.ngllz,
                        assembly.mesh.ngllx, assembly.mesh.mapping, mesh.tags };
   assembly.sources = { sources,

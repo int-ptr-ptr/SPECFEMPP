@@ -15,6 +15,7 @@
 #include "kokkos_abstractions.h"
 #include "mesh/mesh.hpp"
 #include "parameter_parser/interface.hpp"
+#include "periodic_tasks/periodic_task.hpp"
 #include "receiver/interface.hpp"
 #include "solver/solver.hpp"
 #include "source/interface.hpp"
@@ -165,23 +166,12 @@ struct simulation_params {
     _seismogram_types = seismos;
     return *this;
   }
-  simulation_params &
-  add_plotter(std::shared_ptr<specfem::plotter::plotter> plotter) {
-    _plotters.push_back(plotter);
-    return *this;
-  }
-  simulation_params &
-  plotters(std::vector<std::shared_ptr<specfem::plotter::plotter> > plotters) {
-    _plotters = plotters;
-    return *this;
-  }
-  simulation_params &
-  add_writer(std::shared_ptr<specfem::writer::writer> writer) {
+  simulation_params &add_writer(std::shared_ptr<specfem::IO::writer> writer) {
     _writers.push_back(writer);
     return *this;
   }
   simulation_params &
-  writers(std::vector<std::shared_ptr<specfem::writer::writer> > writers) {
+  writers(std::vector<std::shared_ptr<specfem::IO::writer> > writers) {
     _writers = writers;
     return *this;
   }
@@ -212,21 +202,18 @@ struct simulation_params {
     return *this;
   }
   void set_plotters_from_runtime_configuration() {
-    _plotters.clear();
+    _periodic_tasks.clear();
     if (_runtime_config) {
-      _plotters.push_back(
+      _periodic_tasks.push_back(
           _runtime_config->instantiate_wavefield_plotter(*_assembly));
     }
   }
   void set_writers_from_runtime_configuration() {
     _writers.clear();
     if (_runtime_config) {
-      _writers.push_back(
-          _runtime_config->instantiate_seismogram_writer(*_assembly));
-      _writers.push_back(
-          _runtime_config->instantiate_wavefield_writer(*_assembly));
-      _writers.push_back(
-          _runtime_config->instantiate_kernel_writer(*_assembly));
+      _writers.push_back(_runtime_config->instantiate_seismogram_writer());
+      _writers.push_back(_runtime_config->instantiate_wavefield_writer());
+      _writers.push_back(_runtime_config->instantiate_kernel_writer());
     }
   }
 
@@ -242,10 +229,11 @@ struct simulation_params {
   std::vector<std::shared_ptr<specfem::receivers::receiver> > &get_receivers() {
     return _receivers;
   }
-  std::vector<std::shared_ptr<specfem::plotter::plotter> > &get_plotters() {
-    return _plotters;
+  std::vector<std::shared_ptr<specfem::periodic_tasks::periodic_task> > &
+  get_periodic_tasks() {
+    return _periodic_tasks;
   }
-  std::vector<std::shared_ptr<specfem::writer::writer> > &get_writers() {
+  std::vector<std::shared_ptr<specfem::IO::writer> > &get_writers() {
     return _writers;
   }
 
@@ -264,7 +252,7 @@ struct simulation_params {
   void build_assembly() {
     _assembly = std::make_shared<specfem::compute::assembly>(
         _mesh, _quadratures, _sources, _receivers, _seismogram_types, _t0, _dt,
-        _nsteps, _nseismogram_steps, _simulation_type);
+        _nsteps, _nseismogram_steps, _nsteps, _simulation_type, nullptr);
   }
 
 private:
@@ -324,8 +312,9 @@ private:
   std::vector<std::shared_ptr<specfem::sources::source> > _sources;
   std::vector<std::shared_ptr<specfem::receivers::receiver> > _receivers;
   std::vector<specfem::enums::seismogram::type> _seismogram_types;
-  std::vector<std::shared_ptr<specfem::plotter::plotter> > _plotters;
-  std::vector<std::shared_ptr<specfem::writer::writer> > _writers;
+  std::vector<std::shared_ptr<specfem::periodic_tasks::periodic_task> >
+      _periodic_tasks;
+  std::vector<std::shared_ptr<specfem::IO::writer> > _writers;
   int _nseismogram_steps; // TODO this is max_sig_step; verify that this
                           // actually is nseismo_steps
 

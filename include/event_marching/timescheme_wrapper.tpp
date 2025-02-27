@@ -47,14 +47,14 @@ void timescheme_wrapper<TimeScheme>::set_forward_corrector_event(
 
 template <typename TimeScheme>
 template <specfem::element::medium_tag medium, specfem::wavefield::simulation_field WaveFieldType,
-        specfem::dimension::type DimensionType, typename qp_type>
+        specfem::dimension::type DimensionType, int ngll>
 void timescheme_wrapper<TimeScheme>::set_wavefield_update_event(
-      specfem::kernels::kernels<WaveFieldType, DimensionType, qp_type> &kernels,
+      specfem::kokkos_kernels::domain_kernels<WaveFieldType, DimensionType, ngll> &kernels,
       precedence p){
   time_stepper.unregister_event(wavefield_update_events[medium].get());
 
   wavefield_update_events[medium] = std::make_unique<
-      specfem::event_marching::wavefield_update_event<TimeScheme,medium,WaveFieldType,DimensionType,qp_type>>
+      specfem::event_marching::wavefield_update_event<TimeScheme,medium,WaveFieldType,DimensionType,ngll>>
       (*this,kernels,p);
   time_stepper.register_event(wavefield_update_events[medium].get());
 
@@ -62,13 +62,13 @@ void timescheme_wrapper<TimeScheme>::set_wavefield_update_event(
 
 template <typename TimeScheme>
 template <specfem::wavefield::simulation_field WaveFieldType,
-        specfem::dimension::type DimensionType, typename qp_type>
+        specfem::dimension::type DimensionType, int ngll>
 void timescheme_wrapper<TimeScheme>::set_seismogram_update_event(
-      specfem::kernels::kernels<WaveFieldType, DimensionType, qp_type> &kernels, precedence p){
+      specfem::kokkos_kernels::domain_kernels<WaveFieldType, DimensionType, ngll> &kernels, precedence p){
   time_stepper.unregister_event(seismogram_update_events[WaveFieldType].get());
 
   seismogram_update_events[WaveFieldType] = std::make_unique<
-      specfem::event_marching::seismogram_update_event<TimeScheme,WaveFieldType,DimensionType,qp_type>>
+      specfem::event_marching::seismogram_update_event<TimeScheme,WaveFieldType,DimensionType,ngll>>
       (*this,kernels,p);
 
   time_stepper.register_event(seismogram_update_events[WaveFieldType].get());
@@ -77,13 +77,13 @@ void timescheme_wrapper<TimeScheme>::set_seismogram_update_event(
 
 
 template <typename TimeScheme>
-void timescheme_wrapper<TimeScheme>::set_plotter_update_event(
-      std::vector<std::shared_ptr<specfem::plotter::plotter> > &plotters,
+void timescheme_wrapper<TimeScheme>::set_periodic_tasks_event(
+      std::vector<std::shared_ptr<specfem::periodic_tasks::periodic_task> >& tasks,
                                    precedence p){
-  if(plotter_update_event != nullptr)
-    time_stepper.unregister_event(plotter_update_event.get());
-  plotter_update_event = std::make_unique<specfem::event_marching::plotter_update_event<TimeScheme>>(*this,plotters,p);
-  time_stepper.register_event(plotter_update_event.get());
+  if(periodic_tasks_event != nullptr)
+    time_stepper.unregister_event(periodic_tasks_event.get());
+  periodic_tasks_event = std::make_unique<specfem::event_marching::periodic_tasks_event<TimeScheme>>(*this,tasks,p);
+  time_stepper.register_event(periodic_tasks_event.get());
 }
 
 

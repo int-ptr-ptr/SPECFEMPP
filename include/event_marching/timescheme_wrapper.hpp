@@ -3,7 +3,9 @@
 
 #include "event.hpp"
 #include "event_marcher.hpp"
-
+#include "kokkos_kernels/domain_kernels.hpp"
+#include "kokkos_kernels/frechet_kernels.hpp"
+#include "periodic_tasks/periodic_task.hpp"
 #include "timescheme/timescheme.hpp"
 
 #include <set>
@@ -38,13 +40,13 @@ public:
 
 template <typename TimeScheme, specfem::element::medium_tag medium,
           specfem::wavefield::simulation_field WaveFieldType,
-          specfem::dimension::type DimensionType, typename qp_type>
+          specfem::dimension::type DimensionType, int ngll>
 class wavefield_update_event : public timescheme_wrapper_event<TimeScheme> {
 public:
-  wavefield_update_event(
-      timescheme_wrapper<TimeScheme> &wrapper,
-      specfem::kernels::kernels<WaveFieldType, DimensionType, qp_type> &kernels,
-      specfem::event_marching::precedence p)
+  wavefield_update_event(timescheme_wrapper<TimeScheme> &wrapper,
+                         specfem::kokkos_kernels::domain_kernels<
+                             WaveFieldType, DimensionType, ngll> &kernels,
+                         specfem::event_marching::precedence p)
       : kernels(kernels),
         specfem::event_marching::timescheme_wrapper_event<TimeScheme>(wrapper,
                                                                       p) {}
@@ -56,7 +58,8 @@ public:
   }
 
 private:
-  specfem::kernels::kernels<WaveFieldType, DimensionType, qp_type> &kernels;
+  specfem::kokkos_kernels::domain_kernels<WaveFieldType, DimensionType, ngll>
+      &kernels;
 };
 
 template <typename TimeScheme>
@@ -100,13 +103,13 @@ private:
 
 template <typename TimeScheme,
           specfem::wavefield::simulation_field WaveFieldType,
-          specfem::dimension::type DimensionType, typename qp_type>
+          specfem::dimension::type DimensionType, int ngll>
 class seismogram_update_event : public timescheme_wrapper_event<TimeScheme> {
 public:
-  seismogram_update_event(
-      timescheme_wrapper<TimeScheme> &wrapper,
-      specfem::kernels::kernels<WaveFieldType, DimensionType, qp_type> &kernels,
-      specfem::event_marching::precedence p)
+  seismogram_update_event(timescheme_wrapper<TimeScheme> &wrapper,
+                          specfem::kokkos_kernels::domain_kernels<
+                              WaveFieldType, DimensionType, ngll> &kernels,
+                          specfem::event_marching::precedence p)
       : kernels(kernels),
         specfem::event_marching::timescheme_wrapper_event<TimeScheme>(wrapper,
                                                                       p) {}
@@ -124,32 +127,33 @@ public:
   }
 
 private:
-  specfem::kernels::kernels<WaveFieldType, DimensionType, qp_type> &kernels;
+  specfem::kokkos_kernels::domain_kernels<WaveFieldType, DimensionType, ngll>
+      &kernels;
 };
 
 template <typename TimeScheme>
-class plotter_update_event : public timescheme_wrapper_event<TimeScheme> {
+class periodic_tasks_event : public timescheme_wrapper_event<TimeScheme> {
 public:
-  plotter_update_event(
+  periodic_tasks_event(
       timescheme_wrapper<TimeScheme> &wrapper,
-      std::vector<std::shared_ptr<specfem::plotter::plotter> > &plotters,
+      std::vector<std::shared_ptr<specfem::periodic_tasks::periodic_task> >
+          &tasks,
       specfem::event_marching::precedence p)
-      : plotters(plotters),
+      : tasks(tasks),
         specfem::event_marching::timescheme_wrapper_event<TimeScheme>(wrapper,
                                                                       p) {}
 
   int call() {
     int istep = timescheme_wrapper_event<TimeScheme>::wrapper.get_istep();
-    for (const auto &plotter : plotters) {
-      if (plotter && plotter->should_plot(istep)) {
-        plotter->plot();
+    for (const auto &task : tasks) {
+      if (task && task->should_run(istep)) {
+        task->run();
       }
     }
-    return 0;
   }
 
 private:
-  std::vector<std::shared_ptr<specfem::plotter::plotter> > &plotters;
+  std::vector<std::shared_ptr<specfem::periodic_tasks::periodic_task> > &tasks;
 };
 
 template <typename TimeScheme> class timescheme_wrapper {
@@ -164,19 +168,22 @@ public:
 
   template <specfem::element::medium_tag medium,
             specfem::wavefield::simulation_field WaveFieldType,
-            specfem::dimension::type DimensionType, typename qp_type>
+            specfem::dimension::type DimensionType, int ngll>
   void set_wavefield_update_event(
-      specfem::kernels::kernels<WaveFieldType, DimensionType, qp_type> &kernels,
+      specfem::kokkos_kernels::domain_kernels<WaveFieldType, DimensionType,
+                                              ngll> &kernels,
       precedence p);
 
   template <specfem::wavefield::simulation_field WaveFieldType,
-            specfem::dimension::type DimensionType, typename qp_type>
+            specfem::dimension::type DimensionType, int ngll>
   void set_seismogram_update_event(
-      specfem::kernels::kernels<WaveFieldType, DimensionType, qp_type> &kernels,
+      specfem::kokkos_kernels::domain_kernels<WaveFieldType, DimensionType,
+                                              ngll> &kernels,
       precedence p);
 
-  void set_plotter_update_event(
-      std::vector<std::shared_ptr<specfem::plotter::plotter> > &plotters,
+  void set_periodic_tasks_event(
+      std::vector<std::shared_ptr<specfem::periodic_tasks::periodic_task> >
+          &tasks,
       precedence p);
 
   void register_under_marcher(specfem::event_marching::event_marcher *marcher);
@@ -225,7 +232,7 @@ private:
       seismogram_update_events;
   std::unique_ptr<
       specfem::event_marching::timescheme_wrapper_event<TimeScheme> >
-      plotter_update_event;
+      periodic_tasks_event;
 
   // this event gets called by this stepper's parent
   specfem::event_marching::timescheme_step_event<TimeScheme> step_event;

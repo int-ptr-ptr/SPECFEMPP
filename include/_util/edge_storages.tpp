@@ -35,7 +35,7 @@ edge_storage<edgequad, datacapacity>::edge_storage(std::vector<edge> edges,
       assembly(assembly) {
   //count media of edges
   for (int i = 0; i < n_edges; i++) {
-    edges[i].medium = assembly.properties.h_element_types(edges[i].id);
+    edges[i].medium = assembly.element_types.medium_tags(edges[i].id);
     edge_media[i] = edges[i].medium;
     if(edges[i].medium == specfem::element::medium_tag::acoustic){
       edge_sorted_inds[i] = acoustic_edges.size();

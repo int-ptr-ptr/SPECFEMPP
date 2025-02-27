@@ -3,8 +3,6 @@
 
 #include "enumerations/dimension.hpp"
 #include "enumerations/simulation.hpp"
-#include "kernels/frechet_kernels.hpp"
-#include "kernels/kernels.hpp"
 #include "solver/solver.hpp"
 
 #include <cmath>

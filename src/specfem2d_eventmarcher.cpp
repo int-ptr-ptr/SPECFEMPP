@@ -9,9 +9,11 @@
 #define EDGEIND_SHAPENDERIV 9
 #define EDGEIND_BDRY_TYPE 14
 
+#include "_util/quadrature_template_type.hpp"
+
 #define data_capacity 20
-#define edge_storage_quad                                                      \
-  specfem::enums::element::quadrature::static_quadrature_points<5>
+#define QP5_NGLL 5
+#define edge_storage_quad _util::static_quadrature_points<QP5_NGLL>
 #define edge_capacity edge_storage_quad::NGLL
 #define INTERIND_FLUXTOTAL_A 0
 #define INTERIND_FLUX1_A (qp5.NGLL)
@@ -31,7 +33,7 @@
 int ISTEP;
 #include "_util/build_demo_assembly.hpp"
 #include "compute/assembly/assembly.hpp"
-#include "kernels/kernels.hpp"
+#include "constants.hpp"
 #include "solver/time_marching.hpp"
 #include "timescheme/newmark.hpp"
 
@@ -55,10 +57,9 @@ bool USE_DOUBLEMESH;
 #define _PARAMETER_FILENAME_DOUBLE_ std::string("specfem_config_double.yaml")
 #define _PARAMETER_FILENAME_ std::string("specfem_config.yaml")
 
-#include "_util/doublemesh.hpp"
 #include "_util/dump_simfield.hpp"
 #include "_util/edge_storages.hpp"
-#include "_util/rewrite_simfield.hpp"
+// #include "_util/rewrite_simfield.hpp"
 #include "event_marching/event_marcher.hpp"
 #include "event_marching/timescheme_wrapper.hpp"
 
@@ -75,6 +76,7 @@ void execute(specfem::MPI::MPI *mpi) {
   // https://specfem2d-kokkos.readthedocs.io/en/adjoint-simulations/developer_documentation/tutorials/tutorial1/Chapter2/index.html
 
   std::vector<specfem::adjacency_graph::adjacency_pointer> edge_removals;
+  USE_DOUBLEMESH = false;
 #ifdef USE_DEMO_MESH
 #define MATERIAL_MODE 0b0100
 #define GRID_MODE 0b0001
@@ -88,7 +90,7 @@ void execute(specfem::MPI::MPI *mpi) {
 #else
   auto params = load_parameters(
       USE_DOUBLEMESH ? _PARAMETER_FILENAME_DOUBLE_ : _PARAMETER_FILENAME_, mpi);
-
+  USE_DOUBLEMESH = false;
 #endif
 
   std::shared_ptr<specfem::compute::assembly> assembly = params.get_assembly();
@@ -127,21 +129,19 @@ void execute(specfem::MPI::MPI *mpi) {
     }
   }
 
-  if (!FORCE_INTO_CONTINUOUS) {
-    remap_with_disconts(*assembly, params, edge_removals, true);
-  }
+  // if (!FORCE_INTO_CONTINUOUS) {
+  //   remap_with_disconts(*assembly, params, edge_removals, true);
+  // }
 
 #ifdef _EVENT_MARCHER_DUMPS_
   _util::dump_simfield(_index_change_dump_ + "/post_remap.dat",
                        assembly->fields.forward, assembly->mesh.points);
 #endif
 
-  specfem::enums::element::quadrature::static_quadrature_points<5> qp5;
-  auto kernels = specfem::kernels::kernels<
+  edge_storage_quad qp5;
+  auto kernels = specfem::kokkos_kernels::domain_kernels<
       specfem::wavefield::simulation_field::forward,
-      specfem::dimension::type::dim2,
-      specfem::enums::element::quadrature::static_quadrature_points<5> >(
-      params.get_dt(), *assembly, qp5);
+      specfem::dimension::type::dim2, QP5_NGLL>(*assembly);
 
   auto timescheme =
       specfem::time_scheme::newmark<specfem::simulation::type::forward>(
@@ -165,7 +165,7 @@ void execute(specfem::MPI::MPI *mpi) {
   timescheme_wrapper.set_forward_corrector_event(elastic, 4);
   timescheme_wrapper.set_seismogram_update_event<
       specfem::wavefield::simulation_field::forward>(kernels, 5);
-  timescheme_wrapper.set_plotter_update_event(params.get_plotters(), 5.1);
+  timescheme_wrapper.set_periodic_tasks_event(params.get_periodic_tasks(), 5.1);
 
   timescheme_wrapper.register_under_marcher(&event_system);
 
@@ -337,7 +337,7 @@ void execute(specfem::MPI::MPI *mpi) {
             mpi->cout("Writing Output:");
             mpi->cout("-------------------------------");
 
-            writer->write();
+            writer->write(*assembly);
           }
         }
         return 0;
@@ -390,7 +390,7 @@ load_parameters(const std::string &parameter_file, specfem::MPI::MPI *mpi) {
       std::make_shared<specfem::runtime_configuration::setup>(parameter_file,
                                                               __default_file__);
 #define setup (*setup_ptr)
-  const auto [database_filename, source_filename] = setup.get_databases();
+  const auto database_filename = setup.get_databases();
   mpi->cout(setup.print_header(start_time));
 
   // --------------------------------------------------------------
@@ -400,9 +400,7 @@ load_parameters(const std::string &parameter_file, specfem::MPI::MPI *mpi) {
   // --------------------------------------------------------------
   const auto quadrature = setup.instantiate_quadrature();
 
-  auto mesh = USE_DOUBLEMESH ? _util::read_mesh(database_filename,
-                                                database_filename + "_", mpi)
-                             : specfem::IO::read_mesh(database_filename, mpi);
+  auto mesh = specfem::IO::read_mesh(database_filename, mpi);
 
 #ifdef KILL_NONNEUMANN_BDRYS
 
@@ -423,13 +421,14 @@ load_parameters(const std::string &parameter_file, specfem::MPI::MPI *mpi) {
   // --------------------------------------------------------------
   const int nsteps = setup.get_nsteps();
   const specfem::simulation::type simulation_type = setup.get_simulation_type();
-  auto [sources, t0] = specfem::IO::read_sources(
-      source_filename, nsteps, setup.get_t0(), setup.get_dt(), simulation_type);
+  auto [sources, t0] =
+      specfem::IO::read_sources(setup.get_sources(), nsteps, setup.get_t0(),
+                                setup.get_dt(), simulation_type);
   setup.update_t0(t0); // Update t0 in case it was changed
 
-  const auto stations_filename = setup.get_stations_file();
+  const auto stations_node = setup.get_stations();
   const auto angle = setup.get_receiver_angle();
-  auto receivers = specfem::IO::read_receivers(stations_filename, angle);
+  auto receivers = specfem::IO::read_receivers(stations_node, angle);
 
   mpi->cout("Source Information:");
   mpi->cout("-------------------------------");
@@ -462,6 +461,7 @@ load_parameters(const std::string &parameter_file, specfem::MPI::MPI *mpi) {
     std::cout << *time_scheme << std::endl;
 
   const int max_seismogram_time_step = time_scheme->get_max_seismogram_step();
+  const int nstep_between_samples = time_scheme->get_nstep_between_samples();
   // --------------------------------------------------------------
 
   // --------------------------------------------------------------
@@ -473,7 +473,8 @@ load_parameters(const std::string &parameter_file, specfem::MPI::MPI *mpi) {
   specfem::compute::assembly assembly(
       mesh, quadrature, sources, receivers, setup.get_seismogram_types(),
       setup.get_t0(), dt, nsteps, max_seismogram_time_step,
-      setup.get_simulation_type());
+      nstep_between_samples, setup.get_simulation_type(),
+      setup.instantiate_property_reader());
   time_scheme->link_assembly(assembly);
 
   // --------------------------------------------------------------
@@ -482,12 +483,12 @@ load_parameters(const std::string &parameter_file, specfem::MPI::MPI *mpi) {
   //                   Read wavefields
   // --------------------------------------------------------------
 
-  const auto wavefield_reader = setup.instantiate_wavefield_reader(assembly);
+  const auto wavefield_reader = setup.instantiate_wavefield_reader();
   if (wavefield_reader) {
     mpi->cout("Reading wavefield files:");
     mpi->cout("-------------------------------");
 
-    wavefield_reader->read();
+    wavefield_reader->read(assembly);
     // Transfer the buffer field to device
     assembly.fields.buffer.copy_to_device();
   }
