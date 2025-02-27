@@ -305,6 +305,8 @@ add_library(
         src/mesh/coupled_interfaces/coupled_interfaces.cpp
         src/mesh/tags/tags.cpp
         src/mesh/mesh.cpp
+        src/mesh/modifiers/modifiers.cpp
+        src/mesh/modifiers/apply2d.cpp
 )
 
 target_link_libraries(
@@ -416,6 +418,7 @@ target_link_libraries(
 
 add_library(
         compute
+        src/compute/adjacencies/adjacency_map.cpp
         src/compute/compute_mesh.cpp
         src/compute/element_types/element_types.cpp
         src/compute/compute_partial_derivatives.cpp

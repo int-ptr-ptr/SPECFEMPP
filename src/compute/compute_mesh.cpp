@@ -1,18 +1,33 @@
+#include "compute/compute_mesh.hpp"
+#include "compute/adjacencies/adjacency_map.hpp"
 #include "compute/interface.hpp"
 #include "enumerations/interface.hpp"
 #include "enumerations/material_definitions.hpp"
+#include "enumerations/specfem_enums.hpp"
 #include "jacobian/interface.hpp"
 #include "kokkos_abstractions.h"
+#include "mesh/materials/materials.hpp"
 #include "quadrature/interface.hpp"
 #include "specfem_setup.hpp"
 #include <Kokkos_Core.hpp>
 #include <tuple>
+#include <utility>
 #include <vector>
 
 namespace {
 struct qp {
   type_real x = 0, z = 0;
   int iloc = 0, iglob = 0;
+  int imat = 0;
+
+  std::tuple<int, int, int> get_ispec_iz_ix(int nspec, int ngllz) {
+    // int iloc = ix * nspec * ngll + iz * nspec + ispec;
+    int ispec = iloc % nspec;
+    int iz = iloc / nspec;
+    int ix = iz / ngllz;
+    iz %= ngllz;
+    return std::make_tuple(ispec, iz, ix);
+  }
 };
 
 type_real get_tolerance(std::vector<qp> cart_cord, const int nspec,
@@ -41,8 +56,27 @@ type_real get_tolerance(std::vector<qp> cart_cord, const int nspec,
   return 1e-6 * xtypdist;
 }
 
-specfem::compute::points
-assign_numbering(specfem::kokkos::HostView4d<double> global_coordinates) {
+/**
+ * @brief Takes a collection of the global coordinates of each node of each
+ * element, and constructs the specfem::compute::points struct associated with
+ * it. This struct holds the necessary information about the assembly.
+ *
+ * @param global_coordinates - mapping (ispec,iz,ix,dim) -> coordinate value
+ * along dim.
+ * @param material_index_mapping - mapping (ispec) -> material at ispec
+ * @param material_continuity_partition - part[mat1] == part[mat2] iff these
+ * materials should be assembled together.
+ * @return specfem::compute::points
+ */
+specfem::compute::points assign_numbering(
+    specfem::kokkos::HostView4d<double> global_coordinates,
+    const specfem::kokkos::HostView1d<
+        specfem::mesh::materials::material_specification>
+        material_index_mapping,
+    const specfem::kokkos::HostView1d<int> material_continuity_partitions,
+    const specfem::compute::mesh_to_compute_mapping &mesh_to_compute_mapping,
+    const specfem::mesh::boundaries<specfem::dimension::type::dim2>
+        &boundaries) {
 
   int nspec = global_coordinates.extent(0);
   int ngll = global_coordinates.extent(1);
@@ -51,12 +85,15 @@ assign_numbering(specfem::kokkos::HostView4d<double> global_coordinates) {
   std::vector<qp> cart_cord(nspec * ngllxz);
 
   for (int ispec = 0; ispec < nspec; ispec++) {
+    const int ispec_mesh = mesh_to_compute_mapping.compute_to_mesh(ispec);
+    const int mat_index = material_index_mapping(ispec_mesh).database_index;
     for (int iz = 0; iz < ngll; iz++) {
       for (int ix = 0; ix < ngll; ix++) {
         int iloc = ix * nspec * ngll + iz * nspec + ispec;
         cart_cord[iloc].x = global_coordinates(ispec, iz, ix, 0);
         cart_cord[iloc].z = global_coordinates(ispec, iz, ix, 1);
         cart_cord[iloc].iloc = iloc;
+        cart_cord[iloc].imat = mat_index;
       }
     }
   }
@@ -72,20 +109,105 @@ assign_numbering(specfem::kokkos::HostView4d<double> global_coordinates) {
               return qp1.z < qp2.z;
             });
 
+  specfem::compute::points points(nspec, ngll, ngll);
   // Setup numbering
   int ig = 0;
+  // the cart_cord indices at the same point
+  std::vector<int> shared_qp;
+
+  // to allow for material-based decoupling, multiple different iglobs may
+  // correspond to the same coordinate. Store those values based on continuity
+  // partition. Note that with this approach, corners with no shared edges may
+  // still be made continuous. This means that a checkerboard of two materials
+  // gives 2 decoupled regions on the whole board, not one per cell.
+  int num_cont_partitions = 0;
+  const int numat = material_continuity_partitions.extent(0);
+  for (int imat = 0; imat < numat; imat++) {
+    num_cont_partitions =
+        std::max(material_continuity_partitions(imat), num_cont_partitions);
+  }
+  num_cont_partitions++;
+  std::vector<int> mat_iglob(num_cont_partitions);
+  //-1 represents unset; no iglob at this point for this partition.
+  for (int ipart = 0; ipart < num_cont_partitions; ipart++) {
+    mat_iglob[ipart] = -1;
+  }
+
+  mat_iglob[material_continuity_partitions(cart_cord[0].imat)] = ig;
   cart_cord[0].iglob = ig;
+  shared_qp.push_back(0);
 
   type_real xtol = get_tolerance(cart_cord, nspec, ngllxz);
 
   for (int iloc = 1; iloc < cart_cord.size(); iloc++) {
+    int cur_mat = cart_cord[iloc].imat;
+    int cur_part = material_continuity_partitions(cart_cord[0].imat);
     // check if the previous point is same as current
     if ((std::abs(cart_cord[iloc].x - cart_cord[iloc - 1].x) > xtol) ||
         (std::abs(cart_cord[iloc].z - cart_cord[iloc - 1].z) > xtol)) {
+      for (int ipart = 0; ipart < num_cont_partitions; ipart++) {
+        mat_iglob[ipart] = -1;
+      }
       ig++;
+      mat_iglob[cur_part] = ig;
+      cart_cord[iloc].iglob = ig;
+      shared_qp.clear();
+      shared_qp.push_back(iloc);
+      continue;
     }
+
+    // first, handle adjacencies
+    int ispec1, ix1, iz1, ispec2, ix2, iz2;
+    std::tie(ispec1, iz1, ix1) = cart_cord[iloc].get_ispec_iz_ix(nspec, ngll);
+#define foreach_possible_edge(iz, ix, call)                                    \
+  {                                                                            \
+    if (iz == 0) {                                                             \
+      call(specfem::enums::edge::type::BOTTOM);                                \
+    }                                                                          \
+    if (iz == ngll - 1) {                                                      \
+      call(specfem::enums::edge::type::TOP);                                   \
+    }                                                                          \
+    if (ix == 0) {                                                             \
+      call(specfem::enums::edge::type::LEFT);                                  \
+    }                                                                          \
+    if (ix == ngll - 1) {                                                      \
+      call(specfem::enums::edge::type::RIGHT);                                 \
+    }                                                                          \
+  }
+    for (const int &shared : shared_qp) {
+      std::tie(ispec2, iz2, ix2) = cart_cord[iloc].get_ispec_iz_ix(nspec, ngll);
+      foreach_possible_edge(iz1, ix1, [&](specfem::enums::edge::type edge1) {
+        if (points.adjacencies.has_conforming_adjacency<false>(ispec1, edge1)) {
+          return;
+        }
+        foreach_possible_edge(iz2, ix2, [&](specfem::enums::edge::type edge2) {
+          if (specfem::compute::adjacencies::adjacency_map::
+                  are_elements_conforming(global_coordinates, ispec1, edge1,
+                                          ispec2, edge2, xtol)) {
+            points.adjacencies.create_conforming_adjacency<false>(
+                ispec1, edge1, ispec2, edge2);
+          }
+        });
+      });
+    }
+    shared_qp.push_back(iloc);
+#undef foreach_possible_edge
+
+    // has a point been alloted for this partition?
+    if (mat_iglob[cur_part] >= 0) {
+      // same material already stored; use that iglob
+      cart_cord[iloc].iglob = mat_iglob[cur_part];
+      continue;
+    }
+
+    // new iglob for this partition
+    ig++;
+    mat_iglob[cur_part] = ig;
     cart_cord[iloc].iglob = ig;
   }
+  // clean up
+  mat_iglob.clear();
+  shared_qp.clear();
 
   std::vector<qp> copy_cart_cord(nspec * ngllxz);
 
@@ -96,8 +218,6 @@ assign_numbering(specfem::kokkos::HostView4d<double> global_coordinates) {
   }
 
   int nglob = ig + 1;
-
-  specfem::compute::points points(nspec, ngll, ngll);
 
   // Assign numbering to corresponding ispec, iz, ix
   std::vector<int> iglob_counted(nglob, -1);
@@ -151,6 +271,38 @@ assign_numbering(specfem::kokkos::HostView4d<double> global_coordinates) {
   Kokkos::deep_copy(points.index_mapping, points.h_index_mapping);
   Kokkos::deep_copy(points.coord, points.h_coord);
 
+  // TODO set boundary edges
+#define set_bds(bdstruct, nelements)                                           \
+  {                                                                            \
+    for (int ibd = 0; ibd < nelements; ibd++) {                                \
+      switch (bdstruct.type(ibd)) {                                            \
+      case specfem::enums::boundaries::TOP:                                    \
+        points.adjacencies.set_as_boundary<false>(bdstruct.index_mapping(ibd), \
+                                                  specfem::enums::edge::TOP);  \
+        break;                                                                 \
+      case specfem::enums::boundaries::LEFT:                                   \
+        points.adjacencies.set_as_boundary<false>(bdstruct.index_mapping(ibd), \
+                                                  specfem::enums::edge::LEFT); \
+        break;                                                                 \
+      case specfem::enums::boundaries::RIGHT:                                  \
+        points.adjacencies.set_as_boundary<false>(                             \
+            bdstruct.index_mapping(ibd), specfem::enums::edge::RIGHT);         \
+        break;                                                                 \
+      case specfem::enums::boundaries::BOTTOM:                                 \
+        points.adjacencies.set_as_boundary<false>(                             \
+            bdstruct.index_mapping(ibd), specfem::enums::edge::BOTTOM);        \
+        break;                                                                 \
+      default:                                                                 \
+        break;                                                                 \
+      }                                                                        \
+    }                                                                          \
+  }
+  set_bds(boundaries.absorbing_boundary,
+          boundaries.absorbing_boundary.nelements);
+  set_bds(boundaries.acoustic_free_surface,
+          boundaries.acoustic_free_surface.nelem_acoustic_surface);
+  points.adjacencies.fill_nonconforming_adjacencies(global_coordinates);
+  points.adjacencies.full_sync_to_device();
   return points;
 }
 
@@ -267,7 +419,7 @@ specfem::compute::mesh::mesh(
     const specfem::mesh::tags<specfem::dimension::type::dim2> &tags,
     const specfem::mesh::control_nodes<specfem::dimension::type::dim2>
         &m_control_nodes,
-    const specfem::quadrature::quadratures &m_quadratures) {
+    const specfem::quadrature::quadratures &m_quadratures, bool init_points) {
 
   this->mapping = specfem::compute::mesh_to_compute_mapping(tags);
   this->control_nodes =
@@ -278,10 +430,43 @@ specfem::compute::mesh::mesh(
   this->ngllx = this->quadratures.gll.N;
   this->ngllz = this->quadratures.gll.N;
 
-  this->points = this->assemble();
+  if (init_points) {
+    this->points = this->assemble();
+  }
+}
+
+specfem::compute::mesh::mesh(
+    const specfem::mesh::tags<specfem::dimension::type::dim2> &tags,
+    const specfem::mesh::control_nodes<specfem::dimension::type::dim2>
+        &m_control_nodes,
+    const specfem::quadrature::quadratures &m_quadratures,
+    const specfem::mesh::materials &materials,
+    const specfem::mesh::boundaries<specfem::dimension::type::dim2> &boundaries)
+    : mesh(tags, m_control_nodes, m_quadratures, false) {
+
+  this->points =
+      this->assemble(materials.material_index_mapping,
+                     materials.material_continuity_partitions, boundaries);
 }
 
 specfem::compute::points specfem::compute::mesh::assemble() {
+  // spoof materials: full continuity is equivalent to having only material 0
+  // and that material being in partition 0. This behavior is set by default
+  // values.
+  specfem::kokkos::HostView1d<specfem::mesh::materials::material_specification>
+      material_index_mapping("material_index_mapping", nspec);
+  specfem::kokkos::HostView1d<int> material_continuity_partitions(
+      "material_continuity_partitions", 1);
+  return assemble(material_index_mapping, material_continuity_partitions,
+                  specfem::mesh::boundaries<specfem::dimension::type::dim2>());
+}
+specfem::compute::points specfem::compute::mesh::assemble(
+    specfem::kokkos::HostView1d<
+        specfem::mesh::materials::material_specification>
+        material_index_mapping,
+    specfem::kokkos::HostView1d<int> material_continuity_partitions,
+    const specfem::mesh::boundaries<specfem::dimension::type::dim2>
+        &boundaries) {
 
   const int ngnod = control_nodes.ngnod;
   const int nspec = control_nodes.nspec;
@@ -359,7 +544,8 @@ specfem::compute::points specfem::compute::mesh::assemble() {
 
   // Kokkos::fence();
 
-  return assign_numbering(global_coordinates);
+  return assign_numbering(global_coordinates, material_index_mapping,
+                          material_continuity_partitions, mapping, boundaries);
 }
 
 // specfem::compute::compute::compute(

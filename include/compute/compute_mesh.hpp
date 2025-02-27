@@ -1,8 +1,11 @@
 #pragma once
 
 // #include "compute/compute_quadrature.hpp"
+#include "compute/adjacencies/adjacency_map.hpp"
 #include "element/quadrature.hpp"
 #include "kokkos_abstractions.h"
+#include "mesh/boundaries/boundaries.hpp"
+#include "mesh/materials/materials.hpp"
 #include "mesh/mesh.hpp"
 #include "point/interface.hpp"
 #include "quadrature/interface.hpp"
@@ -159,6 +162,8 @@ struct points {
   type_real xmin, xmax, zmin, zmax; ///< Min and max values of x and z
                                     ///< coordinates
 
+  adjacencies::adjacency_map adjacencies;
+
   points() = default;
 
   points(const int &nspec, const int &ngllz, const int &ngllx)
@@ -167,7 +172,7 @@ struct points {
                       ngllx),
         coord("specfem::compute::points::coord", ndim, nspec, ngllz, ngllx),
         h_index_mapping(Kokkos::create_mirror_view(index_mapping)),
-        h_coord(Kokkos::create_mirror_view(coord)) {}
+        h_coord(Kokkos::create_mirror_view(coord)), adjacencies(nspec) {}
 };
 
 /**
@@ -194,8 +199,23 @@ struct mesh {
   mesh(const specfem::mesh::tags<specfem::dimension::type::dim2> &tags,
        const specfem::mesh::control_nodes<specfem::dimension::type::dim2>
            &control_nodes,
-       const specfem::quadrature::quadratures &quadratures);
+       const specfem::quadrature::quadratures &quadratures,
+       bool init_points = true);
+  mesh(const specfem::mesh::tags<specfem::dimension::type::dim2> &tags,
+       const specfem::mesh::control_nodes<specfem::dimension::type::dim2>
+           &control_nodes,
+       const specfem::quadrature::quadratures &quadratures,
+       const specfem::mesh::materials &materials,
+       const specfem::mesh::boundaries<specfem::dimension::type::dim2>
+           &boundaries);
 
+  specfem::compute::points
+  assemble(specfem::kokkos::HostView1d<
+               specfem::mesh::materials::material_specification>
+               material_index_mapping,
+           specfem::kokkos::HostView1d<int> material_continuity_partitions,
+           const specfem::mesh::boundaries<specfem::dimension::type::dim2>
+               &boundaries);
   specfem::compute::points assemble();
 
   /**
