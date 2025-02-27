@@ -1,11 +1,13 @@
 // this file should only be #included from adjacency_map.cpp, just to isolate
 // this intersection check code.
 #include "compute/adjacencies/adjacency_map.hpp"
+#include "macros.hpp"
 
-template <int nquad, typename NumericType>
-NumericType gll_interp(const NumericType *f, const NumericType t) {
-  static_assert(nquad == 5, "gll_interp only ngll=5 supported right now.");
-  constexpr NumericType L[nquad * nquad] = {
+template <typename NumericType>
+NumericType gll_interp(const NumericType *f, const NumericType t,
+                       const int nquad) {
+  ASSERT(nquad == 5, "gll_interp only ngll=5 supported right now.");
+  constexpr NumericType L[5 * 5] = {
     -0.000000000000000, 0.375000000000000,  -0.375000000000000,
     -0.875000000000000, 0.875000000000000,  0.000000000000000,
     -1.336584577695453, 2.041666666666667,  1.336584577695453,
@@ -17,8 +19,8 @@ NumericType gll_interp(const NumericType *f, const NumericType t) {
     0.875000000000000
   };
   // f(t) = sum_{j} f[j] L_j(t) = sum_{ij} f[j] L_{ji} t^i
-  type_real ti = 1; // t^i
-  type_real sum = 0;
+  NumericType ti = 1; // t^i
+  NumericType sum = 0;
   for (int i = 0; i < nquad; i++) {
     for (int j = 0; j < nquad; j++) {
       sum += f[j] * L[j * nquad + i] * ti;
@@ -48,10 +50,9 @@ NumericType gll_interp(const NumericType *f, const NumericType t) {
  * @return true if a nonzero intersection occurs between these two edges
  * @return false if no nonzero intersection occurs between these two edges
  */
-template <int nglla, int ngllb>
-bool intersect(const int a_edge_index, const int b_edge_index,
-               const type_real *anodex, const type_real *anodez,
-               const type_real *bnodex, const type_real *bnodez,
+bool intersect(const type_real *anodex, const type_real *anodez,
+               const int nglla, const type_real *bnodex,
+               const type_real *bnodez, const int ngllb,
                specfem::compute::adjacencies::nonconforming_edge &intersection,
                const bool a_left_side, const bool a_flip, const bool b_flip) {
 #define intersect_eps 1e-3
@@ -70,10 +71,11 @@ bool intersect(const int a_edge_index, const int b_edge_index,
   type_real bz[subdivisions + 1];
 
   for (int i = 0; i < subdivisions + 1; i++) {
-    ax[i] = gll_interp<nglla>(anodex, i * h - 1.0);
-    az[i] = gll_interp<nglla>(anodez, i * h - 1.0);
-    bx[i] = gll_interp<ngllb>(bnodex, i * h - 1.0);
-    bz[i] = gll_interp<ngllb>(bnodez, i * h - 1.0);
+    type_real param = i * h - 1.0;
+    ax[i] = gll_interp(anodex, param, nglla);
+    az[i] = gll_interp(anodez, param, nglla);
+    bx[i] = gll_interp(bnodex, param, ngllb);
+    bz[i] = gll_interp(bnodez, param, ngllb);
   }
 
   const auto line_intersection = [](type_real ax0, type_real az0, type_real ax1,
