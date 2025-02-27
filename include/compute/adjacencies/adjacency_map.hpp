@@ -14,7 +14,7 @@ struct nonconforming_edge {
   type_real param_startL, param_startR;
   type_real param_endL, param_endR;
 
-  nonconforming_edge();
+  nonconforming_edge() = default;
 };
 
 /**
