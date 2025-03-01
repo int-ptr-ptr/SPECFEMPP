@@ -56,6 +56,7 @@ bool intersect(const type_real *anodex, const type_real *anodez,
                specfem::compute::adjacencies::nonconforming_edge &intersection,
                const bool a_left_side, const bool a_flip, const bool b_flip) {
 #define intersect_eps 1e-3
+#define throwout_threshold 1e-2
 #define intersect_eps2 (intersect_eps * intersect_eps)
 
   // maybe do an AABB check for performance? the box can be precomputed per
@@ -91,6 +92,9 @@ bool intersect(const type_real *anodex, const type_real *anodez,
     type_real sin2 =
         cross * cross / ((adx * adx + adz * adz) * (bdx * bdx + bdz * bdz));
     if (sin2 > 1e-2) {
+      if (sin2 > 1) {
+        sin2 = 1;
+      }
       // not parallel, but there is an interval for which the lines are within
       // eps distance parameters where intersections occur: use cramer's rule
       type_real c1 = bx0 - ax0;
@@ -100,7 +104,8 @@ bool intersect(const type_real *anodex, const type_real *anodez,
 
       // this is the distance from the intersection where the lines are
       // intersect_eps distance apart
-      type_real permitted_dist = intersect_eps / sqrt(2 - 2 * sqrt(1 - sin2));
+      type_real permitted_dist =
+          (intersect_eps / 2) / sqrt(2 - 2 * sqrt(1 - sin2));
       // and the distance in parameter space to achieve that:
       type_real a_shift = permitted_dist / sqrt(adx * adx + adz * adz);
       type_real b_shift = permitted_dist / sqrt(bdx * bdx + bdz * bdz);
@@ -181,8 +186,8 @@ bool intersect(const type_real *anodex, const type_real *anodez,
       }
     }
   }
-  if (a_param_end - a_param_start < intersect_eps &&
-      b_param_end - b_param_start < intersect_eps) {
+  if (a_param_end - a_param_start < throwout_threshold &&
+      b_param_end - b_param_start < throwout_threshold) {
     // intersection (within segments) is too small
     return false;
   }

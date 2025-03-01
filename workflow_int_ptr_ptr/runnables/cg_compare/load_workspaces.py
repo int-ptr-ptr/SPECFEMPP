@@ -16,8 +16,13 @@ def init_workspace_folder(test):
     if not os.path.exists(folder):
         os.makedirs(folder)
 
-    if test["class"] == "doublemesh" or test["class"] == "samemesh":
+    if (
+        test["class"] == "doublemesh"
+        or test["class"] == "samemesh"
+        or test["class"] == "subdivmesh"
+    ):
         is_doublemesh = test["class"] == "doublemesh"
+        is_subdivmesh = test["class"] == "subdivmesh"
         with open(config.get("cg_compare.config_files.meshfem_parfile"), "r") as f:
             st = f.read()
             with open(
@@ -95,6 +100,15 @@ def init_workspace_folder(test):
                     config.get("cg_compare.workspace_files.specfem_parfile_double"),
                 ),
             )
+        elif is_subdivmesh:
+            shutil.copy(
+                config.get("cg_compare.config_files.specfem_parfile_subdivs"),
+                os.path.join(
+                    folder,
+                    config.get("cg_compare.workspace_files.specfem_parfile_subdivs"),
+                ),
+            )
+
         shutil.copy(
             config.get("cg_compare.config_files.source"),
             os.path.join(folder, config.get("cg_compare.workspace_files.source")),
@@ -113,7 +127,7 @@ def init_workspace_folder(test):
             )
             if res.returncode != 0:
                 print(
-                    f"{test["name"]}: xmeshfem2D failed! Output:\n"
+                    f"{test['name']}: xmeshfem2D failed! Output:\n"
                     + res.stdout.decode("utf-8")
                 )
                 print("Make sure the parameter file is named PAR_FILE.")
@@ -127,14 +141,17 @@ def init_workspace_folder(test):
         return util.runjob.queue_job(
             util.runjob.SystemCommandJob(
                 name=f"cg_compare: {test['name']}",
-                cmd=f"cd {folder} && " + config.get("specfem.live.exe") + " %C %NOD",
+                cmd=f"cd {folder} && "
+                + config.get("specfem.live.exe")
+                + " %C %NOD -d "
+                + config.get("cg_compare.dump_test_resolution"),
                 min_update_interval=0,
                 linebuf_size=30,
                 print_updates=True,
             )
         )
     else:
-        raise ValueError(f"Unknown test class '{test["class"]}'")
+        raise ValueError(f"Unknown test class '{test['class']}'")
 
 
 def handle_dump(test, log: Callable[[str], None]):

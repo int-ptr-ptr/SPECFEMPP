@@ -1,11 +1,13 @@
 #pragma once
 
+#include "compute/adjacencies/adjacency_map.hpp"
 #include "compute/compute_mesh.hpp"
 #include "compute/compute_partial_derivatives.hpp"
 #include "compute/coupled_interfaces/interface_container.hpp"
 #include "compute/properties/properties.hpp"
 #include "edge/interface.hpp"
 #include "enumerations/interface.hpp"
+#include "enumerations/specfem_enums.hpp"
 #include "kokkos_abstractions.h"
 #include "mesh/coupled_interfaces/coupled_interfaces.hpp"
 #include "mesh/coupled_interfaces/interface_container.hpp"
@@ -515,15 +517,100 @@ template <specfem::element::medium_tag MediumTag1,
           specfem::element::medium_tag MediumTag2>
 specfem::compute::interface_container<MediumTag1, MediumTag2>::
     interface_container(
-        const specfem::mesh::mesh<specfem::dimension::type::dim2> &mesh, const specfem::compute::points &points,
+        const specfem::compute::mesh &mesh,
+        const specfem::compute::points &points,
+        const specfem::compute::quadrature &quadratures,
+        const specfem::compute::partial_derivatives &partial_derivatives,
+        const specfem::compute::element_types &element_types) {
+  int ispec2;
+  specfem::enums::edge::type edge2;
+  std::vector<std::tuple<int, specfem::enums::edge::type, int,
+                         specfem::enums::edge::type> >
+      interfaces;
+  for (int ispec1 = 0; ispec1 < mesh.nspec; ispec1++) {
+    for (int iedge1 = 0; iedge1 < 4; iedge1++) {
+      auto edge1 =
+          specfem::compute::adjacencies::adjacency_map::edge_from_index(iedge1);
+      std::tie(ispec2, edge2) =
+          points.adjacencies.get_conforming_adjacency<false>(ispec1, iedge1);
+      if (edge2 == specfem::enums::edge::type::NONE) {
+        continue;
+      }
+      // we do full iteration of edges, so (e1,e2) and (e2,e1) will be hit.
+      // Filter out by polarity, since Medium1 != Medium2 always.
+      if (element_types.get_medium_tag(ispec1) == MediumTag1 &&
+          element_types.get_medium_tag(ispec2) == MediumTag2) {
+        interfaces.push_back(std::make_tuple(ispec1, edge1, ispec2, edge2));
+      }
+    }
+  }
+  int num_interfaces = interfaces.size();
+  *this = specfem::compute::interface_container<MediumTag1, MediumTag2>(
+    num_interfaces, points.ngllx);
+
+    for (int iedge = 0; iedge < num_interfaces; ++iedge) {
+      const auto& interf = interfaces[iedge];
+      const int ispec1_compute = std::get<0>(interf);
+      const int ispec2_compute = std::get<2>(interf);
+
+      if (!(((element_types.get_medium_tag(ispec1_compute) == MediumTag1) &&
+             (element_types.get_medium_tag(ispec2_compute) == MediumTag2)) ||
+            ((element_types.get_medium_tag(ispec1_compute) == MediumTag2 &&
+              element_types.get_medium_tag(ispec2_compute) == MediumTag1)))) {
+
+        throw std::runtime_error(
+            "Coupled Interfaces: Interface is not between the correct mediums");
+      }
+
+      h_medium1_index_mapping(iedge) = ispec1_compute;
+      h_medium2_index_mapping(iedge) = ispec2_compute;
+
+      const auto [edge1_type, edge2_type, edge_factor, edge_normal] =
+          compute_edge_factors_and_normals(points, partial_derivatives,
+                                           quadratures, ispec1_compute,
+                                           ispec2_compute);
+
+      h_medium1_edge_type(iedge) = edge1_type;
+      h_medium2_edge_type(iedge) = edge2_type;
+
+      const int npoints = edge_factor.size();
+
+      for (int ipoint = 0; ipoint < npoints; ipoint++) {
+        h_medium1_edge_factor(iedge, ipoint) = edge_factor[ipoint];
+        h_medium2_edge_factor(iedge, ipoint) = edge_factor[ipoint];
+
+        h_medium1_edge_normal(0, iedge, ipoint) = edge_normal[ipoint][0];
+        h_medium1_edge_normal(1, iedge, ipoint) = edge_normal[ipoint][1];
+
+        h_medium2_edge_normal(0, iedge, ipoint) = -edge_normal[ipoint][0];
+        h_medium2_edge_normal(1, iedge, ipoint) = -edge_normal[ipoint][1];
+      }
+    }
+
+    Kokkos::deep_copy(medium1_index_mapping, h_medium1_index_mapping);
+    Kokkos::deep_copy(medium2_index_mapping, h_medium2_index_mapping);
+    Kokkos::deep_copy(medium1_edge_type, h_medium1_edge_type);
+    Kokkos::deep_copy(medium2_edge_type, h_medium2_edge_type);
+    Kokkos::deep_copy(medium1_edge_factor, h_medium1_edge_factor);
+    Kokkos::deep_copy(medium2_edge_factor, h_medium2_edge_factor);
+    Kokkos::deep_copy(medium1_edge_normal, h_medium1_edge_normal);
+    Kokkos::deep_copy(medium2_edge_normal, h_medium2_edge_normal);
+}
+
+template <specfem::element::medium_tag MediumTag1,
+          specfem::element::medium_tag MediumTag2>
+specfem::compute::interface_container<MediumTag1, MediumTag2>::
+    interface_container(
+        const specfem::mesh::mesh<specfem::dimension::type::dim2> &mesh,
+        const specfem::compute::points &points,
         const specfem::compute::quadrature &quadratures,
         const specfem::compute::partial_derivatives &partial_derivatives,
         const specfem::compute::element_types &element_types,
         const specfem::compute::mesh_to_compute_mapping &mapping) {
 
-  const auto interface_container =
-      std::get<specfem::mesh::interface_container<specfem::dimension::type::dim2, MediumTag1, MediumTag2> >(
-          mesh.coupled_interfaces.get<MediumTag1, MediumTag2>());
+  const auto interface_container = std::get<specfem::mesh::interface_container<
+      specfem::dimension::type::dim2, MediumTag1, MediumTag2> >(
+      mesh.coupled_interfaces.get<MediumTag1, MediumTag2>());
 
   int num_interfaces = interface_container.num_interfaces;
   const int ngll = points.ngllx;

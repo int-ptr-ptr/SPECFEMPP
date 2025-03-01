@@ -25,7 +25,7 @@ def compare_seismos(
                 line,
             )
             if m:
-                sname = "S" + m.group(1) + m.group(2)
+                sname = m.group(2) + ".S" + m.group(1) + ".S2."
                 sname_sf2d = m.group(2) + ".S" + m.group(1) + "."
                 x = float(m.group(3))
                 z = float(m.group(4))
@@ -167,5 +167,6 @@ if __name__ == "__main__":
         ),
         # tlim=(0, 1),
         subplot_configuration="individual_rows",
+        verbose=True,
         show=True,
     )

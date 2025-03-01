@@ -38,6 +38,7 @@ int ISTEP;
 #include "timescheme/newmark.hpp"
 
 bool FORCE_INTO_CONTINUOUS;
+int DUMP_INTERVAL;
 bool USE_DOUBLEMESH;
 
 // #define DEFAULT_USE_DOUBLEMESH
@@ -67,6 +68,8 @@ bool USE_DOUBLEMESH;
 #include <iostream>
 #include <string>
 
+std::string param_fname = _PARAMETER_FILENAME_;
+
 #define _DUMP_INTERVAL_ 5
 _util::demo_assembly::simulation_params
 load_parameters(const std::string &parameter_file, specfem::MPI::MPI *mpi);
@@ -88,19 +91,20 @@ void execute(specfem::MPI::MPI *mpi) {
     edge_removals.clear();
   }
 #else
-  auto params = load_parameters(
-      USE_DOUBLEMESH ? _PARAMETER_FILENAME_DOUBLE_ : _PARAMETER_FILENAME_, mpi);
+  auto params = load_parameters(param_fname, mpi);
   USE_DOUBLEMESH = false;
 #endif
 
   std::shared_ptr<specfem::compute::assembly> assembly = params.get_assembly();
 
 #ifdef _EVENT_MARCHER_DUMPS_
-  _util::init_dirs(_stepwise_simfield_dump_);
-  _util::init_dirs(_index_change_dump_);
+  if (DUMP_INTERVAL >= 0) {
+    _util::init_dirs(_stepwise_simfield_dump_);
+    _util::init_dirs(_index_change_dump_);
 
-  _util::dump_simfield(_index_change_dump_ + "/prior_remap.dat",
-                       assembly->fields.forward, assembly->mesh.points);
+    _util::dump_simfield(_index_change_dump_ + "/prior_remap.dat",
+                         assembly->fields.forward, assembly->mesh.points);
+  }
 #endif
 
   // convert to compute indices
@@ -134,8 +138,13 @@ void execute(specfem::MPI::MPI *mpi) {
   // }
 
 #ifdef _EVENT_MARCHER_DUMPS_
-  _util::dump_simfield(_index_change_dump_ + "/post_remap.dat",
-                       assembly->fields.forward, assembly->mesh.points);
+  if (DUMP_INTERVAL >= 0) {
+    mpi->cout("dumping with interval " + std::to_string(DUMP_INTERVAL));
+    _util::dump_simfield(_index_change_dump_ + "/post_remap.dat",
+                         assembly->fields.forward, assembly->mesh.points);
+  } else {
+    mpi->cout("no dumps");
+  }
 #endif
 
   edge_storage_quad qp5;
@@ -217,13 +226,28 @@ void execute(specfem::MPI::MPI *mpi) {
     dg_edges[i].bdry = edge_from_id(edge_removals[i].side);
     // medium is set in the edge_storage constructor. It need not be set here.
   }
+  if (!FORCE_INTO_CONTINUOUS) {
+    auto &adj = assembly->mesh.points.adjacencies;
+    const int nspec = assembly->mesh.nspec;
+    for (int ispec = 0; ispec < nspec; ispec++) {
+      for (int iedge = 0; iedge < 4; iedge++) {
+        const auto edge = adj.edge_from_index(iedge);
+        if (!(adj.has_conforming_adjacency<false>(ispec, edge) ||
+              adj.has_boundary<false>(ispec, edge))) {
+          dg_edges.push_back(_util::edge_manager::edge(ispec, edge));
+        }
+      }
+    }
+  }
+
   _util::edge_manager::edge_storage<edge_storage_quad, data_capacity>
       dg_edge_storage(dg_edges, *assembly);
 
   specfem::event_marching::arbitrary_call_event output_fields(
       [&]() {
         int istep = timescheme_wrapper.get_istep();
-        if (istep % _DUMP_INTERVAL_ == 0) {
+        if (istep % DUMP_INTERVAL == 0) {
+          mpi->cout("dumping @ step " + std::to_string(istep));
           _util::dump_simfield_per_step(istep, _stepwise_simfield_dump_ + "/d",
                                         *assembly, dg_edge_storage);
         }
@@ -231,7 +255,10 @@ void execute(specfem::MPI::MPI *mpi) {
       },
       -0.1);
 #ifdef _EVENT_MARCHER_DUMPS_
-  event_system.register_event(&output_fields);
+
+  if (DUMP_INTERVAL >= 0) {
+    event_system.register_event(&output_fields);
+  }
 #endif
   // geometric props
   for (int i = 0;
@@ -400,7 +427,10 @@ load_parameters(const std::string &parameter_file, specfem::MPI::MPI *mpi) {
   // --------------------------------------------------------------
   const auto quadrature = setup.instantiate_quadrature();
 
+  const auto mesh_modifiers =
+      setup.instantiate_mesh_modifiers<specfem::dimension::type::dim2>();
   auto mesh = specfem::IO::read_mesh(database_filename, mpi);
+  mesh_modifiers->apply(mesh);
 
 #ifdef KILL_NONNEUMANN_BDRYS
 
@@ -511,30 +541,33 @@ load_parameters(const std::string &parameter_file, specfem::MPI::MPI *mpi) {
   return params;
 }
 int main(int argc, char **argv) {
-#ifdef DEFAULT_USE_DOUBLEMESH
-  USE_DOUBLEMESH = true;
-#else
   USE_DOUBLEMESH = false;
-#endif
-
+  DUMP_INTERVAL = -1;
   bool continuity_state_requested = false;
   bool continuity_desired = false;
   for (int iarg = 0; iarg < argc; iarg++) {
     if (argv[iarg][0] == '%' && argv[iarg][1] == 'N' && argv[iarg][2] == 'O' &&
-        argv[iarg][3] == 'D') {
-      USE_DOUBLEMESH = false;
-    }
-    if (argv[iarg][0] == '%' && argv[iarg][1] == 'D') {
-      USE_DOUBLEMESH = true;
-    }
-    if (argv[iarg][0] == '%' && argv[iarg][1] == 'N' && argv[iarg][2] == 'O' &&
         argv[iarg][3] == 'C') {
       continuity_state_requested = true;
       continuity_desired = false;
+      continue;
     }
     if (argv[iarg][0] == '%' && argv[iarg][1] == 'C') {
       continuity_state_requested = true;
       continuity_desired = true;
+      continue;
+    }
+
+    std::string arg(argv[iarg]);
+    bool has_next = iarg + 1 < argc;
+    if ((arg == "--file" || arg == "-f") && has_next) {
+      param_fname = std::string(argv[iarg + 1]);
+      iarg++;
+      continue;
+    }
+    if ((arg == "--dump" || arg == "-d") && has_next) {
+      DUMP_INTERVAL = atoi(argv[iarg + 1]);
+      continue;
     }
   }
   if (continuity_state_requested) {

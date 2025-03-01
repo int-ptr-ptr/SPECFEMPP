@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.tri as mpltri
+import matplotlib.patches as mplpatches
 import re
 import struct
 import types
@@ -240,6 +241,7 @@ class dump_frame:
         self.elastic_medium_id = elastic_medium_id
         self.acoustic_medium_id = acoustic_medium_id
 
+        self.nglob = np.max(data_simfield["index_mapping"])
         nglob_acoustic = data_simfield["acoustic_field"].shape[0]
         nglob_elastic = data_simfield["elastic_field"].shape[0]
 
@@ -527,6 +529,7 @@ class dump_frame:
                     f"{ns.label_prefix}_interface_mortartrans2"
                 ]
                 ns.Jw = data_simfield[f"{ns.label_prefix}_interface_jw"]
+                ns.size = ns.medium1_ind.shape[0]
                 ns.nquad = ns.medium1_mortar_trans.shape[1]
                 ns.nedge1quad = ns.medium1_mortar_trans.shape[2]
                 ns.nedge2quad = ns.medium2_mortar_trans.shape[2]
@@ -791,6 +794,39 @@ class dump_frame:
         if show:
             plt.show()
 
+    def plot_assembly(self, plt_cell_margin=0.5, figsize=None, title=None, show=True):
+        pt_centers = self.cell_centers[:, np.newaxis, np.newaxis, :]
+        pts_plt = (1 - plt_cell_margin) * self.pts + plt_cell_margin * pt_centers
+        if figsize is not None:
+            plt.figure(figsize=figsize)
+        for iglob in range(self.nglob):
+            inds = np.where(self.data_simfield["index_mapping"] == iglob)
+            poly = mplpatches.Polygon(pts_plt[*inds, :], edgecolor="k")
+            plt.gca().add_patch(poly)
+        plt.scatter(pts_plt[..., 0], pts_plt[..., 1], 1)
+        if title is not None:
+            plt.title(title)
+        if show:
+            plt.show()
+
+    def plot_LCI(self, plt_cell_margin=0.5, figsize=None, title=None, show=True):
+        pt_centers = self.cell_centers[:, np.newaxis, np.newaxis, :]
+        pts_plt = (1 - plt_cell_margin) * self.pts + plt_cell_margin * pt_centers
+        if figsize is not None:
+            plt.figure(figsize=figsize)
+        plt.scatter(pts_plt[..., 0], pts_plt[..., 1], 1)
+        plt.scatter(self.LCI.FF.medium.pts[..., 0], self.LCI.FF.medium.pts[..., 1], 1)
+        pts_inter = self.LCI.FF.interface.edge1_to_mortar(self.LCI.FF.medium.pts)
+        plt.plot(pts_inter[:, :, 0].T, pts_inter[:, :, 1].T, ":xr")
+        pts_inter = self.LCI.FS.interface.edge1_to_mortar(self.LCI.FS.medium1.pts)
+        plt.plot(pts_inter[:, :, 0].T, pts_inter[:, :, 1].T, ":xg")
+        pts_inter = self.LCI.SS.interface.edge1_to_mortar(self.LCI.SS.medium.pts)
+        plt.plot(pts_inter[:, :, 0].T, pts_inter[:, :, 1].T, ":xb")
+        if title is not None:
+            plt.title(title)
+        if show:
+            plt.show()
+
 
 class dump_series:
     def __init__(self):
@@ -969,14 +1005,15 @@ if __name__ == "__main__":
     pass
     import config
 
-    test = config.get("cg_compare.tests.3")
+    test = config.get("cg_compare.tests.2")
     folder = os.path.join(config.get("cg_compare.workspace_folder"), test["name"])
 
     d = read_dump_file(
         os.path.join(folder, config.get("cg_compare.workspace_files.dump_prefix"))
-        + "5.dat"
+        + "0.dat"
     )
-    d.plot_field(np.linalg.norm(d.displacement, axis=-1), mode="scatter")
+    d.plot_LCI()
+    # d.plot_field(np.linalg.norm(d.displacement, axis=-1), mode="scatter")
 
     # ser = load_series(os.path.join(folder, config.get("cg_compare.workspace_files.dump_prefix")))
 

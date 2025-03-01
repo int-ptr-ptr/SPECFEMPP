@@ -145,11 +145,13 @@ public:
 
   int call() {
     int istep = timescheme_wrapper_event<TimeScheme>::wrapper.get_istep();
-    for (const auto &task : tasks) {
+    for (const std::shared_ptr<specfem::periodic_tasks::periodic_task> &task :
+         tasks) {
       if (task && task->should_run(istep)) {
         task->run();
       }
     }
+    return 0;
   }
 
 private:

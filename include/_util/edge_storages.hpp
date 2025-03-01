@@ -56,6 +56,7 @@ struct edge {
   specfem::enums::edge::type bdry;
   specfem::element::medium_tag medium;
   edge() : id(-1), bdry(specfem::enums::edge::type::NONE) {}
+  edge(int id, specfem::enums::edge::type bdry) : id(id), bdry(bdry) {}
   // edge(const edge& other) : id(other.id), bdry(other.bdry) {}
 };
 

@@ -100,14 +100,16 @@ std::vector<int> specfem::mesh::modifiers<DimensionType>::partition_materials(
   int part = 0; // current partition ID
   for (int imat = 0; imat < num_materials; imat++) {
     // if continuous to prior, set to that
+    bool found_part = false;
     for (int jmat = 0; jmat < imat; jmat++) {
       if (specfem::enums::interface_resolution::requires_assembly(
               get_interface_resolution_rule(jmat, imat))) {
         partitions[imat] = partitions[jmat];
+        found_part = true;
       }
     }
     // otherwise, new partition
-    if (partitions[imat] != -1) {
+    if (found_part) {
       continue;
     }
     partitions[imat] = part;

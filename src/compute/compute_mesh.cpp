@@ -141,7 +141,7 @@ specfem::compute::points assign_numbering(
 
   for (int iloc = 1; iloc < cart_cord.size(); iloc++) {
     int cur_mat = cart_cord[iloc].imat;
-    int cur_part = material_continuity_partitions(cart_cord[0].imat);
+    int cur_part = material_continuity_partitions(cart_cord[iloc].imat);
     // check if the previous point is same as current
     if ((std::abs(cart_cord[iloc].x - cart_cord[iloc - 1].x) > xtol) ||
         (std::abs(cart_cord[iloc].z - cart_cord[iloc - 1].z) > xtol)) {
@@ -175,7 +175,11 @@ specfem::compute::points assign_numbering(
     }                                                                          \
   }
     for (const int &shared : shared_qp) {
-      std::tie(ispec2, iz2, ix2) = cart_cord[iloc].get_ispec_iz_ix(nspec, ngll);
+      if (material_continuity_partitions(cart_cord[shared].imat) != cur_part) {
+        continue;
+      }
+      std::tie(ispec2, iz2, ix2) =
+          cart_cord[shared].get_ispec_iz_ix(nspec, ngll);
       foreach_possible_edge(iz1, ix1, [&](specfem::enums::edge::type edge1) {
         if (points.adjacencies.has_conforming_adjacency<false>(ispec1, edge1)) {
           return;
@@ -275,22 +279,24 @@ specfem::compute::points assign_numbering(
 #define set_bds(bdstruct, nelements)                                           \
   {                                                                            \
     for (int ibd = 0; ibd < nelements; ibd++) {                                \
+      int ispec = mesh_to_compute_mapping.mesh_to_compute(                     \
+          bdstruct.index_mapping(ibd));                                        \
       switch (bdstruct.type(ibd)) {                                            \
       case specfem::enums::boundaries::TOP:                                    \
-        points.adjacencies.set_as_boundary<false>(bdstruct.index_mapping(ibd), \
+        points.adjacencies.set_as_boundary<false>(ispec,                       \
                                                   specfem::enums::edge::TOP);  \
         break;                                                                 \
       case specfem::enums::boundaries::LEFT:                                   \
-        points.adjacencies.set_as_boundary<false>(bdstruct.index_mapping(ibd), \
+        points.adjacencies.set_as_boundary<false>(ispec,                       \
                                                   specfem::enums::edge::LEFT); \
         break;                                                                 \
       case specfem::enums::boundaries::RIGHT:                                  \
         points.adjacencies.set_as_boundary<false>(                             \
-            bdstruct.index_mapping(ibd), specfem::enums::edge::RIGHT);         \
+            ispec, specfem::enums::edge::RIGHT);                               \
         break;                                                                 \
       case specfem::enums::boundaries::BOTTOM:                                 \
         points.adjacencies.set_as_boundary<false>(                             \
-            bdstruct.index_mapping(ibd), specfem::enums::edge::BOTTOM);        \
+            ispec, specfem::enums::edge::BOTTOM);                              \
         break;                                                                 \
       default:                                                                 \
         break;                                                                 \

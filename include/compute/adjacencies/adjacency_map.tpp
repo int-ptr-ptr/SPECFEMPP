@@ -1,6 +1,7 @@
 #pragma once
 
 #include "adjacency_map.hpp"
+#include <utility>
 
 namespace specfem {
 namespace compute {
@@ -165,6 +166,21 @@ KOKKOS_INLINE_FUNCTION bool adjacency_map::has_boundary(const int ispec,
   } else {
     return h_adjacent_edges(ispec, edge) == specfem::enums::edge::type::NONE &&
            h_adjacent_indices(ispec, edge) < 0;
+  }
+}
+
+
+template <bool on_device>
+KOKKOS_INLINE_FUNCTION std::pair<int,specfem::enums::edge::type> adjacency_map::get_conforming_adjacency(const int ispec, const specfem::enums::edge::type edge) const {
+  return get_conforming_adjacency<on_device>(ispec, edge_to_index(edge));
+}
+
+template <bool on_device>
+KOKKOS_INLINE_FUNCTION std::pair<int,specfem::enums::edge::type> adjacency_map::get_conforming_adjacency(const int ispec, const int edge) const{
+  if constexpr (on_device) {
+    return std::make_pair(adjacent_indices(ispec,edge), adjacent_edges(ispec,edge));
+  } else {
+    return std::make_pair(h_adjacent_indices(ispec,edge), h_adjacent_edges(ispec,edge));
   }
 }
 

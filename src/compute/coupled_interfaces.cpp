@@ -541,6 +541,18 @@ specfem::compute::coupled_interfaces::coupled_interfaces(
       acoustic_poroelastic(mesh, points, quadrature, partial_derivatives,
                            element_types, mapping) {}
 
+specfem::compute::coupled_interfaces::coupled_interfaces(
+    const specfem::compute::mesh &mesh, const specfem::compute::points &points,
+    const specfem::compute::quadrature &quadrature,
+    const specfem::compute::partial_derivatives &partial_derivatives,
+    const specfem::compute::element_types &element_types)
+    : elastic_acoustic(mesh, points, quadrature, partial_derivatives,
+                       element_types),
+      elastic_poroelastic(mesh, points, quadrature, partial_derivatives,
+                          element_types),
+      acoustic_poroelastic(mesh, points, quadrature, partial_derivatives,
+                           element_types) {}
+
 // Explicit template instantiation
 
 template class specfem::compute::interface_container<

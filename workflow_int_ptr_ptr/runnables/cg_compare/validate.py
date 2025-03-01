@@ -225,6 +225,7 @@ if __name__ == "__main__":
                 msg = f"[{m.group(2)}]{m.group(3)}{msg}"
         return msg
 
+    outputs = []
     with util.curse_monitor.TestMonitor(dummy_gui=False, close_with_key=False) as mon:
         tests = config.get("cg_compare.tests")
         compares = dict()
@@ -242,12 +243,15 @@ if __name__ == "__main__":
             c = cg_compare_validation(test)
 
             # ====== start the simulation
-            if test["class"] == "samemesh":
+            if test["class"] == "samemesh" or test["class"] == "subdivmesh":
                 args = "%NOC %NOD"
+                if test["class"] == "subdivmesh":
+                    args += f" -f {config.get('cg_compare.workspace_files.specfem_parfile_subdivs')}"
             elif test["class"] == "doublemesh":
                 args = "%NOC %D"
             else:
                 raise ValueError(f"Unknown test class {test['class']}")
+            args += " -d " + config.get("cg_compare.dump_test_resolution")
             i = util.runjob.queue_job(
                 util.runjob.SystemCommandJob(
                     name=f"run: {test['name']}",
@@ -280,11 +284,11 @@ if __name__ == "__main__":
             test_disp[i] = util.curse_monitor.TestContainer(test["name"])
             test_disp[i].tasks = [
                 util.curse_monitor.TestContainer.Task(
-                    f"{test["name"]} dG simulation",
+                    f"{test['name']} dG simulation",
                     messages=collections.deque(maxlen=100),
                 ),
                 util.curse_monitor.TestContainer.Task(
-                    f"{test["name"]} dG-cG comparison",
+                    f"{test['name']} dG-cG comparison",
                     messages=collections.deque(maxlen=100),
                 ),
                 global_completion_broadcast_task,
@@ -332,3 +336,9 @@ if __name__ == "__main__":
                         f"[{test_from_job[i]['name']}]: {test_disp[i].message}"
                     )
                     global_completion_broadcast_task.progress += 1 / num_jobs
+                    outputs.append(
+                        f"[{test_from_job[i]['name']}]: {test_disp[i].message}"
+                    )
+    print("complete. Errors:")
+    for m in outputs:
+        print(m)

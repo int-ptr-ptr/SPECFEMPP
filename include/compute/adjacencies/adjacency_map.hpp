@@ -83,6 +83,14 @@ struct adjacency_map {
   KOKKOS_INLINE_FUNCTION bool has_boundary(const int ispec, const int edge);
 
   template <bool on_device>
+  KOKKOS_INLINE_FUNCTION std::pair<int, specfem::enums::edge::type>
+  get_conforming_adjacency(const int ispec,
+                           const specfem::enums::edge::type edge) const;
+  template <bool on_device>
+  KOKKOS_INLINE_FUNCTION std::pair<int, specfem::enums::edge::type>
+  get_conforming_adjacency(const int ispec, const int edge) const;
+
+  template <bool on_device>
   KOKKOS_INLINE_FUNCTION void create_conforming_adjacency(
       const int ispec1, const specfem::enums::edge::type edge1,
       const int ispec2, const specfem::enums::edge::type edge2);

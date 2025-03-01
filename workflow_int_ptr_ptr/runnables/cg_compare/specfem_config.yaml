@@ -1,11 +1,11 @@
 parameters:
   header:
     ## Header information is used for logging. It is good practice to give your simulations explicit names
-    title: Isotropic Acoustic simulation # name for your simulation
+    title: cg_compare base config # name for your simulation
     # A detailed description for your simulation
     description: |
-      Material systems : Acoustic domain (1)
-      Interfaces : None
+      Material systems : 2
+      Interfaces : horizontal interface
       Sources : Force source (1)
   simulation-setup:
     ## quadrature setup
@@ -26,10 +26,11 @@ parameters:
             directory: specfem_out/seismo
 
   receivers:
-    stations-file: mesh_stations
+    stations: mesh_stations
     angle: 0.0
     seismogram-type:
       - velocity
+      - pressure
     nstep_between_samples: 1
   seismogram:
     seismogram-format: ascii
@@ -41,4 +42,5 @@ parameters:
   ## databases
   databases:
     mesh-database: mesh_gen
-    source-file: source_config.yaml
+
+  sources: source_config.yaml

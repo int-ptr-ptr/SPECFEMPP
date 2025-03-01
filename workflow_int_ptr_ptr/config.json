@@ -15,9 +15,9 @@
     },
     "live":{
       "build": "${specfem.root}/build",
-      "exe": "${specfem.live.build}/specfem2d_eventmarcher",
-      "meshfem": "${build}/xmeshfem2D",
-      "cg_exe": "${specfem.live.build}/specfem2d",
+      "exe": "${specfem.live.build}/bin/specfem2d_eventmarcher",
+      "meshfem": "${build}/bin/xmeshfem2D",
+      "cg_exe": "${specfem.live.build}/bin/specfem2d",
       "cmake_build_options": "-DKokkos_ENABLE_SERIAL=ON -DCMAKE_BUILD_TYPE=Debug -DVTK_CXX_BUILD=OFF"
     }
   },
@@ -54,6 +54,7 @@
       "meshfem_parfile_top": "${dir}/PAR_FILE_DOUBLE2",
       "specfem_parfile": "${dir}/specfem_config.yaml",
       "specfem_parfile_double": "${dir}/specfem_config_double.yaml",
+      "specfem_parfile_subdivs": "${dir}/specfem_config_subdiv.yaml",
       "source": "${dir}/source_config.yaml",
       "topography": "${dir}/topography_file.dat",
       "topography_hires": "${dir}/topography_file_hires.dat",
@@ -71,6 +72,7 @@
       "meshfem_parfile_top": "PAR_FILE_DOUBLE2",
       "specfem_parfile": "specfem_config.yaml",
       "specfem_parfile_double": "specfem_config_double.yaml",
+      "specfem_parfile_subdivs": "specfem_config_subdiv.yaml",
       "meshfem_stations_out": "mesh_stations",
       "source": "source_config.yaml",
       "topography": "topography_file.dat",
@@ -109,13 +111,13 @@
         "name": "FF1",
         "mat1": "1 1 1.5 0 0 0 9999 9999 0 0 0 0 0 0",
         "mat2": "1 1 1 0 0 0 9999 9999 0 0 0 0 0 0",
-        "class": "doublemesh"
+        "class": "subdivmesh"
       },
       {
         "name": "FS1",
         "mat1": "1 1 1.5 0.6 0 0 9999 9999 0 0 0 0 0 0",
         "mat2": "1 1 1 0 0 0 9999 9999 0 0 0 0 0 0",
-        "class": "doublemesh"
+        "class": "subdivmesh"
       }
     ]
   }

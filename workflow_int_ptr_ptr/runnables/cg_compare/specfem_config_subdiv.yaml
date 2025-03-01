@@ -1,7 +1,7 @@
 parameters:
   header:
     ## Header information is used for logging. It is good practice to give your simulations explicit names
-    title: cg_compare doublemesh config # name for your simulation
+    title: cg_compare subdivision config # name for your simulation
     # A detailed description for your simulation
     description: |
       Material systems : 2
@@ -26,7 +26,7 @@ parameters:
             directory: specfem_out/seismo
 
   receivers:
-    stations: mesh_stations_double1
+    stations: mesh_stations
     angle: 0.0
     seismogram-type:
       - velocity
@@ -41,6 +41,17 @@ parameters:
     number-of-runs: 1
   ## databases
   databases:
-    mesh-database: mesh_gen_double
+    mesh-database: mesh_gen
 
   sources: source_config.yaml
+
+  mesh-modifiers:
+    subdivisions:
+      - material: 2
+        x: 2
+        z: 2
+
+    interface-rules:
+      - material1: 1
+        material2: 2
+        rule: domain-separation

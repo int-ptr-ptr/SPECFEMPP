@@ -44,12 +44,19 @@ specfem::compute::assembly::assembly(
                        this->mesh.ngllx,   mesh,
                        this->mesh.mapping, this->mesh.quadratures,
                        this->properties,   this->partial_derivatives };
-  this->coupled_interfaces = { mesh,
-                               this->mesh.points,
-                               this->mesh.quadratures,
-                               this->partial_derivatives,
-                               this->element_types,
-                               this->mesh.mapping };
+  if (mesh.requires_coupled_interface_recalculation) {
+    this->coupled_interfaces = { this->mesh, this->mesh.points,
+                                 this->mesh.quadratures,
+                                 this->partial_derivatives,
+                                 this->element_types };
+  } else {
+    this->coupled_interfaces = { mesh,
+                                 this->mesh.points,
+                                 this->mesh.quadratures,
+                                 this->partial_derivatives,
+                                 this->element_types,
+                                 this->mesh.mapping };
+  }
   this->fields = { this->mesh, this->element_types, simulation };
   this->boundary_values = { max_timesteps, this->mesh, this->element_types,
                             this->boundaries };

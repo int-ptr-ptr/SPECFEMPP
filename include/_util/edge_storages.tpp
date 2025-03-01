@@ -80,6 +80,7 @@ bool edge_storage<edgequad, datacapacity>::intersect(const int a_edge_index,
                edge_intersection<intersection_nquad> &intersection) {
 #define intersect_eps 1e-3
 #define intersect_eps2 (intersect_eps * intersect_eps)
+#define throwout_threshold 1e-2
   quadrature_rule gll = gen_GLL(ngll);
   quadrature_rule interquad = gen_GLL(intersection_nquad);
 
@@ -127,6 +128,9 @@ bool edge_storage<edgequad, datacapacity>::intersect(const int a_edge_index,
     type_real cross = adx * bdz - bdx * adz;
     type_real sin2 = cross * cross / ((adx * adx + adz * adz) * (bdx * bdx + bdz * bdz));
     if (sin2 > 1e-2){
+      if (sin2 > 1){
+        sin2 = 1;
+      }
       //not parallel, but there is an interval for which the lines are within eps distance
       //parameters where intersections occur: use cramer's rule
       type_real c1 = bx0-ax0;
@@ -135,7 +139,7 @@ bool edge_storage<edgequad, datacapacity>::intersect(const int a_edge_index,
       type_real tb = (adz*c1 - adx*c2)/cross;
 
       //this is the distance from the intersection where the lines are intersect_eps distance apart
-      type_real permitted_dist = intersect_eps / sqrt(2 - 2*sqrt(1 - sin2));
+      type_real permitted_dist = (intersect_eps/10.0) / sqrt(2 - 2*sqrt(1 - sin2));
       //and the distance in parameter space to achieve that:
       type_real a_shift = permitted_dist / sqrt(adx*adx + adz*adz);
       type_real b_shift = permitted_dist / sqrt(bdx*bdx + bdz*bdz);
@@ -216,7 +220,7 @@ bool edge_storage<edgequad, datacapacity>::intersect(const int a_edge_index,
       }
     }
   }
-  if(a_param_end - a_param_start < intersect_eps && b_param_end - b_param_start < intersect_eps){
+  if(a_param_end - a_param_start < throwout_threshold && b_param_end - b_param_start < throwout_threshold){
     //intersection (within segments) is too small
     return false;
   }

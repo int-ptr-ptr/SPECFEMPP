@@ -83,6 +83,13 @@ public:
       const specfem::compute::element_types &element_types,
       const specfem::compute::mesh_to_compute_mapping &mapping);
 
+  interface_container(
+      const specfem::compute::mesh &mesh,
+      const specfem::compute::points &points,
+      const specfem::compute::quadrature &quadratures,
+      const specfem::compute::partial_derivatives &partial_derivatives,
+      const specfem::compute::element_types &element_types);
+
   /**
    * @brief Construct interface container from another container where mediums
    * are swapped

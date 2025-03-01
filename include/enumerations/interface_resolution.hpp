@@ -44,7 +44,7 @@ constexpr bool requires_conforming_domain(const type type) {
  */
 constexpr bool requires_assembly(const type type) {
   // constexpr in case we want to do templates.
-  return type == type::CONTINUOUS;
+  return type == type::CONTINUOUS || type == type::UNKNOWN;
 }
 
 /**
