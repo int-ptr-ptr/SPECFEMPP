@@ -164,7 +164,7 @@ void specfem::runtime_configuration::mesh_modifiers::load_interface_rules(
             << "\"rule\" must be specified for each entry.\n";
         throw std::runtime_error(message.str());
       }
-      modifiers.set_interface_resolution_rule(material1, material2, rule);
+      modifiers.set_interface_resolution_rule(material1 - 1, material2 - 1, rule);
     }
   }
 }
