@@ -19,10 +19,12 @@ public:
   template <specfem::dimension::type DimensionType>
   std::shared_ptr<specfem::mesh::modifiers<DimensionType> >
   instantiate_mesh_modifiers();
-  template <specfem::dimension::type DimensionType>
-  void load_subdivisions(specfem::mesh::modifiers<DimensionType> &modifiers);
 
 private:
+  template <specfem::dimension::type DimensionType>
+  void load_subdivisions(specfem::mesh::modifiers<DimensionType> &modifiers);
+  template <specfem::dimension::type DimensionType>
+  void load_interface_rules(specfem::mesh::modifiers<DimensionType> &modifiers);
   YAML::Node mesh_modifiers_node; /// Node that contains receiver information
 };
 

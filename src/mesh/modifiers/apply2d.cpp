@@ -290,6 +290,7 @@ static void subdivide(
 
   mesh.tags = specfem::mesh::tags<specfem::dimension::type::dim2>(
       mesh.materials, mesh.boundaries);
+  // forcing boundary skipped
 }
 
 template <>
@@ -302,5 +303,10 @@ void specfem::mesh::modifiers<specfem::dimension::type::dim2>::apply(
   }
   subdivide(mesh, *this);
 
-  // forcing boundary skipped
+  // this may change: partitions
+  std::vector<int> mat_partitions =
+      partition_materials(mesh.materials.n_materials);
+  for (int imat = 0; imat < mesh.materials.n_materials; imat++) {
+    mesh.materials.material_continuity_partitions(imat) = mat_partitions[imat];
+  }
 }
