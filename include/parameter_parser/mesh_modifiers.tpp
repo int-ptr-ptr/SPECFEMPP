@@ -13,6 +13,7 @@ specfem::runtime_configuration::mesh_modifiers::instantiate_mesh_modifiers() {
       std::make_shared<specfem::mesh::modifiers<DimensionType> >();
 
   load_subdivisions(*modifiers);
+  load_interface_rules(*modifiers);
 
   return modifiers;
 }
@@ -163,6 +164,7 @@ void specfem::runtime_configuration::mesh_modifiers::load_interface_rules(
             << "\"rule\" must be specified for each entry.\n";
         throw std::runtime_error(message.str());
       }
+      modifiers.set_interface_resolution_rule(material1, material2, rule);
     }
   }
 }
