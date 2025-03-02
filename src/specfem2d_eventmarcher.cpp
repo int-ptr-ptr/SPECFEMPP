@@ -44,7 +44,6 @@ bool USE_DOUBLEMESH;
 // #define DEFAULT_USE_DOUBLEMESH
 #define DEFAULT_SET_CONTINUOUS false
 // #define USE_DEMO_MESH
-// #define SET_INITIAL_CONDITION
 
 #define KILL_NONNEUMANN_BDRYS
 
@@ -189,22 +188,6 @@ void execute(specfem::MPI::MPI *mpi) {
       1);
   event_system.register_event(&reset_timer);
 
-#ifdef SET_INITIAL_CONDITION
-#define _IC_SIG 0.05
-#define _IC_CENTER_X 0.3
-#define _IC_CENTER_Z 0.6
-  // initial condition
-  set_field_disp<acoustic>(
-      assembly->fields.forward, assembly->mesh, [](type_real x, type_real z) {
-        x -= _IC_CENTER_X;
-        z -= _IC_CENTER_Z;
-        return (type_real)exp(-(x * x + z * z) / (2.0 * _IC_SIG * _IC_SIG));
-      });
-#undef _IC_SIG
-#undef _IC_CENTER_X
-#undef _IC_CENTER_Z
-#endif
-
   // just populate dg_edges with edge_removals.
   auto edge_from_id = [&](const int8_t id) {
     switch (id) {
@@ -310,12 +293,14 @@ void execute(specfem::MPI::MPI *mpi) {
 
   specfem::event_marching::arbitrary_call_event store_boundaryvals(
       [&]() {
+        assembly->fields.forward.copy_to_host();
         dg_edge_storage.acoustic_acoustic_interface
             .compute_edge_intermediates<1, false>(*assembly);
         dg_edge_storage.acoustic_acoustic_interface
             .compute_edge_intermediates<2, false>(*assembly);
         dg_edge_storage.acoustic_elastic_interface
             .compute_edge_intermediates<2, false>(*assembly);
+        assembly->fields.forward.copy_to_device();
         return 0;
       },
       0.9);
@@ -323,6 +308,7 @@ void execute(specfem::MPI::MPI *mpi) {
 
   specfem::event_marching::arbitrary_call_event mortar_flux_acoustic(
       [&]() {
+        assembly->fields.forward.copy_to_host();
         specfem::coupled_interface::loose::flux::traction_continuity::kernel<
             specfem::dimension::type::dim2,
             specfem::element::medium_tag::acoustic,
@@ -343,6 +329,7 @@ void execute(specfem::MPI::MPI *mpi) {
 
   specfem::event_marching::arbitrary_call_event mortar_flux_elastic(
       [&]() {
+        assembly->fields.forward.copy_to_host();
         specfem::coupled_interface::loose::flux::traction_continuity::kernel<
             specfem::dimension::type::dim2,
             specfem::element::medium_tag::acoustic,

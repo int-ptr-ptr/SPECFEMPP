@@ -534,12 +534,12 @@ class dump_frame:
                 ns.nedge1quad = ns.medium1_mortar_trans.shape[2]
                 ns.nedge2quad = ns.medium2_mortar_trans.shape[2]
                 ns.edge1_to_mortar = lambda efield, ns=ns: np.einsum(
-                    "ei...,eik->ek...",
+                    "ei...,eki->ek...",
                     efield[ns.medium1_ind, ...],
                     ns.medium1_mortar_trans,
                 )
                 ns.edge2_to_mortar = lambda efield, ns=ns: np.einsum(
-                    "ei...,eik->ek...",
+                    "ei...,eki->ek...",
                     efield[ns.medium2_ind, ...],
                     ns.medium2_mortar_trans,
                 )

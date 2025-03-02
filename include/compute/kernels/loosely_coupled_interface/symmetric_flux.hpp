@@ -395,25 +395,24 @@ struct symmetric_flux::kernel<
         specfem::dimension::type::dim2, specfem::element::medium_tag::acoustic,
         specfem::element::property_tag::isotropic, UseSIMD>;
     auto spec_charlen2 = [&](int ispec) {
-      type_real lx1 =
-          assembly.mesh.points.coord(0, ispec, 0, 0) -
-          assembly.mesh.points.coord(0, ispec, ContainerType::NGLL_EDGE - 1,
-                                     ContainerType::NGLL_EDGE - 1);
-      type_real lz1 =
-          assembly.mesh.points.coord(1, ispec, 0, 0) -
-          assembly.mesh.points.coord(1, ispec, ContainerType::NGLL_EDGE - 1,
-                                     ContainerType::NGLL_EDGE - 1);
+#define _coord(od, a, b, c, d)                                                 \
+  (od ? assembly.mesh.points.coord(a, b, c, d)                                 \
+      : assembly.mesh.points.h_coord(a, b, c, d))
+      type_real lx1 = _coord(on_device, 0, ispec, 0, 0) -
+                      _coord(on_device, 0, ispec, ContainerType::NGLL_EDGE - 1,
+                             ContainerType::NGLL_EDGE - 1);
+      type_real lz1 = _coord(on_device, 1, ispec, 0, 0) -
+                      _coord(on_device, 1, ispec, ContainerType::NGLL_EDGE - 1,
+                             ContainerType::NGLL_EDGE - 1);
       type_real lx2 =
-          assembly.mesh.points.coord(0, ispec, ContainerType::NGLL_EDGE - 1,
-                                     0) -
-          assembly.mesh.points.coord(0, ispec, 0, ContainerType::NGLL_EDGE - 1);
+          _coord(on_device, 0, ispec, ContainerType::NGLL_EDGE - 1, 0) -
+          _coord(on_device, 0, ispec, 0, ContainerType::NGLL_EDGE - 1);
       type_real lz2 =
-          assembly.mesh.points.coord(1, ispec, ContainerType::NGLL_EDGE - 1,
-                                     0) -
-          assembly.mesh.points.coord(1, ispec, 0, ContainerType::NGLL_EDGE - 1);
+          _coord(on_device, 1, ispec, ContainerType::NGLL_EDGE - 1, 0) -
+          _coord(on_device, 1, ispec, 0, ContainerType::NGLL_EDGE - 1);
       return std::max(lx1 * lx1 + lz1 * lz1, lx2 * lx2 + lz2 * lz2);
     };
-
+#undef _coord
     const int edge1_index = container.h_interface_medium1_index(iinterface);
     const int edge2_index = container.h_interface_medium2_index(iinterface);
 

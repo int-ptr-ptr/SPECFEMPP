@@ -125,7 +125,7 @@ void dump_edge_container_statics(
       dump, edge_storage.acoustic_elastic_interface.h_medium2_index_mapping);
 
   dump << "edge_type_refs";
-  Kokkos::View<specfem::enums::edge::type[4], Kokkos::DefaultExecutionSpace>
+  Kokkos::View<specfem::enums::edge::type[4], specfem::kokkos::HostMemSpace>
       edge_type_refs("dump_edge_container_statics:edge_type_refs");
   edge_type_refs(0) = specfem::enums::edge::type::RIGHT;
   edge_type_refs(1) = specfem::enums::edge::type::TOP;
@@ -394,7 +394,7 @@ void dump_simfield_statics(std::ofstream &dump,
   // _stream_view<type_real,4>(dump,simfield.h_edge_values_z);
 
   dump << "medium_type_refs";
-  Kokkos::View<int[2], Kokkos::DefaultExecutionSpace> medium_type_refs(
+  Kokkos::View<int[2], specfem::kokkos::HostMemSpace> medium_type_refs(
       "dump_simfield_statics:medium_type_refs");
   medium_type_refs(0) =
       static_cast<int>(specfem::element::medium_tag::acoustic);

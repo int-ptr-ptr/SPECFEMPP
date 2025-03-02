@@ -226,7 +226,7 @@ if __name__ == "__main__":
         return msg
 
     outputs = []
-    with util.curse_monitor.TestMonitor(dummy_gui=False, close_with_key=False) as mon:
+    with util.curse_monitor.TestMonitor(dummy_gui=True, close_with_key=False) as mon:
         tests = config.get("cg_compare.tests")
         compares = dict()
         compare_queues = dict()

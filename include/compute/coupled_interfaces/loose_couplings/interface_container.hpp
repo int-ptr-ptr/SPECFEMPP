@@ -83,15 +83,16 @@ template <specfem::dimension::type DimensionType,
           specfem::element::medium_tag MediumTag2, typename QuadratureType,
           specfem::coupled_interface::loose::flux::type FluxSchemeType>
 struct interface_container
-    : specfem::coupled_interface::loose::flux::FluxScheme<FluxSchemeType>::
-          template ContainerType<DimensionType, MediumTag1, MediumTag2, QuadratureType> {
+    : specfem::coupled_interface::loose::flux::FluxScheme<
+          FluxSchemeType>::template ContainerType<DimensionType, MediumTag1,
+                                                  MediumTag2, QuadratureType> {
 private:
   using FluxScheme =
       typename specfem::coupled_interface::loose::flux::FluxScheme<
           FluxSchemeType>::orig_flux_scheme;
   using super = typename specfem::coupled_interface::loose::flux::FluxScheme<
-      FluxSchemeType>::template ContainerType<DimensionType, MediumTag1, MediumTag2,
-                                     QuadratureType>;
+      FluxSchemeType>::template ContainerType<DimensionType, MediumTag1,
+                                              MediumTag2, QuadratureType>;
 
   using IndexView =
       Kokkos::View<int *, Kokkos::DefaultExecutionSpace>; ///< Underlying view
@@ -323,14 +324,19 @@ public:
         edge = h_medium2_edge_type(edge_index);
       }
     } else {
-      static_assert(medium==1 || medium==2, "Medium can only be 1 or 2!");
+      static_assert(medium == 1 || medium == 2, "Medium can only be 1 or 2!");
     }
     int ix, iz;
 #pragma unroll
     for (int igll = 0; igll < NGLL_EDGE; igll++) {
       point_from_edge<NGLL_EDGE>(iz, ix, edge, igll);
-      edge_positions.x[igll] = assembly.mesh.points.coord(0, ispec, iz, ix);
-      edge_positions.z[igll] = assembly.mesh.points.coord(1, ispec, iz, ix);
+      if constexpr (on_device == true) {
+        edge_positions.x[igll] = assembly.mesh.points.coord(0, ispec, iz, ix);
+        edge_positions.z[igll] = assembly.mesh.points.coord(1, ispec, iz, ix);
+      } else {
+        edge_positions.x[igll] = assembly.mesh.points.h_coord(0, ispec, iz, ix);
+        edge_positions.z[igll] = assembly.mesh.points.h_coord(1, ispec, iz, ix);
+      }
     }
     return edge_positions;
   }
@@ -425,7 +431,7 @@ public:
         edge = h_medium2_edge_type(edge_index);
       }
     } else {
-      static_assert(medium==1 || medium==2, "Medium can only be 1 or 2!");
+      static_assert(medium == 1 || medium == 2, "Medium can only be 1 or 2!");
     }
     int ix, iz;
 #pragma unroll
@@ -493,7 +499,7 @@ public:
   template <int medium, bool on_device>
   void compute_edge_intermediates(specfem::compute::assembly &assembly) {
     static_assert(on_device == false, "on_device == true not yet supported.");
-    static_assert(medium==1 || medium==2, "Medium can only be 1 or 2!");
+    static_assert(medium == 1 || medium == 2, "Medium can only be 1 or 2!");
     if constexpr (single_medium_interface_container::includes<decltype(
                       this)>() &&
                   medium == 2) {

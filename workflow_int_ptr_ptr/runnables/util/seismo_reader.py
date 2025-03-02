@@ -42,8 +42,13 @@ def compare_seismos(
                 )
 
     STATION_IND_POS_OFFSET = 2
+    suptitle_ = "Seismogram Comparison (dG: green, cG: red)"
     foldernames = [ref_folder, test_folder]
     colors = ["r", "g"]
+    if ref_folder is None:
+        suptitle_ = "Siesmogram Outputs"
+        foldernames = [test_folder]
+        colors = ["g"]
 
     num_stations = len(stations)
     row_suffix_search = [
@@ -141,7 +146,7 @@ def compare_seismos(
             )
             a.set_xlim(tlim)
     # ax[0,-1].legend()
-    fig.suptitle("Seismogram Comparison (dG: green, cG: red)")
+    fig.suptitle(suptitle_)
     if show:
         plt.show()
     if save_filename is not None:

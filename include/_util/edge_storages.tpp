@@ -94,11 +94,11 @@ bool edge_storage<edgequad, datacapacity>::intersect(const int a_edge_index,
   int ix, iz;
   for(int igll = 0; igll < ngll; igll++){
     specfem::compute::loose::point_from_edge<ngll>(iz,ix,edges[a_edge_index].bdry,igll);
-    anodex[igll] = assembly.mesh.points.coord(0, edges[a_edge_index].id, iz, ix);
-    anodez[igll] = assembly.mesh.points.coord(1, edges[a_edge_index].id, iz, ix);
+    anodex[igll] = assembly.mesh.points.h_coord(0, edges[a_edge_index].id, iz, ix);
+    anodez[igll] = assembly.mesh.points.h_coord(1, edges[a_edge_index].id, iz, ix);
     specfem::compute::loose::point_from_edge<ngll>(iz,ix,edges[b_edge_index].bdry,igll);
-    bnodex[igll] = assembly.mesh.points.coord(0, edges[b_edge_index].id, iz, ix);
-    bnodez[igll] = assembly.mesh.points.coord(1, edges[b_edge_index].id, iz, ix);
+    bnodex[igll] = assembly.mesh.points.h_coord(0, edges[b_edge_index].id, iz, ix);
+    bnodez[igll] = assembly.mesh.points.h_coord(1, edges[b_edge_index].id, iz, ix);
     intersection.quad_weight[igll] = gll.w[igll];
   }
 
@@ -274,10 +274,10 @@ bool edge_storage<edgequad, datacapacity>::intersect(const int a_edge_index,
   b_len -= b_sublens[b_ind_end] * (1-b_subind_end);
 
 #ifdef ___DEBUG___
-  ASSERT(0 <= a_subind_start && a_subind_start <= 1+1e-6, "start: "+std::to_string(a_param_start)+" ("+std::to_string(a_ind_start)+","+std::to_string(a_subind_start)+")");
-  ASSERT(0 <= a_subind_end && a_subind_end <= 1+1e-6, "end: "+std::to_string(a_param_end)+" ("+std::to_string(a_ind_end)+","+std::to_string(a_subind_end)+")");
-  ASSERT(0 <= b_subind_start && b_subind_start <= 1+1e-6, "start: "+std::to_string(b_param_start)+" ("+std::to_string(b_ind_start)+","+std::to_string(b_subind_start)+")");
-  ASSERT(0 <= b_subind_end && b_subind_end <= 1+1e-6, "end: "+std::to_string(b_param_end)+" ("+std::to_string(b_ind_end)+","+std::to_string(b_subind_end)+")");
+  ASSERT(-intersect_eps <= a_subind_start && a_subind_start <= 1+intersect_eps, "start: "+std::to_string(a_param_start)+" ("+std::to_string(a_ind_start)+","+std::to_string(a_subind_start)+")");
+  ASSERT(-intersect_eps <= a_subind_end && a_subind_end <= 1+intersect_eps, "end: "+std::to_string(a_param_end)+" ("+std::to_string(a_ind_end)+","+std::to_string(a_subind_end)+")");
+  ASSERT(-intersect_eps <= b_subind_start && b_subind_start <= 1+intersect_eps, "start: "+std::to_string(b_param_start)+" ("+std::to_string(b_ind_start)+","+std::to_string(b_subind_start)+")");
+  ASSERT(-intersect_eps <= b_subind_end && b_subind_end <= 1+intersect_eps, "end: "+std::to_string(b_param_end)+" ("+std::to_string(b_ind_end)+","+std::to_string(b_subind_end)+")");
 #endif
 
   for (int i = 0; i < intersection_nquad; i++) {
@@ -341,7 +341,7 @@ bool edge_storage<edgequad, datacapacity>::intersect(const int a_edge_index,
     st += "]";
     return st;
   };
-  ASSERT(-1-1e-6 <= t_samples[0] && t_samples[intersection_nquad-1] <= 1+1e-6,
+  ASSERT(-1-intersect_eps <= t_samples[0] && t_samples[intersection_nquad-1] <= 1+intersect_eps,
     "bad t-samples\ntsamples (side1): log\n"+compute_log+"\nlen = "+std::to_string(a_len)
     +"\nstart: "+std::to_string(a_param_start)+" ("+std::to_string(a_ind_start)+","+std::to_string(a_subind_start)+") "
     +"end: "+std::to_string(a_param_end)+" ("+std::to_string(a_ind_end)+","+std::to_string(a_subind_end)+")"
@@ -373,7 +373,7 @@ bool edge_storage<edgequad, datacapacity>::intersect(const int a_edge_index,
 #endif
   }
 #ifdef ___DEBUG___
-  ASSERT(-1-1e-6 <= t_samples[0] && t_samples[intersection_nquad-1] <= 1+1e-6,
+  ASSERT(-1-intersect_eps <= t_samples[0] && t_samples[intersection_nquad-1] <= 1+intersect_eps,
     "bad t-samples\ntsamples (side2): log\n"+compute_log+"\nlen = "+std::to_string(b_len)
     +"\nstart: "+std::to_string(b_param_start)+" ("+std::to_string(b_ind_start)+","+std::to_string(b_subind_start)+") "
     +"end: "+std::to_string(b_param_end)+" ("+std::to_string(b_ind_end)+","+std::to_string(b_subind_end)+")"
