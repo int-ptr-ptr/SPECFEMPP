@@ -32,20 +32,21 @@
 
 int ISTEP;
 #include "_util/build_demo_assembly.hpp"
+#include "_util/periodify.hpp"
 #include "compute/assembly/assembly.hpp"
 #include "constants.hpp"
 #include "solver/time_marching.hpp"
 #include "timescheme/newmark.hpp"
 
-bool FORCE_INTO_CONTINUOUS;
-int DUMP_INTERVAL;
-bool USE_DOUBLEMESH;
+bool FORCE_INTO_CONTINUOUS = false;
+int DUMP_INTERVAL = -1;
+bool USE_DOUBLEMESH = false;
+bool LR_PERIODIC = false;
+bool KILL_NONNEUMANN_BDRYS = false;
 
 // #define DEFAULT_USE_DOUBLEMESH
 #define DEFAULT_SET_CONTINUOUS false
 // #define USE_DEMO_MESH
-
-#define KILL_NONNEUMANN_BDRYS
 
 #define _RELAX_PARAM_COEF_ACOUSTIC_ 40
 #define _RELAX_PARAM_COEF_ELASTIC_ 40
@@ -291,6 +292,9 @@ void execute(specfem::MPI::MPI *mpi) {
 
   dg_edge_storage.initialize_intersection_data(intersect_data_capacity);
 
+  if (LR_PERIODIC) {
+    _util::periodify_LR(*assembly);
+  }
   specfem::event_marching::arbitrary_call_event store_boundaryvals(
       [&]() {
         assembly->fields.forward.copy_to_host();
@@ -418,19 +422,22 @@ load_parameters(const std::string &parameter_file, specfem::MPI::MPI *mpi) {
       setup.instantiate_mesh_modifiers<specfem::dimension::type::dim2>();
   auto mesh = specfem::IO::read_mesh(database_filename, mpi);
   mesh_modifiers->apply(mesh);
+  if (LR_PERIODIC) {
+    KILL_NONNEUMANN_BDRYS = true;
+  }
+  if (KILL_NONNEUMANN_BDRYS) {
 
-#ifdef KILL_NONNEUMANN_BDRYS
-
-  specfem::mesh::absorbing_boundary<specfem::dimension::type::dim2> bdry_abs(0);
-  specfem::mesh::acoustic_free_surface<specfem::dimension::type::dim2> bdry_afs(
-      0);
-  specfem::mesh::forcing_boundary<specfem::dimension::type::dim2> bdry_forcing(
-      0);
-  mesh.boundaries = specfem::mesh::boundaries<specfem::dimension::type::dim2>(
-      bdry_abs, bdry_afs, bdry_forcing);
-  mesh.tags = specfem::mesh::tags<specfem::dimension::type::dim2>(
-      mesh.materials, mesh.boundaries);
-#endif
+    specfem::mesh::absorbing_boundary<specfem::dimension::type::dim2> bdry_abs(
+        0);
+    specfem::mesh::acoustic_free_surface<specfem::dimension::type::dim2>
+        bdry_afs(0);
+    specfem::mesh::forcing_boundary<specfem::dimension::type::dim2>
+        bdry_forcing(0);
+    mesh.boundaries = specfem::mesh::boundaries<specfem::dimension::type::dim2>(
+        bdry_abs, bdry_afs, bdry_forcing);
+    mesh.tags = specfem::mesh::tags<specfem::dimension::type::dim2>(
+        mesh.materials, mesh.boundaries);
+  }
   // --------------------------------------------------------------
 
   // --------------------------------------------------------------
@@ -528,8 +535,6 @@ load_parameters(const std::string &parameter_file, specfem::MPI::MPI *mpi) {
   return params;
 }
 int main(int argc, char **argv) {
-  USE_DOUBLEMESH = false;
-  DUMP_INTERVAL = -1;
   bool continuity_state_requested = false;
   bool continuity_desired = false;
   for (int iarg = 0; iarg < argc; iarg++) {
@@ -547,13 +552,18 @@ int main(int argc, char **argv) {
 
     std::string arg(argv[iarg]);
     bool has_next = iarg + 1 < argc;
-    if ((arg == "--file" || arg == "-f") && has_next) {
+    if ((arg == "--file" || arg == "-f" || arg == "-p") && has_next) {
       param_fname = std::string(argv[iarg + 1]);
       iarg++;
       continue;
     }
     if ((arg == "--dump" || arg == "-d") && has_next) {
       DUMP_INTERVAL = atoi(argv[iarg + 1]);
+      iarg++;
+      continue;
+    }
+    if (arg == "--lr_periodic") {
+      LR_PERIODIC = true;
       continue;
     }
   }

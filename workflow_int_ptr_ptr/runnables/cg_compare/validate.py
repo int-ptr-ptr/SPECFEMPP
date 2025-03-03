@@ -226,7 +226,7 @@ if __name__ == "__main__":
         return msg
 
     outputs = []
-    with util.curse_monitor.TestMonitor(dummy_gui=True, close_with_key=False) as mon:
+    with util.curse_monitor.TestMonitor(dummy_gui=False, close_with_key=False) as mon:
         tests = config.get("cg_compare.tests")
         compares = dict()
         compare_queues = dict()
@@ -251,7 +251,7 @@ if __name__ == "__main__":
                 args = "%NOC %D"
             else:
                 raise ValueError(f"Unknown test class {test['class']}")
-            args += " -d " + config.get("cg_compare.dump_test_resolution")
+            args += " " + "-d " + config.get("cg_compare.dump_test_resolution")
             i = util.runjob.queue_job(
                 util.runjob.SystemCommandJob(
                     name=f"run: {test['name']}",
