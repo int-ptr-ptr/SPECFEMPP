@@ -16,13 +16,21 @@ def init_workspace_folder(test):
     if not os.path.exists(folder):
         os.makedirs(folder)
 
-    if (
-        test["class"] == "doublemesh"
-        or test["class"] == "samemesh"
-        or test["class"] == "subdivmesh"
-    ):
-        is_doublemesh = test["class"] == "doublemesh"
+    if test["class"] == "samemesh" or test["class"] == "subdivmesh":
         is_subdivmesh = test["class"] == "subdivmesh"
+
+        def convert_meshfem_macros(st):
+            nx = int(test["meshfem_nx"])
+            ny = int(test["meshfem_ny"])
+            return (
+                st.replace("!!MAT1", test["mat1"])
+                .replace("!!MAT2", test["mat2"])
+                .replace("!!HNYP1", str((ny // 2) + 1))
+                .replace("!!HNY", str(ny // 2))
+                .replace("!!NX", str(nx))
+                .replace("!!NY", str(ny))
+            )
+
         with open(config.get("cg_compare.config_files.meshfem_parfile"), "r") as f:
             st = f.read()
             with open(
@@ -31,76 +39,25 @@ def init_workspace_folder(test):
                 ),
                 "w",
             ) as f:
-                f.write(
-                    st.replace("!!MAT1", test["mat1"]).replace("!!MAT2", test["mat2"])
-                )
-        if is_doublemesh:
-            with open(
-                config.get("cg_compare.config_files.meshfem_parfile_bottom"), "r"
-            ) as f:
-                st = f.read()
-                with open(
-                    os.path.join(
-                        folder,
-                        config.get("cg_compare.workspace_files.meshfem_parfile_bottom"),
-                    ),
-                    "w",
-                ) as f:
-                    f.write(
-                        st.replace("!!MAT1", test["mat1"]).replace(
-                            "!!MAT2", test["mat2"]
-                        )
-                    )
-            with open(
-                config.get("cg_compare.config_files.meshfem_parfile_top"), "r"
-            ) as f:
-                st = f.read()
-                with open(
-                    os.path.join(
-                        folder,
-                        config.get("cg_compare.workspace_files.meshfem_parfile_top"),
-                    ),
-                    "w",
-                ) as f:
-                    f.write(
-                        st.replace("!!MAT1", test["mat1"]).replace(
-                            "!!MAT2", test["mat2"]
-                        )
-                    )
+                f.write(convert_meshfem_macros(st))
 
-        shutil.copy(
-            config.get("cg_compare.config_files.topography"),
-            os.path.join(folder, config.get("cg_compare.workspace_files.topography")),
-        )
+        with open(config.get("cg_compare.config_files.topography"), "r") as f:
+            st = f.read()
+            with open(
+                os.path.join(
+                    folder, config.get("cg_compare.workspace_files.topography")
+                ),
+                "w",
+            ) as f:
+                f.write(convert_meshfem_macros(st))
 
-        if is_doublemesh:
-            shutil.copy(
-                config.get("cg_compare.config_files.topography_bottom"),
-                os.path.join(
-                    folder, config.get("cg_compare.workspace_files.topography_bottom")
-                ),
-            )
-            shutil.copy(
-                config.get("cg_compare.config_files.topography_top"),
-                os.path.join(
-                    folder, config.get("cg_compare.workspace_files.topography_top")
-                ),
-            )
         shutil.copy(
             config.get("cg_compare.config_files.specfem_parfile"),
             os.path.join(
                 folder, config.get("cg_compare.workspace_files.specfem_parfile")
             ),
         )
-        if is_doublemesh:
-            shutil.copy(
-                config.get("cg_compare.config_files.specfem_parfile_double"),
-                os.path.join(
-                    folder,
-                    config.get("cg_compare.workspace_files.specfem_parfile_double"),
-                ),
-            )
-        elif is_subdivmesh:
+        if is_subdivmesh:
             shutil.copy(
                 config.get("cg_compare.config_files.specfem_parfile_subdivs"),
                 os.path.join(
@@ -134,9 +91,6 @@ def init_workspace_folder(test):
                 raise RuntimeError
 
         run_xmeshfem("PAR_FILE")
-        if is_doublemesh:
-            run_xmeshfem("PAR_FILE_DOUBLE1")
-            run_xmeshfem("PAR_FILE_DOUBLE2")
 
         return util.runjob.queue_job(
             util.runjob.SystemCommandJob(

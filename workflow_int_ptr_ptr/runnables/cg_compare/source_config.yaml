@@ -1,8 +1,8 @@
 number-of-sources: 1
 sources:
   - force:
-      x : 0.25
-      z : 0.3
+      x : 0.23232323
+      z : 0.31616161
       source_surf: false
       angle : 0.0
       vx : 0.0
