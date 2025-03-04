@@ -252,6 +252,7 @@ if __name__ == "__main__":
             else:
                 raise ValueError(f"Unknown test class {test['class']}")
             args += " " + "-d " + config.get("cg_compare.dump_test_resolution")
+            # args += " --lr_periodic"
             i = util.runjob.queue_job(
                 util.runjob.SystemCommandJob(
                     name=f"run: {test['name']}",

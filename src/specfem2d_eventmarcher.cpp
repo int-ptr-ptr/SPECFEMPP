@@ -422,9 +422,6 @@ load_parameters(const std::string &parameter_file, specfem::MPI::MPI *mpi) {
       setup.instantiate_mesh_modifiers<specfem::dimension::type::dim2>();
   auto mesh = specfem::IO::read_mesh(database_filename, mpi);
   mesh_modifiers->apply(mesh);
-  if (LR_PERIODIC) {
-    KILL_NONNEUMANN_BDRYS = true;
-  }
   if (KILL_NONNEUMANN_BDRYS) {
 
     specfem::mesh::absorbing_boundary<specfem::dimension::type::dim2> bdry_abs(
@@ -435,6 +432,10 @@ load_parameters(const std::string &parameter_file, specfem::MPI::MPI *mpi) {
         bdry_forcing(0);
     mesh.boundaries = specfem::mesh::boundaries<specfem::dimension::type::dim2>(
         bdry_abs, bdry_afs, bdry_forcing);
+    mesh.tags = specfem::mesh::tags<specfem::dimension::type::dim2>(
+        mesh.materials, mesh.boundaries);
+  } else if (LR_PERIODIC) {
+    _util::kill_LR_BCs(mesh);
     mesh.tags = specfem::mesh::tags<specfem::dimension::type::dim2>(
         mesh.materials, mesh.boundaries);
   }
@@ -566,11 +567,15 @@ int main(int argc, char **argv) {
       LR_PERIODIC = true;
       continue;
     }
+    if (arg == "--kill_boundaries") {
+      KILL_NONNEUMANN_BDRYS = true;
+      continue;
+    }
   }
   if (continuity_state_requested) {
     FORCE_INTO_CONTINUOUS = continuity_desired;
   } else {
-    FORCE_INTO_CONTINUOUS = !USE_DOUBLEMESH;
+    FORCE_INTO_CONTINUOUS = false;
   }
 #ifdef DEFAULT_SET_CONTINUOUS
   FORCE_INTO_CONTINUOUS = DEFAULT_SET_CONTINUOUS;
@@ -589,6 +594,12 @@ int main(int argc, char **argv) {
     mpi->cout("Forcing into continuous domain");
   } else {
     mpi->cout("Using discontinuous domain");
+  }
+  if (LR_PERIODIC) {
+    mpi->cout("Setting Left/Right periodic boundaries");
+  }
+  if (KILL_NONNEUMANN_BDRYS) {
+    mpi->cout("Removing unnatural boundaries");
   }
   { execute(mpi); }
   // Finalize Kokkos
