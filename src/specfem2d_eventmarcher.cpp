@@ -33,6 +33,7 @@
 int ISTEP;
 #include "_util/build_demo_assembly.hpp"
 #include "_util/periodify.hpp"
+#include "_util/sourcebd.hpp"
 #include "compute/assembly/assembly.hpp"
 #include "constants.hpp"
 #include "solver/time_marching.hpp"
@@ -155,6 +156,7 @@ void execute(specfem::MPI::MPI *mpi) {
   auto timescheme =
       specfem::time_scheme::newmark<specfem::simulation::type::forward>(
           params.get_numsteps(), 1, params.get_dt(), params.get_t0());
+  const type_real dt = params.get_dt();
   timescheme.link_assembly(*assembly);
 
   params.set_plotters_from_runtime_configuration();
@@ -295,6 +297,30 @@ void execute(specfem::MPI::MPI *mpi) {
   if (LR_PERIODIC) {
     _util::periodify_LR(*assembly);
   }
+  auto wave_inject_acoustic =
+      _util::sourceboundary::kernel<acoustic>(*assembly);
+
+  specfem::event_marching::arbitrary_call_event inject_acoustic_event(
+      [&]() {
+        const int istep = timescheme_wrapper.get_istep();
+        const type_real t = istep * dt;
+        constexpr type_real c = 1;
+        constexpr type_real wind_up = 0.5;
+        constexpr type_real max_amp = 20;
+        const type_real pi = std::atan(1) * 4;
+        // const type_real amp = (t <= 0)? 0:((t < wind_up)?
+        // (1-std::cos(pi*t/wind_up))*max_amp:max_amp);
+        const type_real amp = max_amp;
+        const type_real kx = 2 * pi;
+        const type_real kz = 10;
+        const type_real k = std::sqrt(kx * kx + kz * kz);
+        const type_real omega = c * k;
+        wave_inject_acoustic.force_planar_wave(kx, kz, omega * t, amp);
+        return 0;
+      },
+      0.92);
+  // timescheme_wrapper.time_stepper.register_event(&inject_acoustic_event);
+
   specfem::event_marching::arbitrary_call_event store_boundaryvals(
       [&]() {
         assembly->fields.forward.copy_to_host();
