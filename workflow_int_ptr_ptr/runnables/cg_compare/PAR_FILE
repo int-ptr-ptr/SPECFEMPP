@@ -10,8 +10,6 @@ NPROC                           = 1              # number of processes
 # Output folder to store mesh related files
 OUTPUT_FILES                   = mesh_out
 
-STACEY_ABSORBING_CONDITIONS     = .false.
-
 #-----------------------------------------------------------
 #
 # Mesh
@@ -105,8 +103,9 @@ interfacesfile                  = topography_file.dat
 # geometry of the model (origin lower-left corner = 0,0) and mesh description
 xmin                            = 0.d0           # abscissa of left side of the model
 xmax                            = 1.d0         # abscissa of right side of the model
-nx                              = 10             # number of elements along X
+nx                              = !!NX             # number of elements along X
 # absorbing boundary parameters (see absorbing_conditions above)
+STACEY_ABSORBING_CONDITIONS     = .true.
 absorbbottom                    = .false.
 absorbright                     = .true.
 absorbtop                       = .false.
@@ -114,8 +113,8 @@ absorbleft                      = .true.
 # define the different regions of the model in the (nx,nz) spectral-element mesh
 nbregions                       = 2              # then set below the different regions and model number for each region
 # format of each line: nxmin nxmax nzmin nzmax material_number
-1 10  1 5 1
-1 10  6 10 2
+1 !!NX  1 !!HNY 1
+1 !!NX  !!HNYP1 !!NY 2
 #-----------------------------------------------------------
 #
 # DISPLAY PARAMETERS
