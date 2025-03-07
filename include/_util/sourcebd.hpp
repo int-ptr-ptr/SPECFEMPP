@@ -90,14 +90,17 @@ private:
   type_real nx;
   type_real nz;
   int num_pts;
-  specfem::kokkos::HostView1d<
-      specfem::point::index<specfem::dimension::type::dim2> >
-      inds;
-  decltype(inds)::HostMirror h_inds;
-  specfem::kokkos::HostView1d<type_real[2]> coord;
-  decltype(coord)::HostMirror h_coord;
-  specfem::kokkos::HostView1d<type_real> jac;
-  decltype(jac)::HostMirror h_jac;
+  using IndsType = specfem::kokkos::HostView1d<
+      specfem::point::index<specfem::dimension::type::dim2> >;
+  using CoordsType = specfem::kokkos::HostView1d<type_real[2]>;
+  using JacType = specfem::kokkos::HostView1d<type_real>;
+
+  IndsType inds;
+  IndsType::HostMirror h_inds;
+  CoordsType coord;
+  CoordsType::HostMirror h_coord;
+  JacType jac;
+  JacType::HostMirror h_jac;
 };
 
 } // namespace sourceboundary
