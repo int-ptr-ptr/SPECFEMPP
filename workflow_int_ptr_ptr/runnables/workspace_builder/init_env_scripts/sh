@@ -1,0 +1,4 @@
+#! /bin/bash
+
+export PATH=@workflow_root@/exe:$PATH
+echo "PATH has been updated."

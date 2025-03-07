@@ -206,7 +206,7 @@ struct symmetric_flux::kernel<
         specfem::compute::loose::point_from_edge<ContainerType::NGLL_EDGE>(
             index.iz, index.ix, edge1_type, igll_edge);
         specfem::compute::load_on_host(index, assembly.properties, props);
-        speed_param1[igll_edge] = props.rho_inverse;
+        speed_param1[igll_edge] = props.rho_inverse();
       }
 
       index.ispec = edge2_ispec;
@@ -221,7 +221,7 @@ struct symmetric_flux::kernel<
         specfem::compute::loose::point_from_edge<ContainerType::NGLL_EDGE>(
             index.iz, index.ix, edge2_type, igll_edge);
         specfem::compute::load_on_host(index, assembly.properties, props);
-        speed_param2[igll_edge] = props.rho_inverse;
+        speed_param2[igll_edge] = props.rho_inverse();
       }
 
       for (int igll_interface = 0;
@@ -425,10 +425,10 @@ struct symmetric_flux::kernel<
         specfem::point::index<specfem::dimension::type::dim2> index(edge1_ispec,
                                                                     iz, ix);
         specfem::compute::load_on_host(index, assembly.properties, props);
-        rho_inv_max = std::max(rho_inv_max, props.rho_inverse);
+        rho_inv_max = std::max(rho_inv_max, props.rho_inverse());
         index.ispec = edge2_ispec;
         specfem::compute::load_on_host(index, assembly.properties, props);
-        rho_inv_max = std::max(rho_inv_max, props.rho_inverse);
+        rho_inv_max = std::max(rho_inv_max, props.rho_inverse());
       }
     }
 

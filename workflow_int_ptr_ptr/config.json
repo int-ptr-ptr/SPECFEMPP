@@ -120,5 +120,10 @@
         "class": "subdivmesh"
       }
     ]
+  },
+  "workspace_builder":{
+    "ref_dir":"${root_dir}/runnables/workspace_builder",
+    "config_override_ref": "${ref_dir}/config_overrides.conf",
+    "init_env_scripts": "${ref_dir}/init_env_scripts"
   }
 }

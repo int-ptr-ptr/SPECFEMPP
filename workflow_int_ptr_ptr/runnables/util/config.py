@@ -4,6 +4,9 @@ import os
 import re
 from typing import Any, Iterable
 
+FILENAME_MASTER_CONFIG = "config.json"
+FILENAME_CONFIG_OVERRIDE = "workspace.conf"
+
 # loaded configuration
 config = None
 
@@ -29,7 +32,7 @@ except Exception:
 
 for folder in search_folders:
     try:
-        with open(os.path.join(folder, "config.json"), "r") as f:
+        with open(os.path.join(folder, FILENAME_MASTER_CONFIG), "r") as f:
             config = json.load(f)
             config["root_dir"] = os.path.abspath(folder)
             break

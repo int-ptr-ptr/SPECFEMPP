@@ -65,3 +65,11 @@ def test_cgcompare(session):
     session.install("numpy", "matplotlib")
     session.cd(os.path.join(workspace_root, "runnables"))
     session.run("python", "-m", "cg_compare.validate")
+
+
+@nox.session(python=False)
+def create_workspace(session):
+    import gen_workspace_dir  # pyright: ignore
+
+    directory = input("Workspace directory name: ")
+    gen_workspace_dir.create_workspace(directory, overwrite=None, verbose=True)
