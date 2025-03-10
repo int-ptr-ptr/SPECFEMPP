@@ -1,0 +1,2811 @@
+number-of-sources: 234
+sources:
+
+    - moment-tensor:
+        x: 200.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.0
+            f0: 1.0
+
+    - moment-tensor:
+        x: 300.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.005309
+            f0: 1.0
+
+    - moment-tensor:
+        x: 400.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.010618
+            f0: 1.0
+
+    - moment-tensor:
+        x: 500.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.015927
+            f0: 1.0
+
+    - moment-tensor:
+        x: 600.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.021236
+            f0: 1.0
+
+    - moment-tensor:
+        x: 700.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.026545000000000003
+            f0: 1.0
+
+    - moment-tensor:
+        x: 800.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.031854
+            f0: 1.0
+
+    - moment-tensor:
+        x: 900.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.037163
+            f0: 1.0
+
+    - moment-tensor:
+        x: 1000.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.042472
+            f0: 1.0
+
+    - moment-tensor:
+        x: 1100.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.047781000000000004
+            f0: 1.0
+
+    - moment-tensor:
+        x: 1200.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.053090000000000005
+            f0: 1.0
+
+    - moment-tensor:
+        x: 1300.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.058399000000000006
+            f0: 1.0
+
+    - moment-tensor:
+        x: 1400.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.063708
+            f0: 1.0
+
+    - moment-tensor:
+        x: 1500.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.06901700000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 1600.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.074326
+            f0: 1.0
+
+    - moment-tensor:
+        x: 1700.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.07963500000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 1800.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.084944
+            f0: 1.0
+
+    - moment-tensor:
+        x: 1900.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.090253
+            f0: 1.0
+
+    - moment-tensor:
+        x: 2000.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.09556200000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 2100.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.100871
+            f0: 1.0
+
+    - moment-tensor:
+        x: 2200.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.10618000000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 2300.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.111489
+            f0: 1.0
+
+    - moment-tensor:
+        x: 2400.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.11679800000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 2500.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.12210700000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 2600.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.127416
+            f0: 1.0
+
+    - moment-tensor:
+        x: 2700.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.132725
+            f0: 1.0
+
+    - moment-tensor:
+        x: 2800.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.13803400000000002
+            f0: 1.0
+
+    - moment-tensor:
+        x: 2900.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.143343
+            f0: 1.0
+
+    - moment-tensor:
+        x: 3000.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.148652
+            f0: 1.0
+
+    - moment-tensor:
+        x: 3100.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.15396100000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 3200.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.15927000000000002
+            f0: 1.0
+
+    - moment-tensor:
+        x: 3300.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.164579
+            f0: 1.0
+
+    - moment-tensor:
+        x: 3400.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.169888
+            f0: 1.0
+
+    - moment-tensor:
+        x: 3500.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.17519700000000002
+            f0: 1.0
+
+    - moment-tensor:
+        x: 3600.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.180506
+            f0: 1.0
+
+    - moment-tensor:
+        x: 3700.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.185815
+            f0: 1.0
+
+    - moment-tensor:
+        x: 3800.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.19112400000000002
+            f0: 1.0
+
+    - moment-tensor:
+        x: 3900.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.19643300000000002
+            f0: 1.0
+
+    - moment-tensor:
+        x: 4000.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.201742
+            f0: 1.0
+
+    - moment-tensor:
+        x: 4100.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.207051
+            f0: 1.0
+
+    - moment-tensor:
+        x: 4200.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.21236000000000002
+            f0: 1.0
+
+    - moment-tensor:
+        x: 4300.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.217669
+            f0: 1.0
+
+    - moment-tensor:
+        x: 4400.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.222978
+            f0: 1.0
+
+    - moment-tensor:
+        x: 4500.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.22828700000000002
+            f0: 1.0
+
+    - moment-tensor:
+        x: 4600.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.23359600000000003
+            f0: 1.0
+
+    - moment-tensor:
+        x: 4700.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.238905
+            f0: 1.0
+
+    - moment-tensor:
+        x: 4800.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.24421400000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 4900.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.24952300000000002
+            f0: 1.0
+
+    - moment-tensor:
+        x: 5000.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.254832
+            f0: 1.0
+
+    - moment-tensor:
+        x: 5100.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.260141
+            f0: 1.0
+
+    - moment-tensor:
+        x: 5200.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.26545
+            f0: 1.0
+
+    - moment-tensor:
+        x: 5300.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.270759
+            f0: 1.0
+
+    - moment-tensor:
+        x: 5400.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.27606800000000004
+            f0: 1.0
+
+    - moment-tensor:
+        x: 5500.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.28137700000000004
+            f0: 1.0
+
+    - moment-tensor:
+        x: 5600.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.286686
+            f0: 1.0
+
+    - moment-tensor:
+        x: 5700.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.291995
+            f0: 1.0
+
+    - moment-tensor:
+        x: 5800.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.297304
+            f0: 1.0
+
+    - moment-tensor:
+        x: 5900.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.302613
+            f0: 1.0
+
+    - moment-tensor:
+        x: 6000.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.30792200000000003
+            f0: 1.0
+
+    - moment-tensor:
+        x: 6100.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.31323100000000004
+            f0: 1.0
+
+    - moment-tensor:
+        x: 6200.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.31854000000000005
+            f0: 1.0
+
+    - moment-tensor:
+        x: 6300.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.323849
+            f0: 1.0
+
+    - moment-tensor:
+        x: 6400.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.329158
+            f0: 1.0
+
+    - moment-tensor:
+        x: 6500.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.334467
+            f0: 1.0
+
+    - moment-tensor:
+        x: 6600.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.339776
+            f0: 1.0
+
+    - moment-tensor:
+        x: 6700.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.34508500000000003
+            f0: 1.0
+
+    - moment-tensor:
+        x: 6800.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.35039400000000004
+            f0: 1.0
+
+    - moment-tensor:
+        x: 6900.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.35570300000000005
+            f0: 1.0
+
+    - moment-tensor:
+        x: 7000.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.361012
+            f0: 1.0
+
+    - moment-tensor:
+        x: 7100.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.366321
+            f0: 1.0
+
+    - moment-tensor:
+        x: 7200.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.37163
+            f0: 1.0
+
+    - moment-tensor:
+        x: 7300.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.376939
+            f0: 1.0
+
+    - moment-tensor:
+        x: 7400.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.38224800000000003
+            f0: 1.0
+
+    - moment-tensor:
+        x: 7500.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.38755700000000004
+            f0: 1.0
+
+    - moment-tensor:
+        x: 7600.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.39286600000000005
+            f0: 1.0
+
+    - moment-tensor:
+        x: 7700.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.398175
+            f0: 1.0
+
+    - moment-tensor:
+        x: 7800.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.403484
+            f0: 1.0
+
+    - moment-tensor:
+        x: 7900.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.408793
+            f0: 1.0
+
+    - moment-tensor:
+        x: 8000.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.414102
+            f0: 1.0
+
+    - moment-tensor:
+        x: 8100.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.41941100000000003
+            f0: 1.0
+
+    - moment-tensor:
+        x: 8200.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.42472000000000004
+            f0: 1.0
+
+    - moment-tensor:
+        x: 8300.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.43002900000000005
+            f0: 1.0
+
+    - moment-tensor:
+        x: 8400.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.435338
+            f0: 1.0
+
+    - moment-tensor:
+        x: 8500.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.440647
+            f0: 1.0
+
+    - moment-tensor:
+        x: 8600.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.445956
+            f0: 1.0
+
+    - moment-tensor:
+        x: 8700.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.451265
+            f0: 1.0
+
+    - moment-tensor:
+        x: 8800.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.45657400000000004
+            f0: 1.0
+
+    - moment-tensor:
+        x: 8900.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.46188300000000004
+            f0: 1.0
+
+    - moment-tensor:
+        x: 9000.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.46719200000000005
+            f0: 1.0
+
+    - moment-tensor:
+        x: 9100.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.472501
+            f0: 1.0
+
+    - moment-tensor:
+        x: 9200.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.47781
+            f0: 1.0
+
+    - moment-tensor:
+        x: 9300.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.483119
+            f0: 1.0
+
+    - moment-tensor:
+        x: 9400.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.48842800000000003
+            f0: 1.0
+
+    - moment-tensor:
+        x: 9500.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.49373700000000004
+            f0: 1.0
+
+    - moment-tensor:
+        x: 9600.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.49904600000000005
+            f0: 1.0
+
+    - moment-tensor:
+        x: 9700.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.504355
+            f0: 1.0
+
+    - moment-tensor:
+        x: 9800.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.509664
+            f0: 1.0
+
+    - moment-tensor:
+        x: 9900.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.514973
+            f0: 1.0
+
+    - moment-tensor:
+        x: 10000.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.520282
+            f0: 1.0
+
+    - moment-tensor:
+        x: 10100.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.525591
+            f0: 1.0
+
+    - moment-tensor:
+        x: 10200.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.5309
+            f0: 1.0
+
+    - moment-tensor:
+        x: 10300.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.536209
+            f0: 1.0
+
+    - moment-tensor:
+        x: 10400.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.541518
+            f0: 1.0
+
+    - moment-tensor:
+        x: 10500.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.5468270000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 10600.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.5521360000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 10700.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.5574450000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 10800.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.5627540000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 10900.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.568063
+            f0: 1.0
+
+    - moment-tensor:
+        x: 11000.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.573372
+            f0: 1.0
+
+    - moment-tensor:
+        x: 11100.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.578681
+            f0: 1.0
+
+    - moment-tensor:
+        x: 11200.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.58399
+            f0: 1.0
+
+    - moment-tensor:
+        x: 11300.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.589299
+            f0: 1.0
+
+    - moment-tensor:
+        x: 11400.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.594608
+            f0: 1.0
+
+    - moment-tensor:
+        x: 11500.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.599917
+            f0: 1.0
+
+    - moment-tensor:
+        x: 11600.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.605226
+            f0: 1.0
+
+    - moment-tensor:
+        x: 11700.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.610535
+            f0: 1.0
+
+    - moment-tensor:
+        x: 11800.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.6158440000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 11900.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.6211530000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 12000.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.6264620000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 12100.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.6317710000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 12200.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.6370800000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 12300.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.642389
+            f0: 1.0
+
+    - moment-tensor:
+        x: 12400.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.647698
+            f0: 1.0
+
+    - moment-tensor:
+        x: 12500.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.653007
+            f0: 1.0
+
+    - moment-tensor:
+        x: 12600.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.658316
+            f0: 1.0
+
+    - moment-tensor:
+        x: 12700.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.663625
+            f0: 1.0
+
+    - moment-tensor:
+        x: 12800.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.668934
+            f0: 1.0
+
+    - moment-tensor:
+        x: 12900.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.674243
+            f0: 1.0
+
+    - moment-tensor:
+        x: 13000.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.679552
+            f0: 1.0
+
+    - moment-tensor:
+        x: 13100.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.684861
+            f0: 1.0
+
+    - moment-tensor:
+        x: 13200.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.6901700000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 13300.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.6954790000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 13400.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.7007880000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 13500.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.7060970000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 13600.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.7114060000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 13700.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.7167150000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 13800.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.722024
+            f0: 1.0
+
+    - moment-tensor:
+        x: 13900.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.727333
+            f0: 1.0
+
+    - moment-tensor:
+        x: 14000.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.732642
+            f0: 1.0
+
+    - moment-tensor:
+        x: 14100.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.737951
+            f0: 1.0
+
+    - moment-tensor:
+        x: 14200.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.74326
+            f0: 1.0
+
+    - moment-tensor:
+        x: 14300.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.748569
+            f0: 1.0
+
+    - moment-tensor:
+        x: 14400.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.753878
+            f0: 1.0
+
+    - moment-tensor:
+        x: 14500.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.7591870000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 14600.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.7644960000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 14700.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.7698050000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 14800.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.7751140000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 14900.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.7804230000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 15000.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.7857320000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 15100.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.7910410000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 15200.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.79635
+            f0: 1.0
+
+    - moment-tensor:
+        x: 15300.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.801659
+            f0: 1.0
+
+    - moment-tensor:
+        x: 15400.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.806968
+            f0: 1.0
+
+    - moment-tensor:
+        x: 15500.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.812277
+            f0: 1.0
+
+    - moment-tensor:
+        x: 15600.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.817586
+            f0: 1.0
+
+    - moment-tensor:
+        x: 15700.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.822895
+            f0: 1.0
+
+    - moment-tensor:
+        x: 15800.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.828204
+            f0: 1.0
+
+    - moment-tensor:
+        x: 15900.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.8335130000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 16000.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.8388220000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 16100.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.8441310000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 16200.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.8494400000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 16300.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.8547490000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 16400.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.8600580000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 16500.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.8653670000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 16600.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.870676
+            f0: 1.0
+
+    - moment-tensor:
+        x: 16700.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.875985
+            f0: 1.0
+
+    - moment-tensor:
+        x: 16800.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.881294
+            f0: 1.0
+
+    - moment-tensor:
+        x: 16900.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.886603
+            f0: 1.0
+
+    - moment-tensor:
+        x: 17000.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.891912
+            f0: 1.0
+
+    - moment-tensor:
+        x: 17100.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.897221
+            f0: 1.0
+
+    - moment-tensor:
+        x: 17200.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.90253
+            f0: 1.0
+
+    - moment-tensor:
+        x: 17300.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.9078390000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 17400.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.9131480000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 17500.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.9184570000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 17600.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.9237660000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 17700.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.9290750000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 17800.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.9343840000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 17900.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.9396930000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 18000.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.945002
+            f0: 1.0
+
+    - moment-tensor:
+        x: 18100.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.950311
+            f0: 1.0
+
+    - moment-tensor:
+        x: 18200.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.95562
+            f0: 1.0
+
+    - moment-tensor:
+        x: 18300.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.960929
+            f0: 1.0
+
+    - moment-tensor:
+        x: 18400.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.966238
+            f0: 1.0
+
+    - moment-tensor:
+        x: 18500.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.971547
+            f0: 1.0
+
+    - moment-tensor:
+        x: 18600.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.9768560000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 18700.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.9821650000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 18800.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.9874740000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 18900.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.9927830000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 19000.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 0.9980920000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 19100.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 1.003401
+            f0: 1.0
+
+    - moment-tensor:
+        x: 19200.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 1.00871
+            f0: 1.0
+
+    - moment-tensor:
+        x: 19300.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 1.014019
+            f0: 1.0
+
+    - moment-tensor:
+        x: 19400.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 1.019328
+            f0: 1.0
+
+    - moment-tensor:
+        x: 19500.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 1.024637
+            f0: 1.0
+
+    - moment-tensor:
+        x: 19600.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 1.029946
+            f0: 1.0
+
+    - moment-tensor:
+        x: 19700.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 1.035255
+            f0: 1.0
+
+    - moment-tensor:
+        x: 19800.0
+        z: 720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 9.836e-10
+            tshift: 1.040564
+            f0: 1.0
+
+
+    - moment-tensor:
+        x: 200.0
+        z: 820.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.02893
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 920.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.05786
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 1020.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.08679
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 1120.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.11572
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 1220.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.14465
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 1320.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.17358
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 1420.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.20251
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 1520.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.23144
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 1620.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.26037
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 1720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.2893
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 1820.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.31823
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 1920.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.34716
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 2020.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.37609000000000004
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 2120.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.40502
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 2220.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.43395
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 2320.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.46288
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 2420.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.49181
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 2520.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.52074
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 2620.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.54967
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 2720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.5786
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 2820.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.60753
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 2920.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.63646
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 3020.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.66539
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 3120.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.69432
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 3220.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.7232500000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 3320.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.7521800000000001
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 3420.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.78111
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 3520.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.81004
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 3620.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.83897
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 3720.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.8679
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 3820.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.89683
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 3920.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.92576
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 4020.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.95469
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 4120.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 0.98362
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 4220.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 1.01255
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 4320.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 1.04148
+            f0: 1.0
+
+    - moment-tensor:
+        x: 200.0
+        z: 4420.0
+        Mxx: 1.0
+        Mzz: 1.0
+        Mxz: 0.0
+        angle: 0.0
+        Ricker:
+            factor: 1.805e-10
+            tshift: 1.07041
+            f0: 1.0

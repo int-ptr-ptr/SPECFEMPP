@@ -1,0 +1,39 @@
+#! /usr/bin/env python
+
+import argparse
+import os
+import sys
+
+
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+sys.path.insert(0, os.path.join(ROOT_DIR, "runnables"))
+
+import laboratory  # noqa: E402
+
+
+def _subparser_mesher(sp):
+    parser = sp.add_parser(
+        "mesher",
+        help="runs the mesher",
+        description="Runs the mesher on the given experiment",
+    )
+    parser.add_argument("experiment", type=str, help="name of the experiment")
+
+
+def librarian_args(args: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Manages simulations in a specfem workspace."
+    )
+    sp = parser.add_subparsers(title="subcommands")
+    # new
+    _subparser_mesher(sp)
+
+    return parser.parse_args(args)
+
+
+if __name__ == "__main__":
+    print(laboratory.pi.get_experiment_list(verbose=True))  # pyright: ignore
+    laboratory.pi.full_run_experiment("seis.fs_bathy")  # pyright: ignore
+
+    args = librarian_args()
+    print(args)

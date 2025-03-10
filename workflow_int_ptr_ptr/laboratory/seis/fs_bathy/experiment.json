@@ -1,0 +1,26 @@
+{
+  "tasks": [
+    {
+      "type": "mesher",
+      "parfile": "Par_File",
+      "id": "mesher_hires",
+      "deps":[]
+    },
+    {
+      "type": "mesher",
+      "parfile": "Par_File_half",
+      "id": "mesher_halfres",
+      "deps":[]
+    },
+    {
+      "type": "specfem2d",
+      "parfile": "specfem_config.yaml",
+      "deps":["mesher_hires"]
+    },
+    {
+      "type": "specfemem",
+      "parfile": "specfem_config_dg.yaml",
+      "deps":["mesher_halfres",2]
+    }
+  ]
+}

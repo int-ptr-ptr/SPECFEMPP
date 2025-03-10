@@ -1,0 +1,46 @@
+parameters:
+  header:
+    ## Header information is used for logging. It is good practice to give your simulations explicit names
+    title: cg_compare base config # name for your simulation
+    # A detailed description for your simulation
+    description: |
+      Material systems : 2
+      Interfaces : horizontal interface
+      Sources : Force source (1)
+  simulation-setup:
+    ## quadrature setup
+    quadrature:
+      quadrature-type: GLL4
+    ## Solver setup
+    solver:
+      time-marching:
+        type-of-simulation: forward
+        time-scheme:
+          type: Newmark
+          dt: 1e-3
+          nstep: 5000
+    simulation-mode:
+      forward:
+        writer:
+          seismogram:
+            directory: specfem_out/seismo
+
+  receivers:
+    stations: mesh_stations
+    angle: 0.0
+    seismogram-type:
+      - velocity
+      - pressure
+    nstep_between_samples: 1
+  seismogram:
+    seismogram-format: ascii
+    output-folder: specfem_out/seismo
+  ## Runtime setup
+  run-setup:
+    number-of-processors: 1
+    number-of-runs: 1
+  ## databases
+  databases:
+    mesh-database: mesh_gen
+
+  sources: source_config.yaml

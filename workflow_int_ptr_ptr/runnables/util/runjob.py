@@ -18,6 +18,7 @@ class RunJob:
         self.linebuf_size = linebuf_size
         self.print_updates = print_updates
         self.is_complete = False
+        self.was_submitted = False
 
 
 class FunctionJob(RunJob):
@@ -67,6 +68,7 @@ class SystemCommandJob(RunJob):
         min_update_interval: int = 2,
         linebuf_size: int = 10,
         print_updates: bool = False,
+        cwd: str | None = None,
     ):
         super().__init__(
             name=name,
@@ -75,6 +77,7 @@ class SystemCommandJob(RunJob):
             print_updates=print_updates,
         )
         self.cmd = cmd
+        self.cwd = cwd
 
 
 def _run(job: RunJob, queue: Queue, **kwargs) -> bool:
@@ -106,6 +109,7 @@ def _run(job: RunJob, queue: Queue, **kwargs) -> bool:
             shell=True,
             bufsize=1,
             universal_newlines=True,
+            cwd=job.cwd,
         ) as popen:
             output_queue = collections.deque(maxlen=job.linebuf_size)
 
@@ -139,6 +143,10 @@ _queue = Queue()
 
 
 def queue_job(job: RunJob):
+    if job.was_submitted:
+        raise ValueError("Cannot queue an already submitted job!")
+
+    job.was_submitted = True
     q = Queue()
 
     # new jobID
