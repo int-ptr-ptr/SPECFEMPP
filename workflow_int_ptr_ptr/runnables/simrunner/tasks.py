@@ -24,6 +24,9 @@ class MesherTask(Task):
         if meshfem_parfile is not None:
             kwargs["meshfem_parfile"] = meshfem_parfile
         job = jobs.MesherJob(name, meshfem_exe=meshfem_exe, cwd=cwd, **kwargs)
+        self.exe = job.exe
+        self.parfile = job.parfile
+        self.cwd = cwd
         super().__init__(
             job,
             name=name,
@@ -45,7 +48,7 @@ class Specfem2DTask(Task):
         on_completion: Callable | None = None,
     ):
         self.title = title
-        name = f"{title} (mesher)"
+        name = f"{title} (specfem2d)"
         if group is None:
             group = "unnamed mesher"
 
@@ -54,6 +57,9 @@ class Specfem2DTask(Task):
         if specfem_parfile is not None:
             kwargs["specfem_parfile"] = specfem_parfile
         job = jobs.Specfem2DJob(name, specfem_exe=specfem_exe, cwd=cwd, **kwargs)
+        self.exe = job.exe
+        self.parfile = job.parfile
+        self.cwd = cwd
         super().__init__(
             job,
             name=name,
@@ -75,7 +81,7 @@ class SpecfemEMTask(Task):
         on_completion: Callable | None = None,
     ):
         self.title = title
-        name = f"{title} (mesher)"
+        name = f"{title} (specfemEM)"
         if group is None:
             group = "unnamed mesher"
 
@@ -84,6 +90,9 @@ class SpecfemEMTask(Task):
         if specfem_parfile is not None:
             kwargs["specfem_parfile"] = specfem_parfile
         job = jobs.SpecfemEMJob(name, specfem_exe=specfem_exe, cwd=cwd, **kwargs)
+        self.exe = job.exe
+        self.parfile = job.parfile
+        self.cwd = cwd
         super().__init__(
             job,
             name=name,

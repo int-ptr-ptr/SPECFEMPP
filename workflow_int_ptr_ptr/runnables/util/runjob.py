@@ -1,8 +1,10 @@
 import time
-from multiprocessing import Process, Queue
+from multiprocessing import Process, Queue, queues
 import subprocess
 import collections
 from typing import Callable
+import sys
+from dataclasses import dataclass
 
 
 class RunJob:
@@ -80,7 +82,7 @@ class SystemCommandJob(RunJob):
         self.cwd = cwd
 
 
-def _run(job: RunJob, queue: Queue, **kwargs) -> bool:
+def _run(job: RunJob, queue: Queue, **kwargs) -> None:
     tstart = time.time()
     tlast = tstart
 
@@ -96,11 +98,12 @@ def _run(job: RunJob, queue: Queue, **kwargs) -> bool:
                 ret = job.func(log)
 
             if (ret is None) or (isinstance(ret, bool) and ret):
-                return True
+                # function is successful
+                return
             else:
-                return False
-        except Exception:
-            return False
+                sys.exit(ret)
+        except Exception as e:
+            raise e
     elif isinstance(job, SystemCommandJob):
         with subprocess.Popen(
             job.cmd,
@@ -130,16 +133,55 @@ def _run(job: RunJob, queue: Queue, **kwargs) -> bool:
 
         if retcode != 0:
             log(f"subprocess ({job.name}) failed! Output:\n" + "".join(output_queue))
-            return False
+            sys.exit(retcode)
         elif job.print_updates:
             log(f"subprocess ({job.name}) completed!")
-        return True
-
-    return False
+            return
 
 
-jobs = dict()
-_queue = Queue()
+@dataclass
+class JobStorage:
+    job: RunJob
+    process: Process
+    logqueue: Queue
+    comm_to_job: queues.Queue | None = None
+    comm_from_job: queues.Queue | None = None
+    unconsumed_log_entries: list | None = None
+    _all_log_entries_consumed: bool = False
+    retcode: int = -1
+    _is_alive: bool = True
+
+    def handle_completion(self):
+        """Checks if the process completed, and updates the storage state accordingly."""
+        if self.process.is_alive() or not self._is_alive:
+            # either still alive, or we already handled the completion
+            return
+
+        self._is_alive = False
+
+        # consume_queue() will call handle_completion again, but we set _is_alive already.
+        self.unconsumed_log_entries = self.consume_queue()
+        self.retcode = -1 if self.process.exitcode is None else self.process.exitcode
+        self.process.join(0.01)
+
+    def is_alive(self):
+        self.handle_completion()
+        return self._is_alive
+
+    def consume_queue(self) -> list:
+        self.handle_completion()
+        if self.unconsumed_log_entries is not None:
+            self._all_log_entries_consumed = True
+            return self.unconsumed_log_entries
+
+        q = self.logqueue
+        L = list()
+        while not q.empty():
+            L.append(q.get())
+        return L
+
+
+jobs: dict[int, JobStorage] = dict()
 
 
 def queue_job(job: RunJob):
@@ -162,10 +204,10 @@ def queue_job(job: RunJob):
             args=(job, q),
             kwargs={"comm_to_job": tojob, "comm_from_job": fromjob},
         )
-        jobs[i] = (job, p, q, tojob, fromjob)
+        jobs[i] = JobStorage(job, p, q, tojob, fromjob)
     else:
         p = Process(target=_run, args=(job, q))
-        jobs[i] = (job, p, q)
+        jobs[i] = JobStorage(job, p, q)
     p.start()
 
     return i
@@ -181,47 +223,51 @@ def queue_job(job: RunJob):
     #             del procs[name]
 
 
-def consume_queue(jid: int):
+def consume_queue(jid: int) -> list:
     if jid in jobs:
-        q = jobs[jid][2]
-        if isinstance(q, type(_queue)):
-            L = list()
-            while not q.empty():
-                L.append(q.get())
-            return L
-
-        L = jobs[jid][2]
-
-        jobs[jid][1].join(0.01)
-        del jobs[jid]
-        return L
-
+        return jobs[jid].consume_queue()
     return []
 
 
-def is_job_running(jid: int):
+def is_job_running(jid: int, false_on_nonempty_queue: bool = True):
     if jid not in jobs:
         return False
 
-    if jobs[jid][1].is_alive():
-        return True
+    if false_on_nonempty_queue and jobs[jid]._all_log_entries_consumed:
+        return False
 
-    L = consume_queue(jid)
-    if jid in jobs:
-        jobs[jid] = (jobs[jid][0], jobs[jid][1], L)
+    return jobs[jid].is_alive()
+
+
+def complete_job(jid: int) -> int | None:
+    """Garbage-collects the job and retrieves an exit code if done.
+
+    Args:
+        jid (int): The job ID.
+
+    Returns:
+        int | None: the exit code, or None if the job is still running or already consumed.
+    """
+    if jid not in jobs:
+        return None
+
+    if is_job_running(jid):
+        return None
+
+    retcode = jobs[jid].retcode
+    del jobs[jid]
+
+    return retcode
 
 
 def get_job_queues(jid: int) -> dict[str, Queue]:
     if jid in jobs:
-        job_tuple = jobs[jid]
-        if isinstance(job_tuple[0], FunctionJob):
-            return {
-                "log": job_tuple[2],
-                "to_job": job_tuple[3],
-                "from_job": job_tuple[4],
-            }
-        else:
-            return {
-                "log": job_tuple[2],
-            }
+        job_storage = jobs[jid]
+        queues: dict[str, Queue] = {"log": job_storage.logqueue}
+        if job_storage.comm_from_job is not None:
+            queues["from_job"] = job_storage.comm_from_job
+        if job_storage.comm_to_job is not None:
+            queues["to_job"] = job_storage.comm_to_job
+
+        return queues
     return dict()

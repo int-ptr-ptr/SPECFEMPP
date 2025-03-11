@@ -7,6 +7,7 @@ from util.runjob import (
     queue_job,
     consume_queue as consume_job_queue,
     is_job_running,
+    complete_job as get_job_exitcode,
 )
 import util.curse_monitor
 
@@ -73,13 +74,15 @@ class Task:
         name: str = "unnamed job",
         group: str = "default",
         dependencies: list["Task"] | None = None,
-        on_completion: Callable | None = None,
+        on_completion: Callable[[int], None] | None = None,
     ):
         self.name = name
         self.job = job
         self.group = group
         self.dependencies = list() if dependencies is None else dependencies
-        self.on_completion = (lambda: None) if on_completion is None else on_completion
+        self.on_completion = (
+            (lambda x: None) if on_completion is None else on_completion
+        )
 
     def generate_monitor_container(
         self, group_container: GroupContainer
@@ -172,7 +175,8 @@ class Manager:
             while queued_or_running:
                 if not active_tasks:
                     raise Exception(
-                        "Some tasks were not able to start. Was there a circular dependency?"
+                        "Some tasks were not able to start. Did something fail,"
+                        " or was there a circular dependency?"
                     )
                 # consume active task queues
                 for taskid in list(active_tasks.keys()):
@@ -183,11 +187,14 @@ class Manager:
                         else:
                             container.job_message_callback(_msg_strip_name(line))
 
-                    if not is_job_running(jobid):
-                        self.tasks[taskid].on_completion()
+                    if not is_job_running(jobid, false_on_nonempty_queue=True):
+                        exitcode = get_job_exitcode(jobid)
+                        self.tasks[taskid].on_completion(exitcode)
                         del queued_or_running[taskid]
                         gui.remove_tab(active_tasks[taskid][1])
                         del active_tasks[taskid]
+                        if exitcode != 0:
+                            continue
                         for dep in dep_backlink[taskid]:
                             queued_or_running[dep].remove(taskid)
                             if len(queued_or_running[dep]) == 0:

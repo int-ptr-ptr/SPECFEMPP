@@ -34,6 +34,6 @@ def librarian_args(args: list[str] | None = None) -> argparse.Namespace:
 if __name__ == "__main__":
     print(laboratory.pi.get_experiment_list(verbose=True))  # pyright: ignore
     laboratory.pi.full_run_experiment("seis.fs_bathy")  # pyright: ignore
-
+    # print(laboratory.pi.tasks_in_experiment("seis.fs_bathy",verbose = True))  # pyright: ignore
     args = librarian_args()
     print(args)
