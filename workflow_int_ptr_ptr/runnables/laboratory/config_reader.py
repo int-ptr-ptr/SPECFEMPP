@@ -41,6 +41,27 @@ def file_deps_from_specfem_parfile(parfile: str) -> tuple[list[str], list[str]]:
     return deps, outs
 
 
+def specfem_clear_output_folders(parfile: str, cwd: str | None = None):
+    if cwd is None:
+        cwd = os.path.dirname(parfile)
+    else:
+        parfile = os.path.join(cwd, parfile)
+    # folders to clear
+    folders = []
+
+    with open(parfile, "r") as f:
+        for line in f:
+            if m := re.match(r"\s*directory:\s*(.*)\s*$", line):
+                folders.append(os.path.join(cwd, m.group(1)))
+
+    for foldername in folders:
+        if os.path.exists(foldername):
+            for f in os.listdir(foldername):
+                os.remove(os.path.join(foldername, f))
+        else:
+            os.makedirs(foldername)
+
+
 def experiment_to_tasks(
     folder: str,
     experiment_name: str,
@@ -114,18 +135,25 @@ def experiment_to_tasks(
                 )
             elif kind == "specfem2d":
                 log(f'    specfem2d task "{tname}"')
-                res.append(
-                    simtask.Specfem2DTask(
-                        tname, cwd=os.path.join(folder, cwd), specfem_parfile=parfile
-                    )
+                # store pre-run task to init/clear output folders
+                t = simtask.Specfem2DTask(
+                    tname,
+                    cwd=os.path.join(folder, cwd),
+                    specfem_parfile=parfile,
                 )
+                t.on_pre_run = lambda t=t: specfem_clear_output_folders(
+                    parfile=t.parfile, cwd=t.cwd
+                )
+                res.append(t)
             elif kind == "specfemem" or kind == "specfem2d_eventmarcher":
                 log(f'    specfem2d_eventmarcher task "{tname}"')
-                res.append(
-                    simtask.SpecfemEMTask(
-                        tname, cwd=os.path.join(folder, cwd), specfem_parfile=parfile
-                    )
+                t = simtask.SpecfemEMTask(
+                    tname, cwd=os.path.join(folder, cwd), specfem_parfile=parfile
                 )
+                t.on_pre_run = lambda t=t: specfem_clear_output_folders(
+                    parfile=t.parfile, cwd=t.cwd
+                )
+                res.append(t)
             else:
                 raise IOError(f"Unknown type: {kind}")
 

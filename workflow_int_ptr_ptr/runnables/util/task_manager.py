@@ -68,6 +68,9 @@ class Task:
     # Callback, called in the main thread when the job completes.
     on_completion: Callable
 
+    # Callback, called in the main thread before the job starts
+    on_pre_run: Callable
+
     def __init__(
         self,
         job: RunJob,
@@ -75,6 +78,7 @@ class Task:
         group: str = "default",
         dependencies: list["Task"] | None = None,
         on_completion: Callable[[int], None] | None = None,
+        on_pre_run: Callable[[], None] | None = None,
     ):
         self.name = name
         self.job = job
@@ -83,6 +87,7 @@ class Task:
         self.on_completion = (
             (lambda x: None) if on_completion is None else on_completion
         )
+        self.on_pre_run = (lambda: None) if on_pre_run is None else on_pre_run
 
     def generate_monitor_container(
         self, group_container: GroupContainer
@@ -158,6 +163,7 @@ class Manager:
 
             def start_task(ID: int):
                 task = self.tasks[ID]
+                task.on_pre_run()
                 disp = task.generate_monitor_container(group_containers[task.group])
                 active_tasks[ID] = (queue_job(task.job), disp)
                 gui.add_tab(disp)
