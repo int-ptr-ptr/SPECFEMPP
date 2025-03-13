@@ -1,9 +1,9 @@
 import os
 
-import util.config as config
-from util.task_manager import Manager, Task
+import workflow.util.config as config
+from workflow.util.task_manager import Manager, Task
 
-from laboratory.config_reader import EXPERIMENT_CONFIG_FILENAME, experiment_to_tasks
+from .config_reader import EXPERIMENT_CONFIG_FILENAME, experiment_to_tasks
 
 """
 Manages the laboratory.

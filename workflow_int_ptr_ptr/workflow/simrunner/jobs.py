@@ -1,7 +1,7 @@
 import os
 
-import util.config as config
-from util.runjob import SystemCommandJob
+import workflow.util.config as config
+from workflow.util.runjob import SystemCommandJob
 
 _POSSIBLE_BIN_FOLDERS = ["bin", "."]
 _POSSIBLE_MESHFEM_NAMES = ["xmeshfem2D"]

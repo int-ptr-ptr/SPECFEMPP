@@ -5,9 +5,9 @@ import re
 import time
 from typing import Callable
 
-import simrunner.tasks as simtask
-from util.runjob import SystemCommandJob
-from util.task_manager import Task
+import workflow.simrunner.tasks as simtask
+from workflow.util.runjob import SystemCommandJob
+from workflow.util.task_manager import Task
 
 EXPERIMENT_CONFIG_FILENAME = "experiment.json"
 
@@ -253,11 +253,11 @@ def experiment_to_tasks(
                 else:
                     filedeps = []
                     fileouts = []
-                if "file_in" in data["tasks"][itask]:
-                    filedeps = data["tasks"][itask]["file_in"]
+                if "files_in" in data["tasks"][itask]:
+                    filedeps = data["tasks"][itask]["files_in"]
 
-                if "file_out" in data["tasks"][itask]:
-                    fileouts = data["tasks"][itask]["file_out"]
+                if "files_out" in data["tasks"][itask]:
+                    fileouts = data["tasks"][itask]["files_out"]
 
                 if len(fileouts) == 0 or len(filedeps) == 0:
                     # always run these.

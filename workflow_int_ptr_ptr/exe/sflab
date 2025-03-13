@@ -26,7 +26,9 @@ def librarian_args(args: list[str] | None = None) -> argparse.Namespace:
 
 
 if __name__ == "__main__":
-    print(laboratory.pi.get_experiment_list(verbose=True))
+    # print(laboratory.pi.get_experiment_list(verbose=True))
+    print(laboratory.pi.tasks_in_experiment("snell.FF", verbose=True))
+
     laboratory.pi.full_run_experiment("snell.FF")
+
     args = librarian_args()
-    print(args)

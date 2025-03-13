@@ -1,6 +1,9 @@
 import json
 import os
 
+from workflow.simrunner.jobs import MesherJob
+from workflow.util import runjob
+
 
 def save_parfile(
     fname: str,
@@ -47,6 +50,25 @@ def call():
     dirname = os.path.dirname(__file__)
 
     _counter = dict()
+    parfiles = []
+    topos = set()
+
+    saved_runs = []
+
+    # clean directory
+    outdir = os.path.join(dirname, "OUTPUT_FILES")
+    for f in os.listdir(outdir):
+        fullpath = os.path.join(outdir, f)
+        if f.startswith("mesh"):
+            os.remove(fullpath)
+        elif f.startswith("stations"):
+            os.remove(fullpath)
+    for f in os.listdir(dirname):
+        fullpath = os.path.join(dirname, f)
+        if f.startswith("Par_File"):
+            os.remove(fullpath)
+        elif f.startswith("topo"):
+            os.remove(fullpath)
 
     def snell_FF_init_parfile(nx, vp2):
         if vp2 in _counter:
@@ -54,20 +76,56 @@ def call():
         else:
             vpind = len(_counter)
             _counter[vp2] = vpind
+        parfiles.append(f"Par_File{nx}_{vpind}")
+        topo_file = f"topo_unit_box{nx}.dat"
+        topos.add(topo_file)
         save_parfile(
-            os.path.join(dirname, f"Par_File{nx}_{vpind}"),
+            os.path.join(dirname, parfiles[-1]),
             nx,
             nx,
             vp2,
             database_out=f"mesh{nx}_{vpind}",
-            stations_out=f"stations{nx}_{vpind}",
-            topo_file=f"topo_unit_box{nx}.dat",
+            stations_out="stations",
+            topo_file=topo_file,
+        )
+        saved_runs.append(
+            {
+                "nx": nx,
+                "vp2": vp2,
+                "vp2_ind": vpind,
+                "parfile": parfiles[-1],
+                "database_file": os.path.join("OUTPUT_FILES", f"mesh{nx}_{vpind}"),
+                "stations_file": os.path.join("OUTPUT_FILES", "stations"),
+            }
         )
 
     for nx in [10, 20]:
         for vp2 in [0.25, 0.5, 1, 2, 4]:
             snell_FF_init_parfile(nx, vp2)
-    with open(os.path.join(dirname, "meshconf.json"), "r") as f:
+
+    jobids = []
+    for parfile in parfiles:
+        jobids.append(
+            runjob.queue_job(MesherJob(parfile, meshfem_parfile=parfile, cwd=dirname))
+        )
+
+    while jobids:
+        for jobid in jobids:
+            if not runjob.is_job_running(jobid, true_on_nonempty_queue=False):
+                lines = runjob.consume_queue(jobid)
+                jobname = runjob.get_job(jobid, error_on_no_job=True).name
+                if runjob.complete_job(jobid, error_on_still_running=True) > 0:
+                    print(f"ERROR while running {jobname}. log:")
+                    print(*lines)
+                else:
+                    print(f"Completed {jobname}")
+                jobids.remove(jobid)
+                # parfile is jobname
+                os.remove(os.path.join(dirname, jobname))
+
+    for topo in topos:
+        os.remove(os.path.join(dirname, topo))
+    with open(os.path.join(dirname, "meshconf.json"), "w") as f:
         json.dump({"vp2": _counter}, f)
 
 
@@ -143,7 +201,7 @@ nbregions                       = 2
 output_grid_Gnuplot             = .false.
 output_grid_ASCII               = .false.
 """,
-        f"2\n2\n0 0\n1 0\n2\n0 1\n1 1\n{ny // 2}",
+        f"2\n2\n0 0\n1 0\n2\n0 1\n1 1\n{ny}",
     )
 
 

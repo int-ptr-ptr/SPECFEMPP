@@ -2,16 +2,16 @@ import re
 import time
 from typing import Callable, Iterable, Sequence, override
 
-import util.curse_monitor
-from util.runjob import (
+from workflow.util import curse_monitor
+from workflow.util.runjob import (
     RunJob,
     is_job_running,
     queue_job,
 )
-from util.runjob import (
+from workflow.util.runjob import (
     complete_job as get_job_exitcode,
 )
-from util.runjob import (
+from workflow.util.runjob import (
     consume_queue as consume_job_queue,
 )
 
@@ -24,7 +24,7 @@ def _msg_strip_name(msg: str, keep_timestamp: bool = True) -> str:
     return msg
 
 
-class GroupContainer(util.curse_monitor.TestContainer):
+class GroupContainer(curse_monitor.TestContainer):
     def __init__(self, groupname: str, numtasks: int | None = None):
         self.groupname = groupname
         super().__init__(f"Group: {groupname}")
@@ -33,7 +33,7 @@ class GroupContainer(util.curse_monitor.TestContainer):
         self.tasks.append(self.group_messages)
 
     @override
-    class Task(util.curse_monitor.TestContainer.Task):
+    class Task(curse_monitor.TestContainer.Task):
         def __init__(self, groupname, *args, numtasks: int | None = None, **kwargs):
             if numtasks is None:
                 super().__init__(f'Group "{groupname}"')
@@ -41,7 +41,7 @@ class GroupContainer(util.curse_monitor.TestContainer):
                 super().__init__(f'Group "{groupname}": {numtasks} tasks')
 
 
-class TaskContainer(util.curse_monitor.TestContainer):
+class TaskContainer(curse_monitor.TestContainer):
     def __init__(
         self,
         task: "Task",
@@ -149,7 +149,7 @@ class Manager:
 
     def run(self):
         self.running = True
-        with util.curse_monitor.TestMonitor(
+        with curse_monitor.TestMonitor(
             dummy_gui=not self.use_gui, close_with_key=False
         ) as gui:
             group_containers = dict()
@@ -197,8 +197,8 @@ class Manager:
                         else:
                             container.job_message_callback(_msg_strip_name(line))
 
-                    if not is_job_running(jobid, false_on_nonempty_queue=True):
-                        exitcode = get_job_exitcode(jobid)
+                    if not is_job_running(jobid, true_on_nonempty_queue=True):
+                        exitcode = get_job_exitcode(jobid, error_on_still_running=True)
                         self.tasks[taskid].on_completion(exitcode)
                         del queued_or_running[taskid]
                         gui.remove_tab(active_tasks[taskid][1])

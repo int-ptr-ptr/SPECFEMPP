@@ -4,7 +4,7 @@ import sys
 import time
 from dataclasses import dataclass
 from multiprocessing import Process, Queue, queues
-from typing import Callable
+from typing import Callable, Literal, overload
 
 
 class RunJob:
@@ -229,17 +229,23 @@ def consume_queue(jid: int) -> list:
     return []
 
 
-def is_job_running(jid: int, false_on_nonempty_queue: bool = True):
+def is_job_running(jid: int, true_on_nonempty_queue: bool = True):
     if jid not in jobs:
         return False
 
-    if false_on_nonempty_queue and jobs[jid]._all_log_entries_consumed:
-        return False
+    if jobs[jid].is_alive():
+        return True
 
-    return jobs[jid].is_alive()
+    return true_on_nonempty_queue and (not jobs[jid]._all_log_entries_consumed)
 
 
-def complete_job(jid: int) -> int | None:
+@overload
+def complete_job(jid: int, error_on_still_running: Literal[True]) -> int: ...
+@overload
+def complete_job(jid: int, error_on_still_running: Literal[False]) -> int | None: ...
+def complete_job(
+    jid: int, error_on_still_running: Literal[True, False] = False
+) -> int | None:
     """Garbage-collects the job and retrieves an exit code if done.
 
     Args:
@@ -249,15 +255,30 @@ def complete_job(jid: int) -> int | None:
         int | None: the exit code, or None if the job is still running or already consumed.
     """
     if jid not in jobs:
+        if error_on_still_running:
+            raise ValueError(f"Job id {jid} not a recognized job.")
         return None
 
     if is_job_running(jid):
+        if error_on_still_running:
+            raise ValueError(f"Job id {jid} is still running.")
         return None
 
     retcode = jobs[jid].retcode
     del jobs[jid]
 
     return retcode
+
+
+@overload
+def get_job(jid: int, error_on_no_job: Literal[True]) -> RunJob: ...
+@overload
+def get_job(jid: int, error_on_no_job: Literal[False]) -> RunJob | None: ...
+def get_job(jid: int, error_on_no_job: Literal[True, False] = False) -> RunJob | None:
+    if jid in jobs:
+        return jobs[jid].job
+    if error_on_no_job:
+        raise ValueError(f"Job id {jid} not a recognized job.")
 
 
 def get_job_queues(jid: int) -> dict[str, Queue]:

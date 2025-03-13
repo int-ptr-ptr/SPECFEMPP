@@ -3,7 +3,7 @@ import curses.panel
 from collections import deque
 from typing import Iterable
 
-from util.ui import ProgressBar, ScrollableList, UnscrollableMessageLog
+from .ui import ProgressBar, ScrollableList, UnscrollableMessageLog
 
 
 class TestContainer:

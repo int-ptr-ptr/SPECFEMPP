@@ -1,10 +1,18 @@
 {
   "tasks": [
     {
+      "id": "meshgen",
       "type": "script",
       "command": "python build_meshes.py",
       "files_in": ["build_meshes.py"],
       "files_out": ["meshconf.json"]
+    },
+    {
+      "type": "script",
+      "command": "python run_sims.py",
+      "deps": ["meshgen"],
+      "files_in": ["meshconf.json","run_sims.py"],
+      "files_out": []
     }
   ]
 }

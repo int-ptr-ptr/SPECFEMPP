@@ -429,7 +429,7 @@ def compare_seismos(
 
 
 if __name__ == "__main__":
-    import config
+    import workflow.util.config as config
 
     test = config.get("cg_compare.tests.0")
     folder = os.path.join(config.get("cg_compare.workspace_folder"), test["name"])
