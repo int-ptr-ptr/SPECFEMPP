@@ -140,6 +140,7 @@ class SpecfemEMJob(SystemCommandJob):
         name: str,
         specfem_exe: str | None = None,
         specfem_parfile: str = "Par_File",
+        additional_args: str = "",
         cwd: str | None = None,
         min_update_interval: int = 0,
         linebuf_size: int = 10,
@@ -149,7 +150,7 @@ class SpecfemEMJob(SystemCommandJob):
 
         self.exe = specfem_exe
         self.parfile = specfem_parfile
-        cmd = f"{specfem_exe} -p {specfem_parfile}"
+        cmd = f"{specfem_exe} -p {specfem_parfile} {additional_args}"
         super().__init__(
             name,
             cmd,

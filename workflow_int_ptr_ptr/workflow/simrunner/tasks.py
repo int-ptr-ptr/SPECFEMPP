@@ -86,6 +86,7 @@ class SpecfemEMTask(Task):
         dependencies: list["Task"] | None = None,
         on_completion: Callable[[int], None] | None = None,
         on_pre_run: Callable[[], None] | None = None,
+        additional_args: str | None = None,
     ):
         self.title = title
         name = f"{title} (specfemEM)"
@@ -96,6 +97,8 @@ class SpecfemEMTask(Task):
         kwargs = dict()
         if specfem_parfile is not None:
             kwargs["specfem_parfile"] = specfem_parfile
+        if additional_args is not None:
+            kwargs["additional_args"] = additional_args
         job = jobs.SpecfemEMJob(name, specfem_exe=specfem_exe, cwd=cwd, **kwargs)
         self.exe = job.exe
         self.parfile = job.parfile

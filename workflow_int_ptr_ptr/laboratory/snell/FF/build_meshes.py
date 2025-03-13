@@ -126,7 +126,7 @@ def call():
     for topo in topos:
         os.remove(os.path.join(dirname, topo))
     with open(os.path.join(dirname, "meshconf.json"), "w") as f:
-        json.dump({"vp2": _counter}, f)
+        json.dump({"vp2": _counter, "meshes": saved_runs}, f)
 
 
 def gen_parfile_text(
