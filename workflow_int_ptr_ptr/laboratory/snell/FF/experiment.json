@@ -1,0 +1,10 @@
+{
+  "tasks": [
+    {
+      "type": "script",
+      "command": "python build_meshes.py",
+      "files_in": ["build_meshes.py"],
+      "files_out": ["meshconf.json"]
+    }
+  ]
+}

@@ -1,19 +1,13 @@
-"""
-Manages the laboratory.
-"""
-
 import os
 
 import util.config as config
-
-# try:
-#     import util.config as config
-# except ModuleNotFoundError:
-#     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.realpath(__file__))))
-#     import util.config as config
 from util.task_manager import Manager, Task
+
 from laboratory.config_reader import EXPERIMENT_CONFIG_FILENAME, experiment_to_tasks
 
+"""
+Manages the laboratory.
+"""
 
 ROOT_DIR = config.get("root_dir")
 LABORATORY_DIR = os.path.join(ROOT_DIR, "laboratory")

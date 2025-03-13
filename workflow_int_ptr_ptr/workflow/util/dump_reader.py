@@ -1,12 +1,13 @@
-import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.tri as mpltri
-import matplotlib.patches as mplpatches
+import os
 import re
 import struct
 import types
-import os
 from typing import Literal
+
+import matplotlib.patches as mplpatches
+import matplotlib.pyplot as plt
+import matplotlib.tri as mpltri
+import numpy as np
 
 try:
     from . import GLL

@@ -1,12 +1,13 @@
-import util.config as config
-from multiprocessing import Process, Queue
-import subprocess
+import collections
 import os
+import shutil
+import subprocess
 import time
 import urllib.request
-import collections
-import shutil
 import zipfile
+from multiprocessing import Process, Queue
+
+import util.config as config
 
 specfem_exe = config.get("specfem.reference.exe")
 

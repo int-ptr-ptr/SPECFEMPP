@@ -21,6 +21,12 @@
       "type": "specfemem",
       "parfile": "specfem_config_dg.yaml",
       "deps":["mesher_halfres",2]
+    },
+    {
+      "type": "script",
+      "command": "python plot.py",
+      "deps":[2,3],
+      "files_in": ["OUTPUT_FILES/seismo","OUTPUT_FILES/seismo_dg"]
     }
   ]
 }

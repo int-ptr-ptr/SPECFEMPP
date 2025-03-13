@@ -1,9 +1,10 @@
-import matplotlib.pyplot as plt
+import os
+
 import matplotlib.colors as mpcol
+import matplotlib.pyplot as plt
+import numpy as np
 import util.dump_reader
 import util.dump_reader_aux
-import os
-import numpy as np
 
 
 def compare_frames(

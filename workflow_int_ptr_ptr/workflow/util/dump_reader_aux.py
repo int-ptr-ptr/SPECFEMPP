@@ -176,8 +176,9 @@ class field_remapper:
 
 
 if __name__ == "__main__":
-    import config
     import os
+
+    import config
 
     test = config.get("cg_compare.tests.0")
     folder = os.path.join(config.get("cg_compare.workspace_folder"), test["name"])

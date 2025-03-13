@@ -1,9 +1,9 @@
-from collections import deque
 import curses
 import curses.panel
+from collections import deque
 from typing import Iterable
 
-from util.ui import ScrollableList, ProgressBar, UnscrollableMessageLog
+from util.ui import ProgressBar, ScrollableList, UnscrollableMessageLog
 
 
 class TestContainer:

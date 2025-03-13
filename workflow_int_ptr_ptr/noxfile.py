@@ -1,10 +1,12 @@
-import nox  # type: ignore
 import sys
 
-sys.path.insert(0, "./runnables")
-import util.config as config  # type: ignore
+import nox  # type: ignore
+
+sys.path.insert(0, "./workflow")
 import os
 import shutil
+
+import util.config as config  # type: ignore
 
 workspace_root = config.get("root_dir")
 

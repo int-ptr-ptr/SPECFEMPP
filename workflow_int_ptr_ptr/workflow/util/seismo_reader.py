@@ -1,10 +1,11 @@
+import enum
 import os
 import re
-from typing import Literal, Iterable, overload, Callable
+from dataclasses import dataclass, field
+from typing import Callable, Iterable, Literal, overload
+
 import matplotlib.pyplot as plt
 import numpy as np
-from dataclasses import dataclass, field
-import enum
 
 
 @dataclass

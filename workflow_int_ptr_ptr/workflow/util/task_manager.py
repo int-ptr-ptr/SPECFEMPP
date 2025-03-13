@@ -1,15 +1,19 @@
-from typing import Callable, Iterable, Sequence, override
 import re
 import time
+from typing import Callable, Iterable, Sequence, override
 
+import util.curse_monitor
 from util.runjob import (
     RunJob,
-    queue_job,
-    consume_queue as consume_job_queue,
     is_job_running,
+    queue_job,
+)
+from util.runjob import (
     complete_job as get_job_exitcode,
 )
-import util.curse_monitor
+from util.runjob import (
+    consume_queue as consume_job_queue,
+)
 
 
 def _msg_strip_name(msg: str, keep_timestamp: bool = True) -> str:

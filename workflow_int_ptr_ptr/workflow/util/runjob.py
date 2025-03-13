@@ -1,10 +1,10 @@
-import time
-from multiprocessing import Process, Queue, queues
-import subprocess
 import collections
-from typing import Callable
+import subprocess
 import sys
+import time
 from dataclasses import dataclass
+from multiprocessing import Process, Queue, queues
+from typing import Callable
 
 
 class RunJob:

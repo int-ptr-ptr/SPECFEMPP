@@ -1,13 +1,14 @@
-import util.config as config
-from util.verify_provenance_existence import verify as prov_exist_verify
-from util.dump_reader import read_sfdump
-from multiprocessing import Process, Queue
-import numpy as np
-import subprocess
 import os
-import time
-import shutil
 import re
+import shutil
+import subprocess
+import time
+from multiprocessing import Process, Queue
+
+import numpy as np
+import util.config as config
+from util.dump_reader import read_sfdump
+from util.verify_provenance_existence import verify as prov_exist_verify
 
 STOPKEY = "INITIATE_STOP"
 tol = 1e-3

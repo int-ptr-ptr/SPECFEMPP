@@ -1,10 +1,13 @@
-from util.task_manager import Task
-import simrunner.tasks as simtask
-import os
-import json
-import re
 import datetime
+import json
+import os
+import re
 import time
+from typing import Callable
+
+import simrunner.tasks as simtask
+from util.runjob import SystemCommandJob
+from util.task_manager import Task
 
 EXPERIMENT_CONFIG_FILENAME = "experiment.json"
 
@@ -60,6 +63,35 @@ def specfem_clear_output_folders(parfile: str, cwd: str | None = None):
                 os.remove(os.path.join(foldername, f))
         else:
             os.makedirs(foldername)
+
+
+class ScriptTask(Task):
+    def __init__(
+        self,
+        title: str,
+        command: str,
+        group: str | None = None,
+        cwd: str | None = None,
+        dependencies: list["Task"] | None = None,
+        on_completion: Callable[[int], None] | None = None,
+        on_pre_run: Callable[[], None] | None = None,
+    ):
+        self.title = title
+        name = f"{title} (specfem2d)"
+        if group is None:
+            group = "unnamed mesher"
+
+        # pass kwargs or use defaults for Specfem2DJob
+        job = SystemCommandJob(name, cmd=command, cwd=cwd)
+        self.cwd = cwd
+        super().__init__(
+            job,
+            name=name,
+            group=group,
+            dependencies=dependencies,
+            on_completion=on_completion,
+            on_pre_run=on_pre_run,
+        )
 
 
 def experiment_to_tasks(
@@ -154,6 +186,11 @@ def experiment_to_tasks(
                     parfile=t.parfile, cwd=t.cwd
                 )
                 res.append(t)
+            elif kind == "script":
+                log(f'    script task "{tname}"')
+                res.append(
+                    ScriptTask(tname, task["command"], cwd=os.path.join(folder, cwd))
+                )
             else:
                 raise IOError(f"Unknown type: {kind}")
 
@@ -216,6 +253,11 @@ def experiment_to_tasks(
                 else:
                     filedeps = []
                     fileouts = []
+                if "file_in" in data["tasks"][itask]:
+                    filedeps = data["tasks"][itask]["file_in"]
+
+                if "file_out" in data["tasks"][itask]:
+                    fileouts = data["tasks"][itask]["file_out"]
 
                 if len(fileouts) == 0 or len(filedeps) == 0:
                     # always run these.
@@ -223,34 +265,42 @@ def experiment_to_tasks(
                     dont_prune_from_filemod.append(itask)
                     return
 
-                def read_timestamp(file):
+                def read_timestamp(file, is_in=False, default_time=time.time()):
                     fullpath = os.path.join(folder, file)
                     log(f"      file {file}")
                     if not os.path.exists(fullpath):
-                        log("        Cannot find. Assuming t = now")
-                        return time.time()
+                        timestr = datetime.datetime.fromtimestamp(
+                            default_time
+                        ).strftime("%Y-%m-%d %H:%M:%S")
+                        log(f"        Cannot find. Assuming t = {timestr}")
+                        return default_time
                     t = os.path.getmtime(fullpath)
-                    log(
-                        f"        @ {datetime.datetime.fromtimestamp(t).strftime('%Y-%m-%d %H:%M:%S')}"
+                    timestr = datetime.datetime.fromtimestamp(t).strftime(
+                        "%Y-%m-%d %H:%M:%S"
                     )
+                    log(f"        @ {timestr}")
                     return t
 
                 # last time of input modifications
                 log("    dependent files (and their times):")
-                intime = max(read_timestamp(dep) for dep in filedeps)
+                intime = max(read_timestamp(dep, is_in=True) for dep in filedeps)
 
                 # first time of output modifications
                 log("    output files (and their times):")
-                outtime = min(read_timestamp(dep) for dep in fileouts)
+                outtime = min(
+                    read_timestamp(dep, default_time=intime - 1) for dep in fileouts
+                )
 
                 if intime >= outtime:
+                    deltat = datetime.timedelta(seconds=intime - outtime)
                     log(
-                        f"    not pruning: dep modified time - output modified time: {datetime.timedelta(seconds=intime - outtime)}"
+                        f"    not pruning: dep modified time - output modified time: {deltat}"
                     )
                     dont_prune_from_filemod.append(itask)
                 else:
+                    deltat = datetime.timedelta(seconds=outtime - intime)
                     log(
-                        f"    pruning: output modified time - dep modified time: {datetime.timedelta(seconds=outtime - intime)}"
+                        f"    pruning: output modified time - dep modified time: {deltat}"
                     )
                     to_prune.append(itask)
                     for dep in task_backlinks[itask]:

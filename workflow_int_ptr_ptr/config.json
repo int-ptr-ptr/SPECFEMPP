@@ -47,7 +47,7 @@
   ],
   "cg_compare":{
     "config_files": {
-      "dir":"${root_dir}/runnables/cg_compare",
+      "dir":"${root_dir}/workflow/cg_compare",
       "meshfem_parfile": "${dir}/PAR_FILE",
       "meshfem_parfile_hires": "${dir}/PAR_FILE_hires",
       "meshfem_parfile_bottom": "${dir}/PAR_FILE_DOUBLE1",
@@ -130,7 +130,7 @@
     ]
   },
   "workspace_builder":{
-    "ref_dir":"${root_dir}/runnables/workspace_builder",
+    "ref_dir":"${root_dir}/workflow/workspace_builder",
     "config_override_ref": "${ref_dir}/config_overrides.conf",
     "init_env_scripts": "${ref_dir}/init_env_scripts"
   }

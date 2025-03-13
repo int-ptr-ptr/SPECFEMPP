@@ -1,6 +1,5 @@
 from typing import Callable
 
-
 from util.runjob import FunctionJob
 
 

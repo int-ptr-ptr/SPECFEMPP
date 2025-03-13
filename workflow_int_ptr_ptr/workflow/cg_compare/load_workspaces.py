@@ -1,14 +1,14 @@
-from typing import Callable
-import util.config as config
 import os
+import re
 import shutil
 import subprocess
 import time
-import numpy as np
-import re
+from typing import Callable
 
-import util.runjob
+import numpy as np
+import util.config as config
 import util.dump_reader
+import util.runjob
 
 
 def init_workspace_folder(test):

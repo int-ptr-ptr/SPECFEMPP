@@ -1,7 +1,7 @@
 import json
-import sys
 import os
 import re
+import sys
 from typing import Any, Iterable
 
 FILENAME_MASTER_CONFIG = "config.json"

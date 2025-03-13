@@ -1,6 +1,6 @@
 import curses
-from typing import Iterable
 from collections import deque
+from typing import Iterable
 
 PROGRESS_CHARS = " ▎▎▍▌▋▊▉█"
 PROGRESS_FULLCHAR = PROGRESS_CHARS[-1]

@@ -1,19 +1,19 @@
-from multiprocessing import Queue
-from typing import Callable
-import util.config as config
-import util.runjob
-import util.dump_reader
-import util.dump_reader_aux
-import util.seismo_reader
-import cg_compare.frame_compare
-import util.curse_monitor
-
-import time
+import collections
 import os
 import re
-import numpy as np
 import shutil
-import collections
+import time
+from multiprocessing import Queue
+from typing import Callable
+
+import cg_compare.frame_compare
+import numpy as np
+import util.config as config
+import util.curse_monitor
+import util.dump_reader
+import util.dump_reader_aux
+import util.runjob
+import util.seismo_reader
 
 PRINT_TIME_INTERVAL = 0.1
 SWITCH_INTERVAL = 2
