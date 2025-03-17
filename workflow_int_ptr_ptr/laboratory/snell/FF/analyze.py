@@ -6,6 +6,7 @@ from typing import Iterable
 import matplotlib.animation as mplanim
 import matplotlib.patches as mplpatches
 import matplotlib.pyplot as plt
+import yaml
 
 from workflow.util import config
 from workflow.util.dump_reader import dump_series
@@ -20,6 +21,10 @@ runconfig = {}
 with (output_fol / "run_out.json").open("r") as f:
     runconfig = json.load(f)
 
+sourceconfig = {}
+with (workdir / "source.yaml").open("r") as f:
+    sourceconfig = yaml.load(f, Loader=yaml.Loader)
+
 run_sims_by_vp_ind = dict()
 
 for sim in runconfig["tasks_completed"]:
@@ -29,8 +34,98 @@ for sim in runconfig["tasks_completed"]:
 
     run_sims_by_vp_ind[vp2ind].append(sim)
 
+first_source = sourceconfig["sources"][0]
+first_source = first_source[list(first_source.keys())[0]]
+sourceloc = (first_source["x"], first_source["z"])
 
-def compare_sims(vp2_ind: int, show: bool = False):
+del first_source
+
+
+def make_arrival_include_func(seismo: SeismoDump, vp2: float, tmax: float):
+    def include_arrivals(**kwargs):
+        axes = kwargs["axes"]
+        indexing_func = kwargs["indexing_func"]
+
+        for station in seismo.stations:
+            x = station.x
+            z = station.z
+            T_arrivals = []
+            if (z - 0.5) * (sourceloc[1] - 0.5) < 0:
+                # opposite side
+                if z < 0.5:
+                    csrc = vp2
+                    csta = 1
+                else:
+                    csrc = 1
+                    csta = vp2
+
+                def compute_time(x):
+                    xdiff = x - sourceloc[0]
+
+                    # too lazy to do this analytically, so minimize
+                    def dist(transx):
+                        return ((transx - x) ** 2 + (z - 0.5) ** 2) ** 0.5 / csta + (
+                            (transx - sourceloc[0]) ** 2 + (sourceloc[1] - 0.5) ** 2
+                        ) ** 0.5 / csrc
+
+                    if abs(xdiff) < 1e-6:
+                        return dist((x + sourceloc[0]) / 2)
+
+                    low = min(x, sourceloc[0])
+                    high = max(x, sourceloc[0])
+                    while (high - low) / abs(xdiff) > 1e-4:
+                        c = (high + low) / 2
+                        if (dist(c + 1e-6) - dist(c - 1e-6)) / 2e-6 > 0:
+                            # dist is increasing at c. min less
+                            high = c
+                        else:
+                            low = c
+                    return dist((high + low) / 2)
+
+                num_cycles = 0
+                T_arrivals.append(compute_time(x))
+                keep_going = True
+                while keep_going:
+                    num_cycles += 1
+                    t = compute_time(x + num_cycles)
+
+                    keep_going = t < tmax
+                    if keep_going:
+                        T_arrivals.append(t)
+
+                    t = compute_time(x - num_cycles)
+                    if t < tmax:
+                        T_arrivals.append(t)
+                        keep_going = True
+            else:
+                # same side
+                zdiff2 = (z - sourceloc[1]) ** 2
+                num_cycles = 0
+                xdiff = x - sourceloc[0]
+                c = 1 if z < 0.5 else vp2
+                T_arrivals.append((zdiff2 + xdiff**2) ** 0.5 / c)
+                keep_going = True
+                while keep_going:
+                    num_cycles += 1
+                    t = (zdiff2 + (xdiff + num_cycles) ** 2) ** 0.5 / c
+
+                    keep_going = t < tmax
+                    if keep_going:
+                        T_arrivals.append(t)
+
+                    t = (zdiff2 + (xdiff - num_cycles) ** 2) ** 0.5 / c
+                    if t < tmax:
+                        T_arrivals.append(t)
+                        keep_going = True
+            for stype in seismo.seismogram_types:
+                ax = axes[indexing_func(station, stype)]
+                for t in T_arrivals:
+                    ax.axvline(x=t, color="lightgray")
+
+    return include_arrivals
+
+
+def compare_sims(vp2_ind: int, show: bool = True):
     seismo = SeismoDump(str(output_fol / "stations"))
     vp2 = 0
     for sim in run_sims_by_vp_ind[vp2_ind]:
@@ -49,6 +144,14 @@ def compare_sims(vp2_ind: int, show: bool = False):
             linestyle=N_size // 10,
             label=label,
         )
+    tmax = max(
+        max(
+            max(arr[-1, 0] for arr in stdata if arr is not None)
+            for stdata in seis._seismos.values()
+        )
+        for seis in seismo.seismos
+    )
+
     seismo.plot_onto(
         show=show,
         legend_kwargs={"loc": "lower left"},
@@ -56,10 +159,14 @@ def compare_sims(vp2_ind: int, show: bool = False):
         save_filename=None
         if show
         else str(simout_fol / f"compare_seismo_{vp2_ind}.png"),
+        fig_complete_callback=make_arrival_include_func(seismo, vp2, tmax),
     )
 
 
-def loadsim(simname: str, dt: float = 1e-3, frames: Iterable | None = None):
+def loadsim(sim, frames: Iterable | None = None):
+    simname = sim["sim"]
+    dt = sim["dt"]
+    vp2 = sim["vp2"]
     simfol = output_fol / simname
 
     data = dump_series.load_from_file(str(simfol / "dumps.dat"))
@@ -70,6 +177,13 @@ def loadsim(simname: str, dt: float = 1e-3, frames: Iterable | None = None):
     t0 = min(
         min(
             min(arr[0, 0] for arr in stdata if arr is not None)
+            for stdata in seis._seismos.values()
+        )
+        for seis in seismo.seismos
+    )
+    tmax = max(
+        max(
+            max(arr[-1, 0] for arr in stdata if arr is not None)
             for stdata in seis._seismos.values()
         )
         for seis in seismo.seismos
@@ -133,7 +247,11 @@ def loadsim(simname: str, dt: float = 1e-3, frames: Iterable | None = None):
     ax_vlines = [ax.axvline(x=0, color="lightgray") for ax in axs_seismos]
 
     # fill out seismos
-    seismo.plot_onto(axes=axs_seismos, indexing_func=lambda st, ty: st.station_index)
+    seismo.plot_onto(
+        axes=axs_seismos,
+        indexing_func=lambda st, ty: st.station_index,
+        fig_complete_callback=make_arrival_include_func(seismo, vp2, tmax),
+    )
 
     # correct title and make sure seismo-domain lines get drawn
     for i, ax in enumerate(axs_seismos):
@@ -180,6 +298,12 @@ def loadsim(simname: str, dt: float = 1e-3, frames: Iterable | None = None):
 if not simout_fol.exists():
     os.makedirs(simout_fol)
 
+# compare_sims(1, show=True)
+
 # for vp2_ind in run_sims_by_vp_ind.keys():
-#     compare_sims(vp2_ind)
-loadsim("dg2_20_1")
+#     compare_sims(vp2_ind,show=False)
+
+for run in runconfig["tasks_completed"]:
+    if run["sim"] == "dg2_20_1":
+        loadsim(run)
+        break

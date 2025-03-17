@@ -240,6 +240,7 @@ class SeismoDump:
         save_filename: str | None = None,
         legend_kwargs: dict[str, Any] | None = None,
         plt_title: str | None = None,
+        fig_complete_callback: Callable | None = None,
     ):
         """Plots onto the given axes (creates a new set of subplots if axes is None.)
 
@@ -320,6 +321,8 @@ class SeismoDump:
             plt.gcf().suptitle(plt_title)
         if legend_kwargs is not None:
             plt.gcf().legend(handles=self.get_legend_handles(), **legend_kwargs)
+        if fig_complete_callback is not None:
+            fig_complete_callback(axes=axes, indexing_func=indexing_func)
         if show:
             plt.show()
         if save_filename is not None:
