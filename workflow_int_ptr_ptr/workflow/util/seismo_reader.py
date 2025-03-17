@@ -2,8 +2,9 @@ import enum
 import os
 import re
 from dataclasses import dataclass, field
-from typing import Callable, Iterable, Literal, overload
+from typing import Any, Callable, Iterable, Literal, overload
 
+import matplotlib.lines as mplines
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -72,7 +73,8 @@ class SeismogramCollection:
     _seismos: dict[int, list[np.ndarray | None]] = field(default_factory=dict)
     _num_stations: int = 0
     plot_color = None
-    plot_linestyle: Literal["solid", "dashed", "dashdot", "dotted"] | None = "solid"
+    plot_linestyle: Literal["solid", "dashed", "dashdot", "dotted"] = "solid"
+    plot_label: str | None = None
 
     def seistype(self, types: SeismoType | Iterable[SeismoType]):
         if isinstance(types, SeismoType):
@@ -171,11 +173,32 @@ class SeismoDump:
         self.seismos = []
         self.seismogram_types = set()
 
-    def load_from_seismodir(self, fol: str, verbose: bool | None = None, color=None):
+    def load_from_seismodir(
+        self,
+        fol: str,
+        verbose: bool | None = None,
+        color=None,
+        linestyle: Literal["solid", "dashed", "dashdot", "dotted"] | int = "solid",
+        label: str | None = None,
+    ):
         if verbose is None:
             verbose = self.verbose
 
         seismos = SeismogramCollection.empty(len(self.stations))
+        seismos.plot_color = color
+        seismos.plot_label = label
+        if isinstance(linestyle, int):
+            lsint = ((linestyle % 4) + 4) % 4
+            if lsint == 0:
+                seismos.plot_linestyle = "solid"
+            elif lsint == 1:
+                seismos.plot_linestyle = "dashed"
+            elif lsint == 2:
+                seismos.plot_linestyle = "dashdot"
+            elif lsint == 3:
+                seismos.plot_linestyle = "dotted"
+        else:
+            seismos.plot_linestyle = linestyle
         self.seismos.append(seismos)
 
         for f in os.listdir(fol):
@@ -215,6 +238,8 @@ class SeismoDump:
         tlim=(None, None),
         show: bool = False,
         save_filename: str | None = None,
+        legend_kwargs: dict[str, Any] | None = None,
+        plt_title: str | None = None,
     ):
         """Plots onto the given axes (creates a new set of subplots if axes is None.)
 
@@ -291,7 +316,10 @@ class SeismoDump:
                         )
                         a.set_title(f"{seistype.latex_str} @ ({station.x},{station.z})")
                         a.set_xlim(tlim)
-        # fig.suptitle(suptitle_)
+        if plt_title:
+            plt.gcf().suptitle(plt_title)
+        if legend_kwargs is not None:
+            plt.gcf().legend(handles=self.get_legend_handles(), **legend_kwargs)
         if show:
             plt.show()
         if save_filename is not None:
@@ -299,6 +327,21 @@ class SeismoDump:
             if not os.path.exists(fol):
                 os.makedirs(fol)
             plt.savefig(save_filename)
+
+    def get_legend_handles(self):
+        handles = []
+        for coll in self.seismos:
+            if coll.plot_label is not None:
+                handles.append(
+                    mplines.Line2D(
+                        [0],
+                        [0],
+                        color=coll.plot_color,
+                        linestyle=coll.plot_linestyle,
+                        label=coll.plot_label,
+                    )
+                )
+        return handles
 
 
 def compare_seismos(

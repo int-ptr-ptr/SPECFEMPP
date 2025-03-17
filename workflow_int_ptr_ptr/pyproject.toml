@@ -7,7 +7,12 @@ name = "workflow"
 version = "0.1.0"
 description = "Automatic scripts to work with SFPP"
 requires-python = ">=3.10"
-dependencies = ["numpy","matplotlib","ruff"]
+dependencies = ["numpy","matplotlib","ruff", "nox"]
+
+[project.optional-dependencies]
+qt = [
+  "pyqt6",
+]
 
 
 [tool.hatch.build.targets.sdist]

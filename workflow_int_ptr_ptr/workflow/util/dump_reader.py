@@ -9,10 +9,7 @@ import matplotlib.pyplot as plt
 import matplotlib.tri as mpltri
 import numpy as np
 
-try:
-    from . import GLL
-except ImportError:
-    import GLL
+from . import GLL
 
 
 def get_type_formatters(type, size):
@@ -733,18 +730,20 @@ class dump_frame:
         ptsize=None,
         vmin=None,
         vmax=None,
+        current_axes=None,
     ):
         pt_centers = self.cell_centers[:, np.newaxis, np.newaxis, :]
         pts_plt = (1 - plt_cell_margin) * self.pts + plt_cell_margin * pt_centers
-        if figsize is not None:
+        if figsize is not None and current_axes is None:
             plt.figure(figsize=figsize)
+        active = plt if current_axes is None else current_axes
         if draw_cell_borders:
-            plt.plot(self.pts[:, :, -1, 0].T, self.pts[:, :, -1, 1].T, ":k")
-            plt.plot(self.pts[:, :, 0, 0].T, self.pts[:, :, 0, 1].T, ":k")
-            plt.plot(self.pts[:, -1, :, 0].T, self.pts[:, -1, :, 1].T, ":k")
-            plt.plot(self.pts[:, -1, :, 0].T, self.pts[:, 0, :, 1].T, ":k")
+            active.plot(self.pts[:, :, -1, 0].T, self.pts[:, :, -1, 1].T, ":k")
+            active.plot(self.pts[:, :, 0, 0].T, self.pts[:, :, 0, 1].T, ":k")
+            active.plot(self.pts[:, -1, :, 0].T, self.pts[:, -1, :, 1].T, ":k")
+            active.plot(self.pts[:, -1, :, 0].T, self.pts[:, 0, :, 1].T, ":k")
         if mode == "scatter":
-            plt.scatter(
+            active.scatter(
                 pts_plt[..., 0], pts_plt[..., 1], ptsize, field, vmin=vmin, vmax=vmax
             )
         elif mode == "contour":
@@ -758,7 +757,7 @@ class dump_frame:
                 )
             tri = self.full_domain_triangulation
             try:
-                plt.tricontourf(
+                active.tricontourf(
                     tri,
                     field.reshape((self.nspec * self.ngllz * self.ngllx,)),
                     100,
@@ -768,14 +767,17 @@ class dump_frame:
             except ValueError:
                 # probably because we have NaN or inf values
                 global_mean = np.mean(pt_centers, axis=(0, 1, 2))
-                plt.text(
+                active.text(
                     global_mean[0],
                     global_mean[1],
                     "non-finite value;\n cannot contour.",
                     color="red",
                 )
         if title is not None:
-            plt.title(title)
+            if current_axes is None:
+                plt.title(title)
+            else:
+                current_axes.set_title(title)
         if show:
             plt.show()
 
@@ -1004,7 +1006,7 @@ def load_series(simfield_dump_prefix: str):
 
 if __name__ == "__main__":
     pass
-    import config
+    from . import config
 
     test = config.get("cg_compare.tests.2")
     folder = os.path.join(config.get("cg_compare.workspace_folder"), test["name"])

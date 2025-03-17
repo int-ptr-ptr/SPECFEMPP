@@ -6,9 +6,10 @@ import time
 from typing import Callable
 
 import numpy as np
-import util.config as config
-import util.dump_reader
-import util.runjob
+
+import workflow.util.config as config
+import workflow.util.dump_reader as dump_reader
+import workflow.util.runjob as runjob
 
 
 def init_workspace_folder(test):
@@ -92,8 +93,8 @@ def init_workspace_folder(test):
 
         run_xmeshfem("PAR_FILE")
 
-        return util.runjob.queue_job(
-            util.runjob.SystemCommandJob(
+        return runjob.queue_job(
+            runjob.SystemCommandJob(
                 name=f"cg_compare: {test['name']}",
                 cmd=f"cd {folder} && "
                 + config.get("specfem.live.exe")
@@ -123,7 +124,7 @@ def handle_dump(test, log: Callable[[str], None]):
         folder, config.get("cg_compare.workspace_files.dump_prefix")
     )
     log("Compiling dump files into one series file.")
-    series = util.dump_reader.load_series(dump_prefix)
+    series = dump_reader.load_series(dump_prefix)
 
     provfile = os.path.join(
         folder, config.get("cg_compare.workspace_files.provenance_dump")
@@ -159,7 +160,11 @@ def handle_dump(test, log: Callable[[str], None]):
 
 
 if __name__ == "__main__":
-    import util.curse_monitor as disp
+    import workflow.util.curse_monitor as disp
+
+    cg_workspace = config.get("cg_compare.workspace_folder")
+    if os.path.exists(cg_workspace):
+        shutil.rmtree(cg_workspace)
 
     def msg_strip_name(msg: str, keep_timestamp: bool = True) -> str:
         if m := re.match(r"\[(.+):\s*(\d+:\d\d)\](\s?)", msg):
@@ -191,7 +196,7 @@ if __name__ == "__main__":
             time.sleep(0.1)
 
             for i in run_jobs:
-                for line in util.runjob.consume_queue(i):
+                for line in runjob.consume_queue(i):
                     disp_tests[i].tasks[0].messages.append(msg_strip_name(line))
                     if mon.dummy_gui:
                         print(line)
@@ -199,18 +204,18 @@ if __name__ == "__main__":
                         prog = int(m.group(1)) / int(m.group(2))
                         disp_tests[i].tasks[0].progress = prog
                         disp_tests[i].progress = prog
-                if not util.runjob.is_job_running(i):
+                if not runjob.is_job_running(i):
                     run_jobs.remove(i)
-                    clean_jobs[i] = util.runjob.queue_job(
-                        util.runjob.FunctionJob(
+                    clean_jobs[i] = runjob.queue_job(
+                        runjob.FunctionJob(
                             name=f"clean workspace: {test_from_job[i]['name']}",
                             func=lambda logfunc: handle_dump(test_from_job[i], logfunc),
                         )
                     )
 
             for i, j in list(clean_jobs.items()):
-                for line in util.runjob.consume_queue(j):
+                for line in runjob.consume_queue(j):
                     disp_tests[i].tasks[0].messages.append(line)
-                if not util.runjob.is_job_running(j):
+                if not runjob.is_job_running(j):
                     del clean_jobs[i]
                     mon.remove_tab(disp_tests[i])

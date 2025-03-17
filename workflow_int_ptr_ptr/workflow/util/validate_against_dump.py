@@ -6,9 +6,10 @@ import time
 from multiprocessing import Process, Queue
 
 import numpy as np
-import util.config as config
-from util.dump_reader import read_sfdump
-from util.verify_provenance_existence import verify as prov_exist_verify
+
+import workflow.util.config as config
+from workflow.util.dump_reader import read_sfdump
+from workflow.util.verify_provenance_existence import verify as prov_exist_verify
 
 STOPKEY = "INITIATE_STOP"
 tol = 1e-3

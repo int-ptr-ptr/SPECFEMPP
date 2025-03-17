@@ -5,14 +5,14 @@
       "type": "script",
       "command": "python build_meshes.py",
       "files_in": ["build_meshes.py"],
-      "files_out": ["meshconf.json"]
+      "files_out": ["OUTPUT_FILES/meshconf.json","OUTPUT_FILES/stations"]
     },
     {
       "type": "script",
       "command": "python run_sims.py",
       "deps": ["meshgen"],
-      "files_in": ["meshconf.json","run_sims.py"],
-      "files_out": []
+      "files_in": ["OUTPUT_FILES/meshconf.json","run_sims.py","OUTPUT_FILES/stations"],
+      "files_out": ["OUTPUT_FILES/run_out.json"]
     }
   ]
 }

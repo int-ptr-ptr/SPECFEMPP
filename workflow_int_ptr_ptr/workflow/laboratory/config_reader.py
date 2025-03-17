@@ -44,6 +44,56 @@ def file_deps_from_specfem_parfile(parfile: str) -> tuple[list[str], list[str]]:
     return deps, outs
 
 
+def should_skip_by_file_deps(
+    infiles: list[str], outfiles: list[str], cwd: str, verbose: bool = False
+) -> bool:
+    if len(outfiles) == 0 or len(infiles) == 0:
+        # always run these.
+        if verbose:
+            print("    no files on either input or output side. always run these")
+        return False
+
+    def read_timestamp(file, is_in=False, default_time=time.time()):
+        fullpath = os.path.join(cwd, file)
+        if verbose:
+            print(f"      file {file}")
+        if not os.path.exists(fullpath):
+            if verbose:
+                timestr = datetime.datetime.fromtimestamp(default_time).strftime(
+                    "%Y-%m-%d %H:%M:%S"
+                )
+                print(f"        Cannot find. Assuming t = {timestr}")
+            return default_time
+        t = os.path.getmtime(fullpath)
+        if verbose:
+            timestr = datetime.datetime.fromtimestamp(t).strftime("%Y-%m-%d %H:%M:%S")
+            print(f"        @ {timestr}")
+        return t
+
+    # last time of input modifications
+    if verbose:
+        print("    dependent files (and their times):")
+    intime = max(read_timestamp(dep, is_in=True) for dep in infiles)
+
+    # first time of output modifications
+    if verbose:
+        print("    output files (and their times):")
+    outtime = min(read_timestamp(dep, default_time=intime - 1) for dep in outfiles)
+
+    if intime >= outtime:
+        if verbose:
+            deltat = datetime.timedelta(seconds=intime - outtime)
+            print(
+                f"    not pruning: dep modified time - output modified time: {deltat}"
+            )
+        return False
+    else:
+        if verbose:
+            deltat = datetime.timedelta(seconds=outtime - intime)
+            print(f"    pruning: output modified time - dep modified time: {deltat}")
+        return True
+
+
 def specfem_clear_output_folders(parfile: str, cwd: str | None = None):
     if cwd is None:
         cwd = os.path.dirname(parfile)
@@ -259,53 +309,15 @@ def experiment_to_tasks(
                 if "files_out" in data["tasks"][itask]:
                     fileouts = data["tasks"][itask]["files_out"]
 
-                if len(fileouts) == 0 or len(filedeps) == 0:
-                    # always run these.
-                    log("    no files on either input or output side. always run these")
-                    dont_prune_from_filemod.append(itask)
-                    return
-
-                def read_timestamp(file, is_in=False, default_time=time.time()):
-                    fullpath = os.path.join(folder, file)
-                    log(f"      file {file}")
-                    if not os.path.exists(fullpath):
-                        timestr = datetime.datetime.fromtimestamp(
-                            default_time
-                        ).strftime("%Y-%m-%d %H:%M:%S")
-                        log(f"        Cannot find. Assuming t = {timestr}")
-                        return default_time
-                    t = os.path.getmtime(fullpath)
-                    timestr = datetime.datetime.fromtimestamp(t).strftime(
-                        "%Y-%m-%d %H:%M:%S"
-                    )
-                    log(f"        @ {timestr}")
-                    return t
-
-                # last time of input modifications
-                log("    dependent files (and their times):")
-                intime = max(read_timestamp(dep, is_in=True) for dep in filedeps)
-
-                # first time of output modifications
-                log("    output files (and their times):")
-                outtime = min(
-                    read_timestamp(dep, default_time=intime - 1) for dep in fileouts
-                )
-
-                if intime >= outtime:
-                    deltat = datetime.timedelta(seconds=intime - outtime)
-                    log(
-                        f"    not pruning: dep modified time - output modified time: {deltat}"
-                    )
-                    dont_prune_from_filemod.append(itask)
-                else:
-                    deltat = datetime.timedelta(seconds=outtime - intime)
-                    log(
-                        f"    pruning: output modified time - dep modified time: {deltat}"
-                    )
+                if should_skip_by_file_deps(
+                    infiles=filedeps, outfiles=fileouts, cwd=folder, verbose=verbose
+                ):
                     to_prune.append(itask)
                     for dep in task_backlinks[itask]:
                         res[dep].dependencies.remove(task)
                         prune(dep)
+                else:
+                    dont_prune_from_filemod.append(itask)
 
             for i in range(len(res)):
                 prune(i)

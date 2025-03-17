@@ -6,14 +6,16 @@ import time
 from multiprocessing import Queue
 from typing import Callable
 
-import cg_compare.frame_compare
 import numpy as np
-import util.config as config
-import util.curse_monitor
-import util.dump_reader
-import util.dump_reader_aux
-import util.runjob
-import util.seismo_reader
+
+import workflow.util.config as config
+import workflow.util.curse_monitor
+import workflow.util.dump_reader
+import workflow.util.dump_reader_aux
+import workflow.util.runjob
+import workflow.util.seismo_reader
+
+from . import frame_compare
 
 PRINT_TIME_INTERVAL = 0.1
 SWITCH_INTERVAL = 2
@@ -32,7 +34,7 @@ class cg_compare_validation:
         )
         self.job = -1
 
-        self.provenance = util.dump_reader.dump_series.load_from_file(
+        self.provenance = workflow.util.dump_reader.dump_series.load_from_file(
             os.path.join(
                 self.folder, config.get("cg_compare.workspace_files.provenance_dump")
             )
@@ -98,7 +100,7 @@ class cg_compare_validation:
             for fname in os.listdir(self.dumpfol):
                 # did we find the statics file?
                 if fname.endswith("statics.dat"):
-                    self.statics = util.dump_reader.read_sfdump(
+                    self.statics = workflow.util.dump_reader.read_sfdump(
                         os.path.join(self.dumpfol, fname)
                     )
                     continue
@@ -124,19 +126,21 @@ class cg_compare_validation:
             self.dumpnum = min(files_to_check.keys())
             self.provind = files_to_check[self.dumpnum][1]
 
-            thisdump = util.dump_reader.read_dump_file(
+            thisdump = workflow.util.dump_reader.read_dump_file(
                 os.path.join(self.dumpfol, files_to_check[self.dumpnum][0]),
                 statics_data=self.statics,
             )
 
             prov = self.provenance.get_frame_as_dump_frame(self.provind)
 
-            mapper = util.dump_reader_aux.field_remapper(prov.pts, thisdump.pts)
+            mapper = workflow.util.dump_reader_aux.field_remapper(
+                prov.pts, thisdump.pts
+            )
             disp_err = thisdump.displacement - mapper(prov.displacement)
             err = np.linalg.norm(disp_err) / (disp_err.size**0.5)
             self.errs[self.dumpnum] = err
 
-            cg_compare.frame_compare.compare_frames(
+            frame_compare.compare_frames(
                 thisdump,
                 prov,
                 mapper,
@@ -172,7 +176,7 @@ class cg_compare_validation:
             self.finalize(logfunc=logfunc)
 
     def write_seismos(self):
-        util.seismo_reader.compare_seismos(
+        workflow.util.seismo_reader.compare_seismos(
             os.path.join(
                 self.folder, config.get("cg_compare.workspace_files.out_seismo")
             ),
@@ -226,7 +230,9 @@ if __name__ == "__main__":
         return msg
 
     outputs = []
-    with util.curse_monitor.TestMonitor(dummy_gui=False, close_with_key=False) as mon:
+    with workflow.util.curse_monitor.TestMonitor(
+        dummy_gui=False, close_with_key=False
+    ) as mon:
         tests = config.get("cg_compare.tests")
         compares = dict()
         compare_queues = dict()
@@ -234,8 +240,10 @@ if __name__ == "__main__":
         run_jobs = list()
         compare_jobs = dict()
         test_from_job = dict()
-        global_completion_broadcast_task = util.curse_monitor.TestContainer.Task(
-            "All dG-cG comparisons", messages=list()
+        global_completion_broadcast_task = (
+            workflow.util.curse_monitor.TestContainer.Task(
+                "All dG-cG comparisons", messages=list()
+            )
         )
         num_jobs = 0
         for test in tests:
@@ -252,8 +260,9 @@ if __name__ == "__main__":
             args += " -d " + config.get("cg_compare.dump_test_resolution")
             # args += " --lr_periodic"
             # args += " --kill_boundaries"
-            i = util.runjob.queue_job(
-                util.runjob.SystemCommandJob(
+            args += " --absorb_top --absorb_bottom"
+            i = workflow.util.runjob.queue_job(
+                workflow.util.runjob.SystemCommandJob(
                     name=f"run: {test['name']}",
                     cmd=f"cd {c.folder} && "
                     + config.get("specfem.live.exe")
@@ -269,8 +278,8 @@ if __name__ == "__main__":
             c.job = i
             c.max_num_steps = config.get("cg_compare.maxsteps")
             # ====== initialize comparison process
-            j = util.runjob.queue_job(
-                util.runjob.CommunicationQueuedFunctionJob(
+            j = workflow.util.runjob.queue_job(
+                workflow.util.runjob.CommunicationQueuedFunctionJob(
                     name=f"compare: {test['name']}",
                     func=lambda log, qin, qout: c.consume_dumps(
                         run_to_completion=True,
@@ -281,20 +290,20 @@ if __name__ == "__main__":
                     min_update_interval=0,
                 )
             )
-            test_disp[i] = util.curse_monitor.TestContainer(test["name"])
+            test_disp[i] = workflow.util.curse_monitor.TestContainer(test["name"])
             test_disp[i].tasks = [
-                util.curse_monitor.TestContainer.Task(
+                workflow.util.curse_monitor.TestContainer.Task(
                     f"{test['name']} dG simulation",
                     messages=collections.deque(maxlen=100),
                 ),
-                util.curse_monitor.TestContainer.Task(
+                workflow.util.curse_monitor.TestContainer.Task(
                     f"{test['name']} dG-cG comparison",
                     messages=collections.deque(maxlen=100),
                 ),
                 global_completion_broadcast_task,
             ]
             mon.add_tab(test_disp[i])
-            compare_queues[i] = util.runjob.get_job_queues(j)
+            compare_queues[i] = workflow.util.runjob.get_job_queues(j)
             compare_jobs[i] = j
             mon.manage_inputs()
             mon.redraw_display()
@@ -305,18 +314,18 @@ if __name__ == "__main__":
             time.sleep(0.1)
 
             for i in run_jobs:
-                for line in util.runjob.consume_queue(i):
+                for line in workflow.util.runjob.consume_queue(i):
                     test_disp[i].tasks[0].messages.append(msg_strip_name(line))
                     if m := re.search(r"step\s*(\d+)\s*/\s*(\d+)", line):
                         prog = int(m.group(1)) / int(m.group(2))
                         test_disp[i].tasks[0].progress = prog
-                if not util.runjob.is_job_running(i):
+                if not workflow.util.runjob.is_job_running(i):
                     test_disp[i].tasks[0].messages.append("[!]: simulation complete.")
                     compare_queues[i]["to_job"].put(SIM_COMPLETE_CODE)
                     run_jobs.remove(i)
 
             for i, j in list(compare_jobs.items()):
-                for line in util.runjob.consume_queue(j):
+                for line in workflow.util.runjob.consume_queue(j):
                     test_disp[i].tasks[1].messages.append(msg_strip_name(line))
 
                 while not compare_queues[i]["from_job"].empty():
@@ -329,7 +338,7 @@ if __name__ == "__main__":
                         err = line.replace("maxerr", "")
                         test_disp[i].message = f"max error:{err}"
 
-                if not util.runjob.is_job_running(j):
+                if not workflow.util.runjob.is_job_running(j):
                     del compare_jobs[i]
                     mon.remove_tab(test_disp[i])
                     global_completion_broadcast_task.messages.append(  # type: ignore

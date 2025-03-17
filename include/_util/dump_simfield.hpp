@@ -322,14 +322,22 @@ void dump_simfield(
     const specfem::compute::points &points, bool skip_statics = false) {
 
   if (!skip_statics) {
+    Kokkos::deep_copy(points.h_coord, points.coord);
     dump << "pts";
     _stream_view<type_real, 4>(dump, points.h_coord);
+    Kokkos::deep_copy(simfield.h_index_mapping, simfield.index_mapping);
     dump << "index_mapping";
     _stream_view<unsigned int, 3>(dump, simfield.h_index_mapping);
+    Kokkos::deep_copy(simfield.h_assembly_index_mapping,
+                      simfield.assembly_index_mapping);
     dump << "assembly_index_mapping";
     _stream_view<int, 2>(dump, simfield.h_assembly_index_mapping);
+    Kokkos::deep_copy(simfield.acoustic.h_mass_inverse,
+                      simfield.acoustic.mass_inverse);
     dump << "acoustic_mass_inverse";
     _stream_view<type_real, 2>(dump, simfield.acoustic.h_mass_inverse);
+    Kokkos::deep_copy(simfield.elastic.h_mass_inverse,
+                      simfield.elastic.mass_inverse);
     dump << "elastic_mass_inverse";
     _stream_view<type_real, 2>(dump, simfield.elastic.h_mass_inverse);
   }
@@ -340,12 +348,18 @@ void dump_simfield(
   // dump << "ispec_map";
   // _stream_view<int,2>(dump,simfield.h_assembly_ispec_mapping);
   // dump acoustic, elastic
+  Kokkos::deep_copy(simfield.acoustic.h_field, simfield.acoustic.field);
   dump << "acoustic_field";
   _stream_view<type_real, 2>(dump, simfield.acoustic.h_field);
+  Kokkos::deep_copy(simfield.elastic.h_field, simfield.elastic.field);
   dump << "elastic_field";
   _stream_view<type_real, 2>(dump, simfield.elastic.h_field);
+  Kokkos::deep_copy(simfield.acoustic.h_field_dot_dot,
+                    simfield.acoustic.field_dot_dot);
   dump << "acoustic_field_ddot";
   _stream_view<type_real, 2>(dump, simfield.acoustic.h_field_dot_dot);
+  Kokkos::deep_copy(simfield.elastic.h_field_dot_dot,
+                    simfield.elastic.field_dot_dot);
   dump << "elastic_field_ddot";
   _stream_view<type_real, 2>(dump, simfield.elastic.h_field_dot_dot);
   // //dump edge values
@@ -368,10 +382,11 @@ void dump_simfield(
 void dump_simfield_statics(std::ofstream &dump,
                            specfem::compute::assembly &assembly) {
   const auto &simfield = assembly.fields.forward;
-
+  Kokkos::deep_copy(assembly.mesh.points.h_coord, assembly.mesh.points.coord);
   // dump points
   dump << "pts";
   _stream_view<type_real, 4>(dump, assembly.mesh.points.h_coord);
+  Kokkos::deep_copy(simfield.h_index_mapping, simfield.index_mapping);
   dump << "index_mapping";
   _stream_view<unsigned int, 3>(dump, simfield.h_index_mapping);
   // //dump mesh adjacency
@@ -381,10 +396,16 @@ void dump_simfield_statics(std::ofstream &dump,
   // dump << "ispec_map";
   // _stream_view<int,2>(dump,simfield.h_assembly_ispec_mapping);
   // dump acoustic, elastic
+  Kokkos::deep_copy(simfield.h_assembly_index_mapping,
+                    simfield.assembly_index_mapping);
   dump << "assembly_index_mapping";
   _stream_view<int, 2>(dump, simfield.h_assembly_index_mapping);
+  Kokkos::deep_copy(simfield.acoustic.h_mass_inverse,
+                    simfield.acoustic.mass_inverse);
   dump << "acoustic_mass_inverse";
   _stream_view<type_real, 2>(dump, simfield.acoustic.h_mass_inverse);
+  Kokkos::deep_copy(simfield.elastic.h_mass_inverse,
+                    simfield.elastic.mass_inverse);
   dump << "elastic_mass_inverse";
   _stream_view<type_real, 2>(dump, simfield.elastic.h_mass_inverse);
   // //dump edge values

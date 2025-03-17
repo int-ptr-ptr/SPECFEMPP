@@ -202,5 +202,25 @@ void kill_LR_BCs(specfem::mesh::mesh<specfem::dimension::type::dim2> &mesh) {
   bdkill(mesh.boundaries.acoustic_free_surface, on_LR,
          mesh.boundaries.acoustic_free_surface.nelem_acoustic_surface);
 }
+void kill_TB_BCs(specfem::mesh::mesh<specfem::dimension::type::dim2> &mesh,
+                 bool killtop, bool killbottom) {
+  type_real ymin = mesh.control_nodes.coord(1, 0);
+  type_real ymax = ymin;
+  for (int i = 1; i < mesh.control_nodes.coord.extent(1); i++) {
+    const type_real y = mesh.control_nodes.coord(1, i);
+    ymin = std::min(ymin, y);
+    ymax = std::max(ymax, y);
+  }
+  type_real epsy = (ymax - ymin) * 1e-5;
+  const auto on_TB = [&](int ispec, int inod) {
+    const int node = mesh.control_nodes.knods(inod, ispec);
+    const type_real y = mesh.control_nodes.coord(1, node);
+    return (ymax - y < epsy) && killtop || (y - ymin < epsy) && killbottom;
+  };
+  bdkill(mesh.boundaries.absorbing_boundary, on_TB,
+         mesh.boundaries.absorbing_boundary.nelements);
+  bdkill(mesh.boundaries.acoustic_free_surface, on_TB,
+         mesh.boundaries.acoustic_free_surface.nelem_acoustic_surface);
+}
 
 } // namespace _util

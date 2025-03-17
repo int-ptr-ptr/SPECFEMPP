@@ -1,6 +1,7 @@
 import json
 import os
 
+from workflow.laboratory.parfilegen import meshfem_config
 from workflow.simrunner.jobs import MesherJob
 from workflow.util import runjob
 
@@ -22,7 +23,7 @@ def save_parfile(
 ):
     folder = os.path.dirname(fname)
     # this method is populated at the end of the file for readability
-    parfile, topo = gen_parfile_text(
+    parfile, topo = meshfem_config(
         nx=nx,
         ny=ny,
         vp1=1,
@@ -125,84 +126,8 @@ def call():
 
     for topo in topos:
         os.remove(os.path.join(dirname, topo))
-    with open(os.path.join(dirname, "meshconf.json"), "w") as f:
+    with open(os.path.join(dirname, "OUTPUT_FILES", "meshconf.json"), "w") as f:
         json.dump({"vp2": _counter, "meshes": saved_runs}, f)
-
-
-def gen_parfile_text(
-    nx: int,
-    ny: int,
-    vp1: float,
-    vs1: float,
-    vp2: float,
-    vs2: float,
-    stacey: bool,
-    absLR: bool,
-    absTB: bool,
-    outfol: str,
-    database_out: str,
-    stations_out: str,
-    topo_in_location: str,
-):
-    stacey_st = "true" if stacey else "false"
-    absLR_st = "true" if absLR else "false"
-    absTB_st = "true" if absTB else "false"
-    return (
-        f"""title                           = snell 1x1 square
-NPROC                           = 1
-OUTPUT_FILES                   = {outfol}
-
-PARTITIONING_TYPE               = 3
-NGNOD                           = 9
-database_filename               = {os.path.join(outfol, database_out)}
-use_existing_STATIONS           = .false.
-nreceiversets                   = 2
-anglerec                        = 0.d0
-rec_normal_to_surface           = .false.
-nrec                            = 3
-xdeb                            = 0.35
-zdeb                            = 0.35
-xfin                            = 0.65
-zfin                            = 0.35
-record_at_surface_same_vertical = .false.
-nrec                            = 3
-xdeb                            = 0.35
-zdeb                            = 0.65
-xfin                            = 0.65
-zfin                            = 0.65
-record_at_surface_same_vertical = .false.
-stations_filename              = {os.path.join(outfol, stations_out)}
-nbmodels                        = 2
-1 1 1 {vp1} {vs1} 0 0 9999 9999 0 0 0 0 0 0
-2 1 1 {vp2} {vs2} 0 0 9999 9999 0 0 0 0 0 0
-TOMOGRAPHY_FILE                 = ./DATA/tomo_file.xyz
-read_external_mesh              = .false.
-mesh_file                       = ./DATA/mesh_file
-nodes_coords_file               = ./DATA/nodes_coords_file
-materials_file                  = ./DATA/materials_file
-free_surface_file               = ./DATA/free_surface_file
-axial_elements_file             = ./DATA/axial_elements_file
-absorbing_surface_file          = ./DATA/absorbing_surface_file
-acoustic_forcing_surface_file   = ./DATA/MSH/Surf_acforcing_Bottom_enforcing_mesh
-absorbing_cpml_file             = ./DATA/absorbing_cpml_file
-tangential_detection_curve_file = ./DATA/courbe_eros_nodes
-interfacesfile                  = {topo_in_location}
-xmin                            = 0.d0
-xmax                            = 1.d0
-nx                              = {nx}
-STACEY_ABSORBING_CONDITIONS     = .{stacey_st}.
-absorbbottom                    = .{absTB_st}.
-absorbright                     = .{absLR_st}.
-absorbtop                       = .{absTB_st}.
-absorbleft                      = .{absLR_st}.
-nbregions                       = 2
-1 {nx}  1 {ny // 2} 1
-1 {nx}  {(ny // 2) + 1} {ny} 2
-output_grid_Gnuplot             = .false.
-output_grid_ASCII               = .false.
-""",
-        f"2\n2\n0 0\n1 0\n2\n0 1\n1 1\n{ny}",
-    )
 
 
 if __name__ == "__main__":

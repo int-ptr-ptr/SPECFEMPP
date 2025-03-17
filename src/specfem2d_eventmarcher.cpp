@@ -44,6 +44,8 @@ int DUMP_INTERVAL = -1;
 bool USE_DOUBLEMESH = false;
 bool LR_PERIODIC = false;
 bool KILL_NONNEUMANN_BDRYS = false;
+bool TOP_ABS = false;
+bool BOT_ABS = false;
 
 // #define DEFAULT_USE_DOUBLEMESH
 #define DEFAULT_SET_CONTINUOUS false
@@ -54,7 +56,7 @@ bool KILL_NONNEUMANN_BDRYS = false;
 
 #define _EVENT_MARCHER_DUMPS_
 #define _stepwise_simfield_dump_ std::string("dump/simfield")
-#define _index_change_dump_ std::string("dump/indexchange")
+std::string DUMP_OUTFOL = _stepwise_simfield_dump_;
 
 #define _PARAMETER_FILENAME_DOUBLE_ std::string("specfem_config_double.yaml")
 #define _PARAMETER_FILENAME_ std::string("specfem_config.yaml")
@@ -100,11 +102,7 @@ void execute(specfem::MPI::MPI *mpi) {
 
 #ifdef _EVENT_MARCHER_DUMPS_
   if (DUMP_INTERVAL >= 0) {
-    _util::init_dirs(_stepwise_simfield_dump_);
-    _util::init_dirs(_index_change_dump_);
-
-    _util::dump_simfield(_index_change_dump_ + "/prior_remap.dat",
-                         assembly->fields.forward, assembly->mesh.points);
+    _util::init_dirs(DUMP_OUTFOL);
   }
 #endif
 
@@ -141,8 +139,6 @@ void execute(specfem::MPI::MPI *mpi) {
 #ifdef _EVENT_MARCHER_DUMPS_
   if (DUMP_INTERVAL >= 0) {
     mpi->cout("dumping with interval " + std::to_string(DUMP_INTERVAL));
-    _util::dump_simfield(_index_change_dump_ + "/post_remap.dat",
-                         assembly->fields.forward, assembly->mesh.points);
   } else {
     mpi->cout("no dumps");
   }
@@ -234,8 +230,8 @@ void execute(specfem::MPI::MPI *mpi) {
         int istep = timescheme_wrapper.get_istep();
         if (istep % DUMP_INTERVAL == 0) {
           mpi->cout("dumping @ step " + std::to_string(istep));
-          _util::dump_simfield_per_step(istep, _stepwise_simfield_dump_ + "/d",
-                                        *assembly, dg_edge_storage);
+          _util::dump_simfield_per_step(istep, DUMP_OUTFOL + "/d", *assembly,
+                                        dg_edge_storage);
         }
         return 0;
       },
@@ -298,28 +294,51 @@ void execute(specfem::MPI::MPI *mpi) {
     _util::periodify_LR(*assembly);
   }
   auto wave_inject_acoustic =
-      _util::sourceboundary::kernel<acoustic>(*assembly);
+      _util::sourceboundary::kernel<acoustic>(*assembly, TOP_ABS, BOT_ABS);
+  auto wave_inject_elastic =
+      _util::sourceboundary::kernel<elastic>(*assembly, TOP_ABS, BOT_ABS);
 
   specfem::event_marching::arbitrary_call_event inject_acoustic_event(
       [&]() {
-        const int istep = timescheme_wrapper.get_istep();
-        const type_real t = istep * dt;
-        constexpr type_real c = 1;
-        constexpr type_real wind_up = 0.5;
-        constexpr type_real max_amp = 20;
-        const type_real pi = std::atan(1) * 4;
-        // const type_real amp = (t <= 0)? 0:((t < wind_up)?
-        // (1-std::cos(pi*t/wind_up))*max_amp:max_amp);
-        const type_real amp = max_amp;
-        const type_real kx = 2 * pi;
-        const type_real kz = 10;
-        const type_real k = std::sqrt(kx * kx + kz * kz);
-        const type_real omega = c * k;
-        wave_inject_acoustic.force_planar_wave(kx, kz, omega * t, amp);
+        // const int istep = timescheme_wrapper.get_istep();
+        // const type_real t = istep * dt;
+        // constexpr type_real c = 1;
+        // constexpr type_real wind_up = 0.5;
+        // constexpr type_real max_amp = 20;
+        // const type_real pi = std::atan(1) * 4;
+        // // const type_real amp = (t <= 0)? 0:((t < wind_up)?
+        // // (1-std::cos(pi*t/wind_up))*max_amp:max_amp);
+        // const type_real amp = max_amp;
+        // const type_real kx = 2 * pi;
+        // const type_real kz = 10;
+        // const type_real k = std::sqrt(kx * kx + kz * kz);
+        // const type_real omega = c * k;
+        // wave_inject_acoustic.force_planar_wave(0, 0, omega * t, amp);
+        wave_inject_acoustic.absorb();
+        wave_inject_elastic.absorb();
         return 0;
       },
       0.92);
-  // timescheme_wrapper.time_stepper.register_event(&inject_acoustic_event);
+  timescheme_wrapper.time_stepper.register_event(&inject_acoustic_event);
+
+  specfem::event_marching::arbitrary_call_event inject_acoustic_velget_event(
+      [&]() {
+        // 1.5 dt since this is before corrector stage, when vel gets to current
+        // step and accel gets zeroed out. We want the next step velocity
+        wave_inject_acoustic.store_velocity(dt * 1.5);
+        return 0;
+      },
+      1.5);
+  timescheme_wrapper.time_stepper.register_event(&inject_acoustic_velget_event);
+  specfem::event_marching::arbitrary_call_event inject_elastic_velget_event(
+      [&]() {
+        // 1.5 dt since this is before corrector stage, when vel gets to current
+        // step and accel gets zeroed out. We want the next step velocity
+        wave_inject_elastic.store_velocity(dt * 1.5);
+        return 0;
+      },
+      3.5);
+  timescheme_wrapper.time_stepper.register_event(&inject_elastic_velget_event);
 
   specfem::event_marching::arbitrary_call_event store_boundaryvals(
       [&]() {
@@ -460,10 +479,17 @@ load_parameters(const std::string &parameter_file, specfem::MPI::MPI *mpi) {
         bdry_abs, bdry_afs, bdry_forcing);
     mesh.tags = specfem::mesh::tags<specfem::dimension::type::dim2>(
         mesh.materials, mesh.boundaries);
-  } else if (LR_PERIODIC) {
-    _util::kill_LR_BCs(mesh);
-    mesh.tags = specfem::mesh::tags<specfem::dimension::type::dim2>(
-        mesh.materials, mesh.boundaries);
+  } else {
+    if (LR_PERIODIC) {
+      _util::kill_LR_BCs(mesh);
+      mesh.tags = specfem::mesh::tags<specfem::dimension::type::dim2>(
+          mesh.materials, mesh.boundaries);
+    }
+    if (TOP_ABS || BOT_ABS) {
+      _util::kill_TB_BCs(mesh, TOP_ABS, BOT_ABS);
+      mesh.tags = specfem::mesh::tags<specfem::dimension::type::dim2>(
+          mesh.materials, mesh.boundaries);
+    }
   }
   // --------------------------------------------------------------
 
@@ -589,12 +615,26 @@ int main(int argc, char **argv) {
       iarg++;
       continue;
     }
+
+    if ((arg == "--dumpfolder" || arg == "-D") && has_next) {
+      DUMP_OUTFOL = std::string(argv[iarg + 1]);
+      iarg++;
+      continue;
+    }
     if (arg == "--lr_periodic") {
       LR_PERIODIC = true;
       continue;
     }
     if (arg == "--kill_boundaries") {
       KILL_NONNEUMANN_BDRYS = true;
+      continue;
+    }
+    if (arg == "--absorb_top") {
+      TOP_ABS = true;
+      continue;
+    }
+    if (arg == "--absorb_bottom") {
+      BOT_ABS = true;
       continue;
     }
   }
@@ -627,7 +667,9 @@ int main(int argc, char **argv) {
   if (KILL_NONNEUMANN_BDRYS) {
     mpi->cout("Removing unnatural boundaries");
   }
-  { execute(mpi); }
+  {
+    execute(mpi);
+  }
   // Finalize Kokkos
   Kokkos::finalize();
   // Finalize MPI
