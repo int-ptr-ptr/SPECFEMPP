@@ -7,7 +7,7 @@ name = "workflow"
 version = "0.1.0"
 description = "Automatic scripts to work with SFPP"
 requires-python = ">=3.10"
-dependencies = ["numpy","matplotlib","ruff", "nox", "pyyaml"]
+dependencies = ["numpy","matplotlib","ruff", "nox", "pyyaml","opencv-python","jupyterlab"]
 
 [project.optional-dependencies]
 qt = [

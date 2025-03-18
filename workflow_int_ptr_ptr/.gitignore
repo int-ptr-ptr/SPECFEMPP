@@ -4,3 +4,4 @@ reference/**
 **/__pycache__/**
 outputs/**
 *.lock
+playground/

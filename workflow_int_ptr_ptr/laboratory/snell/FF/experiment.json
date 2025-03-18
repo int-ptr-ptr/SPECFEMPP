@@ -8,11 +8,18 @@
       "files_out": ["OUTPUT_FILES/meshconf.json","OUTPUT_FILES/stations"]
     },
     {
+      "id": "specfem",
       "type": "script",
       "command": "python run_sims.py",
       "deps": ["meshgen"],
       "files_in": ["OUTPUT_FILES/meshconf.json","run_sims.py","OUTPUT_FILES/stations"],
       "files_out": ["OUTPUT_FILES/run_out.json"]
+    },
+    {
+      "type": "script",
+      "command": "python analyze.py --default",
+      "deps": ["specfem"],
+      "files_in": ["OUTPUT_FILES/run_out.json","analyze.py","OUTPUT_FILES/stations"]
     }
   ]
 }

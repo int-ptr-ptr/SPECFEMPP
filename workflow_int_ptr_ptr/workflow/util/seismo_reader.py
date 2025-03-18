@@ -241,6 +241,7 @@ class SeismoDump:
         legend_kwargs: dict[str, Any] | None = None,
         plt_title: str | None = None,
         fig_complete_callback: Callable | None = None,
+        axtitles_inside: bool = False,
     ):
         """Plots onto the given axes (creates a new set of subplots if axes is None.)
 
@@ -315,7 +316,17 @@ class SeismoDump:
                             color=plot_color,
                             linestyle=plot_linestyle,
                         )
-                        a.set_title(f"{seistype.latex_str} @ ({station.x},{station.z})")
+                        if axtitles_inside:
+                            a.set_title(
+                                f"   {seistype.latex_str} @ ({station.x},{station.z})",
+                                y=1,
+                                pad=-14,
+                                loc="left",
+                            )
+                        else:
+                            a.set_title(
+                                f"{seistype.latex_str} @ ({station.x},{station.z})"
+                            )
                         a.set_xlim(tlim)
         if plt_title:
             plt.gcf().suptitle(plt_title)
