@@ -1,20 +1,22 @@
-import sys
 import os
 
-d = __file__
-while not os.path.isdir(os.path.join(d, "runnables")):
-    d = os.path.dirname(d)
-sys.path.insert(0, d)
-del d
-
-import runnables.util.seismo_reader as seismo_reader  # noqa: E402
-
+import workflow.util.seismo_reader as seismo_reader
 
 dirname = os.path.dirname(__file__)
 seismos = seismo_reader.SeismoDump(os.path.join(dirname, "OUTPUT_FILES/STATIONS"))
-seismos.load_from_seismodir(os.path.join(dirname, "OUTPUT_FILES/seismo"))
-seismos.load_from_seismodir(os.path.join(dirname, "OUTPUT_FILES/seismo_dg"))
-seismos.seismos[0].plot_linestyle = "dashdot"
-seismos.seismos[1].plot_linestyle = "dotted"
+seismos.load_from_seismodir(
+    os.path.join(dirname, "OUTPUT_FILES/seismo"),
+    linestyle="dashdot",
+    label="cG",
+    color="r",
+)
+seismos.load_from_seismodir(
+    os.path.join(dirname, "OUTPUT_FILES/seismo_dg"),
+    linestyle="dotted",
+    label="dG",
+    color="g",
+)
 
-seismos.plot_onto(show=True)
+seismos.plot_onto(
+    save_filename=os.path.join(dirname, "OUTPUT_FILES/seiscomp.png"), legend_kwargs={}
+)

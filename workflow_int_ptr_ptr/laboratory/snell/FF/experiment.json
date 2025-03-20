@@ -19,7 +19,8 @@
       "type": "script",
       "command": "python analyze.py --default",
       "deps": ["specfem"],
-      "files_in": ["OUTPUT_FILES/run_out.json","analyze.py","OUTPUT_FILES/stations"]
+      "files_in": ["OUTPUT_FILES/run_out.json","analyze.py","OUTPUT_FILES/stations"],
+      "files_out": ["OUTPUT_FILES/analyze_timestamp"]
     }
   ]
 }

@@ -21,7 +21,7 @@ from workflow.util.seismo_reader import SeismoDump
 workdir = pathlib.Path(__file__).parent
 output_fol = workdir / "OUTPUT_FILES"
 
-simout_fol = pathlib.Path(config.get("output_dir")) / "snell" / "FF"
+analysis_outfol = pathlib.Path(config.get("output_dir")) / "snell" / "FF"
 
 runconfig = {}
 with (output_fol / "run_out.json").open("r") as f:
@@ -196,7 +196,7 @@ def make_arrival_include_func(seismo: SeismoDump, vp2: float, tmax: float):
 
 
 def compare_sim_filename(vp2_ind: int):
-    return str(simout_fol / f"compare_seismo_{vp2_ind}.png")
+    return str(analysis_outfol / f"compare_seismo_{vp2_ind}.png")
 
 
 def compare_sims(
@@ -254,7 +254,7 @@ def loadsim(
     vp2 = sim["vp2"]
     simfol = output_fol / simname
 
-    outfile_mp4 = simout_fol / (simname + ".mp4")
+    outfile_mp4 = analysis_outfol / (simname + ".mp4")
     if skip_and_get_filedeps_only:
         return [
             __file__,
@@ -473,8 +473,8 @@ def loadsim(
     # seismo.plot_onto(show=True)
 
 
-if not simout_fol.exists():
-    os.makedirs(simout_fol)
+if not analysis_outfol.exists():
+    os.makedirs(analysis_outfol)
 
 
 def run_standard():
@@ -503,7 +503,7 @@ def run_standard():
     files_to_keep = []
     for _, outfiles, _ in targets:
         files_to_keep.extend(outfiles)
-    for f in output_fol.iterdir():
+    for f in analysis_outfol.iterdir():
         if str(f) not in files_to_keep:
             print(f"clearing {f}")
             os.remove(f)
@@ -511,7 +511,12 @@ def run_standard():
     # run everything
     for infiles, outfiles, invoke in targets:
         if not should_skip_by_file_deps(infiles, outfiles, "", False):
+            print(f"Running target for files {outfiles}")
             invoke()
+        else:
+            print(f"Skipping target for files {outfiles}")
+
+    (output_fol / "analyze_timestamp").touch()
 
 
 if __name__ == "__main__":

@@ -58,6 +58,8 @@ def call():
 
     # clean directory
     outdir = os.path.join(dirname, "OUTPUT_FILES")
+    if not os.path.exists(outdir):
+        os.makedirs(outdir)
     for f in os.listdir(outdir):
         fullpath = os.path.join(outdir, f)
         if f.startswith("mesh"):

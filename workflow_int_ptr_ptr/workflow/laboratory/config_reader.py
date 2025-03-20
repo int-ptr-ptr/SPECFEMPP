@@ -229,8 +229,14 @@ def experiment_to_tasks(
                 res.append(t)
             elif kind == "specfemem" or kind == "specfem2d_eventmarcher":
                 log(f'    specfem2d_eventmarcher task "{tname}"')
+                additional_args = None
+                if "args" in task:
+                    additional_args = task["args"]
                 t = simtask.SpecfemEMTask(
-                    tname, cwd=os.path.join(folder, cwd), specfem_parfile=parfile
+                    tname,
+                    cwd=os.path.join(folder, cwd),
+                    specfem_parfile=parfile,
+                    additional_args=additional_args,
                 )
                 t.on_pre_run = lambda t=t: specfem_clear_output_folders(
                     parfile=t.parfile, cwd=t.cwd

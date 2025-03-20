@@ -13,20 +13,28 @@
       "deps":[]
     },
     {
+      "type": "mesher",
+      "parfile": "Par_File_quarter",
+      "id": "mesher_quarterres",
+      "deps":[]
+    },
+    {
       "type": "specfem2d",
       "parfile": "specfem_config.yaml",
+      "id": "sfcg",
       "deps":["mesher_hires"]
     },
     {
       "type": "specfemem",
       "parfile": "specfem_config_dg.yaml",
-      "deps":["mesher_halfres",2]
+      "id": "sfdg1",
+      "deps":["mesher_quarterres","sfcg"]
     },
     {
       "type": "script",
       "command": "python plot.py",
-      "deps":[2,3],
-      "files_in": ["OUTPUT_FILES/seismo","OUTPUT_FILES/seismo_dg"]
+      "deps":["sfcg","sfdg1"],
+      "files_in": ["OUTPUT_FILES/seismo","OUTPUT_FILES/seismo_dg","plot.py"]
     }
   ]
 }

@@ -1,12 +1,9 @@
 #pragma once
 
 #include "Kokkos_Core.hpp"
-#include "Kokkos_Macros.hpp"
-#include "Serial/Kokkos_Serial_Parallel_Range.hpp"
 #include "compute/assembly/assembly.hpp"
 #include "compute/fields/simulation_field.hpp"
 #include "compute/sources/sources.hpp"
-#include "decl/Kokkos_Declare_SERIAL.hpp"
 #include "enumerations/dimension.hpp"
 #include "enumerations/medium.hpp"
 #include "kokkos_abstractions.h"
