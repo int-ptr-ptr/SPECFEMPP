@@ -151,7 +151,8 @@ void execute(specfem::MPI::MPI *mpi) {
 
   auto timescheme =
       specfem::time_scheme::newmark<specfem::simulation::type::forward>(
-          params.get_numsteps(), 1, params.get_dt(), params.get_t0());
+          params.get_numsteps(), params.get_num_steps_between_samples(),
+          params.get_dt(), params.get_t0());
   const type_real dt = params.get_dt();
   timescheme.link_assembly(*assembly);
 

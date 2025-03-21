@@ -111,6 +111,10 @@ public:
       // type_real kx, type_real kz, type_real phase,
       //                      type_real amplitude
   ) {
+    if (num_pts == 0) {
+      return;
+    }
+
     Kokkos::parallel_for(
         num_pts, KOKKOS_LAMBDA(const int iworker) {
           specfem::point::field<specfem::dimension::type::dim2, MediumType,
@@ -181,6 +185,9 @@ public:
   }
 
   void store_velocity(type_real dt_inc) {
+    if (num_pts == 0) {
+      return;
+    }
     Kokkos::parallel_for(
         num_pts, KOKKOS_LAMBDA(const int iworker) {
           specfem::point::field<specfem::dimension::type::dim2, MediumType,

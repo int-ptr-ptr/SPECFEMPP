@@ -219,6 +219,7 @@ struct simulation_params {
 
   int get_numsteps() { return _nsteps; }
   int get_num_seismogram_steps() { return _nseismogram_steps; }
+  int get_num_steps_between_samples() { return _nsteps / _nseismogram_steps; }
   type_real get_t0() { return _t0; }
   type_real get_dt() { return _dt; }
   type_real get_tmax() { return _tmax; }
@@ -252,7 +253,8 @@ struct simulation_params {
   void build_assembly() {
     _assembly = std::make_shared<specfem::compute::assembly>(
         _mesh, _quadratures, _sources, _receivers, _seismogram_types, _t0, _dt,
-        _nsteps, _nseismogram_steps, _nsteps, _simulation_type, nullptr);
+        _nsteps, _nseismogram_steps, _nsteps / _nseismogram_steps,
+        _simulation_type, nullptr);
   }
 
 private:

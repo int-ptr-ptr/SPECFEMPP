@@ -22,7 +22,7 @@ parameters:
         time-scheme:
           type: Newmark
           dt: 1.000e-3
-          nstep: 15000  #this was originally 32500
+          nstep: 32500 #this was originally 32500
 
     simulation-mode:
       forward:
@@ -52,7 +52,7 @@ parameters:
 
   ## databases
   databases:
-    mesh-database: ./OUTPUT_FILES/database_quarter.bin
+    mesh-database: ./OUTPUT_FILES/database_half.bin
 
   ## sources
   sources: ./line_sources.yaml
@@ -60,11 +60,11 @@ parameters:
   mesh-modifiers:
     subdivisions:
       - material: 2
-        x: 3
-        z: 3
-      - material: 1
         x: 2
         z: 2
+      - material: 1
+        x: 1
+        z: 1
     interface-rules:
       - material1: 1
         material2: 2

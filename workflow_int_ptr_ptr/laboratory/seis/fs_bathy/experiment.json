@@ -28,7 +28,7 @@
       "type": "specfemem",
       "parfile": "specfem_config_dg.yaml",
       "id": "sfdg1",
-      "deps":["mesher_quarterres","sfcg"]
+      "deps":["mesher_halfres","sfcg"]
     },
     {
       "type": "script",
