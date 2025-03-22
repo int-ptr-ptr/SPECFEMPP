@@ -260,7 +260,7 @@ if __name__ == "__main__":
             args += " -d " + config.get("cg_compare.dump_test_resolution")
             # args += " --lr_periodic"
             # args += " --kill_boundaries"
-            args += " --absorb_top --absorb_bottom"
+            # args += " --absorb_top --absorb_bottom"
             i = workflow.util.runjob.queue_job(
                 workflow.util.runjob.SystemCommandJob(
                     name=f"run: {test['name']}",

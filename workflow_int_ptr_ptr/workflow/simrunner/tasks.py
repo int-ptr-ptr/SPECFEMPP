@@ -55,7 +55,7 @@ class Specfem2DTask(Task):
         self.title = title
         name = f"{title} (specfem2d)"
         if group is None:
-            group = "unnamed mesher"
+            group = "unnamed specfem"
 
         # pass kwargs or use defaults for Specfem2DJob
         kwargs = dict()
@@ -91,7 +91,7 @@ class SpecfemEMTask(Task):
         self.title = title
         name = f"{title} (specfemEM)"
         if group is None:
-            group = "unnamed mesher"
+            group = "unnamed specfem"
 
         # pass kwargs or use defaults for SpecfemEMJob
         kwargs = dict()

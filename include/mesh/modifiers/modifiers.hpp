@@ -53,6 +53,8 @@ public:
   //===== getting modifiers =====
   specfem::mesh::modifiers<DimensionType>::subdiv_tuple
   get_subdivision(const int material) const;
+  specfem::mesh::modifiers<DimensionType>::subdiv_tuple get_subdivision(
+      const specfem::mesh::materials::material_specification &matspec) const;
   specfem::enums::interface_resolution::type
   get_interface_resolution_rule(const int material1, const int material2) const;
   std::vector<int> partition_materials(const int num_materials) const;

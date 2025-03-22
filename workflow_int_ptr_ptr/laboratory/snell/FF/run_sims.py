@@ -1,8 +1,9 @@
-import json
 import os
-import shutil
+import re
 import sys
 import time
+
+from experiment import Simulation  # pyright: ignore
 
 from workflow.laboratory.parfilegen import sf_config
 from workflow.simrunner.tasks import SpecfemEMTask
@@ -18,12 +19,12 @@ def get_runsim_task(
     database_in: str,
     dt: float,
     nstep: int,
-    subdivs: int | None,
+    subdivs: tuple[int, int] | None,
     steps_per_dump: int | None = None,
 ):
     if steps_per_dump is None:
         steps_per_dump = max(1, int(0.05 / dt))
-    parfile = "specfem_config.yaml"
+    parfile = f"specfem_config_{sim_dir}.yaml"
     # output files
     outdir = os.path.join(workdir, output_folname, sim_dir)
 
@@ -67,107 +68,72 @@ def get_runsim_task(
         on_completion=compile_series,
         additional_args=f"--lr_periodic --absorb_top --absorb_bottom --dumpfolder {outdir} --dump {steps_per_dump} --kill_boundaries",
     )
-    return task, dt, subdivs, sim_dir
+    return task, parfile
 
 
-DT = 1e-3
-NSTEP = int(1.5 / DT)
+def NSTEP(dt):
+    return int(1.5 / dt)
 
 
-def call():
-    # clean
-    for f in os.listdir(output_fol):
-        fullpath = os.path.join(output_fol, f)
-        if os.path.isdir(fullpath):
-            if f.startswith("cont") or f.startswith("dg"):
-                shutil.rmtree(fullpath)
+def run(sim: Simulation):
+    simname = sim.simname()
+    task, parfile_name = get_runsim_task(
+        simname,
+        os.path.join(output_fol, sim.recover_mesh().mesh_database_name()),
+        dt=sim.dt(),
+        nstep=NSTEP(sim.dt()),
+        subdivs=sim.subdivisions,
+    )
 
-    data = None
-    with open(os.path.join(output_fol, "meshconf.json"), "r") as f:
-        data = json.load(f)
+    task.on_pre_run()
+    task.job.print_updates = True
 
-    if data is None:
-        print("meshconf.json not found")
-        return
+    print(f"starting job {task.name}")
+    jid = runjob.queue_job(task.job)
+    lines = []
+    last_numlines = 0
+    while runjob.is_job_running(jid):
+        time.sleep(1)
+        lines.extend(runjob.consume_queue(jid))
+        if len(lines) > last_numlines:
+            print(lines[-1])
+            last_numlines = len(lines)
 
-    tasks = []
-    for mesh in data["meshes"]:
-        database = mesh["database_file"]
-        nx = mesh["nx"]
-        # vp2 = mesh["vp2"]
-        vpind = mesh["vp2_ind"]
-        suff = f"{nx}_{vpind}"
+    if (retcode := runjob.complete_job(jid, error_on_still_running=True)) > 0:
+        print('Job failed. error logged in "run_err.txt".')
+        with open(os.path.join(output_fol, simname, "run_err.txt"), "w") as f:
+            f.writelines(lines)
+        return retcode
 
-        def add_simtask(taskret):
-            auxdata = {
-                "sim": taskret[3],
-                "N_size": nx,
-                "vp2": mesh["vp2"],
-                "vp2_ind": vpind,
-                "dt": taskret[1],
-                "subdivisions2": taskret[2],
-            }
-            tasks.append((taskret[0], auxdata))
+    task.on_completion(0)
+    os.remove(parfile_name)
+    print("job complete")
 
-        add_simtask(get_runsim_task(f"cont_{suff}", database, DT, NSTEP, None))
-        add_simtask(get_runsim_task(f"dg1_{suff}", database, DT, NSTEP, 1))
-        add_simtask(get_runsim_task(f"dg2_{suff}", database, DT, NSTEP, 2))
-        add_simtask(get_runsim_task(f"dg3_{suff}", database, DT, NSTEP, 3))
+    return 0
 
-    task_completes = list()
-    failure = None
-    for task, auxdata in tasks:
-        task.on_pre_run()
-        task.job.print_updates = True
 
-        tstart = time.time()
-
-        print(f"starting job {task.name}")
-        jid = runjob.queue_job(task.job)
-        lines = []
-        last_numlines = 0
-        while runjob.is_job_running(jid):
-            time.sleep(1)
-            lines.extend(runjob.consume_queue(jid))
-            if len(lines) > last_numlines:
-                print(lines[-1])
-                last_numlines = len(lines)
-
-        if runjob.complete_job(jid, error_on_still_running=True) > 0:
-            print("Job failed:")
-            print(*lines, sep="")
-            failure = {"job": task.name, "output": "".join(lines)}
-            break
-
-        tend = time.time()
-
-        task_completes.append(
-            {
-                "time": int(
-                    round(tend - tstart)
-                ),  # seconds, since we use the time.sleep(1) call.
-            }
-            | auxdata
-        )
-
-        task.on_completion(0)
-        print("job complete")
-
-    outlog: dict[str, list | dict] = {"tasks_completed": task_completes}
-    if failure:
-        outlog["failure"] = failure
-
-    with open(os.path.join(output_fol, "run_out.json"), "w") as f:
-        json.dump(outlog, f)
-
-    # clean up parfile
-    os.remove(os.path.join(workdir, "specfem_config.yaml"))
-
-    if failure:
-        with open(os.path.join(output_fol, "run_err.txt"), "w") as f:
-            f.write(failure["output"])
-        sys.exit(1)
+def clean_simwork():
+    # for f in os.listdir(output_fol):
+    #     fullpath = os.path.join(output_fol, f)
+    #     if os.path.isdir(fullpath):
+    #         if f.startswith("cont") or f.startswith("dg"):
+    #             shutil.rmtree(fullpath)
+    for f in os.listdir(workdir):
+        if re.match(r"specfem_config_.+\.yaml", f):
+            os.remove(os.path.join(workdir, f))
 
 
 if __name__ == "__main__":
-    call()
+    args = " ".join(sys.argv)
+    m = re.search(r"!\s*TASK\s*\[([^\[\]]+)\]\s*!", args)
+    if m:
+        sim = Simulation.from_str(m.group(1).strip())
+        sys.exit(run(sim))
+
+    m = re.search(r"!\s*CLEAN\s*!", args)
+    if m:
+        clean_simwork()
+        sys.exit(0)
+
+    print(f'Failed to parse arguments "{args}"')
+    sys.exit(1)

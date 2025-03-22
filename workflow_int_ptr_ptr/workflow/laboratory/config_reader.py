@@ -3,13 +3,22 @@ import json
 import os
 import re
 import time
+from subprocess import PIPE as subproc_PIPE
+from subprocess import run as subproc_run
 from typing import Callable
 
 import workflow.simrunner.tasks as simtask
 from workflow.util.runjob import SystemCommandJob
 from workflow.util.task_manager import Task
 
-EXPERIMENT_CONFIG_FILENAME = "experiment.json"
+EXPERIMENT_CONFIG_FILENAME_JSON = "experiment.json"
+EXPERIMENT_CONFIG_FILENAME_PYTHON = "experiment.py"
+
+
+def is_experiment_folder(folder: str):
+    return os.path.isfile(
+        os.path.join(folder, EXPERIMENT_CONFIG_FILENAME_JSON)
+    ) or os.path.isfile(os.path.join(folder, EXPERIMENT_CONFIG_FILENAME_PYTHON))
 
 
 def file_deps_from_meshfem_parfile(parfile: str) -> tuple[list[str], list[str]]:
@@ -127,9 +136,9 @@ class ScriptTask(Task):
         on_pre_run: Callable[[], None] | None = None,
     ):
         self.title = title
-        name = f"{title} (specfem2d)"
+        name = f"{title} (script)"
         if group is None:
-            group = "unnamed mesher"
+            group = "script"
 
         # pass kwargs or use defaults for Specfem2DJob
         job = SystemCommandJob(name, cmd=command, cwd=cwd)
@@ -169,8 +178,32 @@ def experiment_to_tasks(
 
     res = list()
     try:
-        with open(os.path.join(folder, EXPERIMENT_CONFIG_FILENAME), "r") as f:
-            data = json.load(f)
+        experiment_json = os.path.join(folder, EXPERIMENT_CONFIG_FILENAME_JSON)
+        experiment_py = os.path.join(folder, EXPERIMENT_CONFIG_FILENAME_PYTHON)
+        if os.path.exists(experiment_json):
+            if os.path.exists(experiment_py):
+                raise IOError(
+                    f"This experiment folder ({folder}) has both "
+                    f'"{EXPERIMENT_CONFIG_FILENAME_JSON}" and '
+                    f'"{EXPERIMENT_CONFIG_FILENAME_PYTHON}". Please remove one.'
+                )
+            else:
+                with open(experiment_json, "r") as f:
+                    data = json.load(f)
+        else:
+            if os.path.exists(experiment_py):
+                data = json.loads(
+                    subproc_run(
+                        ["python", experiment_py], stdout=subproc_PIPE
+                    ).stdout.decode("utf-8")
+                )
+            else:
+                raise IOError(
+                    f"This experiment folder ({folder}) has neither"
+                    f' "{EXPERIMENT_CONFIG_FILENAME_JSON}" nor '
+                    f'"{EXPERIMENT_CONFIG_FILENAME_PYTHON}".'
+                    "Verify the directory, or create an experiment config."
+                )
 
         log("Successfully retrieved file contents.")
         if "tasks" not in data:
@@ -249,9 +282,11 @@ def experiment_to_tasks(
                 )
             else:
                 raise IOError(f"Unknown type: {kind}")
-
+            if "taskgroups" in task:
+                res[-1].group.extend(task["taskgroups"])
         log("Setting dependencies:")
         task_backlinks = [[] for _ in res]
+        task_forwardlinks = [[] for _ in res]
         for itask, task in enumerate(data["tasks"]):
             log(f"  task {itask}:", end="")
             deps = []
@@ -270,9 +305,10 @@ def experiment_to_tasks(
                     log(f" {dep},", end="")
                 res[itask].dependencies.append(res[dep])
                 task_backlinks[dep].append(itask)
+                task_forwardlinks[itask].append(dep)
             log()
 
-        # prune unneccesary nodes now that dependency lists are not linked by index
+        # prune unneccesary nodes
         if run_necessary_only:
             log("Pruning unneeded experiments:")
             to_prune = []
@@ -282,6 +318,7 @@ def experiment_to_tasks(
 
             def prune(itask: int):
                 task = res[itask]
+                taskdata = data["tasks"][itask]
                 if itask in to_prune:
                     # already pruned
                     return
@@ -309,11 +346,23 @@ def experiment_to_tasks(
                 else:
                     filedeps = []
                     fileouts = []
-                if "files_in" in data["tasks"][itask]:
-                    filedeps = data["tasks"][itask]["files_in"]
+                if "files_in" in taskdata:
+                    filedeps = taskdata["files_in"]
 
-                if "files_out" in data["tasks"][itask]:
-                    fileouts = data["tasks"][itask]["files_out"]
+                if "files_out" in taskdata:
+                    fileouts = taskdata["files_out"]
+
+                # special rule:
+                if (
+                    "skip_if_no_deps" in taskdata
+                    and len(filedeps) == 0
+                    and len(fileouts) == 0
+                    and taskdata["skip_if_no_deps"].lower() in ["true", "1", "yes"]
+                ):
+                    log(
+                        "  skip_if_no_deps flag set. Pruning due to no file dependencies."
+                    )
+                    to_prune.append(itask)
 
                 if should_skip_by_file_deps(
                     infiles=filedeps, outfiles=fileouts, cwd=folder, verbose=verbose

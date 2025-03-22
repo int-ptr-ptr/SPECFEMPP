@@ -3,7 +3,7 @@ import os
 import workflow.util.config as config
 from workflow.util.task_manager import Manager, Task
 
-from .config_reader import EXPERIMENT_CONFIG_FILENAME, experiment_to_tasks
+from .config_reader import experiment_to_tasks, is_experiment_folder
 
 """
 Manages the laboratory.
@@ -37,7 +37,7 @@ def get_experiment_list(verbose: bool = False) -> dict[str, str]:
                 cur_heirarchy = (
                     f"{experiment_heirarchy}.{entry}" if depth > 0 else entry
                 )
-                if os.path.isfile(os.path.join(file, EXPERIMENT_CONFIG_FILENAME)):
+                if is_experiment_folder(file):
                     log(f"{header} ├ [{entry}] FOUND ({cur_heirarchy})")
                     # this is an experiment. Append it
                     experiments[cur_heirarchy] = file
@@ -58,7 +58,12 @@ def tasks_in_experiment(name: str, verbose: bool = False) -> list[Task]:
         return []
 
 
-def full_run_experiment(name: str, use_gui: bool = False):
+def full_run_experiment(name: str, use_gui: bool = False, verbose: bool = False):
     if name in get_experiment_list():
-        manager = Manager(use_gui=use_gui, tasks=tasks_in_experiment(name))
+        manager = Manager(
+            use_gui=use_gui,
+            tasks=tasks_in_experiment(name),
+            verbose=verbose,
+            sequential_groups=["gpu"],
+        )
         manager.run()

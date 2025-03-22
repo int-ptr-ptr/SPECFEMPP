@@ -1,10 +1,10 @@
-import argparse
 import json
 import os
 import pathlib
+import re
 import sys
 from math import nan
-from typing import Any, Callable, Iterable, Literal, overload
+from typing import Any, Iterable, Literal, overload
 
 import matplotlib.animation as mplanim
 import matplotlib.lines as mplines
@@ -12,8 +12,8 @@ import matplotlib.patches as mplpatches
 import matplotlib.pyplot as plt
 import numpy as np
 import yaml
+from experiment import Simulation, get_all_experiments  # pyright: ignore
 
-from workflow.laboratory.config_reader import should_skip_by_file_deps
 from workflow.util import config
 from workflow.util.dump_reader import dump_series
 from workflow.util.seismo_reader import SeismoDump
@@ -23,32 +23,28 @@ output_fol = workdir / "OUTPUT_FILES"
 
 analysis_outfol = pathlib.Path(config.get("output_dir")) / "snell" / "FF"
 
-runconfig = {}
-with (output_fol / "run_out.json").open("r") as f:
-    runconfig = json.load(f)
-
 sourceconfig = {}
 with (workdir / "source.yaml").open("r") as f:
     sourceconfig = yaml.load(f, Loader=yaml.Loader)
 
-run_sims_by_vp_ind = dict()
-run_sims_by_name = dict()
+run_sims_by_vp_ind: dict[int, list[Simulation]] = dict()
+run_sims_by_name: dict[str, Simulation] = dict()
 
-for sim in runconfig["tasks_completed"]:
-    vp2ind = sim["vp2_ind"]
+for sim in get_all_experiments():
+    vp2ind = sim.vp2_ind
     if vp2ind not in run_sims_by_vp_ind:
         run_sims_by_vp_ind[vp2ind] = list()
 
     run_sims_by_vp_ind[vp2ind].append(sim)
 
-    run_sims_by_name[sim["sim"]] = sim
+    run_sims_by_name[sim.simname()] = sim
 
 
 first_source = sourceconfig["sources"][0]
 first_source = first_source[list(first_source.keys())[0]]
 sourceloc = (first_source["x"], first_source["z"])
 
-del first_source
+# del first_source
 
 
 @overload
@@ -199,34 +195,41 @@ def compare_sim_filename(vp2_ind: int):
     return str(analysis_outfol / f"compare_seismo_{vp2_ind}.png")
 
 
+def color_from_sim(sim: Simulation):
+    color_ind = 0 if sim.subdivisions is None else int(sim.subdivisions[1])
+    return "rgbc"[color_ind]
+
+
 def compare_sims(
     vp2_ind: int, show: bool = True, skip_and_get_filedeps_only: bool = False
 ) -> Any:
     seismo = SeismoDump(str(output_fol / "stations"))
     fdeps = [__file__, str(output_fol / "stations")]
+    simdeps = []
     vp2 = 0
     for sim in run_sims_by_vp_ind[vp2_ind]:
-        vp2 = sim["vp2"]
-        N_size = int(sim["N_size"])
-        color_ind = 0 if "cont" in sim["sim"] else int(sim["sim"][2])
-        if color_ind == 0:
+        vp2 = sim.vp2()
+        N_size = int(sim.N)
+        if sim.scheme == "cont":
             label = f"cG {N_size} cell resolution"
         else:
-            label = f"dG {N_size * color_ind}:{N_size} cell resolution (Symmetric flux)"
+            numcells = sim.get_horiz_numcells()
+            label = f"dG {numcells[0]}:{numcells[1]} cell resolution (Symmetric flux, dt = {sim.dt():.1e})"
 
-        simfol = output_fol / sim["sim"]
+        simfol = output_fol / sim.simname()
         if skip_and_get_filedeps_only:
             fdeps.append(str(simfol))
+            simdeps.append(sim.taskname())
         else:
             seismo.load_from_seismodir(
                 str(simfol),
-                color="rgbc"[color_ind],
+                color=color_from_sim(sim),
                 linestyle=N_size // 10,
                 label=label,
             )
     outfile = compare_sim_filename(vp2_ind)
     if skip_and_get_filedeps_only:
-        return fdeps, [outfile]
+        return fdeps, [outfile], simdeps
 
     tmax = max(
         max(
@@ -242,26 +245,33 @@ def compare_sims(
         plt_title=f"Acoustic-Acoustic Seismogram comparison ($(v_p)_2 = {vp2:.2f}$)",
         save_filename=None if show else outfile,
         fig_complete_callback=make_arrival_include_func(seismo, vp2, tmax),
+        ylim_rule="max_of_no_nan",
         axtitles_inside=True,
     )
 
 
 def loadsim(
-    sim, frames: Iterable | None = None, skip_and_get_filedeps_only: bool = False
+    sim: Simulation,
+    frames: Iterable | None = None,
+    skip_and_get_filedeps_only: bool = False,
 ) -> Any:
-    simname = sim["sim"]
-    dt = sim["dt"]
-    vp2 = sim["vp2"]
+    simname = sim.simname()
+    dt = sim.dt()
+    vp2 = sim.vp2()
     simfol = output_fol / simname
 
     outfile_mp4 = analysis_outfol / (simname + ".mp4")
     if skip_and_get_filedeps_only:
-        return [
-            __file__,
-            str(simfol / "dumps.dat"),
-            str(output_fol / "stations"),
-            str(simfol),
-        ], [outfile_mp4]
+        return (
+            [
+                __file__,
+                str(simfol / "dumps.dat"),
+                str(output_fol / "stations"),
+                str(simfol),
+            ],
+            [outfile_mp4],
+            [sim.taskname()],
+        )
 
     data = dump_series.load_from_file(str(simfol / "dumps.dat"))
     seismo = SeismoDump(str(output_fol / "stations"))
@@ -478,56 +488,76 @@ if not analysis_outfol.exists():
 
 
 def run_standard():
-    # select targets (infiles, outfiles, invoke)
-    targets: list[tuple[list[str], list[str], Callable[[], None]]] = []
-    for vp2_ind in run_sims_by_vp_ind.keys():
-        targets.append(
-            (
-                *compare_sims(vp2_ind, skip_and_get_filedeps_only=True),
-                lambda vp2_ind=vp2_ind: compare_sims(vp2_ind, show=False),
+    return [f"compare_all_vp2[{i}]" for i in run_sims_by_vp_ind.keys()]
+
+
+def commands_from_names(name: str) -> list[tuple[str, Any]]:
+    outs = []
+    if "compare_all_vp2" in name:
+        for m in re.finditer(r"compare_all_vp2\s*\[\s*(\d+)\s*\]", name):
+            vp2_ind = int(m.group(1))
+            outs.append(
+                [
+                    m.group(0),
+                    lambda *args, vp2_ind=vp2_ind, **kwargs: compare_sims(
+                        vp2_ind, *args, show=False, **kwargs
+                    ),
+                ]
             )
-        )
-
-    # sims_to_run = ["dg2_20_1"]
-    sims_to_run = []
-    for simname in sims_to_run:
-        sim = run_sims_by_name[simname]
-        targets.append(
-            (
-                *loadsim(sim, skip_and_get_filedeps_only=True),
-                lambda sim=sim: loadsim(sim),
+    if "simanim" in name:
+        for m in re.finditer(r"simanim\s*\[([^\[\]]+)\]", name):
+            simname = m.group(1)
+            outs.append(
+                [
+                    m.group(0),
+                    lambda *args, simname=simname, **kwargs: loadsim(
+                        run_sims_by_name[simname], *args, **kwargs
+                    ),
+                ]
             )
-        )
 
-    # kill unneeded files
-    files_to_keep = []
-    for _, outfiles, _ in targets:
-        files_to_keep.extend(outfiles)
-    for f in analysis_outfol.iterdir():
-        if str(f) not in files_to_keep:
-            print(f"clearing {f}")
-            os.remove(f)
-
-    # run everything
-    for infiles, outfiles, invoke in targets:
-        if not should_skip_by_file_deps(infiles, outfiles, "", False):
-            print(f"Running target for files {outfiles}")
-            invoke()
-        else:
-            print(f"Skipping target for files {outfiles}")
-
-    (output_fol / "analyze_timestamp").touch()
+    return outs
 
 
 if __name__ == "__main__":
+    import argparse
+
     parser = argparse.ArgumentParser()
-    parser.add_argument("--default", action="store_true")
+    sp = parser.add_subparsers(help="analysis command")
+    parser_deps = sp.add_parser("deps", help="get dependencies for analysis")
+    parser_deps.add_argument("name_to_query", nargs="*", type=str)
+
+    parser_run = sp.add_parser("run", help="run the analysis")
+    parser_run.add_argument("name_to_run", nargs="+", type=str)
+
     args = parser.parse_args()
-    if args.default:
-        run_standard()
+    if "name_to_query" in args:
+        names = []
+        if len(args.name_to_query) == 0:
+            names.extend(run_standard())
+        else:
+            names.append(" ".join(args.name_to_query))
+
+        out = {"deps": []}
+        for name in names:
+            for cmdname, cmd in commands_from_names(name):
+                fin, fout, deps = cmd(skip_and_get_filedeps_only=True)
+                out["deps"].append(
+                    {
+                        "identifier": cmdname,
+                        "in": fin,
+                        "out": fout,
+                        "deps": deps,
+                    }
+                )
+        print(json.dumps(out))
+        sys.exit(0)
+    if "name_to_run" in args:
+        for cmdname, cmd in commands_from_names(" ".join(args.name_to_run)):
+            cmd()
         sys.exit(0)
 
     # for vp2_ind in run_sims_by_vp_ind.keys():
     #     compare_sims(vp2_ind,show=False)
 
-    loadsim(run_sims_by_name["dg2_20_1"])
+    # loadsim(run_sims_by_name["dg2_20_1"])

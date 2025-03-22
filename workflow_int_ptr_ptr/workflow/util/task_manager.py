@@ -63,8 +63,8 @@ class Task:
     # the corresponding job to run
     job: RunJob
 
-    # group that this task belongs to
-    group: str
+    # group(s) that this task belongs to
+    group: list[str]
 
     # list of tasks that must complete before this task can run
     dependencies: Sequence["Task"]
@@ -79,19 +79,27 @@ class Task:
         self,
         job: RunJob,
         name: str = "unnamed job",
-        group: str = "default",
+        group: list[str] | str | None = None,
         dependencies: list["Task"] | None = None,
         on_completion: Callable[[int], None] | None = None,
         on_pre_run: Callable[[], None] | None = None,
     ):
         self.name = name
         self.job = job
-        self.group = group
+        if group is None:
+            self.group = []
+        elif isinstance(group, str):
+            self.group = [group]
+        else:
+            self.group = group
         self.dependencies = list() if dependencies is None else dependencies
         self.on_completion = (
             (lambda x: None) if on_completion is None else on_completion
         )
         self.on_pre_run = (lambda: None) if on_pre_run is None else on_pre_run
+
+    def get_primary_group(self) -> str | None:
+        return None if not self.group else self.group[0]
 
     def generate_monitor_container(
         self, group_container: GroupContainer
@@ -106,15 +114,27 @@ class Manager:
 
     # groups whose members must be done one at a time (ex: GPU intensive tasks)
     sequential_groups: list[str]
+
+    # all tasks handled by this manager
     tasks: list[Task]
+
+    # all tasks that belong to each group
     groups: dict[str, list[Task]]
+
+    # all tasks by group[0]. This is a partition.
+    primary_groups: dict[str | None, list[Task]]
+
+    # print lots of logs? Logs are not printed when GUI is live
+    verbose: bool
 
     def __init__(
         self,
         use_gui: bool = False,
         tasks: list[Task] | None = None,
         sequential_groups: list[str] | None = None,
+        verbose: bool = False,
     ):
+        self.verbose = verbose
         self.use_gui = use_gui
         self.running = False
         self.sequential_groups = (
@@ -122,17 +142,29 @@ class Manager:
         )
         self.tasks = list()
         self.groups = dict()
+        self.primary_groups = dict()
 
         if tasks is not None:
             for t in tasks:
                 self.add_task(t)
 
+    def _log(self, *args, **kwargs):
+        if self.verbose and not (self.use_gui and self.running):
+            print(*args, **kwargs)
+
     def add_task(self, task: Task):
         self.tasks.append(task)
         grp = task.group
-        if grp not in self.groups:
-            self.groups[grp] = list()
-        self.groups[grp].append(task)
+        self._log(f"Adding task {task.name} to manager (groups = {task.group}).")
+
+        if task.get_primary_group() not in self.primary_groups:
+            self.primary_groups[task.get_primary_group()] = list()
+        self.primary_groups[task.get_primary_group()].append(task)
+
+        for g in grp:
+            if g not in self.groups:
+                self.groups[g] = list()
+            self.groups[g].append(task)
 
     def add_tasks(self, *tasks: Iterable[Task | Iterable[Task]]):
         for task in tasks:
@@ -148,13 +180,25 @@ class Manager:
                 ) from e
 
     def run(self):
+        if self.running:
+            raise RuntimeError("Attempting to run() an already running task manager.")
+
+        if not self.tasks:
+            self._log("Manager.run() call issued without any tasks. Doing nothing.")
+            return
+
         self.running = True
         with curse_monitor.TestMonitor(
             dummy_gui=not self.use_gui, close_with_key=False
         ) as gui:
+            self._log(
+                f"Manager.run() call issued with {len(self.tasks)} tasks."
+                f" Entering TestMonitor context with dummy_gui={gui.dummy_gui}."
+            )
             group_containers = dict()
-            for group, tasks in self.groups.items():
-                disp = GroupContainer(group)
+            for group in self.primary_groups.keys():
+                grpname = "(ungrouped)" if group is None else group
+                disp = GroupContainer(grpname)
                 group_containers[group] = disp
             # integer list for deps for easy access
             queued_or_running: dict[int, list[int]] = {
@@ -163,24 +207,54 @@ class Manager:
                 ]
                 for tindex, task in enumerate(self.tasks)
             }
-            active_tasks: dict[int, tuple[int, TaskContainer]] = dict()
 
-            def start_task(ID: int):
+            sequential_task_waitlist: set[int] = set()
+            active_tasks: dict[int, tuple[int, TaskContainer]] = dict()
+            active_sequential_groups: set[str] = set()
+
+            def start_task(ID: int, queued_removals: set[int] | None = None):
                 task = self.tasks[ID]
+                for group in task.group:
+                    if (
+                        group in self.sequential_groups
+                        and group in active_sequential_groups
+                    ):
+                        if queued_removals is None:
+                            self._log(f"{task.name} (id={ID}) [blocked], ", end="")
+                            sequential_task_waitlist.add(ID)
+                        return
+
+                if queued_removals is None:
+                    self._log(f"{task.name} (id={ID}), ", end="")
+                else:
+                    self._log(f"  Queued Task {task.name} (id={ID}) unblocked.")
+                    queued_removals.add(ID)
+                for group in task.group:
+                    if group in self.sequential_groups:
+                        active_sequential_groups.add(group)
                 task.on_pre_run()
-                disp = task.generate_monitor_container(group_containers[task.group])
+                disp = task.generate_monitor_container(
+                    group_containers[task.get_primary_group()]
+                )
                 active_tasks[ID] = (queue_job(task.job), disp)
                 gui.add_tab(disp)
 
             dep_backlink: list[list[int]] = [list() for _ in range(len(self.tasks))]
 
             # initialize nondependent tasks and store indices of tasks that depend on these
+            self._log("Initially enqueued tasks: [", end="")
             for t, deps in queued_or_running.items():
                 for dep in deps:
                     # t depends on dep, so let dep have a reference to t for when it completes
                     dep_backlink[dep].append(t)
                 if len(deps) == 0:
                     start_task(t)
+
+            self._log("]")
+            if not active_tasks:
+                raise RuntimeError(
+                    "All tasks have a dependency. Cannot start due to deadlock."
+                )
 
             while queued_or_running:
                 if not active_tasks:
@@ -199,17 +273,37 @@ class Manager:
 
                     if not is_job_running(jobid, true_on_nonempty_queue=True):
                         exitcode = get_job_exitcode(jobid, error_on_still_running=True)
+                        self._log(
+                            f"Task {self.tasks[taskid].name} (id={taskid}) exited with code {exitcode}."
+                        )
                         self.tasks[taskid].on_completion(exitcode)
                         del queued_or_running[taskid]
                         gui.remove_tab(active_tasks[taskid][1])
                         del active_tasks[taskid]
-                        if exitcode != 0:
-                            continue
-                        for dep in dep_backlink[taskid]:
-                            queued_or_running[dep].remove(taskid)
-                            if len(queued_or_running[dep]) == 0:
-                                start_task(dep)
+
+                        # refresh active sequential groups
+                        active_sequential_groups.clear()
+                        for active_tid in active_tasks.keys():
+                            for group in self.tasks[active_tid].group:
+                                active_sequential_groups.add(group)
+
+                        if exitcode == 0:
+                            self._log("  unlocked dependencies: [", end="")
+                            for dep in dep_backlink[taskid]:
+                                queued_or_running[dep].remove(taskid)
+                                if len(queued_or_running[dep]) == 0:
+                                    start_task(dep)
+                            self._log("]")
+
+                        # check for sequential group unlock
+                        seq_remove = set()
+                        for tid in sequential_task_waitlist:
+                            start_task(tid, queued_removals=seq_remove)
+                        for tid in seq_remove:
+                            sequential_task_waitlist.remove(tid)
 
                 gui.manage_inputs()
                 gui.redraw_display()
                 time.sleep(0.1)
+            self._log("Completed all tasks. Exiting TextMonitor context.")
+        self.running = False

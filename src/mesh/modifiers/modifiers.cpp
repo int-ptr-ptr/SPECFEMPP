@@ -34,7 +34,7 @@ std::string specfem::mesh::modifiers<DimensionType>::to_string() const {
 template <specfem::dimension::type DimensionType>
 void specfem::mesh::modifiers<DimensionType>::set_subdivision(
     const int material, subdiv_tuple subdivs) {
-  subdivisions.insert(std::make_pair(0, subdivs));
+  subdivisions.insert(std::make_pair(material, subdivs));
   does_any_modifications = true;
 }
 
@@ -75,6 +75,12 @@ specfem::mesh::modifiers<DimensionType>::get_subdivision(
   } else {
     return got->second;
   }
+}
+template <specfem::dimension::type DimensionType>
+typename specfem::mesh::modifiers<DimensionType>::subdiv_tuple
+specfem::mesh::modifiers<DimensionType>::get_subdivision(
+    const specfem::mesh::materials::material_specification &matspec) const {
+  return get_subdivision(matspec.database_index);
 }
 
 template <specfem::dimension::type DimensionType>

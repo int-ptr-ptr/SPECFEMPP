@@ -34,7 +34,7 @@ void specfem::runtime_configuration::mesh_modifiers::load_subdivisions(
     for (YAML::Node subdiv_entry : subdivisions_node) {
       int subx = 1;
       int subz = 1;
-      int materialID;
+      int materialID = -1;
       if (const YAML::Node &materialentry = subdiv_entry["material"]) {
         try {
           materialID = materialentry.as<int>();

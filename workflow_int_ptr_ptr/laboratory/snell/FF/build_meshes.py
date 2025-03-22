@@ -1,9 +1,12 @@
-import json
 import os
+import sys
+from subprocess import PIPE as subproc_PIPE
+from subprocess import run as subproc_run
+
+from experiment import Mesh, output_fol, receivers, workdir  # pyright: ignore
 
 from workflow.laboratory.parfilegen import meshfem_config
 from workflow.simrunner.jobs import MesherJob
-from workflow.util import runjob
 
 
 def save_parfile(
@@ -37,7 +40,8 @@ def save_parfile(
         database_out=database_out,
         stations_out=stations_out,
         topo_in_location=topo_file,
-    )  # pyright: ignore
+        receivers=receivers,
+    )
     with open(fname, "w") as f:
         f.write(parfile)
 
@@ -45,92 +49,65 @@ def save_parfile(
         f.write(topo)
 
 
-# the end of the file calls this. Consider this def as
-# if __name__ == "__main__"
-def call():
-    dirname = os.path.dirname(__file__)
+def run(mesh: Mesh):
+    vp2 = mesh.vp2()
+    nx = mesh.N
+    parfile = mesh.parfile()
+    topo_file = mesh.topofile()
 
-    _counter = dict()
-    parfiles = []
-    topos = set()
+    if not os.path.exists(output_fol):
+        os.makedirs(output_fol)
 
-    saved_runs = []
+    save_parfile(
+        os.path.join(workdir, parfile),
+        nx,
+        nx,
+        vp2,
+        database_out=mesh.mesh_database_name(),
+        stations_out="stations",
+        topo_file=topo_file,
+    )
+    mesher = MesherJob(parfile, meshfem_parfile=parfile, cwd=str(workdir))
 
-    # clean directory
-    outdir = os.path.join(dirname, "OUTPUT_FILES")
-    if not os.path.exists(outdir):
-        os.makedirs(outdir)
-    for f in os.listdir(outdir):
-        fullpath = os.path.join(outdir, f)
-        if f.startswith("mesh"):
-            os.remove(fullpath)
-        elif f.startswith("stations"):
-            os.remove(fullpath)
-    for f in os.listdir(dirname):
-        fullpath = os.path.join(dirname, f)
+    proc = subproc_run([mesher.exe, "-p", mesher.parfile], stdout=subproc_PIPE)
+    if proc.returncode != 0 or not os.path.exists(
+        output_fol / mesh.mesh_database_name()
+    ):
+        print(f"ERROR while running mesher for {str(mesh)}. log:")
+        print(proc.stdout.decode("utf-8"))
+    else:
+        print(f"Completed mesher {str(mesh)}.")
+    return proc.returncode
+
+
+def clean_meshwork():
+    # clean directory (vtk files)
+    for f in os.listdir(output_fol):
+        if f.endswith(".vtk"):
+            os.remove(output_fol / f)
+
+    # clear mesh parameter files
+    for f in os.listdir(workdir):
+        fullpath = os.path.join(workdir, f)
         if f.startswith("Par_File"):
             os.remove(fullpath)
         elif f.startswith("topo"):
             os.remove(fullpath)
 
-    def snell_FF_init_parfile(nx, vp2):
-        if vp2 in _counter:
-            vpind = _counter[vp2]
-        else:
-            vpind = len(_counter)
-            _counter[vp2] = vpind
-        parfiles.append(f"Par_File{nx}_{vpind}")
-        topo_file = f"topo_unit_box{nx}.dat"
-        topos.add(topo_file)
-        save_parfile(
-            os.path.join(dirname, parfiles[-1]),
-            nx,
-            nx,
-            vp2,
-            database_out=f"mesh{nx}_{vpind}",
-            stations_out="stations",
-            topo_file=topo_file,
-        )
-        saved_runs.append(
-            {
-                "nx": nx,
-                "vp2": vp2,
-                "vp2_ind": vpind,
-                "parfile": parfiles[-1],
-                "database_file": os.path.join("OUTPUT_FILES", f"mesh{nx}_{vpind}"),
-                "stations_file": os.path.join("OUTPUT_FILES", "stations"),
-            }
-        )
-
-    for nx in [10, 20]:
-        for vp2 in [0.25, 0.5, 1, 2, 4]:
-            snell_FF_init_parfile(nx, vp2)
-
-    jobids = []
-    for parfile in parfiles:
-        jobids.append(
-            runjob.queue_job(MesherJob(parfile, meshfem_parfile=parfile, cwd=dirname))
-        )
-
-    while jobids:
-        for jobid in jobids:
-            if not runjob.is_job_running(jobid, true_on_nonempty_queue=False):
-                lines = runjob.consume_queue(jobid)
-                jobname = runjob.get_job(jobid, error_on_no_job=True).name
-                if runjob.complete_job(jobid, error_on_still_running=True) > 0:
-                    print(f"ERROR while running {jobname}. log:")
-                    print(*lines)
-                else:
-                    print(f"Completed {jobname}")
-                jobids.remove(jobid)
-                # parfile is jobname
-                os.remove(os.path.join(dirname, jobname))
-
-    for topo in topos:
-        os.remove(os.path.join(dirname, topo))
-    with open(os.path.join(dirname, "OUTPUT_FILES", "meshconf.json"), "w") as f:
-        json.dump({"vp2": _counter, "meshes": saved_runs}, f)
-
 
 if __name__ == "__main__":
-    call()
+    import re
+
+    args = " ".join(sys.argv)
+    m = re.search(r"!\s*TASK\s*\[\s*(\d+)\s*,\s*(\d+)\s*\]\s*!", args)
+    if m:
+        mesh = Mesh(N=int(m.group(1)), vp2_ind=int(m.group(2)))
+        sys.exit(run(mesh))
+
+    m = re.search(r"!\s*CLEAN\s*!", args)
+    if m:
+        clean_meshwork()
+        sys.exit(0)
+
+    print(f'Failed to parse arguments "{args}"')
+    sys.exit(1)

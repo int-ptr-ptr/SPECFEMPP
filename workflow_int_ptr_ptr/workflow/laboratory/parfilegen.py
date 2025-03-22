@@ -1,4 +1,26 @@
 import os
+from dataclasses import dataclass
+from typing import Sequence
+
+
+@dataclass
+class ReceiverSeries:
+    nrec: int
+    xdeb: float
+    zdeb: float
+    xfin: float
+    zfin: float
+    record_at_surface_same_vertical: bool = False
+
+    def __str__(self):
+        return f"""
+nrec                            = {self.nrec}
+xdeb                            = {self.xdeb:f}
+zdeb                            = {self.zdeb:f}
+xfin                            = {self.xfin:f}
+zfin                            = {self.zfin:f}
+record_at_surface_same_vertical = .{str(self.record_at_surface_same_vertical).lower()}.
+      """
 
 
 def meshfem_config(
@@ -15,6 +37,7 @@ def meshfem_config(
     database_out: str,
     stations_out: str,
     topo_in_location: str,
+    receivers: Sequence[ReceiverSeries],
 ):
     stacey_st = "true" if stacey else "false"
     absLR_st = "true" if absLR else "false"
@@ -28,21 +51,10 @@ PARTITIONING_TYPE               = 3
 NGNOD                           = 9
 database_filename               = {os.path.join(outfol, database_out)}
 use_existing_STATIONS           = .false.
-nreceiversets                   = 2
+nreceiversets                   = {len(receivers)}
 anglerec                        = 0.d0
 rec_normal_to_surface           = .false.
-nrec                            = 3
-xdeb                            = 0.5
-zdeb                            = 0.7
-xfin                            = 1
-zfin                            = 0.7
-record_at_surface_same_vertical = .false.
-nrec                            = 3
-xdeb                            = 1
-zdeb                            = 0.45
-xfin                            = 0.5
-zfin                            = 0.45
-record_at_surface_same_vertical = .false.
+{"".join(str(rec) for rec in receivers)}
 stations_filename              = {os.path.join(outfol, stations_out)}
 nbmodels                        = 2
 1 1 1 {vp1} {vs1} 0 0 9999 9999 0 0 0 0 0 0
@@ -87,7 +99,7 @@ def sf_config(
     seismo_step_between_samples: int,
     database_in: str,
     source_in: str,
-    domain_sep_subdivision: int | None,
+    domain_sep_subdivision: int | None | tuple[int, int],
 ):
     if out_disp is None:
         dispstr = ""
@@ -103,12 +115,17 @@ def sf_config(
     if domain_sep_subdivision is None:
         meshmod = ""
     else:
+        if isinstance(domain_sep_subdivision, int):
+            domain_sep_subdivision = (1, domain_sep_subdivision)
         meshmod = f"""
   mesh-modifiers:
     subdivisions:
+      - material: 1
+        x: {domain_sep_subdivision[0]}
+        z: {domain_sep_subdivision[0]}
       - material: 2
-        x: {domain_sep_subdivision}
-        z: {domain_sep_subdivision}
+        x: {domain_sep_subdivision[1]}
+        z: {domain_sep_subdivision[1]}
     interface-rules:
       - material1: 1
         material2: 2

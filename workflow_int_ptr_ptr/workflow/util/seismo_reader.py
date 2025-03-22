@@ -114,6 +114,41 @@ class SeismogramCollection:
         )
 
 
+_ylim_rule_names_T = Literal["none", "max_of_no_nan"]
+
+
+def _ylim_rule_default_data(rule: _ylim_rule_names_T):
+    if rule == "max_of_no_nan":
+        return {"low": np.inf, "high": -np.inf, "margin": 0.05}
+    return dict()
+
+
+class SeismoYlimRule:
+    rule: _ylim_rule_names_T
+    intermediate_data: dict[Any, dict]
+
+    def __init__(self, rule: _ylim_rule_names_T, *args, **kwargs):
+        self.rule = rule
+        self.intermediate_data = dict()
+
+    def handle(self, ind, t: np.ndarray, y: np.ndarray) -> tuple:
+        if ind not in self.intermediate_data:
+            self.intermediate_data[ind] = _ylim_rule_default_data(self.rule)
+
+        data = self.intermediate_data[ind]
+        if self.rule == "max_of_no_nan":
+            if not np.any(np.isnan(y)):
+                data["low"] = min(data["low"], min(y))
+                data["high"] = max(data["high"], max(y))
+            lo = data["low"]
+            hi = data["high"]
+            margin = data["margin"] * (hi - lo)
+            if hi < lo:
+                return (None, None)
+            return (lo - margin, hi + margin)
+        return (None, None)
+
+
 class SeismoDump:
     cwd: str | None
     stations_filename: str
@@ -236,6 +271,7 @@ class SeismoDump:
         seismo_aspect: float | None = None,
         fig_len: float = 10,
         tlim=(None, None),
+        ylim_rule: None | SeismoYlimRule | _ylim_rule_names_T = None,
         show: bool = False,
         save_filename: str | None = None,
         legend_kwargs: dict[str, Any] | None = None,
@@ -297,6 +333,10 @@ class SeismoDump:
         if indexing_func is None:
             raise TypeError("if axes are given, indexing_func must be as well.")
 
+        if ylim_rule is None:
+            ylim_rule = SeismoYlimRule("none")
+        elif isinstance(ylim_rule, str):
+            ylim_rule = SeismoYlimRule(ylim_rule)
         for icollection, seismocol in enumerate(self.seismos):
             plot_linestyle = seismocol.plot_linestyle
             plot_color = seismocol.plot_color
@@ -309,13 +349,15 @@ class SeismoDump:
                 for istation, seis in enumerate(seislist):
                     if seis is not None:
                         station = self.stations[istation]
-                        a = axes[indexing_func(station, seistype)]
+                        ind = indexing_func(station, seistype)
+                        a = axes[ind]  # we may need to switch to a dunder getitem
                         a.plot(
                             seis[:, 0],
                             seis[:, 1],
                             color=plot_color,
                             linestyle=plot_linestyle,
                         )
+                        a.set_ylim(ylim_rule.handle(ind, seis[:, 0], seis[:, 1]))
                         if axtitles_inside:
                             a.set_title(
                                 f"   {seistype.latex_str} @ ({station.x},{station.z})",
