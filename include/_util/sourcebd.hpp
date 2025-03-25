@@ -145,7 +145,9 @@ public:
             const type_real c = std::sqrt(ppt.kappa());
             type_real dfdn = dfdxi[0] * nxi + dfdga[0] * nga;
             accel.acceleration(0) =
-                -(velstore(iworker, 0) / c - dfdn) * 0.5 * jac(iworker);
+                (-velstore(iworker, 0) * ppt.rho_vpinverse() +
+                 dfdn * ppt.rho_inverse()) *
+                0.5 * jac(iworker);
             // accel.acceleration(0) += (kx * nx + kz * nz) * amplitude *
             //                          std::sin(waveparam < 0 ? waveparam : 0)
             //                          * jac(iworker);

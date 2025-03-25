@@ -382,10 +382,9 @@ struct symmetric_flux::kernel<
   }
 
   template <bool on_device>
-  KOKKOS_INLINE_FUNCTION static void
-  compute_relaxation_parameter(int iinterface,
-                               specfem::compute::assembly &assembly,
-                               ContainerType &container) {
+  KOKKOS_INLINE_FUNCTION static void compute_relaxation_parameter(
+      int iinterface, specfem::compute::assembly &assembly,
+      ContainerType &container, const type_real penalty_parameter) {
     if constexpr (on_device) {
       static_assert(on_device == false,
                     "on_device not written for compute_relaxation_paramter");
@@ -433,7 +432,7 @@ struct symmetric_flux::kernel<
     }
 
     container.h_interface_relaxation_parameter(iinterface) =
-        _RELAX_PARAM_COEF_ACOUSTIC_ * rho_inv_max /
+        penalty_parameter * rho_inv_max /
         sqrt(std::max(spec_charlen2(edge1_ispec), spec_charlen2(edge2_ispec)));
   }
   template <bool on_device>

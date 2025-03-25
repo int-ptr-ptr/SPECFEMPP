@@ -47,6 +47,7 @@ struct properties
    * assignment if true)
    */
   properties(const int nspec, const int ngllz, const int ngllx,
+             const specfem::compute::mesh_to_compute_mapping &mapping,
              const specfem::compute::element_types &element_types,
              const specfem::mesh::materials &materials, bool has_gll_model);
 

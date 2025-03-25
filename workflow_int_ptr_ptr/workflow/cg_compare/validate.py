@@ -261,6 +261,8 @@ if __name__ == "__main__":
             # args += " --lr_periodic"
             # args += " --kill_boundaries"
             # args += " --absorb_top --absorb_bottom"
+            args += " --flux_jump_penalty 40.0"
+            # args += " --acoustic_flux 2 --flux_TR 0 --flux_XR 0.01"
             i = workflow.util.runjob.queue_job(
                 workflow.util.runjob.SystemCommandJob(
                     name=f"run: {test['name']}",

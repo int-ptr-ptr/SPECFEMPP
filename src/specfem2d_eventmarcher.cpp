@@ -46,13 +46,14 @@ bool LR_PERIODIC = false;
 bool KILL_NONNEUMANN_BDRYS = false;
 bool TOP_ABS = false;
 bool BOT_ABS = false;
+int acoustic_flux_mode = 0;
+type_real flux_trace_relaxation = 0;
+type_real flux_crossover_relaxation = 0;
+type_real fieldjump_penalty_parameter = 0;
 
 // #define DEFAULT_USE_DOUBLEMESH
 #define DEFAULT_SET_CONTINUOUS false
 // #define USE_DEMO_MESH
-
-#define _RELAX_PARAM_COEF_ACOUSTIC_ 40
-#define _RELAX_PARAM_COEF_ELASTIC_ 40
 
 #define _EVENT_MARCHER_DUMPS_
 #define _stepwise_simfield_dump_ std::string("dump/simfield")
@@ -64,6 +65,7 @@ std::string DUMP_OUTFOL = _stepwise_simfield_dump_;
 #include "_util/dump_simfield.hpp"
 #include "_util/edge_storages.hpp"
 // #include "_util/rewrite_simfield.hpp"
+#include "_util/placeholder_fluxes/interface.hpp"
 #include "event_marching/event_marcher.hpp"
 #include "event_marching/timescheme_wrapper.hpp"
 
@@ -260,7 +262,8 @@ void execute(specfem::MPI::MPI *mpi) {
         specfem::dimension::type::dim2, specfem::element::medium_tag::acoustic,
         specfem::element::medium_tag::acoustic, edge_storage_quad>::
         compute_relaxation_parameter<false>(
-            i, *assembly, dg_edge_storage.acoustic_acoustic_interface);
+            i, *assembly, dg_edge_storage.acoustic_acoustic_interface,
+            fieldjump_penalty_parameter);
     specfem::coupled_interface::loose::flux::symmetric_flux::kernel<
         specfem::dimension::type::dim2, specfem::element::medium_tag::acoustic,
         specfem::element::medium_tag::acoustic, edge_storage_quad>::
@@ -301,20 +304,6 @@ void execute(specfem::MPI::MPI *mpi) {
 
   specfem::event_marching::arbitrary_call_event inject_acoustic_event(
       [&]() {
-        // const int istep = timescheme_wrapper.get_istep();
-        // const type_real t = istep * dt;
-        // constexpr type_real c = 1;
-        // constexpr type_real wind_up = 0.5;
-        // constexpr type_real max_amp = 20;
-        // const type_real pi = std::atan(1) * 4;
-        // // const type_real amp = (t <= 0)? 0:((t < wind_up)?
-        // // (1-std::cos(pi*t/wind_up))*max_amp:max_amp);
-        // const type_real amp = max_amp;
-        // const type_real kx = 2 * pi;
-        // const type_real kz = 10;
-        // const type_real k = std::sqrt(kx * kx + kz * kz);
-        // const type_real omega = c * k;
-        // wave_inject_acoustic.force_planar_wave(0, 0, omega * t, amp);
         wave_inject_acoustic.absorb();
         wave_inject_elastic.absorb();
         return 0;
@@ -327,6 +316,8 @@ void execute(specfem::MPI::MPI *mpi) {
         // 1.5 dt since this is before corrector stage, when vel gets to current
         // step and accel gets zeroed out. We want the next step velocity
         wave_inject_acoustic.store_velocity(dt * 1.5);
+        _util::placeholder_fluxes::upwind::store_vel(
+            *assembly, dg_edge_storage.acoustic_acoustic_interface, dt * 1.5);
         return 0;
       },
       1.5);
@@ -365,12 +356,22 @@ void execute(specfem::MPI::MPI *mpi) {
             specfem::element::medium_tag::elastic, edge_storage_quad>::
             elastic_to_acoustic_accel(
                 *assembly, dg_edge_storage.acoustic_elastic_interface);
-        specfem::coupled_interface::loose::flux::symmetric_flux::kernel<
-            specfem::dimension::type::dim2,
-            specfem::element::medium_tag::acoustic,
-            specfem::element::medium_tag::acoustic, edge_storage_quad>::
-            compute_fluxes(*assembly,
-                           dg_edge_storage.acoustic_acoustic_interface);
+        if (acoustic_flux_mode == 0) {
+          specfem::coupled_interface::loose::flux::symmetric_flux::kernel<
+              specfem::dimension::type::dim2,
+              specfem::element::medium_tag::acoustic,
+              specfem::element::medium_tag::acoustic, edge_storage_quad>::
+              compute_fluxes(*assembly,
+                             dg_edge_storage.acoustic_acoustic_interface);
+        } else if (acoustic_flux_mode == 1) {
+          _util::placeholder_fluxes::midpoint::compute_fluxes(
+              *assembly, dg_edge_storage.acoustic_acoustic_interface,
+              flux_trace_relaxation, flux_crossover_relaxation);
+        } else if (acoustic_flux_mode == 2) {
+          _util::placeholder_fluxes::upwind::compute_fluxes(
+              *assembly, dg_edge_storage.acoustic_acoustic_interface,
+              flux_trace_relaxation, flux_crossover_relaxation);
+        }
         assembly->fields.forward.copy_to_device();
         return 0;
       },
@@ -616,9 +617,28 @@ int main(int argc, char **argv) {
       iarg++;
       continue;
     }
-
     if ((arg == "--dumpfolder" || arg == "-D") && has_next) {
       DUMP_OUTFOL = std::string(argv[iarg + 1]);
+      iarg++;
+      continue;
+    }
+    if ((arg == "--acoustic_flux") && has_next) {
+      acoustic_flux_mode = atoi(argv[iarg + 1]);
+      iarg++;
+      continue;
+    }
+    if ((arg == "--flux_TR") && has_next) {
+      flux_trace_relaxation = atof(argv[iarg + 1]);
+      iarg++;
+      continue;
+    }
+    if ((arg == "--flux_XR") && has_next) {
+      flux_crossover_relaxation = atof(argv[iarg + 1]);
+      iarg++;
+      continue;
+    }
+    if ((arg == "--flux_jump_penalty") && has_next) {
+      fieldjump_penalty_parameter = atof(argv[iarg + 1]);
       iarg++;
       continue;
     }

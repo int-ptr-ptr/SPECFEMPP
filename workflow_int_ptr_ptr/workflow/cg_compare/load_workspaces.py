@@ -32,6 +32,24 @@ def init_workspace_folder(test):
                 .replace("!!NY", str(ny))
             )
 
+        def convert_specfem_macros(st):
+            sd1x = 1
+            sd1z = 1
+            sd2x = 1
+            sd2z = 1
+            if "subdiv_mat1" in test:
+                sd1x = int(test["subdiv_mat1"])
+                sd1z = sd1x
+            if "subdiv_mat2" in test:
+                sd2x = int(test["subdiv_mat2"])
+                sd2z = sd2x
+            return (
+                st.replace("^SD1X^", str(sd1x))
+                .replace("^SD2X^", str(sd2x))
+                .replace("^SD1Z^", str(sd1z))
+                .replace("^SD2Z^", str(sd2z))
+            )
+
         with open(config.get("cg_compare.config_files.meshfem_parfile"), "r") as f:
             st = f.read()
             with open(
@@ -59,13 +77,20 @@ def init_workspace_folder(test):
             ),
         )
         if is_subdivmesh:
-            shutil.copy(
-                config.get("cg_compare.config_files.specfem_parfile_subdivs"),
-                os.path.join(
-                    folder,
-                    config.get("cg_compare.workspace_files.specfem_parfile_subdivs"),
-                ),
-            )
+            with open(
+                config.get("cg_compare.config_files.specfem_parfile_subdivs"), "r"
+            ) as f:
+                st = f.read()
+                with open(
+                    os.path.join(
+                        folder,
+                        config.get(
+                            "cg_compare.workspace_files.specfem_parfile_subdivs"
+                        ),
+                    ),
+                    "w",
+                ) as f:
+                    f.write(convert_specfem_macros(st))
 
         shutil.copy(
             config.get("cg_compare.config_files.source"),

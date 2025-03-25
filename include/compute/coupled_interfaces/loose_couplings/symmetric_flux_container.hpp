@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Kokkos_Core.hpp"
 #include "coupled_interface/loose/fluxes/symmetric_flux.hpp"
 #include "interface_geometry.hpp"
 #include "interface_quadrature.hpp"
@@ -7,6 +8,33 @@
 namespace specfem {
 namespace compute {
 namespace loosely_coupled_interface {
+
+template <specfem::dimension::type DimensionType, typename QuadratureType>
+struct temp_aux_container {
+private:
+  using IntersectionQuadrature = QuadratureType;
+  using EdgeQuadrature = QuadratureType;
+  using RealView = Kokkos::View<type_real *, Kokkos::DefaultExecutionSpace>;
+  using EdgeField1View = specfem::compute::loose::EdgeFieldView<
+      DimensionType, specfem::element::medium_tag::acoustic, QuadratureType>;
+  using EdgeField2View = specfem::compute::loose::EdgeFieldView<
+      DimensionType, specfem::element::medium_tag::elastic, QuadratureType>;
+
+public:
+  temp_aux_container(int num_medium1_edges = 0)
+      : medium1_field_vel("temp_aux_container::medium1_field_vel",
+                          num_medium1_edges),
+        h_medium1_field_vel(Kokkos::create_mirror_view(medium1_field_vel)),
+        medium1_field_nderiv_noncontra(
+            "temp_aux_container::medium1_field_deriv", num_medium1_edges),
+        h_medium1_field_nderiv_noncontra(
+            Kokkos::create_mirror_view(medium1_field_nderiv_noncontra)) {}
+
+  EdgeField1View medium1_field_vel;
+  typename EdgeField1View::HostMirror h_medium1_field_vel;
+  EdgeField1View medium1_field_nderiv_noncontra;
+  typename EdgeField1View::HostMirror h_medium1_field_nderiv_noncontra;
+};
 
 template <specfem::dimension::type DimensionType,
           specfem::element::medium_tag MediumTag1,
@@ -23,7 +51,8 @@ struct symmetric_flux_container<
           DimensionType, QuadratureType, 1, true>,
       specfem::compute::loose::interface_normal_container<
           DimensionType, QuadratureType, 1, true>,
-      specfem::compute::loose::single_medium_interface_container {
+      specfem::compute::loose::single_medium_interface_container,
+      temp_aux_container<DimensionType, QuadratureType> {
 private:
   using IntersectionQuadrature = QuadratureType;
   using EdgeQuadrature = QuadratureType;
@@ -111,7 +140,8 @@ protected:
             num_interfaces),
         h_interface_medium2_mortar_transfer_deriv_times_n(
             Kokkos::create_mirror_view(
-                interface_medium2_mortar_transfer_deriv_times_n)) {}
+                interface_medium2_mortar_transfer_deriv_times_n)),
+        temp_aux_container<DimensionType, QuadratureType>(num_medium1_edges) {}
 };
 
 template <specfem::dimension::type DimensionType, typename QuadratureType>

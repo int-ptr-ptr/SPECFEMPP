@@ -354,6 +354,12 @@ void dump_simfield(
   Kokkos::deep_copy(simfield.elastic.h_field, simfield.elastic.field);
   dump << "elastic_field";
   _stream_view<type_real, 2>(dump, simfield.elastic.h_field);
+  Kokkos::deep_copy(simfield.acoustic.h_field_dot, simfield.acoustic.field_dot);
+  dump << "acoustic_field_dot";
+  _stream_view<type_real, 2>(dump, simfield.acoustic.h_field_dot);
+  Kokkos::deep_copy(simfield.elastic.h_field_dot, simfield.elastic.field_dot);
+  dump << "elastic_field_dot";
+  _stream_view<type_real, 2>(dump, simfield.elastic.h_field_dot);
   Kokkos::deep_copy(simfield.acoustic.h_field_dot_dot,
                     simfield.acoustic.field_dot_dot);
   dump << "acoustic_field_ddot";

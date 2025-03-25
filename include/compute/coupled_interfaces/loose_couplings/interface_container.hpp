@@ -1,5 +1,7 @@
 #pragma once
 
+#include "enumerations/dimension.hpp"
+#include "enumerations/specfem_enums.hpp"
 #include "kokkos_abstractions.h"
 
 namespace specfem {

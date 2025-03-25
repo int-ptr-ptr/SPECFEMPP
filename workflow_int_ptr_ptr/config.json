@@ -101,7 +101,9 @@
         "mat2": "1 1 1 0 0 0 9999 9999 0 0 0 0 0 0",
         "meshfem_nx": 20,
         "meshfem_ny": 20,
-        "class": "samemesh"
+        "class": "subdivmesh",
+        "subdiv_mat1": 1,
+        "subdiv_mat2": 1
       },
       {
         "name": "FS0",
@@ -109,7 +111,9 @@
         "mat2": "1 1 1 0 0 0 9999 9999 0 0 0 0 0 0",
         "meshfem_nx": 20,
         "meshfem_ny": 20,
-        "class": "samemesh"
+        "class": "subdivmesh",
+        "subdiv_mat1": 1,
+        "subdiv_mat2": 1
       },
       {
         "name": "FF1",
@@ -117,7 +121,9 @@
         "mat2": "1 1 1 0 0 0 9999 9999 0 0 0 0 0 0",
         "meshfem_nx": 20,
         "meshfem_ny": 20,
-        "class": "subdivmesh"
+        "class": "subdivmesh",
+        "subdiv_mat1": 1,
+        "subdiv_mat2": 2
       },
       {
         "name": "FS1",
@@ -125,7 +131,9 @@
         "mat2": "1 1 1 0 0 0 9999 9999 0 0 0 0 0 0",
         "meshfem_nx": 20,
         "meshfem_ny": 20,
-        "class": "subdivmesh"
+        "class": "subdivmesh",
+        "subdiv_mat1": 1,
+        "subdiv_mat2": 2
       }
     ]
   },

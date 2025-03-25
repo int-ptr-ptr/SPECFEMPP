@@ -47,9 +47,12 @@ parameters:
 
   mesh-modifiers:
     subdivisions:
+      - material: 1
+        x: ^SD1X^
+        z: ^SD1Z^
       - material: 2
-        x: 2
-        z: 2
+        x: ^SD2X^
+        z: ^SD2Z^
 
     interface-rules:
       - material1: 1

@@ -252,6 +252,15 @@ class dump_frame:
                     medium_inds[..., acoustic_medium_id], 0
                 ],
             )
+        chi_dot = np.full((nspec, ngllga, ngllxi), np.nan)
+        if nglob_acoustic > 0:
+            chi_dot[...] = np.where(
+                medium_inds[..., acoustic_medium_id] == -1,
+                np.nan,
+                data_simfield["acoustic_field_dot"][
+                    medium_inds[..., acoustic_medium_id], 0
+                ],
+            )
         chi_ddot = np.full((nspec, ngllga, ngllxi), np.nan)
         if nglob_acoustic > 0:
             chi_ddot[...] = np.where(
@@ -342,12 +351,20 @@ class dump_frame:
         )
 
         displacement_elastic = np.full((nspec, ngllga, ngllxi, 2), np.nan)
+        displacement_elastic_dot = np.full((nspec, ngllga, ngllxi, 2), np.nan)
         displacement_elastic_ddot = np.full((nspec, ngllga, ngllxi, 2), np.nan)
         if nglob_elastic > 0:
             displacement_elastic[...] = np.where(
                 medium_inds[..., elastic_medium_id, np.newaxis] == -1,
                 np.nan,
                 data_simfield["elastic_field"][medium_inds[..., elastic_medium_id], :],
+            )
+            displacement_elastic_dot[...] = np.where(
+                medium_inds[..., elastic_medium_id, np.newaxis] == -1,
+                np.nan,
+                data_simfield["elastic_field_dot"][
+                    medium_inds[..., elastic_medium_id], :
+                ],
             )
             displacement_elastic_ddot[...] = np.where(
                 medium_inds[..., elastic_medium_id, np.newaxis] == -1,
@@ -372,6 +389,7 @@ class dump_frame:
         self.X = chi
         self.pts = pts
         self.P = pts
+        self.Xdot = chi_dot
         self.Xddot = chi_ddot
         self.displacement_elastic = displacement_elastic
         self.displacement_elastic_ddot = displacement_elastic_ddot
@@ -797,7 +815,9 @@ class dump_frame:
         if show:
             plt.show()
 
-    def plot_assembly(self, plt_cell_margin=0.5, figsize=None, title=None, show=True):
+    def plot_assembly(
+        self, plt_cell_margin=0.5, figsize=None, title=None, show=True, number_all=False
+    ):
         pt_centers = self.cell_centers[:, np.newaxis, np.newaxis, :]
         pts_plt = (1 - plt_cell_margin) * self.pts + plt_cell_margin * pt_centers
         if figsize is not None:
@@ -807,6 +827,15 @@ class dump_frame:
             poly = mplpatches.Polygon(pts_plt[*inds, :], edgecolor="k")
             plt.gca().add_patch(poly)
         plt.scatter(pts_plt[..., 0], pts_plt[..., 1], 1)
+        if number_all:
+            for ispec in range(self.nspec):
+                plt.text(
+                    self.cell_centers[ispec, 0],
+                    self.cell_centers[ispec, 1],
+                    str(ispec),
+                    va="center",
+                    ha="center",
+                )
         if title is not None:
             plt.title(title)
         if show:
@@ -818,7 +847,6 @@ class dump_frame:
         if figsize is not None:
             plt.figure(figsize=figsize)
         plt.scatter(pts_plt[..., 0], pts_plt[..., 1], 1)
-        plt.scatter(self.LCI.FF.medium.pts[..., 0], self.LCI.FF.medium.pts[..., 1], 1)
         pts_inter = self.LCI.FF.interface.edge1_to_mortar(self.LCI.FF.medium.pts)
         plt.plot(pts_inter[:, :, 0].T, pts_inter[:, :, 1].T, ":xr")
         pts_inter = self.LCI.FS.interface.edge1_to_mortar(self.LCI.FS.medium1.pts)
