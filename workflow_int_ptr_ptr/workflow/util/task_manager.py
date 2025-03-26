@@ -1,5 +1,8 @@
+import itertools
+import queue
 import re
 import time
+from dataclasses import dataclass, field
 from typing import Callable, Iterable, Sequence, override
 
 from workflow.util import curse_monitor
@@ -75,6 +78,9 @@ class Task:
     # Callback, called in the main thread before the job starts
     on_pre_run: Callable
 
+    # priority: lower number is selected first (0 is default)
+    priority: float
+
     def __init__(
         self,
         job: RunJob,
@@ -83,6 +89,7 @@ class Task:
         dependencies: list["Task"] | None = None,
         on_completion: Callable[[int], None] | None = None,
         on_pre_run: Callable[[], None] | None = None,
+        priority: float = 0,
     ):
         self.name = name
         self.job = job
@@ -97,6 +104,7 @@ class Task:
             (lambda x: None) if on_completion is None else on_completion
         )
         self.on_pre_run = (lambda: None) if on_pre_run is None else on_pre_run
+        self.priority = priority
 
     def get_primary_group(self) -> str | None:
         return None if not self.group else self.group[0]
@@ -106,6 +114,12 @@ class Task:
     ) -> TaskContainer:
         disp = TaskContainer(self, group_container=group_container)
         return disp
+
+
+@dataclass(order=True)
+class _PrioTask:
+    priority: float = field(compare=True)
+    taskID: int = field(compare=False)
 
 
 class Manager:
@@ -127,12 +141,16 @@ class Manager:
     # print lots of logs? Logs are not printed when GUI is live
     verbose: bool
 
+    # the total number of tasks active at once cannot exceed this (negative is unlimited)
+    max_concurrent_tasks: int
+
     def __init__(
         self,
         use_gui: bool = False,
         tasks: list[Task] | None = None,
         sequential_groups: list[str] | None = None,
         verbose: bool = False,
+        max_concurrent_tasks: int = -1,
     ):
         self.verbose = verbose
         self.use_gui = use_gui
@@ -143,6 +161,7 @@ class Manager:
         self.tasks = list()
         self.groups = dict()
         self.primary_groups = dict()
+        self.max_concurrent_tasks = max_concurrent_tasks
 
         if tasks is not None:
             for t in tasks:
@@ -209,8 +228,11 @@ class Manager:
             }
 
             sequential_task_waitlist: set[int] = set()
+            # taskID -> (jobID, gui element)
             active_tasks: dict[int, tuple[int, TaskContainer]] = dict()
             active_sequential_groups: set[str] = set()
+
+            active_queue: queue.PriorityQueue[_PrioTask] = queue.PriorityQueue()
 
             def start_task(ID: int, queued_removals: set[int] | None = None):
                 task = self.tasks[ID]
@@ -232,12 +254,8 @@ class Manager:
                 for group in task.group:
                     if group in self.sequential_groups:
                         active_sequential_groups.add(group)
-                task.on_pre_run()
-                disp = task.generate_monitor_container(
-                    group_containers[task.get_primary_group()]
-                )
-                active_tasks[ID] = (queue_job(task.job), disp)
-                gui.add_tab(disp)
+
+                active_queue.put(ID)
 
             dep_backlink: list[list[int]] = [list() for _ in range(len(self.tasks))]
 
@@ -251,18 +269,31 @@ class Manager:
                     start_task(t)
 
             self._log("]")
-            if not active_tasks:
+            if (not active_tasks) and (not active_queue):
                 raise RuntimeError(
                     "All tasks have a dependency. Cannot start due to deadlock."
                 )
 
             while queued_or_running:
-                if not active_tasks:
+                if (not active_tasks) and (not active_queue):
                     raise Exception(
                         "Some tasks were not able to start. Did something fail,"
                         " or was there a circular dependency?"
                     )
-                # consume active task queues
+                # pop the active queue to capacity
+                while (len(active_tasks) < self.max_concurrent_tasks) and (
+                    not active_queue.empty()
+                ):
+                    ID = active_queue.get_nowait().taskID
+                    task = self.tasks[ID]
+                    task.on_pre_run()
+                    disp = task.generate_monitor_container(
+                        group_containers[task.get_primary_group()]
+                    )
+                    active_tasks[ID] = (queue_job(task.job), disp)
+                    gui.add_tab(disp)
+
+                # consume active task job queues
                 for taskid in list(active_tasks.keys()):
                     jobid, container = active_tasks[taskid]
                     for line in consume_job_queue(jobid):
@@ -283,22 +314,37 @@ class Manager:
 
                         # refresh active sequential groups
                         active_sequential_groups.clear()
-                        for active_tid in active_tasks.keys():
+                        actives = itertools.chain(
+                            active_tasks.keys(),
+                            (entry.taskID for entry in active_queue.queue),
+                        )
+                        for active_tid in actives:
                             for group in self.tasks[active_tid].group:
                                 active_sequential_groups.add(group)
 
                         if exitcode == 0:
                             self._log("  unlocked dependencies: [", end="")
+                            # start in order of task priority
+                            q: queue.PriorityQueue[_PrioTask] = queue.PriorityQueue
                             for dep in dep_backlink[taskid]:
                                 queued_or_running[dep].remove(taskid)
                                 if len(queued_or_running[dep]) == 0:
-                                    start_task(dep)
+                                    q.put_nowait(dep)
+                            while not q.empty():
+                                start_task(q.get_nowait().taskID)
                             self._log("]")
 
                         # check for sequential group unlock
                         seq_remove = set()
+
+                        # start in order of task priority
+                        q: queue.PriorityQueue[_PrioTask] = queue.PriorityQueue
                         for tid in sequential_task_waitlist:
-                            start_task(tid, queued_removals=seq_remove)
+                            q.put(tid)
+                        while not q.empty():
+                            start_task(
+                                q.get_nowait().taskID, queued_removals=seq_remove
+                            )
                         for tid in seq_remove:
                             sequential_task_waitlist.remove(tid)
 

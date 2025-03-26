@@ -16,6 +16,7 @@ class MesherTask(Task):
         dependencies: list["Task"] | None = None,
         on_completion: Callable[[int], None] | None = None,
         on_pre_run: Callable[[], None] | None = None,
+        priority: float = 0,
     ):
         self.title = title
         name = f"{title} (mesher)"
@@ -37,6 +38,7 @@ class MesherTask(Task):
             dependencies=dependencies,
             on_completion=on_completion,
             on_pre_run=on_pre_run,
+            priority=priority,
         )
 
 
@@ -51,6 +53,7 @@ class Specfem2DTask(Task):
         dependencies: list["Task"] | None = None,
         on_completion: Callable[[int], None] | None = None,
         on_pre_run: Callable[[], None] | None = None,
+        priority: float = 0,
     ):
         self.title = title
         name = f"{title} (specfem2d)"
@@ -72,6 +75,7 @@ class Specfem2DTask(Task):
             dependencies=dependencies,
             on_completion=on_completion,
             on_pre_run=on_pre_run,
+            priority=priority,
         )
 
 
@@ -87,6 +91,7 @@ class SpecfemEMTask(Task):
         on_completion: Callable[[int], None] | None = None,
         on_pre_run: Callable[[], None] | None = None,
         additional_args: str | None = None,
+        priority: float = 0,
     ):
         self.title = title
         name = f"{title} (specfemEM)"
@@ -110,4 +115,5 @@ class SpecfemEMTask(Task):
             dependencies=dependencies,
             on_completion=on_completion,
             on_pre_run=on_pre_run,
+            priority=priority,
         )

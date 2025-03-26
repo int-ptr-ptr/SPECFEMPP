@@ -134,6 +134,7 @@ class ScriptTask(Task):
         dependencies: list["Task"] | None = None,
         on_completion: Callable[[int], None] | None = None,
         on_pre_run: Callable[[], None] | None = None,
+        priority: float = 0,
     ):
         self.title = title
         name = f"{title} (script)"
@@ -150,6 +151,7 @@ class ScriptTask(Task):
             dependencies=dependencies,
             on_completion=on_completion,
             on_pre_run=on_pre_run,
+            priority=priority,
         )
 
 

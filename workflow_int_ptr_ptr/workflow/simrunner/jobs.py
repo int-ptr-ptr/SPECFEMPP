@@ -1,4 +1,5 @@
 import os
+import re
 
 import workflow.util.config as config
 from workflow.util.runjob import SystemCommandJob
@@ -7,6 +8,26 @@ _POSSIBLE_BIN_FOLDERS = ["bin", "."]
 _POSSIBLE_MESHFEM_NAMES = ["xmeshfem2D"]
 _POSSIBLE_SPECFEM2D_NAMES = ["specfem2d"]
 _POSSIBLE_SPECFEMEM_NAMES = ["specfem2d_eventmarcher"]
+
+
+def is_build_gpu(buildfolder: str):
+    # add other GPU flags as necessary
+    cachefile = os.path.join(buildfolder, "CMakeCache.txt")
+    if os.path.exists(cachefile):
+        with open(cachefile, "r") as f:
+            for line in f:
+                # Kokkos_ENABLE_CUDA:BOOL=ON
+                if re.match("Kokkos_ENABLE_CUDA.*=ON", line):
+                    return True
+    return False
+
+
+# for testing is_build_gpu
+
+# sfroot = config.get("specfem.root")
+# for fol in os.listdir(sfroot):
+#     if fol.startswith("build"):
+#         print(fol,is_build_gpu(os.path.join(sfroot,fol)))
 
 
 def _isexe(file: str) -> bool:
