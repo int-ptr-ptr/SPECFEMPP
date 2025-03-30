@@ -255,7 +255,7 @@ class Manager:
                     if group in self.sequential_groups:
                         active_sequential_groups.add(group)
 
-                active_queue.put(ID)
+                active_queue.put(_PrioTask(priority=task.priority, taskID=ID))
 
             dep_backlink: list[list[int]] = [list() for _ in range(len(self.tasks))]
 
@@ -281,9 +281,10 @@ class Manager:
                         " or was there a circular dependency?"
                     )
                 # pop the active queue to capacity
-                while (len(active_tasks) < self.max_concurrent_tasks) and (
-                    not active_queue.empty()
-                ):
+                while (
+                    self.max_concurrent_tasks < 0
+                    or len(active_tasks) < self.max_concurrent_tasks
+                ) and (not active_queue.empty()):
                     ID = active_queue.get_nowait().taskID
                     task = self.tasks[ID]
                     task.on_pre_run()
@@ -299,8 +300,7 @@ class Manager:
                     for line in consume_job_queue(jobid):
                         if gui.dummy_gui:
                             print(line, end="" if line.endswith("\n") else "\n")
-                        else:
-                            container.job_message_callback(_msg_strip_name(line))
+                        container.job_message_callback(_msg_strip_name(line))
 
                     if not is_job_running(jobid, true_on_nonempty_queue=True):
                         exitcode = get_job_exitcode(jobid, error_on_still_running=True)
@@ -325,11 +325,16 @@ class Manager:
                         if exitcode == 0:
                             self._log("  unlocked dependencies: [", end="")
                             # start in order of task priority
-                            q: queue.PriorityQueue[_PrioTask] = queue.PriorityQueue
+                            q: queue.PriorityQueue[_PrioTask] = queue.PriorityQueue()
                             for dep in dep_backlink[taskid]:
                                 queued_or_running[dep].remove(taskid)
                                 if len(queued_or_running[dep]) == 0:
-                                    q.put_nowait(dep)
+                                    q.put_nowait(
+                                        _PrioTask(
+                                            priority=self.tasks[dep].priority,
+                                            taskID=dep,
+                                        )
+                                    )
                             while not q.empty():
                                 start_task(q.get_nowait().taskID)
                             self._log("]")
@@ -338,9 +343,11 @@ class Manager:
                         seq_remove = set()
 
                         # start in order of task priority
-                        q: queue.PriorityQueue[_PrioTask] = queue.PriorityQueue
+                        q: queue.PriorityQueue[_PrioTask] = queue.PriorityQueue()
                         for tid in sequential_task_waitlist:
-                            q.put(tid)
+                            q.put(
+                                _PrioTask(priority=self.tasks[tid].priority, taskID=tid)
+                            )
                         while not q.empty():
                             start_task(
                                 q.get_nowait().taskID, queued_removals=seq_remove

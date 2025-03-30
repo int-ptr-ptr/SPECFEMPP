@@ -83,7 +83,7 @@ static void compute_fluxes(specfem::compute::assembly &assembly,
                                                        igll_interface, chi1) -
            container.template edge_to_mortar<2, false>(iinterface,
                                                        igll_interface, chi2)) *
-          container.h_interface_relaxation_parameter(iinterface) / 2;
+          container.h_interface_relaxation_parameter(iinterface);
 
       type_real mean_1 = inverse_one_minus_half_trace_relaxation *
                          (container.template edge_to_mortar<1, false>(

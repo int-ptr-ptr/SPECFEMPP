@@ -16,7 +16,7 @@ from experiment import Simulation, get_all_experiments  # pyright: ignore
 
 from workflow.util import config
 from workflow.util.dump_reader import dump_series
-from workflow.util.seismo_reader import SeismoDump
+from workflow.util.seismo_reader import SeismoDump, SeismoYlimRule
 
 workdir = pathlib.Path(__file__).parent
 output_fol = workdir / "OUTPUT_FILES"
@@ -185,52 +185,107 @@ def make_arrival_include_func(seismo: SeismoDump, vp2: float, tmax: float):
                     )
                 ],
                 loc="lower right",
-                bbox_to_anchor=(1, 1),
+                bbox_to_anchor=(1, 1.1),
             )
+        axes[-1].set_xlabel("t")
 
     return include_arrivals
 
 
-def compare_sim_filename(vp2_ind: int):
-    return str(analysis_outfol / f"compare_seismo_{vp2_ind}.png")
-
-
-def color_from_sim(sim: Simulation):
-    color_ind = 0 if sim.subdivisions is None else int(sim.subdivisions[1])
-    return "rgbc"[color_ind]
-
-
-def compare_sims(
-    vp2_ind: int, show: bool = True, skip_and_get_filedeps_only: bool = False
+def compare_sims_conform_by_vp(
+    vp2_ind: int,
+    filter_N: None | Iterable[int] = None,
+    show: bool = True,
+    skip_and_get_filedeps_only: bool = False,
 ) -> Any:
-    seismo = SeismoDump(str(output_fol / "stations"))
+    def compare_sim_filename(vp2_ind: int):
+        return str(analysis_outfol / f"compare_conforming_{vp2_ind}.png")
+
+    # def color_from_sim(sim: Simulation):
+    #     color_ind = 0 if sim.subdivisions is None else int(sim.subdivisions[1])
+    #     return "rgbc"[color_ind]
+    seismo = None
+    if not skip_and_get_filedeps_only:
+        seismo = SeismoDump(str(output_fol / "stations"))
     fdeps = [__file__, str(output_fol / "stations")]
     simdeps = []
     vp2 = 0
-    for sim in run_sims_by_vp_ind[vp2_ind]:
+    ground_truth_sim = None
+    ground_truth_ind = -1
+    sims_to_do = [
+        sim
+        for sim in run_sims_by_vp_ind[vp2_ind]
+        if (sim.subdivisions is None or sim.subdivisions == (1, 1))
+        and (filter_N is None or sim.N in filter_N)
+    ]
+    gridsizes = [sim.N for sim in sims_to_do]
+    try:
+        gridsizemean = np.mean(gridsizes)
+        gridsizemax = max(gridsizes)
+
+        def style_from_size(N):
+            if gridsizemean == gridsizemax:
+                return (np.random.rand() * 4, (2, 2))
+            if N == gridsizemax:
+                return "dotted"
+            elif N >= gridsizemean:
+                return "dashdot"
+            else:
+                return "dashed"
+    finally:
+        ...
+    for sim in sims_to_do:
         vp2 = sim.vp2()
         N_size = int(sim.N)
         if sim.scheme == "cont":
-            label = f"cG {N_size} cell resolution"
+            label = f"cG {N_size}x{N_size} grid"
+            color = "r"
+        elif sim.scheme == "symm":
+            label = f"dG {N_size}x{N_size} grid (Symmetric flux, dt = {sim.dt():.1e})"
+            color = "g"
+        elif sim.scheme == "upwind":
+            label = f"dG {N_size}x{N_size} grid (Upwind flux, dt = {sim.dt():.1e})"
+            color = "b"
+        elif sim.scheme == "mid":
+            XR = sim.get_scheme_param("XR", 0)
+            if XR == 0:
+                label = (
+                    f"dG {N_size}x{N_size} grid (Midpoint flux, dt = {sim.dt():.1e})"
+                )
+                color = "c"
+            elif XR == -1:
+                label = (
+                    f"dG {N_size}x{N_size} grid (Crossover flux, dt = {sim.dt():.1e})"
+                )
+                color = "m"
+            else:
+                paramstr = "$w_{xr}$ = " + f"{XR:.1f}"
+                label = (
+                    f"dG {N_size}x{N_size} grid (Modified"
+                    f" Midpoint flux ({paramstr}), dt = {sim.dt():.1e})"
+                )
+                color = "y"
         else:
-            numcells = sim.get_horiz_numcells()
-            label = f"dG {numcells[0]}:{numcells[1]} cell resolution (Symmetric flux, dt = {sim.dt():.1e})"
+            raise ValueError(f"unsupported sim scheme {sim.scheme}")
 
         simfol = output_fol / sim.simname()
         if skip_and_get_filedeps_only:
             fdeps.append(str(simfol))
             simdeps.append(sim.taskname())
         else:
-            seismo.load_from_seismodir(
+            ind = seismo.load_from_seismodir(  # type: ignore
                 str(simfol),
-                color=color_from_sim(sim),
-                linestyle=N_size // 10,
+                color=color,
+                linestyle=style_from_size(N_size),
                 label=label,
             )
+            if sim.scheme == "cont":
+                if ground_truth_sim is None or ground_truth_sim.N < sim.N:
+                    ground_truth_sim = sim
+                    ground_truth_ind = ind
     outfile = compare_sim_filename(vp2_ind)
-    if skip_and_get_filedeps_only:
+    if skip_and_get_filedeps_only or seismo is None:
         return fdeps, [outfile], simdeps
-
     tmax = max(
         max(
             max(arr[-1, 0] for arr in stdata if arr is not None)
@@ -238,6 +293,7 @@ def compare_sims(
         )
         for seis in seismo.seismos
     )
+    assert ground_truth_sim is not None, "We need a ground truth simulation."
 
     seismo.plot_onto(
         show=show,
@@ -245,7 +301,9 @@ def compare_sims(
         plt_title=f"Acoustic-Acoustic Seismogram comparison ($(v_p)_2 = {vp2:.2f}$)",
         save_filename=None if show else outfile,
         fig_complete_callback=make_arrival_include_func(seismo, vp2, tmax),
-        ylim_rule="max_of_no_nan",
+        ylim_rule=SeismoYlimRule(
+            "rel_to_ground_truth", collection_index=ground_truth_ind
+        ),
         axtitles_inside=True,
     )
 
@@ -488,33 +546,42 @@ if not analysis_outfol.exists():
 
 
 def run_standard():
-    return [f"compare_all_vp2[{i}]" for i in run_sims_by_vp_ind.keys()]
+    return [f"conforming_seismos_vp2[{i},40]" for i in run_sims_by_vp_ind.keys()]
 
 
-def commands_from_names(name: str) -> list[tuple[str, Any]]:
+def commands_from_names(name_query: str) -> list[tuple[str, Any]]:
     outs = []
-    if "compare_all_vp2" in name:
-        for m in re.finditer(r"compare_all_vp2\s*\[\s*(\d+)\s*\]", name):
-            vp2_ind = int(m.group(1))
-            outs.append(
-                [
-                    m.group(0),
-                    lambda *args, vp2_ind=vp2_ind, **kwargs: compare_sims(
-                        vp2_ind, *args, show=False, **kwargs
-                    ),
-                ]
-            )
-    if "simanim" in name:
-        for m in re.finditer(r"simanim\s*\[([^\[\]]+)\]", name):
-            simname = m.group(1)
-            outs.append(
-                [
-                    m.group(0),
-                    lambda *args, simname=simname, **kwargs: loadsim(
-                        run_sims_by_name[simname], *args, **kwargs
-                    ),
-                ]
-            )
+
+    def namecheck(name):
+        if name not in name_query:
+            return
+        namepattern = name + r"\s*\[([^\[\]]*)\]"
+        for m in re.finditer(namepattern, name_query):
+            yield m.group(0), [s.strip() for s in m.group(1).split(",")]
+
+    for name, args in namecheck("conforming_seismos_vp2"):
+        vp2_ind = int(args[0])
+        Nfilter = None
+        if len(args) > 1:
+            Nfilter = [int(N) for N in args[1:]]
+        outs.append(
+            [
+                name,
+                lambda *args, vp2_ind=vp2_ind, **kwargs: compare_sims_conform_by_vp(
+                    vp2_ind, filter_N=Nfilter, *args, show=False, **kwargs
+                ),
+            ]
+        )
+    for name, args in namecheck("simanim"):
+        simname = args[0]
+        outs.append(
+            [
+                name,
+                lambda *args, simname=simname, **kwargs: loadsim(
+                    run_sims_by_name[simname], *args, **kwargs
+                ),
+            ]
+        )
 
     return outs
 

@@ -8,8 +8,11 @@ from subprocess import run as subproc_run
 from typing import Callable
 
 import workflow.simrunner.tasks as simtask
+import workflow.util.config as config
 from workflow.util.runjob import SystemCommandJob
 from workflow.util.task_manager import Task
+
+from .priority_rule import PriorityRule
 
 EXPERIMENT_CONFIG_FILENAME_JSON = "experiment.json"
 EXPERIMENT_CONFIG_FILENAME_PYTHON = "experiment.py"
@@ -286,6 +289,8 @@ def experiment_to_tasks(
                 raise IOError(f"Unknown type: {kind}")
             if "taskgroups" in task:
                 res[-1].group.extend(task["taskgroups"])
+            if "priority" in task:
+                res[-1].priority = int(task["priority"])
         log("Setting dependencies:")
         task_backlinks = [[] for _ in res]
         task_forwardlinks = [[] for _ in res]
@@ -382,6 +387,19 @@ def experiment_to_tasks(
             to_prune.sort()
             for itask in reversed(to_prune):
                 del res[itask]
+
+        # override priorities
+        if "priority_overrides" in data:
+            for rule in data["priority_overrides"]:
+                PriorityRule(rule).apply(res)
+        try:
+            prio_override = config.get(
+                f"laboratory.experiments.{experiment_name}.priority_overrides"
+            )
+            for rule in prio_override:
+                PriorityRule(rule).apply(res)
+        except ValueError:
+            pass
         return res
 
     except IOError as e:

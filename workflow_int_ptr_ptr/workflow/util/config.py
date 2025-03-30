@@ -42,6 +42,7 @@ def _read_default_config_files():
             if os.path.exists(file):
                 with open(file, "r") as f:
                     config = json.load(f)
+                    config["root_dir"] = os.path.abspath(folder)
                     found = True
             if found:
                 file = os.path.join(folder, DEFAULT_USER_CONFIG)
@@ -55,7 +56,6 @@ def _read_default_config_files():
         print("Configuration not found!")
         sys.exit(1)
 
-    config["root_dir"] = os.path.abspath(folder)
     if user_config is not None:
         config |= user_config
 

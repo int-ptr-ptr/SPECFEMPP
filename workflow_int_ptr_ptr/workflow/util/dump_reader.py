@@ -859,7 +859,7 @@ class dump_frame:
             plt.show()
 
 
-class dump_series:
+class DumpSeries:
     def __init__(self):
         self.statics_defined = False
         self.gll_defined = False
@@ -953,7 +953,7 @@ class dump_series:
         if timeseries is None:
             raise ValueError("File has no time series!")
 
-        series = dump_series()
+        series = DumpSeries()
         if len(statics) > 0:
             series.set_statics(statics)
 
@@ -962,6 +962,9 @@ class dump_series:
         series.framedata = framedata
 
         return series
+
+
+dump_series = DumpSeries
 
 
 def read_dump_file(

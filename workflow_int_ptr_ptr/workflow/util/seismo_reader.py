@@ -73,7 +73,10 @@ class SeismogramCollection:
     _seismos: dict[int, list[np.ndarray | None]] = field(default_factory=dict)
     _num_stations: int = 0
     plot_color = None
-    plot_linestyle: Literal["solid", "dashed", "dashdot", "dotted"] = "solid"
+    plot_linestyle: (
+        Literal["solid", "dashed", "dashdot", "dotted"]
+        | tuple[float, tuple[float, ...]]
+    ) = "solid"
     plot_label: str | None = None
 
     def seistype(self, types: SeismoType | Iterable[SeismoType]):
@@ -114,32 +117,69 @@ class SeismogramCollection:
         )
 
 
-_ylim_rule_names_T = Literal["none", "max_of_no_nan"]
+_ylim_rule_names_T = Literal["none", "set", "max_of_no_nan", "rel_to_ground_truth"]
 
 
-def _ylim_rule_default_data(rule: _ylim_rule_names_T):
+def _ylim_rule_default_data(rule: _ylim_rule_names_T, obj: "SeismoYlimRule"):
     if rule == "max_of_no_nan":
-        return {"low": np.inf, "high": -np.inf, "margin": 0.05}
+        return {
+            "low": np.inf,
+            "high": -np.inf,
+            "margin": 0.05 if "margin" not in obj.all_data else obj.all_data["margin"],
+        }
+    elif rule == "set":
+        return {
+            "low": None if "low" not in obj.all_data else obj.all_data["low"],
+            "high": None if "high" not in obj.all_data else obj.all_data["high"],
+        }
+    elif rule == "rel_to_ground_truth":
+        return {
+            "low": np.inf,
+            "high": -np.inf,
+            "margin": 0.05 if "margin" not in obj.all_data else obj.all_data["margin"],
+        }
     return dict()
 
 
 class SeismoYlimRule:
     rule: _ylim_rule_names_T
     intermediate_data: dict[Any, dict]
+    all_data: dict
 
     def __init__(self, rule: _ylim_rule_names_T, *args, **kwargs):
         self.rule = rule
         self.intermediate_data = dict()
+        self.all_data = kwargs
 
-    def handle(self, ind, t: np.ndarray, y: np.ndarray) -> tuple:
+    def handle(
+        self,
+        ind,
+        t: np.ndarray,
+        y: np.ndarray,
+        seisdump: "SeismoDump",
+        collection_index: int,
+    ) -> tuple:
         if ind not in self.intermediate_data:
-            self.intermediate_data[ind] = _ylim_rule_default_data(self.rule)
+            self.intermediate_data[ind] = _ylim_rule_default_data(self.rule, self)
 
         data = self.intermediate_data[ind]
         if self.rule == "max_of_no_nan":
             if not np.any(np.isnan(y)):
                 data["low"] = min(data["low"], min(y))
                 data["high"] = max(data["high"], max(y))
+            lo = data["low"]
+            hi = data["high"]
+            margin = data["margin"] * (hi - lo)
+            if hi < lo:
+                return (None, None)
+            return (lo - margin, hi + margin)
+        elif self.rule == "set":
+            return (data["low"], data["high"])
+        elif self.rule == "rel_to_ground_truth":
+            if collection_index == self.all_data["collection_index"]:
+                data["low"] = min(data["low"], min(y))
+                data["high"] = max(data["high"], max(y))
+
             lo = data["low"]
             hi = data["high"]
             margin = data["margin"] * (hi - lo)
@@ -213,9 +253,11 @@ class SeismoDump:
         fol: str,
         verbose: bool | None = None,
         color=None,
-        linestyle: Literal["solid", "dashed", "dashdot", "dotted"] | int = "solid",
+        linestyle: Literal["solid", "dashed", "dashdot", "dotted"]
+        | int
+        | tuple[float, tuple[float, ...]] = "solid",
         label: str | None = None,
-    ):
+    ) -> int:
         if verbose is None:
             verbose = self.verbose
 
@@ -262,6 +304,8 @@ class SeismoDump:
         self.seismogram_types.update(
             SeismoType.from_index(k) for k in seismos._seismos.keys()
         )
+
+        return len(self.seismos) - 1
 
     def plot_onto(
         self,
@@ -357,7 +401,11 @@ class SeismoDump:
                             color=plot_color,
                             linestyle=plot_linestyle,
                         )
-                        a.set_ylim(ylim_rule.handle(ind, seis[:, 0], seis[:, 1]))
+                        a.set_ylim(
+                            ylim_rule.handle(
+                                ind, seis[:, 0], seis[:, 1], self, icollection
+                            )
+                        )
                         if axtitles_inside:
                             a.set_title(
                                 f"   {seistype.latex_str} @ ({station.x},{station.z})",

@@ -116,7 +116,7 @@ static void compute_fluxes(specfem::compute::assembly &assembly,
                                                        igll_interface, chi1) -
            container.template edge_to_mortar<2, false>(iinterface,
                                                        igll_interface, chi2)) *
-          container.h_interface_relaxation_parameter(iinterface) / 2;
+          container.h_interface_relaxation_parameter(iinterface);
       type_real c1 = container.template edge_to_mortar<1, false>(
           iinterface, igll_interface, rcinv_edge1);
       type_real c2 = container.template edge_to_mortar<2, false>(

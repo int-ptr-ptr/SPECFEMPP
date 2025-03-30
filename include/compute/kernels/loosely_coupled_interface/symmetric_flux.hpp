@@ -275,9 +275,8 @@ struct symmetric_flux::kernel<
           accel1[igll_edge].acceleration(0) +=
               Jw *
               (ujmp * half_c1 * dv +
-               0.5 *
-                   container.h_interface_medium1_mortar_transfer(
-                       iinterface, igll_interface, igll_edge) *
+               container.h_interface_medium1_mortar_transfer(
+                   iinterface, igll_interface, igll_edge) *
                    (cdu_avg - ujmp * container.h_interface_relaxation_parameter(
                                          iinterface)));
 
@@ -298,9 +297,8 @@ struct symmetric_flux::kernel<
           accel2[igll_edge].acceleration(0) +=
               Jw *
               (-ujmp * half_c2 * dv -
-               0.5 *
-                   container.h_interface_medium2_mortar_transfer(
-                       iinterface, igll_interface, igll_edge) *
+               container.h_interface_medium2_mortar_transfer(
+                   iinterface, igll_interface, igll_edge) *
                    (cdu_avg - ujmp * container.h_interface_relaxation_parameter(
                                          iinterface)));
         }
@@ -433,7 +431,7 @@ struct symmetric_flux::kernel<
 
     container.h_interface_relaxation_parameter(iinterface) =
         penalty_parameter * rho_inv_max /
-        sqrt(std::max(spec_charlen2(edge1_ispec), spec_charlen2(edge2_ispec)));
+        sqrt(std::min(spec_charlen2(edge1_ispec), spec_charlen2(edge2_ispec)));
   }
   template <bool on_device>
   KOKKOS_INLINE_FUNCTION static void

@@ -41,9 +41,6 @@ KOKKOS_INLINE_FUNCTION void _util::placeholder_fluxes::fix_free_surface(
                                      point_boundary_composite);
       return point_boundary_composite.tag == tag;
     default:
-      throw std::runtime_error("h_is_bdry_at_pt: unknown "
-                               "assembly->boundaries.boundary_tags(ispec) "
-                               "value!");
       return false;
     }
   };

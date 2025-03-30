@@ -1,5 +1,6 @@
 import os
 import re
+import shutil
 import sys
 import time
 
@@ -19,6 +20,8 @@ def get_runsim_task(
     database_in: str,
     dt: float,
     nstep: int,
+    scheme: str,
+    scheme_params: None | dict,
     subdivs: tuple[int, int] | None,
     steps_per_dump: int | None = None,
 ):
@@ -49,7 +52,11 @@ def get_runsim_task(
         else:
             # clean
             for f in os.listdir(outdir):
-                os.remove(os.path.join(outdir, f))
+                fullpath = os.path.join(outdir, f)
+                if os.path.isfile(fullpath):
+                    os.remove(fullpath)
+                else:
+                    shutil.rmtree(fullpath)
 
     def compile_series(completestate):
         if completestate == 0:
@@ -59,6 +66,21 @@ def get_runsim_task(
                     os.remove(os.path.join(outdir, f))
             series.save_to_file(os.path.join(outdir, "dumps.dat"))
 
+    if scheme_params is None:
+        scheme_params = dict()
+    afmode = ""
+    if scheme == "symm" or scheme == "sym":
+        afmode = " --acoustic_flux 0"
+    elif scheme.startswith("upwind"):
+        afmode = " --acoustic_flux 1"
+    elif scheme.startswith("mid"):
+        afmode = " --acoustic_flux 2"
+    if "IPS" in scheme_params:
+        afmode += f" --flux_jump_penalty {scheme_params['IPS']:.3e}"
+    if "TR" in scheme_params:
+        afmode += f" --flux_TR {scheme_params['TR']:.3e}"
+    if "XR" in scheme_params:
+        afmode += f" --flux_XR {scheme_params['XR']:.3e}"
     task = SpecfemEMTask(
         sim_dir,
         group="gpu",
@@ -66,7 +88,8 @@ def get_runsim_task(
         cwd=workdir,
         on_pre_run=set_parfile,
         on_completion=compile_series,
-        additional_args=f"--lr_periodic --absorb_top --absorb_bottom --dumpfolder {outdir} --dump {steps_per_dump} --kill_boundaries",
+        additional_args=f"--lr_periodic --absorb_top --absorb_bottom --dumpfolder {outdir} --dump {steps_per_dump} --kill_boundaries"
+        + afmode,
     )
     return task, parfile
 
@@ -82,6 +105,8 @@ def run(sim: Simulation):
         os.path.join(output_fol, sim.recover_mesh().mesh_database_name()),
         dt=sim.dt(),
         nstep=NSTEP(sim.dt()),
+        scheme=sim.scheme,
+        scheme_params=sim.scheme_params,
         subdivs=sim.subdivisions,
     )
 
