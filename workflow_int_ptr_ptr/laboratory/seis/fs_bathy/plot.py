@@ -20,3 +20,11 @@ seismos.load_from_seismodir(
 seismos.plot_onto(
     save_filename=os.path.join(dirname, "OUTPUT_FILES/seiscomp.png"), legend_kwargs={}
 )
+
+
+os.system(
+    f"ffmpeg -i {os.path.join(dirname, 'OUTPUT_FILES/display/wavefield%04d00.png')} {os.path.join(dirname, 'OUTPUT_FILES/anim.mp4')} -y"
+)
+os.system(
+    f"ffmpeg -i {os.path.join(dirname, 'OUTPUT_FILES/display_dg/wavefield%04d00.png')} {os.path.join(dirname, 'OUTPUT_FILES/anim_dg.mp4')} -y"
+)
