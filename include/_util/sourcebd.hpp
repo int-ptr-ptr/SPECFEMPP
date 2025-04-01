@@ -142,7 +142,6 @@ public:
                 specfem::element::property_tag::isotropic, false>
                 ppt;
             specfem::compute::load_on_device(ind, assembly.properties, ppt);
-            const type_real c = std::sqrt(ppt.kappa());
             type_real dfdn = dfdxi[0] * nxi + dfdga[0] * nga;
             accel.acceleration(0) =
                 (-velstore(iworker, 0) * ppt.rho_vpinverse() +

@@ -3,6 +3,7 @@
 import argparse
 
 import workflow.laboratory as laboratory
+import workflow.util.config as config
 
 
 def _subparser_mesher(sp):
@@ -29,7 +30,11 @@ if __name__ == "__main__":
     # print(laboratory.pi.get_experiment_list(verbose=True))
     # print(laboratory.pi.tasks_in_experiment("snell.FF", verbose=True))
 
-    laboratory.pi.full_run_experiment("snell.FF", verbose=True)
-    # laboratory.pi.full_run_experiment("seis.fs_bathy")
+    # laboratory.pi.full_run_experiment("snell.FF", verbose=True)
+
+    default_experiment = config.get("lab.default_experiment")
+    print(f'Running default experiment "{default_experiment}".')
+    print(laboratory.pi.tasks_in_experiment(default_experiment, verbose=True))
+    laboratory.pi.full_run_experiment(default_experiment, verbose=True)
 
     args = librarian_args()

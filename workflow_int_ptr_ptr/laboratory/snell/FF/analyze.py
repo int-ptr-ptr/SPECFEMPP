@@ -12,7 +12,11 @@ import matplotlib.patches as mplpatches
 import matplotlib.pyplot as plt
 import numpy as np
 import yaml
-from experiment import Simulation, get_all_experiments  # pyright: ignore
+from experiment import (  # pyright: ignore
+    _GRIDTEST_N_VALS,
+    Simulation,
+    get_all_experiments,
+)
 
 from workflow.util import config
 from workflow.util.dump_reader import dump_series
@@ -38,6 +42,31 @@ for sim in get_all_experiments():
     run_sims_by_vp_ind[vp2ind].append(sim)
 
     run_sims_by_name[sim.simname()] = sim
+
+
+def filter_sims(
+    vp2_ind: int | None = None,
+    dt: float | None = None,
+    N: int | None = None,
+    scheme: str | None = None,
+    sims_to_filter: list[Simulation] | None = None,
+) -> list[Simulation]:
+    if sims_to_filter is None:
+        if vp2_ind is None:
+            simlist = get_all_experiments()
+        else:
+            simlist = run_sims_by_vp_ind[vp2_ind]
+    else:
+        simlist = sims_to_filter
+
+    return [
+        s
+        for s in simlist
+        if (vp2_ind is None or s.vp2_ind == vp2_ind)
+        and (dt is None or s.dt() == dt)
+        and (N is None or s.N == N)
+        and (scheme is None or s.scheme == scheme)
+    ]
 
 
 first_source = sourceconfig["sources"][0]
@@ -158,12 +187,18 @@ def compute_arrivals(
     return arrivals
 
 
-def make_arrival_include_func(seismo: SeismoDump, vp2: float, tmax: float):
+def make_arrival_include_func(
+    seismo: SeismoDump, vp2: float, tmax: float, legends_and_labels: bool = True
+):
     arrivals = compute_arrivals(seismo, vp2, tmax)
 
     def include_arrivals(**kwargs):
         axes = kwargs["axes"]
         indexing_func = kwargs["indexing_func"]
+        if isinstance(axes, list):
+            axdim = 1
+        else:
+            axdim = len(axes.shape)
 
         for station in seismo.stations:
             T_arrivals = arrivals[station.station_index]
@@ -178,16 +213,23 @@ def make_arrival_include_func(seismo: SeismoDump, vp2: float, tmax: float):
                         va="bottom",
                         ha="center",
                     )
-            axes[0].legend(
-                handles=[
-                    mplines.Line2D(
-                        [0], [0], color="lightgray", label="Expected arrivals"
-                    )
-                ],
-                loc="lower right",
-                bbox_to_anchor=(1, 1.1),
-            )
-        axes[-1].set_xlabel("t")
+            if legends_and_labels:
+                lax = axes[0, -1] if axdim == 2 else axes[0]  # type: ignore
+                lax.legend(
+                    handles=[
+                        mplines.Line2D(
+                            [0], [0], color="lightgray", label="Expected arrivals"
+                        )
+                    ],
+                    loc="lower right",
+                    bbox_to_anchor=(1, 1.1),
+                )
+        if legends_and_labels:
+            if axdim == 1:
+                axes[-1].set_xlabel("t")
+            else:
+                for i in range(axes.shape[1]):  # type: ignore
+                    axes[-1, i].set_xlabel("t")  # type: ignore
 
     return include_arrivals
 
@@ -197,6 +239,7 @@ def compare_sims_conform_by_vp(
     filter_N: None | Iterable[int] = None,
     show: bool = True,
     skip_and_get_filedeps_only: bool = False,
+    is_error_plot: bool = True,
 ) -> Any:
     def compare_sim_filename(vp2_ind: int):
         return str(analysis_outfol / f"compare_conforming_{vp2_ind}.png")
@@ -239,6 +282,8 @@ def compare_sims_conform_by_vp(
         N_size = int(sim.N)
         if sim.scheme == "cont":
             label = f"cG {N_size}x{N_size} grid"
+            if is_error_plot:
+                label += ' "ground truth" reference'
             color = "r"
         elif sim.scheme == "symm":
             label = f"dG {N_size}x{N_size} grid (Symmetric flux, dt = {sim.dt():.1e})"
@@ -286,25 +331,114 @@ def compare_sims_conform_by_vp(
     outfile = compare_sim_filename(vp2_ind)
     if skip_and_get_filedeps_only or seismo is None:
         return fdeps, [outfile], simdeps
+    tmin = min(
+        min(
+            min(min(arr[:, 0]) for arr in stdata if arr is not None)
+            for stdata in seis._seismos.values()
+        )
+        for seis in seismo.seismos
+    )
     tmax = max(
         max(
-            max(arr[-1, 0] for arr in stdata if arr is not None)
+            max(max(arr[:, 0]) for arr in stdata if arr is not None)
             for stdata in seis._seismos.values()
         )
         for seis in seismo.seismos
     )
     assert ground_truth_sim is not None, "We need a ground truth simulation."
 
+    def plot_error(
+        ax, data, plot_kwargs, collection_index, station_index, seismogram_type
+    ):
+        if collection_index == ground_truth_ind:
+            # reference plot
+            plot_kwargs["transform"] = ax.transAxes
+            # plot_kwargs["scalex"] = False
+            # plot_kwargs["scaley"] = False
+            data[:, 0] = np.linspace(0, 1, data.shape[0])
+
+            dataheight = 0.2
+            datamargin = 0.1
+
+            datamin = np.min(data[:, 1])
+            datamax = np.max(data[:, 1])
+            data[:, 1] *= dataheight / (datamax - datamin)
+            data[:, 1] += datamargin - datamin * dataheight / (datamax - datamin)
+
+            return True
+        else:
+            # error
+            truedat = seismo.seismos[ground_truth_ind].get_seismo(
+                station_index, seismogram_type
+            )
+            if truedat is None:
+                return False
+            data[:, 1] -= np.interp(data[:, 0], xp=truedat[:, 0], fp=truedat[:, 1])
+            data[:, 1] /= np.max(np.abs(truedat[:, 1]))
+            plot_kwargs["lw"] = 1
+            # plot_kwargs["scalex"] = True
+            # plot_kwargs["scaley"] = True
+            return True
+
+    def on_complete(*args, **kwargs):
+        make_arrival_include_func(seismo, vp2, tmax)(*args, **kwargs)
+        # axes = kwargs["axes"]
+        # indexing_func = kwargs["indexing_func"]
+        # for station in seismo.stations:
+        #     for stype in seismo.seismogram_types:
+        #         ax = axes[indexing_func(station, stype)]
+        #         ax.set_ylim(-1,1)
+
+    fig_len = 10
+    seismo_aspect = 5
+    fig, ax = plt.subplots(
+        nrows=len(seismo.seismogram_types) * len(seismo.stations),
+        ncols=2,
+        figsize=(
+            fig_len * 2,
+            fig_len
+            / seismo_aspect
+            * len(seismo.seismogram_types)
+            * len(seismo.stations),
+        ),
+        sharex=True,
+    )
+    for i in range(ax.shape[0]):
+        ax[i, 0].set_ylabel("seismogram value")
+        ax[i, 1].set_ylabel("relative error")
     seismo.plot_onto(
-        show=show,
+        axes=ax,
+        indexing_func=lambda station, seismotype: (station.station_index, 0),
+        show=False,
+        tlim=(tmin, tmax),
         legend_kwargs={"loc": "lower left"},
-        plt_title=f"Acoustic-Acoustic Seismogram comparison ($(v_p)_2 = {vp2:.2f}$)",
-        save_filename=None if show else outfile,
-        fig_complete_callback=make_arrival_include_func(seismo, vp2, tmax),
+        # plt_title=f"Acoustic-Acoustic Seismogram comparison ($(v_p)_2 = {vp2:.2f}$)",
+        save_filename=None,
+        fig_complete_callback=make_arrival_include_func(
+            seismo, vp2, tmax, legends_and_labels=False
+        ),
         ylim_rule=SeismoYlimRule(
             "rel_to_ground_truth", collection_index=ground_truth_ind
         ),
         axtitles_inside=True,
+    )
+    seismo.plot_onto(
+        axes=ax,
+        indexing_func=lambda station, seismotype: (station.station_index, 1),
+        show=show,
+        tlim=(tmin, tmax),
+        # legend_kwargs={"loc": "lower left"},
+        plt_title=f"Acoustic-Acoustic Seismogram comparison ($(v_p)_2 = {vp2:.2f}$)",
+        save_filename=None if show else outfile,
+        fig_complete_callback=on_complete,
+        ylim_rule=SeismoYlimRule(
+            "max_of_within_range",
+            min=-0.1,
+            max=0.1,
+            ignore_collections=[ground_truth_ind],
+        ),
+        axtitles_inside=True,
+        preplot_callback=plot_error if is_error_plot else None,
     )
 
 
@@ -327,7 +461,7 @@ def loadsim(
                 str(output_fol / "stations"),
                 str(simfol),
             ],
-            [outfile_mp4],
+            [str(outfile_mp4)],
             [sim.taskname()],
         )
 
@@ -546,7 +680,15 @@ if not analysis_outfol.exists():
 
 
 def run_standard():
-    return [f"conforming_seismos_vp2[{i},40]" for i in run_sims_by_vp_ind.keys()]
+    N_ref = _GRIDTEST_N_VALS[-1]
+    commands = []
+
+    for i in run_sims_by_vp_ind.keys():
+        commands.append(f"conforming_seismos_vp2[{i},{N_ref}]")
+        refsims = filter_sims(vp2_ind=i, N=N_ref, scheme="cont")
+        if refsims:
+            commands.append(f"simanim[{refsims[0].simname()}]")
+    return commands
 
 
 def commands_from_names(name_query: str) -> list[tuple[str, Any]]:
@@ -595,7 +737,7 @@ if __name__ == "__main__":
     parser_deps.add_argument("name_to_query", nargs="*", type=str)
 
     parser_run = sp.add_parser("run", help="run the analysis")
-    parser_run.add_argument("name_to_run", nargs="+", type=str)
+    parser_run.add_argument("name_to_run", nargs="*", type=str)
 
     args = parser.parse_args()
     if "name_to_query" in args:
@@ -620,8 +762,14 @@ if __name__ == "__main__":
         print(json.dumps(out))
         sys.exit(0)
     if "name_to_run" in args:
-        for cmdname, cmd in commands_from_names(" ".join(args.name_to_run)):
-            cmd()
+        names = []
+        if len(args.name_to_run) == 0:
+            names.extend(run_standard())
+        else:
+            names.append(" ".join(args.name_to_run))
+        for name in names:
+            for cmdname, cmd in commands_from_names(name):
+                cmd()
         sys.exit(0)
 
     # for vp2_ind in run_sims_by_vp_ind.keys():

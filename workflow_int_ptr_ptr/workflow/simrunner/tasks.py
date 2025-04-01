@@ -92,6 +92,7 @@ class SpecfemEMTask(Task):
         on_pre_run: Callable[[], None] | None = None,
         additional_args: str | None = None,
         priority: float = 0,
+        gpu_preference: bool | None = None,
     ):
         self.title = title
         name = f"{title} (specfemEM)"
@@ -104,7 +105,13 @@ class SpecfemEMTask(Task):
             kwargs["specfem_parfile"] = specfem_parfile
         if additional_args is not None:
             kwargs["additional_args"] = additional_args
-        job = jobs.SpecfemEMJob(name, specfem_exe=specfem_exe, cwd=cwd, **kwargs)
+        job = jobs.SpecfemEMJob(
+            name,
+            specfem_exe=specfem_exe,
+            cwd=cwd,
+            gpu_preference=gpu_preference,
+            **kwargs,
+        )
         self.exe = job.exe
         self.parfile = job.parfile
         self.cwd = cwd

@@ -270,6 +270,15 @@ void dump_edge_container_statics(
   dump << "acoustic_elastic_normal";
   _stream_view<type_real, 3>(
       dump, edge_storage.acoustic_elastic_interface.h_medium2_edge_normal);
+
+  // temporary:
+
+  dump << "acoustic_acoustic_edge_aux";
+  _stream_view<type_real, 3>(
+      dump, edge_storage.acoustic_acoustic_interface.h_edge_aux);
+  dump << "acoustic_acoustic_interface_aux";
+  _stream_view<type_real, 3>(
+      dump, edge_storage.acoustic_acoustic_interface.h_intersection_aux);
 }
 template <typename edgequad, int datacapacity>
 void dump_edge_container_statics(

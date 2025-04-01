@@ -9,6 +9,8 @@ _POSSIBLE_MESHFEM_NAMES = ["xmeshfem2D"]
 _POSSIBLE_SPECFEM2D_NAMES = ["specfem2d"]
 _POSSIBLE_SPECFEMEM_NAMES = ["specfem2d_eventmarcher"]
 
+_build_folder_skips = config.get("simrunner.build_search_ignores")
+
 
 def is_build_gpu(buildfolder: str):
     # add other GPU flags as necessary
@@ -34,13 +36,18 @@ def _isexe(file: str) -> bool:
     return os.path.isfile(file) and os.access(file, os.X_OK)
 
 
-def _bin_possibilities(exe_name_possibilities):
+def _bin_possibilities(exe_name_possibilities, gpu_preference: bool | None = None):
     sfroot = config.get("specfem.root")
     for fol in os.listdir(sfroot):
-        if fol.startswith("build"):
+        if fol.startswith("build") and fol not in _build_folder_skips:
+            buildfol = os.path.join(sfroot, fol)
+            if gpu_preference is not None and (
+                is_build_gpu(buildfol) != gpu_preference
+            ):
+                continue
             for binfol in _POSSIBLE_BIN_FOLDERS:
                 for exe in exe_name_possibilities:
-                    yield os.path.join(sfroot, fol, binfol, exe)
+                    yield os.path.join(buildfol, binfol, exe)
 
 
 def guess_meshfem_exe() -> str:
@@ -63,7 +70,7 @@ def guess_meshfem_exe() -> str:
     )
 
 
-def guess_specfem2d_exe() -> str:
+def guess_specfem2d_exe(gpu_preference: bool | None = None) -> str:
     """Tries to locate a specfem2d executable.
 
     Returns:
@@ -74,7 +81,9 @@ def guess_specfem2d_exe() -> str:
         return exe
 
     # try build directories
-    for f in _bin_possibilities(_POSSIBLE_SPECFEM2D_NAMES):
+    for f in _bin_possibilities(
+        _POSSIBLE_SPECFEM2D_NAMES, gpu_preference=gpu_preference
+    ):
         if _isexe(f):
             return f
 
@@ -83,7 +92,7 @@ def guess_specfem2d_exe() -> str:
     )
 
 
-def guess_specfemem_exe() -> str:
+def guess_specfemem_exe(gpu_preference: bool | None = None) -> str:
     """Tries to locate a specfem2d_eventmarcher executable.
 
     Returns:
@@ -94,7 +103,9 @@ def guess_specfemem_exe() -> str:
         return exe
 
     # try build directories
-    for f in _bin_possibilities(_POSSIBLE_SPECFEM2D_NAMES):
+    for f in _bin_possibilities(
+        _POSSIBLE_SPECFEM2D_NAMES, gpu_preference=gpu_preference
+    ):
         if _isexe(f):
             return f
 
@@ -165,9 +176,10 @@ class SpecfemEMJob(SystemCommandJob):
         cwd: str | None = None,
         min_update_interval: int = 0,
         linebuf_size: int = 10,
+        gpu_preference: bool | None = None,
     ):
         if specfem_exe is None:
-            specfem_exe = guess_specfemem_exe()
+            specfem_exe = guess_specfemem_exe(gpu_preference=gpu_preference)
 
         self.exe = specfem_exe
         self.parfile = specfem_parfile

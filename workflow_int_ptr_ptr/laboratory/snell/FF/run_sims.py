@@ -8,7 +8,7 @@ from experiment import Simulation  # pyright: ignore
 
 from workflow.laboratory.parfilegen import sf_config
 from workflow.simrunner.tasks import SpecfemEMTask
-from workflow.util import dump_reader, runjob
+from workflow.util import dump_reader, gpulock, runjob
 
 workdir = os.path.dirname(__file__)
 output_folname = "OUTPUT_FILES"
@@ -24,6 +24,7 @@ def get_runsim_task(
     scheme_params: None | dict,
     subdivs: tuple[int, int] | None,
     steps_per_dump: int | None = None,
+    use_gpu: bool = False,
 ):
     if steps_per_dump is None:
         steps_per_dump = max(1, int(0.05 / dt))
@@ -72,9 +73,9 @@ def get_runsim_task(
     if scheme == "symm" or scheme == "sym":
         afmode = " --acoustic_flux 0"
     elif scheme.startswith("upwind"):
-        afmode = " --acoustic_flux 1"
-    elif scheme.startswith("mid"):
         afmode = " --acoustic_flux 2"
+    elif scheme.startswith("mid"):
+        afmode = " --acoustic_flux 1"
     if "IPS" in scheme_params:
         afmode += f" --flux_jump_penalty {scheme_params['IPS']:.3e}"
     if "TR" in scheme_params:
@@ -100,29 +101,37 @@ def NSTEP(dt):
 
 def run(sim: Simulation):
     simname = sim.simname()
-    task, parfile_name = get_runsim_task(
-        simname,
-        os.path.join(output_fol, sim.recover_mesh().mesh_database_name()),
-        dt=sim.dt(),
-        nstep=NSTEP(sim.dt()),
-        scheme=sim.scheme,
-        scheme_params=sim.scheme_params,
-        subdivs=sim.subdivisions,
-    )
 
-    task.on_pre_run()
-    task.job.print_updates = True
+    with gpulock.GPULock(
+        utilization=0.5,
+        alloted_time=10 * 60,
+        request_timeout=1,
+        enter_serial_context_on_fail=True,
+    ) as context:
+        gpu = context.is_gpu
+        task, parfile_name = get_runsim_task(
+            simname,
+            os.path.join(output_fol, sim.recover_mesh().mesh_database_name()),
+            dt=sim.dt(),
+            nstep=NSTEP(sim.dt()),
+            scheme=sim.scheme,
+            scheme_params=sim.scheme_params,
+            subdivs=sim.subdivisions,
+            use_gpu=gpu,
+        )
+        task.job.print_updates = True
 
-    print(f"starting job {task.name}")
-    jid = runjob.queue_job(task.job)
-    lines = []
-    last_numlines = 0
-    while runjob.is_job_running(jid):
-        time.sleep(1)
-        lines.extend(runjob.consume_queue(jid))
-        if len(lines) > last_numlines:
-            print(lines[-1])
-            last_numlines = len(lines)
+        task.on_pre_run()
+        print(f"starting job {task.name}")
+        jid = runjob.queue_job(task.job)
+        lines = []
+        last_numlines = 0
+        while runjob.is_job_running(jid):
+            time.sleep(1)
+            lines.extend(runjob.consume_queue(jid))
+            if len(lines) > last_numlines:
+                print(lines[-1])
+                last_numlines = len(lines)
 
     if (retcode := runjob.complete_job(jid, error_on_still_running=True)) > 0:
         print('Job failed. error logged in "run_err.txt".')

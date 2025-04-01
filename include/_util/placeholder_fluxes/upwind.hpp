@@ -82,6 +82,11 @@ static void compute_fluxes(specfem::compute::assembly &assembly,
           (-rcinv_edge1[igll_edge] * vel_edge1[igll_edge] +
            sigma_edge1[igll_edge] * one_minus_trace_relaxation) /
           2;
+      container.h_edge_aux(edge1_index, 0, igll_edge) = vel_edge1[igll_edge];
+      container.h_edge_aux(edge1_index, 1, igll_edge) = rcinv_edge1[igll_edge];
+      container.h_edge_aux(edge1_index, 2, igll_edge) = sigma_edge1[igll_edge];
+      container.h_edge_aux(edge1_index, 3, igll_edge) =
+          outflow_edge1[igll_edge];
     }
 
     index.ispec = edge2_ispec;
@@ -107,6 +112,11 @@ static void compute_fluxes(specfem::compute::assembly &assembly,
           (-rcinv_edge2[igll_edge] * vel_edge2[igll_edge] +
            sigma_edge2[igll_edge] * one_minus_trace_relaxation) /
           2;
+      container.h_edge_aux(edge2_index, 0, igll_edge) = vel_edge2[igll_edge];
+      container.h_edge_aux(edge2_index, 1, igll_edge) = rcinv_edge2[igll_edge];
+      container.h_edge_aux(edge2_index, 2, igll_edge) = sigma_edge2[igll_edge];
+      container.h_edge_aux(edge2_index, 3, igll_edge) =
+          outflow_edge2[igll_edge];
     }
 
     for (int igll_interface = 0; igll_interface < ContainerType::NGLL_INTERFACE;
@@ -158,6 +168,15 @@ static void compute_fluxes(specfem::compute::assembly &assembly,
            inflow_edge2 * one_minus_crossover_relaxation + jump_penalty) *
           Jw * inverse_one_minus_half_trace_relaxation;
 
+      container.h_intersection_aux(iinterface, 4, igll_interface) =
+          inflow_edge1;
+      container.h_intersection_aux(iinterface, 5, igll_interface) =
+          inflow_edge2;
+      container.h_intersection_aux(iinterface, 6, igll_interface) =
+          jump_penalty;
+      container.h_intersection_aux(iinterface, 2, igll_interface) = integrand1;
+      container.h_intersection_aux(iinterface, 3, igll_interface) = integrand2;
+
       for (int igll_edge = 0; igll_edge < ContainerType::NGLL_EDGE;
            igll_edge++) {
         accel1[igll_edge].acceleration(0) +=
@@ -173,6 +192,12 @@ static void compute_fluxes(specfem::compute::assembly &assembly,
                                                 edge1_type);
     _util::placeholder_fluxes::fix_free_surface(assembly, accel2, edge2_ispec,
                                                 edge2_type);
+    for (int igll_edge = 0; igll_edge < ContainerType::NGLL_EDGE; igll_edge++) {
+      container.h_intersection_aux(iinterface, 0, igll_edge) =
+          accel1[igll_edge].acceleration(0);
+      container.h_intersection_aux(iinterface, 1, igll_edge) =
+          accel2[igll_edge].acceleration(0);
+    }
 
     container.template atomic_add_to_field<1, false>(edge1_index, assembly,
                                                      accel1);

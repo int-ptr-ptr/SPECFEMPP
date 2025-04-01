@@ -113,6 +113,7 @@ class Simulation:
     vp2_ind: int
     subdivisions: tuple[int, int] | None
     scheme: _scheme_types
+    dt_val: float | None = None
     scheme_params: dict | None = None
     disappearing_information: dict | None = None
 
@@ -120,20 +121,31 @@ class Simulation:
         return _vp2_vals[self.vp2_ind]
 
     def dt(self):
+        if self.dt_val is not None:
+            return self.dt_val
         numcells = self.get_horiz_numcells()
         return cfl_default / min(numcells[0], numcells[1] * self.vp2())
+
+    def set_dt_by_courant(self, courant: float):
+        # C = u * dt / dx,   # dt = C * dx / u = C * (L/numcells) / u
+        numcells = self.get_horiz_numcells()
+        self.dt_val = courant / min(
+            numcells[0] * 1,  # vp1 = 1
+            numcells[1] * self.vp2(),
+        )
 
     def recover_mesh(self) -> Mesh:
         return Mesh(N=self.N, vp2_ind=self.vp2_ind)
 
     def simname(self):
+        dtstr = "n" if self.dt_val is None else _f2str(self.dt_val)
         if self.subdivisions is None:
-            return f"{self.scheme}_{self.N}_{self.vp2_ind}" + _out_params(
+            return f"{self.scheme}_{self.N}_{self.vp2_ind}_{dtstr}" + _out_params(
                 self.scheme, self.scheme_params
             )
         else:
             return (
-                f"{self.scheme}{self.subdivisions[0]}-{self.subdivisions[1]}_{self.N}_{self.vp2_ind}"
+                f"{self.scheme}{self.subdivisions[0]}-{self.subdivisions[1]}_{self.N}_{self.vp2_ind}_{dtstr}"
                 + _out_params(self.scheme, self.scheme_params)
             )
 
@@ -158,17 +170,22 @@ class Simulation:
             if s.startswith(scheme):
                 try:
                     sub = s[len(scheme) :].split("_")
-                    assert len(sub) >= 3
+                    assert len(sub) >= 4
                     subdivisions = None
                     if len(sub[0]) != 0:
                         subdivisions = tuple(int(k) for k in sub[0].split("-"))
                         assert len(subdivisions) == 2
+                    if sub[3] == "n":
+                        dt = None
+                    else:
+                        dt = _str2f(sub[3])
                     return Simulation(
                         N=int(sub[1]),
                         vp2_ind=int(sub[2]),
                         subdivisions=subdivisions,
                         scheme=scheme,
-                        scheme_params=_parse_params(scheme, sub[3:]),
+                        scheme_params=_parse_params(scheme, sub[4:]),
+                        dt_val=dt,
                     )
                 except Exception as e:
                     raise ValueError(f'Cannot parse "{s}"') from e
@@ -192,6 +209,8 @@ class Simulation:
 _ALL_SIMS: list[Simulation] | None = None
 _ALL_MESHES: list[Mesh] | None = None
 
+_GRIDTEST_N_VALS = [20, 40]
+
 
 def get_all_experiments() -> list[Simulation]:
     global _ALL_SIMS
@@ -199,7 +218,7 @@ def get_all_experiments() -> list[Simulation]:
         return _ALL_SIMS
 
     # start with the broad grid
-    N_vals = [20, 40]
+    N_vals = _GRIDTEST_N_VALS
     subdivs = [(1, 1), (1, 2), (1, 3)]
     maxsubdiv = 3
     schemes: list[tuple[_scheme_types, dict | None]] = [
@@ -221,6 +240,7 @@ def get_all_experiments() -> list[Simulation]:
                     scheme="cont",
                 )
             )
+            sims[-1].set_dt_by_courant(1e-3)
             for subdiv in subdivs:
                 for scheme in schemes:
                     sims.append(
@@ -232,6 +252,7 @@ def get_all_experiments() -> list[Simulation]:
                             scheme_params=scheme[1],
                         )
                     )
+                    sims[-1].set_dt_by_courant(1e-3)
     # ground truths
 
     for ivp2 in range(len(_vp2_vals)):

@@ -64,6 +64,7 @@ def full_run_experiment(name: str, use_gui: bool = False, verbose: bool = False)
             use_gui=use_gui,
             tasks=tasks_in_experiment(name),
             verbose=verbose,
-            sequential_groups=["gpu"],
+            # sequential_groups=["gpu"],
+            max_concurrent_tasks=10,
         )
         manager.run()

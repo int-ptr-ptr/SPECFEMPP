@@ -88,7 +88,7 @@ class Task:
         group: list[str] | str | None = None,
         dependencies: list["Task"] | None = None,
         on_completion: Callable[[int], None] | None = None,
-        on_pre_run: Callable[[], None] | None = None,
+        on_pre_run: Callable[..., None] | None = None,
         priority: float = 0,
     ):
         self.name = name

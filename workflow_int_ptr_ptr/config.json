@@ -13,7 +13,7 @@
       "meshfem": "${build_dir}/xmeshfem2D",
       "cmake_build_options": "-DKokkos_ENABLE_SERIAL=ON -DCMAKE_BUILD_TYPE=Release -DVTK_CXX_BUILD=OFF"
     },
-    "live":{
+    "live": {
       "build": "${specfem.root}/build",
       "exe": "${specfem.live.build}/bin/specfem2d_eventmarcher",
       "meshfem": "${build}/bin/xmeshfem2D",
@@ -45,9 +45,9 @@
       }
     }
   ],
-  "cg_compare":{
+  "cg_compare": {
     "config_files": {
-      "dir":"${root_dir}/workflow/cg_compare",
+      "dir": "${root_dir}/workflow/cg_compare",
       "meshfem_parfile": "${dir}/PAR_FILE",
       "meshfem_parfile_hires": "${dir}/PAR_FILE_hires",
       "meshfem_parfile_bottom": "${dir}/PAR_FILE_DOUBLE1",
@@ -61,9 +61,9 @@
       "topography_bottom": "${dir}/topo_bot.dat",
       "topography_top": "${dir}/topo_top.dat"
     },
-    "workspace_folder":"${data_dir}/cg_compare",
+    "workspace_folder": "${data_dir}/cg_compare",
     "output_folder": "${output_dir}/cg_compare",
-    "dump_test_resolution":"50",
+    "dump_test_resolution": "50",
     "dt": "0.001",
     "maxsteps": "5000",
     "workspace_files": {
@@ -90,7 +90,7 @@
         "animation_framerate": "5"
       }
     },
-    "outputs":{
+    "outputs": {
       "seismo": "seismo_compare.png",
       "animation_out": "disp_compare.mp4"
     },
@@ -137,9 +137,23 @@
       }
     ]
   },
-  "workspace_builder":{
-    "ref_dir":"${root_dir}/workflow/workspace_builder",
+  "workspace_builder": {
+    "ref_dir": "${root_dir}/workflow/workspace_builder",
     "config_override_ref": "${ref_dir}/config_overrides.conf",
     "init_env_scripts": "${ref_dir}/init_env_scripts"
+  },
+  "simrunner":{
+    "build_search_ignores": []
+  },
+  "lock": {
+    "timeout": 0.3,
+    "gpu": "${user_dir}/gpulock"
+  },
+  "gpu": {
+    "memory_per_elem": 4e5,
+    "memory_cap": 8e9
+  },
+  "lab": {
+    "default_experiment": "snell.FF"
   }
 }

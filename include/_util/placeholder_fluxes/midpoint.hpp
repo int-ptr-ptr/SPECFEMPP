@@ -61,6 +61,7 @@ static void compute_fluxes(specfem::compute::assembly &assembly,
       sigma_edge1[igll_edge] =
           container.h_medium1_field_nderiv(edge1_index, igll_edge, 0) *
           props.rho_inverse();
+      container.h_edge_aux(edge1_index, 2, igll_edge) = sigma_edge1[igll_edge];
     }
 
     index.ispec = edge2_ispec;
@@ -74,6 +75,7 @@ static void compute_fluxes(specfem::compute::assembly &assembly,
       sigma_edge2[igll_edge] =
           container.h_medium1_field_nderiv(edge2_index, igll_edge, 0) *
           props.rho_inverse();
+      container.h_edge_aux(edge2_index, 2, igll_edge) = sigma_edge2[igll_edge];
     }
 
     for (int igll_interface = 0; igll_interface < ContainerType::NGLL_INTERFACE;
@@ -102,11 +104,19 @@ static void compute_fluxes(specfem::compute::assembly &assembly,
                               one_minus_crossover_relaxation) /
                          2;
 
+      container.h_intersection_aux(iinterface, 4, igll_interface) = mean_1;
+      container.h_intersection_aux(iinterface, 5, igll_interface) = mean_2;
+      container.h_intersection_aux(iinterface, 6, igll_interface) =
+          jump_penalty;
+      jump_penalty;
       const type_real Jw = container.h_interface_surface_jacobian_times_weight(
           iinterface, igll_interface);
 
       type_real integrand1 = (mean_1 - jump_penalty) * Jw;
       type_real integrand2 = (mean_2 + jump_penalty) * Jw;
+
+      container.h_intersection_aux(iinterface, 2, igll_interface) = integrand1;
+      container.h_intersection_aux(iinterface, 3, igll_interface) = integrand2;
       //   integrand1 = container.template edge_to_mortar<1, false>(
       //     iinterface, igll_interface, sigma_edge1) * Jw / 2;
       //   integrand2 = container.template edge_to_mortar<2, false>(
@@ -127,7 +137,12 @@ static void compute_fluxes(specfem::compute::assembly &assembly,
                                                 edge1_type);
     _util::placeholder_fluxes::fix_free_surface(assembly, accel2, edge2_ispec,
                                                 edge2_type);
-
+    for (int igll_edge = 0; igll_edge < ContainerType::NGLL_EDGE; igll_edge++) {
+      container.h_intersection_aux(iinterface, 0, igll_edge) =
+          accel1[igll_edge].acceleration(0);
+      container.h_intersection_aux(iinterface, 1, igll_edge) =
+          accel2[igll_edge].acceleration(0);
+    }
     container.template atomic_add_to_field<1, false>(edge1_index, assembly,
                                                      accel1);
     container.template atomic_add_to_field<2, false>(edge2_index, assembly,

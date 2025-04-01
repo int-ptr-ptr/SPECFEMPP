@@ -7,13 +7,55 @@ from typing import Any, Iterable
 FILENAME_MASTER_CONFIG = "config.json"
 FILENAME_CONFIG_OVERRIDE = "workspace.conf"
 USER_FOLDERNAME = "_user"
-DEFAULT_USER_CONFIG = f"{USER_FOLDERNAME}/config_override.json"
+DEFAULT_USER_CONFIG = "config_override.json"
+
+_found_config_path = None
+_found_user_path = None
 
 # loaded configuration
 _config = None
 
 
+def _override_config(
+    target: dict[str, list | dict | str],
+    override: dict[str, list | dict | str],
+    namespace=None,
+):
+    for k, v in override.items():
+        namespace_new = k if namespace is None else f"{namespace}.{k}"
+        if k in target:
+            tv = target[k]
+            if isinstance(v, list) and isinstance(tv, list):
+                if len(v) > 0 and (v[0] == "${...}" or v[0] == "$..."):
+                    tv.extend(v[1:])
+                else:
+                    target[k] = v
+            elif isinstance(v, dict) and isinstance(tv, dict):
+                _override_config(tv, v, namespace=namespace_new)
+            elif isinstance(v, str) and isinstance(tv, str):
+                target[k] = v
+            else:
+                raise ValueError(
+                    f"Attempting to override value {namespace_new} with a different type."
+                )
+
+        else:
+            target[k] = v
+
+
+def _make_userfol():
+    global _found_user_path
+    if _found_config_path is not None:
+        userfol = os.path.join(os.path.dirname(_found_config_path), USER_FOLDERNAME)
+        _found_user_path = userfol
+        if not os.path.exists(userfol):
+            os.mkdir(userfol)
+            with open(os.path.join(userfol, ".gitignore"), "w") as f:
+                f.write("*\n")
+
+
 def _read_default_config_files():
+    global _found_config_path
     # folders where config file could be
     search_folders = []
     config = None
@@ -43,9 +85,11 @@ def _read_default_config_files():
                 with open(file, "r") as f:
                     config = json.load(f)
                     config["root_dir"] = os.path.abspath(folder)
+                    _found_config_path = file
                     found = True
             if found:
-                file = os.path.join(folder, DEFAULT_USER_CONFIG)
+                _make_userfol()
+                file = os.path.join(folder, USER_FOLDERNAME, DEFAULT_USER_CONFIG)
                 if os.path.exists(file):
                     with open(file, "r") as f:
                         user_config = json.load(f)
@@ -57,8 +101,10 @@ def _read_default_config_files():
         sys.exit(1)
 
     if user_config is not None:
-        config |= user_config
+        _override_config(config, user_config)
+    config["user_dir"] = _found_user_path
 
+    # set after
     return config
 
 
@@ -157,8 +203,45 @@ def _expand_references(entries):
     return config
 
 
+def set_user_config(name: str, entry):
+    conf = dict()
+    try:
+        with open(os.path.join(_found_user_path, DEFAULT_USER_CONFIG), "r") as f:  # type: ignore
+            conf = json.load(f)
+    except IOError:
+        ...
+    target_type = type(entry)
+    # store
+
+    namespaces = name.split(".")
+    found = conf
+    found_parent = conf
+    try:
+        for i, resnav in enumerate(namespaces):
+            if isinstance(found, list):
+                found_parent = found
+                rn = int(resnav)
+
+                # this may raise an index error. Let it happen
+                found = found[rn]  # type: ignore
+            else:
+                found_parent = found
+                if resnav not in found:
+                    # found = entry. They need to be the same type
+                    found[resnav] = dict() if i + 1 < len(namespaces) else target_type()
+                found = found[resnav]  # type: ignore
+
+        _override_config(found_parent, {namespaces[-1]: entry})  # type: ignore
+    except Exception as e:
+        raise ValueError(f'Unable to resolve name "{name}"') from e
+
+    with open(os.path.join(_found_user_path, DEFAULT_USER_CONFIG), "w") as f:  # type: ignore
+        json.dump(conf, f)
+
+
 _default_unexpanded_conf = _read_default_config_files()
 _config = _expand_references(_default_unexpanded_conf)
 
 if __name__ == "__main__":
     print(get("cg_compare.workspace_files.provenance_seismo"))
+    # set_user_config("simrunneTr.build_search_ignores",["build_debug_mpi"])

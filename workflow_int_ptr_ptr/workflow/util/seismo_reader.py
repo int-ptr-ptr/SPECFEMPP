@@ -8,6 +8,8 @@ import matplotlib.lines as mplines
 import matplotlib.pyplot as plt
 import numpy as np
 
+from workflow.util import pass_supported_kwargs
+
 
 @dataclass
 class Station:
@@ -116,8 +118,16 @@ class SeismogramCollection:
             dtype=float,
         )
 
+    def get_seismo(self, station: int, seistype: SeismoType) -> None | np.ndarray:
+        sind = seistype.index
+        if sind not in self._seismos:
+            return None
+        return self._seismos[sind][station]
 
-_ylim_rule_names_T = Literal["none", "set", "max_of_no_nan", "rel_to_ground_truth"]
+
+_ylim_rule_names_T = Literal[
+    "none", "set", "max_of_no_nan", "rel_to_ground_truth", "max_of_within_range"
+]
 
 
 def _ylim_rule_default_data(rule: _ylim_rule_names_T, obj: "SeismoYlimRule"):
@@ -133,6 +143,12 @@ def _ylim_rule_default_data(rule: _ylim_rule_names_T, obj: "SeismoYlimRule"):
             "high": None if "high" not in obj.all_data else obj.all_data["high"],
         }
     elif rule == "rel_to_ground_truth":
+        return {
+            "low": np.inf,
+            "high": -np.inf,
+            "margin": 0.05 if "margin" not in obj.all_data else obj.all_data["margin"],
+        }
+    elif rule == "max_of_within_range":
         return {
             "low": np.inf,
             "high": -np.inf,
@@ -186,6 +202,29 @@ class SeismoYlimRule:
             if hi < lo:
                 return (None, None)
             return (lo - margin, hi + margin)
+        elif self.rule == "max_of_within_range":
+            if "min" not in self.all_data:
+                self.all_data["min"] = -np.inf
+            if "max" not in self.all_data:
+                self.all_data["max"] = np.inf
+            if "ignore_collections" not in self.all_data:
+                self.all_data["ignore_collections"] = []
+            datamin = np.min(y)
+            datamax = np.max(y)
+            if (
+                self.all_data["min"] < datamin
+                and datamax < self.all_data["max"]
+                and collection_index not in self.all_data["ignore_collections"]
+            ):
+                data["low"] = min(data["low"], datamin)
+                data["high"] = max(data["high"], datamax)
+            lo = data["low"]
+            hi = data["high"]
+            margin = data["margin"] * (hi - lo)
+            if hi < lo:
+                return (None, None)
+            return (lo - margin, hi + margin)
+
         return (None, None)
 
 
@@ -322,6 +361,7 @@ class SeismoDump:
         plt_title: str | None = None,
         fig_complete_callback: Callable | None = None,
         axtitles_inside: bool = False,
+        preplot_callback: Callable[..., bool] | None = None,
     ):
         """Plots onto the given axes (creates a new set of subplots if axes is None.)
 
@@ -373,7 +413,6 @@ class SeismoDump:
             indexing_func = lambda station, seismotype: get_ax(  # noqa: E731
                 stype_map[seismotype.index], station.station_index
             )
-
         if indexing_func is None:
             raise TypeError("if axes are given, indexing_func must be as well.")
 
@@ -390,17 +429,27 @@ class SeismoDump:
 
             for iseistype, seislist in seismocol._seismos.items():
                 seistype = SeismoType.from_index(iseistype)
-                for istation, seis in enumerate(seislist):
-                    if seis is not None:
+                for istation, seis_ in enumerate(seislist):
+                    if seis_ is not None:
+                        seis = seis_.copy()
                         station = self.stations[istation]
                         ind = indexing_func(station, seistype)
                         a = axes[ind]  # we may need to switch to a dunder getitem
-                        a.plot(
-                            seis[:, 0],
-                            seis[:, 1],
-                            color=plot_color,
-                            linestyle=plot_linestyle,
-                        )
+                        plot_kwargs = {"color": plot_color, "linestyle": plot_linestyle}
+
+                        if preplot_callback is not None and (
+                            not pass_supported_kwargs(
+                                preplot_callback,
+                                ax=a,
+                                seismogram_type=seistype,
+                                data=seis,
+                                station_index=istation,
+                                collection_index=icollection,
+                                plot_kwargs=plot_kwargs,
+                            )
+                        ):
+                            continue
+                        a.plot(seis[:, 0], seis[:, 1], **plot_kwargs)
                         a.set_ylim(
                             ylim_rule.handle(
                                 ind, seis[:, 0], seis[:, 1], self, icollection
@@ -423,7 +472,9 @@ class SeismoDump:
         if legend_kwargs is not None:
             plt.gcf().legend(handles=self.get_legend_handles(), **legend_kwargs)
         if fig_complete_callback is not None:
-            fig_complete_callback(axes=axes, indexing_func=indexing_func)
+            pass_supported_kwargs(
+                fig_complete_callback, axes=axes, indexing_func=indexing_func
+            )
         if show:
             plt.show()
         if save_filename is not None:
