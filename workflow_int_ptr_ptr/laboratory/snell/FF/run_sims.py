@@ -25,6 +25,7 @@ def get_runsim_task(
     subdivs: tuple[int, int] | None,
     steps_per_dump: int | None = None,
     use_gpu: bool = False,
+    use_new_abs: bool = True,
 ):
     if steps_per_dump is None:
         steps_per_dump = max(1, int(0.05 / dt))
@@ -82,6 +83,7 @@ def get_runsim_task(
         afmode += f" --flux_TR {scheme_params['TR']:.3e}"
     if "XR" in scheme_params:
         afmode += f" --flux_XR {scheme_params['XR']:.3e}"
+    abs_flags = " --absorb_top --absorb_bottom" if use_new_abs else ""
     task = SpecfemEMTask(
         sim_dir,
         group="gpu",
@@ -89,7 +91,7 @@ def get_runsim_task(
         cwd=workdir,
         on_pre_run=set_parfile,
         on_completion=compile_series,
-        additional_args=f"--lr_periodic --absorb_top --absorb_bottom --dumpfolder {outdir} --dump {steps_per_dump} --kill_boundaries"
+        additional_args=f"--lr_periodic{abs_flags} --dumpfolder {outdir} --dump {steps_per_dump}"
         + afmode,
     )
     return task, parfile
@@ -99,11 +101,11 @@ def NSTEP(dt):
     return int(1.5 / dt)
 
 
-def run(sim: Simulation):
+def run(sim: Simulation, use_new_abs: bool = True):
     simname = sim.simname()
 
     with gpulock.GPULock(
-        utilization=0.5,
+        utilization=0.65,
         alloted_time=10 * 60,
         request_timeout=1,
         enter_serial_context_on_fail=True,
@@ -118,6 +120,7 @@ def run(sim: Simulation):
             scheme_params=sim.scheme_params,
             subdivs=sim.subdivisions,
             use_gpu=gpu,
+            use_new_abs=use_new_abs,
         )
         task.job.print_updates = True
 

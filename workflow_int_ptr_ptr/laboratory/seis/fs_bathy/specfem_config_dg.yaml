@@ -31,12 +31,12 @@ parameters:
             format: ascii
             directory: ./OUTPUT_FILES/seismo_dg
 
-          display:
-            format: PNG
-            directory: ./OUTPUT_FILES/display_dg
-            field: displacement
-            simulation-field: forward
-            time-interval: 100
+          # display:
+          #   format: PNG
+          #   directory: ./OUTPUT_FILES/display_dg
+          #   field: displacement
+          #   simulation-field: forward
+          #   time-interval: 100
 
   receivers:
     stations: ./OUTPUT_FILES/STATIONS

@@ -56,9 +56,9 @@ record_at_surface_same_vertical = .false.        # receivers inside the medium o
 # second receiver set (repeat these 6 lines and adjust nreceiversets accordingly)
 nrec                            = 1              # number of receivers
 xdeb                            = 1.000d+04      # first receiver x in meters
-zdeb                            = 5.472d+03      # first receiver z in meters
+zdeb                            = 5.552d+03      # first receiver z in meters
 xfin                            = 1.000d+04      # last receiver x in meters (ignored if only one receiver)
-zfin                            = 5.472d+03      # last receiver z in meters (ignored if only one receiver)
+zfin                            = 5.552d+03      # last receiver z in meters (ignored if only one receiver)
 record_at_surface_same_vertical = .false.        # receivers inside the medium or at the surface
 
 # filename to store stations file

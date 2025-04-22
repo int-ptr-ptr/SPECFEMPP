@@ -1,4 +1,4 @@
 Par_File*
 topo*.dat
-specfem_config.yaml
+specfem_config*.yaml
 meshconf.json

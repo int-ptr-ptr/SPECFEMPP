@@ -164,6 +164,16 @@ def compute_arrivals(
             if t < tmax:
                 T_arrivals.append(t)
                 x_crossovers.append((x, nan))
+
+            # include reflections if short enough time
+            len_refl = ((0.5 - sourceloc[1]) ** 2 + ((xdiff) / 2) ** 2) ** 0.5 + (
+                (0.5 - z) ** 2 + ((xdiff) / 2) ** 2
+            ) ** 0.5
+            t = len_refl / c
+            if t < tmax:
+                T_arrivals.append(t)
+                x_crossovers.append((x, (x + sourceloc[0]) / 2))
+
             keep_going = True
             while keep_going:
                 num_cycles += 1
@@ -179,6 +189,27 @@ def compute_arrivals(
                     T_arrivals.append(t)
                     x_crossovers.append((x - num_cycles, nan))
                     keep_going = True
+
+                # include reflections if short enough time
+                len_refl = (
+                    (0.5 - sourceloc[1]) ** 2 + ((xdiff + num_cycles) / 2) ** 2
+                ) ** 0.5 + ((0.5 - z) ** 2 + ((xdiff + num_cycles) / 2) ** 2) ** 0.5
+                t = len_refl / c
+                if t < tmax:
+                    T_arrivals.append(t)
+                    x_crossovers.append(
+                        (x + num_cycles, (x + num_cycles + sourceloc[0]) / 2)
+                    )
+
+                len_refl = (
+                    (0.5 - sourceloc[1]) ** 2 + ((xdiff - num_cycles) / 2) ** 2
+                ) ** 0.5 + ((0.5 - z) ** 2 + ((xdiff - num_cycles) / 2) ** 2) ** 0.5
+                t = len_refl / c
+                if t < tmax:
+                    T_arrivals.append(t)
+                    x_crossovers.append(
+                        (x - num_cycles, (x - num_cycles + sourceloc[0]) / 2)
+                    )
 
         arrivals[station.station_index] = T_arrivals
         crossovers[station.station_index] = x_crossovers
@@ -212,6 +243,7 @@ def make_arrival_include_func(
                         xycoords=("data", "axes fraction"),
                         va="bottom",
                         ha="center",
+                        fontsize=5,
                     )
             if legends_and_labels:
                 lax = axes[0, -1] if axdim == 2 else axes[0]  # type: ignore
@@ -389,7 +421,7 @@ def compare_sims_conform_by_vp(
         #         ax = axes[indexing_func(station, stype)]
         #         ax.set_ylim(-1,1)
 
-    fig_len = 10
+    fig_len = 7
     seismo_aspect = 5
     fig, ax = plt.subplots(
         nrows=len(seismo.seismogram_types) * len(seismo.stations),
@@ -402,9 +434,10 @@ def compare_sims_conform_by_vp(
             * len(seismo.stations),
         ),
         sharex=True,
+        sharey="col",
     )
     for i in range(ax.shape[0]):
-        ax[i, 0].set_ylabel("seismogram value")
+        ax[i, 0].set_ylabel("seis. pressure")
         ax[i, 1].set_ylabel("relative error")
     seismo.plot_onto(
         axes=ax,
@@ -418,7 +451,7 @@ def compare_sims_conform_by_vp(
             seismo, vp2, tmax, legends_and_labels=False
         ),
         ylim_rule=SeismoYlimRule(
-            "rel_to_ground_truth", collection_index=ground_truth_ind
+            "rel_to_ground_truth", collection_index=ground_truth_ind, sharey=True
         ),
         axtitles_inside=True,
     )
@@ -428,7 +461,7 @@ def compare_sims_conform_by_vp(
         show=show,
         tlim=(tmin, tmax),
         # legend_kwargs={"loc": "lower left"},
-        plt_title=f"Acoustic-Acoustic Seismogram comparison ($(v_p)_2 = {vp2:.2f}$)",
+        plt_title=f"Acoustic-Acoustic Seismogram comparison ($c_2 = {vp2:.2f}$)",
         save_filename=None if show else outfile,
         fig_complete_callback=on_complete,
         ylim_rule=SeismoYlimRule(
@@ -436,6 +469,7 @@ def compare_sims_conform_by_vp(
             min=-0.1,
             max=0.1,
             ignore_collections=[ground_truth_ind],
+            sharey=True,
         ),
         axtitles_inside=True,
         preplot_callback=plot_error if is_error_plot else None,
@@ -610,7 +644,7 @@ def loadsim(
                         ydata = np.array([sourceloc[1], 0.5, sz])
 
                         if do_ratios:
-                            if sz < 0.5:
+                            if sourceloc[1] > 0.5:
                                 csrc = vp2
                             else:
                                 csrc = 1
@@ -720,7 +754,7 @@ def commands_from_names(name_query: str) -> list[tuple[str, Any]]:
             [
                 name,
                 lambda *args, simname=simname, **kwargs: loadsim(
-                    run_sims_by_name[simname], *args, **kwargs
+                    Simulation.from_str(simname), *args, **kwargs
                 ),
             ]
         )

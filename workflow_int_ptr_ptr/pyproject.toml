@@ -13,6 +13,10 @@ dependencies = ["numpy","matplotlib","ruff", "nox", "pyyaml","opencv-python","ju
 qt = [
   "pyqt6",
 ]
+analysis = [
+  "sympy",
+  "scipy",
+]
 
 
 [tool.hatch.build.targets.sdist]

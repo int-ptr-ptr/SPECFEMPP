@@ -22,14 +22,14 @@ parameters:
         time-scheme:
           type: Newmark
           dt: 1.000e-3
-          nstep: 32500 #this was originally 32500
+          nstep: 32 #this was originally 32500
 
     simulation-mode:
       forward:
         writer:
           seismogram:
             format: ascii
-            directory: ./OUTPUT_FILES/seismo
+            directory: ./OUTPUT_FILES/seismo_trash
 
           # display:
           #   format: PNG

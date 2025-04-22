@@ -18,11 +18,11 @@ output_fol = workdir / output_folname
 analysis_outfol = pathlib.Path(config.get("output_dir")) / "snell" / "FF"
 
 receivers = [
-    ReceiverSeries(nrec=3, xdeb=0.5, zdeb=0.7, xfin=1, zfin=0.7),
-    ReceiverSeries(nrec=3, xdeb=1, zdeb=0.45, xfin=0.5, zfin=0.45),
+    ReceiverSeries(nrec=3, xdeb=0.5, zdeb=0.7, xfin=0.9, zfin=0.7),
+    ReceiverSeries(nrec=3, xdeb=0.9, zdeb=0.2, xfin=0.5, zfin=0.2),
 ]
 
-cfl_default = 1e-2
+cfl_default = 2e-2
 _vp2_vals = [0.25, 0.5, 1.0, 2.0, 4.0]
 
 _scheme_types = Literal["cont", "symm", "upwind", "mid"]
@@ -124,12 +124,12 @@ class Simulation:
         if self.dt_val is not None:
             return self.dt_val
         numcells = self.get_horiz_numcells()
-        return cfl_default / min(numcells[0], numcells[1] * self.vp2())
+        return cfl_default / max(numcells[0], numcells[1] * self.vp2())
 
     def set_dt_by_courant(self, courant: float):
         # C = u * dt / dx,   # dt = C * dx / u = C * (L/numcells) / u
         numcells = self.get_horiz_numcells()
-        self.dt_val = courant / min(
+        self.dt_val = courant / max(
             numcells[0] * 1,  # vp1 = 1
             numcells[1] * self.vp2(),
         )
@@ -240,7 +240,7 @@ def get_all_experiments() -> list[Simulation]:
                     scheme="cont",
                 )
             )
-            sims[-1].set_dt_by_courant(1e-3)
+            # sims[-1].set_dt_by_courant(1e-3)
             for subdiv in subdivs:
                 for scheme in schemes:
                     sims.append(
@@ -252,7 +252,7 @@ def get_all_experiments() -> list[Simulation]:
                             scheme_params=scheme[1],
                         )
                     )
-                    sims[-1].set_dt_by_courant(1e-3)
+                    # sims[-1].set_dt_by_courant(1e-3)
     # ground truths
 
     for ivp2 in range(len(_vp2_vals)):
@@ -381,6 +381,42 @@ def get_all_tasks():
         for dep in task["deps"]:
             if dep in experiment_tasks and experiment_tasks[dep]["priority"] > 0:
                 experiment_tasks[dep]["priority"] = 0
+
+    arrivaldata = dict()
+    with open(workdir / "arrival_comparison.json", "r") as f:
+        arrivaldata = json.load(f)
+    for key, value in arrivaldata.items():
+        ivp2 = int(key)
+        if "export_prefix" not in value:
+            continue
+        simdeps = [sim for sim in get_all_experiments() if sim.vp2_ind == ivp2]
+        tasks.append(
+            {
+                "id": f"arrival_comp {ivp2}",
+                "type": "script",
+                "command": f"python arrival_comparison.py !TASK[{ivp2}]!",
+                "files_in": [
+                    "arrival_comparison.py",
+                    "arrival_comparison.json",
+                    *(str(output_fol / sim.simname() / "dumps.dat") for sim in simdeps),
+                ],
+                "files_out": [str(analysis_outfol / (value["export_prefix"] + ".png"))],
+                "deps": [sim.taskname() for sim in simdeps],
+            }
+        )
+
+    # domain draw
+    tasks.append(
+        {
+            "id": "domain plot",
+            "type": "script",
+            "command": "python arrival_comparison.py !TASK[domain]!",
+            "files_in": [
+                "arrival_comparison.py",
+            ],
+            "files_out": [str(analysis_outfol / "domain.png")],
+        }
+    )
 
     return {"tasks": tasks, "priority_overrides": prio_overrides}
 

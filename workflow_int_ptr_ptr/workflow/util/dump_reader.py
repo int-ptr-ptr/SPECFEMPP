@@ -799,6 +799,33 @@ class dump_frame:
         if show:
             plt.show()
 
+    def plot_mesh(
+        self,
+        plt_cell_margin=0,
+        draw_cell_borders=True,
+        figsize=None,
+        title=None,
+        show=True,
+        current_axes=None,
+    ):
+        pt_centers = self.cell_centers[:, np.newaxis, np.newaxis, :]
+        pts_plt = (1 - plt_cell_margin) * self.pts + plt_cell_margin * pt_centers
+        if figsize is not None and current_axes is None:
+            plt.figure(figsize=figsize)
+        active = plt if current_axes is None else current_axes
+        if draw_cell_borders:
+            active.plot(pts_plt[:, :, -1, 0].T, pts_plt[:, :, -1, 1].T, ":k")
+            active.plot(pts_plt[:, :, 0, 0].T, pts_plt[:, :, 0, 1].T, ":k")
+            active.plot(pts_plt[:, -1, :, 0].T, pts_plt[:, -1, :, 1].T, ":k")
+            active.plot(pts_plt[:, -1, :, 0].T, pts_plt[:, 0, :, 1].T, ":k")
+        if title is not None:
+            if current_axes is None:
+                plt.title(title)
+            else:
+                current_axes.set_title(title)
+        if show:
+            plt.show()
+
     def plot_edge_field(
         self, field, plt_cell_margin=0.5, figsize=None, title=None, show=True
     ):

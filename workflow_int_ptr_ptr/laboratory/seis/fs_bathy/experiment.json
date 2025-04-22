@@ -28,13 +28,28 @@
       "type": "specfemem",
       "parfile": "specfem_config_dg.yaml",
       "id": "sfdg1",
-      "deps":["mesher_halfres","sfcg"]
+      "deps":["mesher_halfres","sfcg"],
+      "args": "-d 100000 -D OUTPUT_FILES/dumps_dg"
+    },
+    {
+      "type": "specfemem",
+      "parfile": "specfem_config_dumpget.yaml",
+      "id": "sfdg2",
+      "deps":["mesher_hires","sfcg"],
+      "args": "-d 100000 -D OUTPUT_FILES/dumps_cg"
     },
     {
       "type": "script",
       "command": "python plot.py",
       "deps":["sfcg","sfdg1"],
       "files_in": ["OUTPUT_FILES/seismo","OUTPUT_FILES/seismo_dg","plot.py"]
+    },
+    {
+      "type": "script",
+      "command": "python domains.py",
+      "deps":["sfdg2","sfdg1"],
+      "files_in": ["OUTPUT_FILES/dumps_cg","OUTPUT_FILES/dumps_dg"],
+      "files_out": ["OUTPUT_FILES/dof.txt"]
     }
   ]
 }

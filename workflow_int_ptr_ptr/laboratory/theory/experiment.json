@@ -1,0 +1,11 @@
+{
+  "tasks": [
+    {
+      "id": "eigenvalues",
+      "type": "script",
+      "command": "python eigenvalues.py",
+      "deps":[],
+      "files_in": ["eigenvalues.py"]
+    }
+  ]
+}

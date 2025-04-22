@@ -74,18 +74,28 @@ class SeismoType(enum.Enum):
 class SeismogramCollection:
     _seismos: dict[int, list[np.ndarray | None]] = field(default_factory=dict)
     _num_stations: int = 0
-    plot_color = None
+    plot_color: Any = None
     plot_linestyle: (
         Literal["solid", "dashed", "dashdot", "dotted"]
         | tuple[float, tuple[float, ...]]
     ) = "solid"
     plot_label: str | None = None
 
+    def copy_with_datachange(self, _seismos: dict[int, list[np.ndarray | None]]):
+        num_stations = max(len(v) for v in _seismos.values())
+        return SeismogramCollection(
+            _seismos=_seismos,
+            _num_stations=num_stations,
+            plot_color=self.plot_color,
+            plot_linestyle=self.plot_linestyle,
+            plot_label=self.plot_label,
+        )
+
     def seistype(self, types: SeismoType | Iterable[SeismoType]):
         if isinstance(types, SeismoType):
             types = [types]
 
-        return SeismogramCollection(
+        return self.copy_with_datachange(
             _seismos={
                 t: v
                 for t, v in self._seismos.items()
@@ -97,11 +107,34 @@ class SeismogramCollection:
         if isinstance(stations, int):
             stations = [stations]
 
-        return SeismogramCollection(
+        return self.copy_with_datachange(
             _seismos={
                 t: [s for i, s in enumerate(v) if i in stations]
                 for t, v in self._seismos.items()
             }
+        )
+
+    def clip_times(self, tmin: float = -np.inf, tmax: float = np.inf):
+        """Trims seismogram data by removing any data points corresponding to times
+        before `tmin` or after `tmax`. This object
+        remains unmodified, and a replacement is returned.
+
+        Args:
+            tmin (float): The minimum time to keep
+            tmax (float): The maximum time to keep
+
+        Returns:
+            SeismogramCollection: a collection with the trimmed times.
+        """
+
+        def clip(series: np.ndarray | None) -> np.ndarray | None:
+            if series is None:
+                return None
+
+            return series[np.logical_and(tmin <= series[:, 0], series[:, 0] <= tmax), :]
+
+        return self.copy_with_datachange(
+            _seismos={t: [clip(s) for s in v] for t, v in self._seismos.items()}
         )
 
     @staticmethod
@@ -161,11 +194,16 @@ class SeismoYlimRule:
     rule: _ylim_rule_names_T
     intermediate_data: dict[Any, dict]
     all_data: dict
+    sharey: bool
 
     def __init__(self, rule: _ylim_rule_names_T, *args, **kwargs):
         self.rule = rule
         self.intermediate_data = dict()
         self.all_data = kwargs
+        if "sharey" in kwargs:
+            self.sharey = kwargs["sharey"]
+        else:
+            self.sharey = False
 
     def handle(
         self,
@@ -175,6 +213,9 @@ class SeismoYlimRule:
         seisdump: "SeismoDump",
         collection_index: int,
     ) -> tuple:
+        if self.sharey:
+            ind = 0
+
         if ind not in self.intermediate_data:
             self.intermediate_data[ind] = _ylim_rule_default_data(self.rule, self)
 
