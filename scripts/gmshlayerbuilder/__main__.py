@@ -12,7 +12,7 @@ except ImportError:
     import _gmsh2meshfem  # noqa: F401
 
 
-BOUNDARY_TYPES = ["neumann", "acoustic_free_surface", "absorbing"]
+from _gmsh2meshfem.topo_import.layer_builder.layeredbuilder import BOUNDARY_TYPES
 
 
 def get_parser():
@@ -45,28 +45,28 @@ def get_parser():
         choices=BOUNDARY_TYPES,
         help="Boundary type on the top (defaults to neumann)",
         dest="bdry_top",
-        default=BOUNDARY_TYPES[0],
+        default="neumann",
     )
     parser.add_argument(
         "--bottom",
         choices=BOUNDARY_TYPES,
         help="Boundary type on the bottom (defaults to neumann)",
         dest="bdry_bottom",
-        default=BOUNDARY_TYPES[0],
+        default="neumann",
     )
     parser.add_argument(
         "--left",
         choices=BOUNDARY_TYPES,
         help="Boundary type on the left (defaults to neumann)",
         dest="bdry_left",
-        default=BOUNDARY_TYPES[0],
+        default="neumann",
     )
     parser.add_argument(
         "--right",
         choices=BOUNDARY_TYPES,
         help="Boundary type on the right (defaults to neumann)",
         dest="bdry_right",
-        default=BOUNDARY_TYPES[0],
+        default="neumann",
     )
     return parser
 

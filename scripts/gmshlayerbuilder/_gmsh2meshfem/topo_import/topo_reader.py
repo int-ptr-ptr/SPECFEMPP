@@ -1,9 +1,11 @@
 from pathlib import Path
-from typing import Literal
 
 from .layer_builder.layer_boundaries import LerpLayerBoundary
 from .layer_builder.layer import Layer
-from .layer_builder.layeredbuilder import LayeredBuilder
+from .layer_builder.layeredbuilder import (
+    LayeredBuilder,
+    BoundaryConditionType,
+)
 
 
 # processes out comments from topo file
@@ -28,18 +30,10 @@ def _file_get_line(file_input_stream):
 
 def builder_from_topo_file(
     file: Path | str,
-    set_left_boundary: Literal[
-        "neumann", "acoustic_free_surface", "absorbing"
-    ] = "neumann",
-    set_right_boundary: Literal[
-        "neumann", "acoustic_free_surface", "absorbing"
-    ] = "neumann",
-    set_top_boundary: Literal[
-        "neumann", "acoustic_free_surface", "absorbing"
-    ] = "neumann",
-    set_bottom_boundary: Literal[
-        "neumann", "acoustic_free_surface", "absorbing"
-    ] = "neumann",
+    set_left_boundary: BoundaryConditionType = "neumann",
+    set_right_boundary: BoundaryConditionType = "neumann",
+    set_top_boundary: BoundaryConditionType = "neumann",
+    set_bottom_boundary: BoundaryConditionType = "neumann",
 ) -> LayeredBuilder:
     with Path(file).open("r") as f:
         ninterfaces = int(_file_get_line(f))
