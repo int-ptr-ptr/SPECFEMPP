@@ -113,6 +113,16 @@ def interfaces_from_boundaryspec_entities(
             if entity2.start_index <= i_b and i_b < entity2.end_index:
                 elem_b = bdspec.element_inds[i_b]
                 edge_b = bdspec.element_edges[i_b]
+
+                # edge case (lol): an element should not intersect itself on the same side
+                # this might happen if the same boundary is used for two different surfaces.
+
+                # we want to allow entities to be the same, since an entity can be a union
+                # of others, so it may be that two elements on the same entity intersect
+
+                if elem_a == elem_b and edge_a == edge_b:
+                    continue
+
                 edgenodes_b = edges_to_nodes[elem_b, edge_b, :]
 
                 if quadratic_beziers_intersect(

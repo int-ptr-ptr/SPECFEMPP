@@ -155,7 +155,7 @@ class Exporter:
         # node coords
         # =========================
         with (self.destination_folder / self.node_coords_file).open("w") as f:
-            nodes_arr = self.model.nodes
+            nodes_arr = self.model.nodes[...,(0,2)]
 
             # header is number of lines (1 line per node)
             nnodes = nodes_arr.shape[0]

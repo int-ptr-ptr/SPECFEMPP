@@ -85,7 +85,8 @@ class LayerBoundary(ABC):
             if (
                 layer_above is None
                 or layer_below is None
-                or layer_above.is_conforming(layer_below)
+                # for now, don't repeat geometry -- we will just assume users want nonconforming.
+                # or layer_above.is_conforming(layer_below)
             ):
                 object.__setattr__(self, "_curve_copy", self.curve)
                 object.__setattr__(self, "_left_vertex_copy", self.left_vertex)

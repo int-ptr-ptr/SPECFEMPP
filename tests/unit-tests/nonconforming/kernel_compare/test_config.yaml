@@ -1,0 +1,4 @@
+Tests:
+  - name: "4x4 neumann"
+    description: "A 4x4 regular grid (cells 25x25 units) with neumann bcs"
+    mesh: "data/mesh/ncmarked_conforming_grid/database.bin"

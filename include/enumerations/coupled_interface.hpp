@@ -16,6 +16,7 @@
 
 #pragma once
 
+#include "enumerations/connections.hpp"
 #include "enumerations/dimension.hpp"
 #include "enumerations/medium.hpp"
 
@@ -263,5 +264,7 @@ struct attributes<specfem::dimension::type::dim2,
                                    specfem::element::medium_tag::elastic_psv,
                                    false>;
 };
+
+std::string to_string(const interface_tag &interface_tag);
 
 } // namespace specfem::interface
