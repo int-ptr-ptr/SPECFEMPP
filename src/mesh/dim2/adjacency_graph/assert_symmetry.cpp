@@ -3,6 +3,11 @@
 template <>
 void specfem::mesh::adjacency_graph<
     specfem::dimension::type::dim2>::assert_symmetry() const {
+
+  if (this->empty()) {
+    return; // An empty graph is symmetric
+  }
+
   const auto &g = this->graph();
 
   for (const auto &edge : boost::make_iterator_range(boost::edges(g))) {

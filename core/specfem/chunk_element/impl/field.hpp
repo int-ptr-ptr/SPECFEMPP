@@ -210,11 +210,15 @@ public:
 
   /// @brief SIMD type for vectorized operations
   using simd = typename base_type::template simd<type_real>;
+  constexpr static auto using_simd = UseSIMD;
 
   /// @brief Vector type for storing chunk field data with optimized layout
   using value_type =
       typename base_type::template vector_type<type_real, nelements, ngll,
                                                components>;
+
+  /// @brief Dimension tag identifying the physical medium type
+  constexpr static auto dimension_tag = DimensionTag;
 
   /// @brief Medium tag identifying the physical medium type
   constexpr static auto medium_tag = MediumTag;
@@ -283,6 +287,25 @@ public:
   KOKKOS_FORCEINLINE_FUNCTION typename value_type::value_type &
   operator()(Indices... indices) const {
     return m_data(indices...);
+  }
+
+  template <typename IndexType,
+            typename std::enable_if_t<
+                specfem::data_access::is_index_type<IndexType>::value &&
+                    specfem::data_access::is_point<IndexType>::value,
+                int> = 0>
+  KOKKOS_FORCEINLINE_FUNCTION auto &operator()(const IndexType &index) {
+    return m_data(index);
+  }
+
+  template <typename IndexType,
+            typename std::enable_if_t<
+                specfem::data_access::is_index_type<IndexType>::value &&
+                    specfem::data_access::is_point<IndexType>::value,
+                int> = 0>
+  KOKKOS_FORCEINLINE_FUNCTION typename value_type::value_type &
+  operator()(const IndexType &index, const int &icomp) {
+    return m_data(index, icomp);
   }
 
   /**

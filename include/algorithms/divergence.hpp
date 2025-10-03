@@ -54,9 +54,6 @@ KOKKOS_FUNCTION void divergence(
   using VectorPointViewType =
       specfem::datatype::VectorPointViewType<type_real, components, using_simd>;
 
-  static_assert(VectorFieldType::isVectorViewType,
-                "ViewType must be a vector field view type");
-
   static_assert(
       std::is_invocable_v<CallableType,
                           typename ChunkIndexType::iterator_type::index_type,
@@ -75,7 +72,7 @@ KOKKOS_FUNCTION void divergence(
       chunk_index.get_iterator(),
       [&](const typename ChunkIndexType::iterator_type::index_type
               &iterator_index) {
-        const auto ielement = iterator_index.get_policy_index();
+        const auto ielement = iterator_index.get_local_index().ispec;
         const auto index = iterator_index.get_index();
         const int iz = index.iz;
         const int ix = index.ix;

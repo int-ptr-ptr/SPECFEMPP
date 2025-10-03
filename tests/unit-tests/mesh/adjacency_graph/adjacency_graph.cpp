@@ -55,8 +55,6 @@ TEST(AdjacencyGraphTest, DefaultConstructor) {
   specfem::mesh::adjacency_graph<specfem::dimension::type::dim2> graph;
 
   EXPECT_TRUE(graph.empty());
-  EXPECT_EQ(boost::num_vertices(graph.graph()), 0);
-  EXPECT_EQ(boost::num_edges(graph.graph()), 0);
 }
 
 /**

@@ -2,6 +2,7 @@
 
 #include "enumerations/interface.hpp"
 #include <boost/graph/adjacency_list.hpp>
+#include <memory>
 
 namespace specfem::mesh {
 
@@ -66,7 +67,7 @@ private:
                             boost::no_property, EdgeProperties>;
 
   /** @brief The underlying Boost graph storing adjacency relationships */
-  Graph graph_;
+  std::shared_ptr<Graph> p_graph_;
 
 public:
   /**
@@ -74,7 +75,7 @@ public:
    *
    * Creates an empty adjacency graph with no vertices or edges.
    */
-  adjacency_graph() = default;
+  adjacency_graph() : p_graph_(std::make_shared<Graph>(0)) {}
 
   /**
    * @brief Constructor with specified number of spectral elements
@@ -84,7 +85,7 @@ public:
    *
    * @param nspec Number of spectral elements in the mesh
    */
-  adjacency_graph(const int nspec) : graph_(nspec) {}
+  adjacency_graph(const int nspec) : p_graph_(std::make_shared<Graph>(nspec)) {}
 
   /**
    * @brief Get mutable reference to the underlying graph
@@ -94,7 +95,7 @@ public:
    *
    * @return Mutable reference to the Boost adjacency_list graph
    */
-  Graph &graph() { return graph_; }
+  Graph &graph() { return *p_graph_; }
 
   /**
    * @brief Get const reference to the underlying graph
@@ -104,7 +105,7 @@ public:
    *
    * @return Const reference to the Boost adjacency_list graph
    */
-  const Graph &graph() const { return graph_; }
+  const Graph &graph() const { return *p_graph_; }
 
   // TODO(Rohit: ADJ_GRAPH_DEFAULT)
   // Graph should never be empty after it is made as default
@@ -116,7 +117,7 @@ public:
    *
    * @return true if the graph has no vertices, false otherwise
    */
-  bool empty() const { return boost::num_vertices(graph_) == 0; }
+  bool empty() const { return (boost::num_vertices(*p_graph_) == 0); }
 
   /**
    * @brief Assert that the adjacency graph is symmetric

@@ -139,7 +139,7 @@ public:
    * @brief Returns the assembled index given element index.
    *
    */
-  template <bool on_device>
+  template <bool on_device, typename IndexType>
   KOKKOS_INLINE_FUNCTION constexpr int
   get_iglob(const int &ispec, const int &iz, const int &iy, const int &ix,
             const specfem::element::medium_tag MediumTag) const {
@@ -161,6 +161,40 @@ public:
                             }
                           })
     }
+  }
+
+  /**
+   * @brief Returns the assembled index given element index.
+   *
+   */
+  template <bool on_device, typename IndexType,
+            typename std::enable_if_t<
+                specfem::data_access::is_index_type<IndexType>::value &&
+                    IndexType::using_simd == false &&
+                    IndexType::dimension_tag == specfem::dimension::type::dim3,
+                int> = 0>
+  KOKKOS_INLINE_FUNCTION constexpr int
+  get_iglob(const IndexType &index,
+            const specfem::element::medium_tag MediumTag) const {
+    return get_iglob<on_device>(index.ispec, index.iz, index.iy, index.ix,
+                                MediumTag);
+  }
+
+  /**
+   * @brief Returns the assembled index given element index.
+   *
+   */
+  template <bool on_device, typename IndexType,
+            typename std::enable_if_t<
+                specfem::data_access::is_index_type<IndexType>::value &&
+                    IndexType::using_simd == true &&
+                    IndexType::dimension_tag == specfem::dimension::type::dim3,
+                int> = 0>
+  KOKKOS_INLINE_FUNCTION constexpr int
+  get_iglob(const IndexType &index, const int &lane,
+            const specfem::element::medium_tag MediumTag) const {
+    return get_iglob<on_device>(index.ispec + lane, index.iz, index.iy,
+                                index.ix, MediumTag);
   }
 
   int nglob = 0; ///< Number of global degrees of freedom

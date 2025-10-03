@@ -1,6 +1,5 @@
 #pragma once
 
-#include "algorithms/dot.hpp"
 #include "algorithms/gradient.hpp"
 #include "enumerations/medium.hpp"
 #include "medium/compute_stress.hpp"
@@ -62,7 +61,7 @@ KOKKOS_FUNCTION void impl_compute_wavefield(
                 &iterator_index,
             const FieldDerivativesType::value_type &du) {
           const auto index = iterator_index.get_index();
-          const int ielement = iterator_index.get_policy_index();
+          const int ielement = iterator_index.get_local_index().ispec;
           PointPropertyType point_property;
 
           specfem::assembly::load_on_device(index, properties, point_property);
@@ -103,7 +102,7 @@ KOKKOS_FUNCTION void impl_compute_wavefield(
       [&](const typename ChunkIndexType::iterator_type::index_type
               &iterator_index) {
         const auto index = iterator_index.get_index();
-        const int ielement = iterator_index.get_policy_index();
+        const int ielement = iterator_index.get_local_index().ispec;
         wavefield(ielement, index.iz, index.ix, 0) =
             active_field(ielement, index.iz, index.ix, 0);
         wavefield(ielement, index.iz, index.ix, 1) =
@@ -161,7 +160,7 @@ KOKKOS_FUNCTION void impl_compute_wavefield(
       [&](const typename ChunkIndexType::iterator_type::index_type
               &iterator_index) {
         const auto index = iterator_index.get_index();
-        const int ielement = iterator_index.get_policy_index();
+        const int ielement = iterator_index.get_local_index().ispec;
         wavefield(ielement, index.iz, index.ix, 0) =
             active_field(ielement, index.iz, index.ix, 0);
       });

@@ -175,6 +175,39 @@ public:
     return -1;
   }
 
+  /**
+   * @brief Returns the assembled index given element index.
+   *
+   */
+  template <bool on_device, typename IndexType,
+            typename std::enable_if_t<
+                specfem::data_access::is_index_type<IndexType>::value &&
+                    IndexType::using_simd == false &&
+                    IndexType::dimension_tag == specfem::dimension::type::dim2,
+                int> = 0>
+  KOKKOS_INLINE_FUNCTION constexpr int
+  get_iglob(const IndexType &index,
+            const specfem::element::medium_tag MediumTag) const {
+    return get_iglob<on_device>(index.ispec, index.iz, index.ix, MediumTag);
+  }
+
+  /**
+   * @brief Returns the assembled index given element index.
+   *
+   */
+  template <bool on_device, typename IndexType,
+            typename std::enable_if_t<
+                specfem::data_access::is_index_type<IndexType>::value &&
+                    IndexType::using_simd == true &&
+                    IndexType::dimension_tag == specfem::dimension::type::dim2,
+                int> = 0>
+  KOKKOS_INLINE_FUNCTION constexpr int
+  get_iglob(const IndexType &index, const int &lane,
+            const specfem::element::medium_tag MediumTag) const {
+    return get_iglob<on_device>(index.ispec + lane, index.iz, index.ix,
+                                MediumTag);
+  }
+
   int nglob = 0; ///< Number of global degrees of freedom
   int nspec;     ///< Number of spectral elements
   int ngllz;     ///< Number of quadrature points in z direction
