@@ -20,12 +20,10 @@ target_link_libraries(
         ${BOOST_LIBS}
 )
 
-if (__INTEL_LLVM__)
-    set_target_properties(assembly PROPERTIES
-            # UNITY_BUILD OFF
-            UNITY_BUILD_BATCH_SIZE 2
-    )
-endif()
+set_target_properties(assembly PROPERTIES
+    # UNITY_BUILD $<NOT:$<BOOL:${__INTEL_LLVM__}>>
+    UNITY_BUILD_BATCH_SIZE $<IF:$<BOOL:${__INTEL_LLVM__}>,2,8>
+)
 
 
 if (NOT SPECFEM_ENABLE_VTK)

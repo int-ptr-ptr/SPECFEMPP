@@ -1,6 +1,7 @@
 #pragma once
 
 #include "enumerations/interface.hpp"
+#include "enumerations/interface_definitions.hpp"
 #include "enumerations/material_definitions.hpp"
 #include "impl/interface_container.hpp"
 #include "specfem/assembly/coupled_interfaces.hpp"
@@ -52,30 +53,20 @@ public:
 
 private:
   template <specfem::interface::interface_tag InterfaceTag,
-            specfem::element::boundary_tag BoundaryTag>
+            specfem::element::boundary_tag BoundaryTag,
+            specfem::connections::type ConnectionTag>
   using InterfaceContainerType =
       specfem::assembly::coupled_interfaces_impl::interface_container<
-          dimension_tag, InterfaceTag, BoundaryTag>;
-  template <specfem::interface::interface_tag InterfaceTag,
-            specfem::element::boundary_tag BoundaryTag>
-  using NonconformingInterfaceContainerType =
-      specfem::assembly::nonconforming_interfaces_impl::interface_container<
-          dimension_tag, InterfaceTag, BoundaryTag>;
+          dimension_tag, InterfaceTag, BoundaryTag, ConnectionTag>;
 
-  FOR_EACH_IN_PRODUCT((DIMENSION_TAG(DIM2), CONNECTION_TAG(WEAKLY_CONFORMING),
-                       INTERFACE_TAG(ELASTIC_ACOUSTIC, ACOUSTIC_ELASTIC),
-                       BOUNDARY_TAG(NONE, ACOUSTIC_FREE_SURFACE, STACEY,
-                                    COMPOSITE_STACEY_DIRICHLET)),
-                      DECLARE(((InterfaceContainerType,
-                                (_INTERFACE_TAG_, _BOUNDARY_TAG_)),
-                               interface_container)))
-  FOR_EACH_IN_PRODUCT((DIMENSION_TAG(DIM2), CONNECTION_TAG(NONCONFORMING),
-                       INTERFACE_TAG(ELASTIC_ACOUSTIC, ACOUSTIC_ELASTIC),
-                       BOUNDARY_TAG(NONE, ACOUSTIC_FREE_SURFACE, STACEY,
-                                    COMPOSITE_STACEY_DIRICHLET)),
-                      DECLARE(((NonconformingInterfaceContainerType,
-                                (_INTERFACE_TAG_, _BOUNDARY_TAG_)),
-                               interface_container)))
+  FOR_EACH_IN_PRODUCT(
+      (DIMENSION_TAG(DIM2), CONNECTION_TAG(WEAKLY_CONFORMING, NONCONFORMING),
+       INTERFACE_TAG(ELASTIC_ACOUSTIC, ACOUSTIC_ELASTIC),
+       BOUNDARY_TAG(NONE, ACOUSTIC_FREE_SURFACE, STACEY,
+                    COMPOSITE_STACEY_DIRICHLET)),
+      DECLARE(((InterfaceContainerType,
+                (_INTERFACE_TAG_, _BOUNDARY_TAG_, _CONNECTION_TAG_)),
+               interface_container)))
 
 public:
   /**
@@ -134,9 +125,10 @@ public:
    * ```
    */
   template <specfem::interface::interface_tag InterfaceTag,
-            specfem::element::boundary_tag BoundaryTag>
+            specfem::element::boundary_tag BoundaryTag,
+            specfem::connections::type ConnectionTag>
   KOKKOS_INLINE_FUNCTION const
-      InterfaceContainerType<InterfaceTag, BoundaryTag> &
+      InterfaceContainerType<InterfaceTag, BoundaryTag, ConnectionTag> &
       get_interface_container() const {
     // Compile-time dispatch using FOR_EACH_IN_PRODUCT macro
     FOR_EACH_IN_PRODUCT((DIMENSION_TAG(DIM2), CONNECTION_TAG(WEAKLY_CONFORMING),
@@ -145,7 +137,8 @@ public:
                                       COMPOSITE_STACEY_DIRICHLET)),
                         CAPTURE((interface_container, interface_container)) {
                           if constexpr (InterfaceTag == _interface_tag_ &&
-                                        BoundaryTag == _boundary_tag_) {
+                                        BoundaryTag == _boundary_tag_ &&
+                                        ConnectionTag == _connection_tag_) {
                             return _interface_container_;
                           }
                         })
@@ -155,55 +148,6 @@ public:
     KOKKOS_ABORT_WITH_LOCATION(
         "specfem::assembly::coupled_interfaces::get_interface_container(): No "
         "matching specialization found.");
-#endif
-
-    // Unreachable code - satisfy compiler return requirements
-    return {};
-  }
-
-  /**
-   * @brief Get nonconforming interface container for specific coupling and
-   * boundary types
-   *
-   * Uses compile-time dispatch to return the appropriate interface container
-   * without runtime overhead. Supports elastic_acoustic/acoustic_elastic
-   * interfaces with
-   * none/acoustic_free_surface/stacey/composite_stacey_dirichlet boundary
-   * conditions.
-   *
-   * @tparam InterfaceTag Interface coupling type
-   * @tparam BoundaryTag Boundary condition type
-   * @return const reference to the requested interface container
-   *
-   * @example
-   * ```cpp
-   * const auto& container = interfaces.get_nonconforming_interface_container<
-   *     specfem::interface::interface_tag::elastic_acoustic,
-   *     specfem::element::boundary_tag::stacey>();
-   * ```
-   */
-  template <specfem::interface::interface_tag InterfaceTag,
-            specfem::element::boundary_tag BoundaryTag>
-  KOKKOS_INLINE_FUNCTION const
-      NonconformingInterfaceContainerType<InterfaceTag, BoundaryTag> &
-      get_nonconforming_interface_container() const {
-    // Compile-time dispatch using FOR_EACH_IN_PRODUCT macro
-    FOR_EACH_IN_PRODUCT((DIMENSION_TAG(DIM2), CONNECTION_TAG(NONCONFORMING),
-                         INTERFACE_TAG(ELASTIC_ACOUSTIC, ACOUSTIC_ELASTIC),
-                         BOUNDARY_TAG(NONE, ACOUSTIC_FREE_SURFACE, STACEY,
-                                      COMPOSITE_STACEY_DIRICHLET)),
-                        CAPTURE((interface_container, interface_container)) {
-                          if constexpr (InterfaceTag == _interface_tag_ &&
-                                        BoundaryTag == _boundary_tag_) {
-                            return _interface_container_;
-                          }
-                        })
-
-#ifndef NDEBUG
-    // Debug check: abort if no matching specialization found
-    KOKKOS_ABORT_WITH_LOCATION("specfem::assembly::coupled_interfaces::get_"
-                               "nonconforming_interface_container(): No "
-                               "matching specialization found.");
 #endif
 
     // Unreachable code - satisfy compiler return requirements
@@ -297,8 +241,13 @@ KOKKOS_FORCEINLINE_FUNCTION void load_on_device(const IndexType &index,
       "Incompatible types in load_on_host");
 
   container
-      .template get_interface_container<PointType::interface_tag,
-                                        PointType::boundary_tag>()
+      .template get_interface_container<
+          PointType::interface_tag, PointType::boundary_tag,
+          specfem::connections::type::
+              weakly_conforming // TODO replace with
+                                // PointType::connection_tag
+                                // later
+          >()
       .template impl_load<true>(index, point);
 }
 

@@ -8,19 +8,11 @@ namespace coupled_interfaces_impl {
 
 template <specfem::dimension::type DimensionTag,
           specfem::interface::interface_tag InterfaceTag,
-          specfem::element::boundary_tag BoundaryTag>
+          specfem::element::boundary_tag BoundaryTag,
+          specfem::connections::type ConnectionTag>
 struct interface_container;
 
 } // namespace coupled_interfaces_impl
-
-namespace nonconforming_interfaces_impl {
-
-template <specfem::dimension::type DimensionTag,
-          specfem::interface::interface_tag InterfaceTag,
-          specfem::element::boundary_tag BoundaryTag>
-struct interface_container;
-
-} // namespace nonconforming_interfaces_impl
 
 /**
  * @brief Information on coupled interfaces between two mediums
