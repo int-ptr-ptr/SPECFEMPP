@@ -7,7 +7,7 @@
 #include "specfem/assembly/mesh.hpp"
 #include "specfem/data_access.hpp"
 
-namespace specfem::assembly::nonconforming_interfaces_impl {
+namespace specfem::assembly::coupled_interfaces_impl {
 
 /**
  * @brief Container for 2D nonconforming interface data storage and access
@@ -24,7 +24,8 @@ namespace specfem::assembly::nonconforming_interfaces_impl {
 template <specfem::interface::interface_tag InterfaceTag,
           specfem::element::boundary_tag BoundaryTag>
 struct interface_container<specfem::dimension::type::dim2, InterfaceTag,
-                           BoundaryTag>
+                           BoundaryTag,
+                           specfem::connections::type::nonconforming>
     : public specfem::data_access::Container<
           specfem::data_access::ContainerType::edge,
           specfem::data_access::DataClassType::coupled_interface,
@@ -127,4 +128,4 @@ public:
     return;
   }
 };
-} // namespace specfem::assembly::nonconforming_interfaces_impl
+} // namespace specfem::assembly::coupled_interfaces_impl

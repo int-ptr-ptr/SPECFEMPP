@@ -11,7 +11,7 @@
 template <specfem::interface::interface_tag InterfaceTag,
           specfem::element::boundary_tag BoundaryTag>
 specfem::assembly::coupled_interfaces_impl::interface_container<
-    specfem::dimension::type::dim2, InterfaceTag, BoundaryTag>::
+    specfem::dimension::type::dim2, InterfaceTag, BoundaryTag, specfem::connections::type::weakly_conforming>::
     interface_container(
         const int ngllz, const int ngllx,
         const specfem::assembly::edge_types<specfem::dimension::type::dim2>

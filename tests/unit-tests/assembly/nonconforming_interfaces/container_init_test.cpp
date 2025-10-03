@@ -10,11 +10,10 @@
 
 template <typename TransferView, typename CoordView>
 specfem::point::global_coordinates<specfem::dimension::type::dim2>
-transfer_position_to_mortar(
-    const TransferView &transfer_function,
-    const CoordView &coord_view,
-    const int &ispec, const specfem::mesh_entity::type &edge_type,
-    const int &iedge, const int &imortar) {
+transfer_position_to_mortar(const TransferView &transfer_function,
+                            const CoordView &coord_view, const int &ispec,
+                            const specfem::mesh_entity::type &edge_type,
+                            const int &iedge, const int &imortar) {
   specfem::point::global_coordinates<specfem::dimension::type::dim2> coords(0,
                                                                             0);
   const int ngllz = coord_view.extent(2);
@@ -165,18 +164,20 @@ void test_nonconforming_container_transfers(
         &assembly) {
   const type_real length_verify_epsilon = 1e-2;
 
-  const int ngllx = assembly.mesh.shape_functions::ngllx;
-  const int ngllz = assembly.mesh.shape_functions::ngllz;
+  const int ngllx = assembly.mesh.element_grid.ngllx;
+  const int ngllz = assembly.mesh.element_grid.ngllz;
 
   const auto &nc_interface_acoustic_elastic =
-      assembly.coupled_interfaces.get_nonconforming_interface_container<
+      assembly.coupled_interfaces.get_interface_container<
           specfem::interface::interface_tag::acoustic_elastic,
-          specfem::element::boundary_tag::none>();
+          specfem::element::boundary_tag::none,
+          specfem::connections::type::nonconforming>();
 
   const auto &nc_interface_elastic_acoustic =
-      assembly.coupled_interfaces.get_nonconforming_interface_container<
+      assembly.coupled_interfaces.get_interface_container<
           specfem::interface::interface_tag::elastic_acoustic,
-          specfem::element::boundary_tag::none>();
+          specfem::element::boundary_tag::none,
+          specfem::connections::type::nonconforming>();
 
   const auto [acoustic_edges, elastic_edges] =
       assembly.edge_types.get_edges_on_host(
@@ -262,19 +263,23 @@ void test_nonconforming_container_transfers(
     for (int imortar = 0; imortar < nquad_mortar; imortar++) {
 
       // interpolated positions on acoustic-elastic interface
-      const specfem::point::global_coordinates<specfem::dimension::type::dim2> acel_self = transfer_position_to_mortar(
-          nc_interface_acoustic_elastic.h_transfer_function,
-          assembly.mesh.h_coord, ac_spec, ac_edgetype, iedge, imortar);
-      const specfem::point::global_coordinates<specfem::dimension::type::dim2> acel_other = transfer_position_to_mortar(
-          nc_interface_acoustic_elastic.h_transfer_function_other,
-          assembly.mesh.h_coord, el_spec, el_edgetype, iedge, imortar);
+      const specfem::point::global_coordinates<specfem::dimension::type::dim2>
+          acel_self = transfer_position_to_mortar(
+              nc_interface_acoustic_elastic.h_transfer_function,
+              assembly.mesh.h_coord, ac_spec, ac_edgetype, iedge, imortar);
+      const specfem::point::global_coordinates<specfem::dimension::type::dim2>
+          acel_other = transfer_position_to_mortar(
+              nc_interface_acoustic_elastic.h_transfer_function_other,
+              assembly.mesh.h_coord, el_spec, el_edgetype, iedge, imortar);
       // interpolated positions on elastic-acoustic interface
-      const specfem::point::global_coordinates<specfem::dimension::type::dim2> elac_self = transfer_position_to_mortar(
-          nc_interface_elastic_acoustic.h_transfer_function,
-          assembly.mesh.h_coord, el_spec, el_edgetype, iedge, imortar);
-      const specfem::point::global_coordinates<specfem::dimension::type::dim2> elac_other = transfer_position_to_mortar(
-          nc_interface_elastic_acoustic.h_transfer_function_other,
-          assembly.mesh.h_coord, ac_spec, ac_edgetype, iedge, imortar);
+      const specfem::point::global_coordinates<specfem::dimension::type::dim2>
+          elac_self = transfer_position_to_mortar(
+              nc_interface_elastic_acoustic.h_transfer_function,
+              assembly.mesh.h_coord, el_spec, el_edgetype, iedge, imortar);
+      const specfem::point::global_coordinates<specfem::dimension::type::dim2>
+          elac_other = transfer_position_to_mortar(
+              nc_interface_elastic_acoustic.h_transfer_function_other,
+              assembly.mesh.h_coord, ac_spec, ac_edgetype, iedge, imortar);
       EXPECT_TRUE(specfem::point::distance(acel_self, acel_other) < 1e-3)
           << "acoustic-elastic interface has transfer functions from either "
              "side mapping to incompatible coordinates.";

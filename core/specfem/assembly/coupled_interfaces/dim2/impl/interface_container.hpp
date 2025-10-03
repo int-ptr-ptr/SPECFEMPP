@@ -22,7 +22,8 @@ namespace specfem::assembly::coupled_interfaces_impl {
 template <specfem::interface::interface_tag InterfaceTag,
           specfem::element::boundary_tag BoundaryTag>
 struct interface_container<specfem::dimension::type::dim2, InterfaceTag,
-                           BoundaryTag>
+                           BoundaryTag,
+                           specfem::connections::type::weakly_conforming>
     : public specfem::data_access::Container<
           specfem::data_access::ContainerType::edge,
           specfem::data_access::DataClassType::coupled_interface,
