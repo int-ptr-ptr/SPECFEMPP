@@ -122,7 +122,7 @@ void specfem::kokkos_kernels::impl::compute_coupling(
 
   const auto field = assembly.fields.template get_simulation_field<wavefield>();
 
-  const auto num_points = assembly.mesh.ngllx;
+  const auto num_points = assembly.mesh.element_grid.ngllx;
 
   using parallel_config = specfem::parallel_config::default_chunk_edge_config<
       DimensionTag, Kokkos::DefaultExecutionSpace>;
@@ -132,21 +132,20 @@ void specfem::kokkos_kernels::impl::compute_coupling(
   using SelfFieldType = typename specfem::interface::attributes<
       dimension_tag, interface_tag>::template self_field_t<connection_tag>;
 
-  //   specfem::execution::ChunkedIntersectionIterator chunk(
-  //       parallel_config(), self_edges, coupled_edges, num_points);
+    // specfem::execution::ChunkedIntersectionIterator chunk(
+    //     parallel_config(), self_edges, coupled_edges, num_points);
 
-  //   specfem::execution::for_each_level(
-  //       "specfem::kokkos_kernels::impl::compute_coupling", chunk,
-  //       KOKKOS_LAMBDA(
-  //           const typename decltype(chunk)::index_type &chunk_iterator_index)
-  //           {
-  //         const auto &chunk_index = chunk_iterator_index.get_index();
-  //         const auto &self_chunk_index = chunk_index.self_index;
-  //         const auto &coupled_chunk_index = chunk_index.coupled_index;
+    // specfem::execution::for_each_level(
+    //     "specfem::kokkos_kernels::impl::compute_coupling", chunk,
+    //     KOKKOS_LAMBDA(
+    //         const typename decltype(chunk)::index_type &chunk_iterator_index)
+    //         {
+    //       const auto &chunk_index = chunk_iterator_index.get_index();
+    //       const auto &self_chunk_index = chunk_index.self_index;
+    //       const auto &coupled_chunk_index = chunk_index.coupled_index;
 
-  //         CoupledFieldType coupled_field; //< Coupled field type should be
-  //         chunk
-  //                                         // edge field type
+    //       CoupledFieldType coupled_field; //< Coupled field type should be chunk
+                                          // edge field type
   //         specfem::assembly::load_on_device(coupled_chunk_index, field,
   //                                           coupled_field);
 
@@ -189,7 +188,7 @@ void specfem::kokkos_kernels::impl::compute_coupling(
   //               specfem::assembly::atomic_add_on_device(self_index, field,
   //                                                       self_field);
   //             });
-  //       });
+        // });
 
   return;
 }
