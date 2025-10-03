@@ -1,7 +1,9 @@
 #include "fixture.hpp"
 #include "kokkos_kernels/domain_kernels.hpp"
 
+#include "gtest/gtest.h"
 #include <boost/graph/filtered_graph.hpp>
+#include <stdexcept>
 
 /**
  * For a given field acessor, clear those values.
@@ -112,8 +114,10 @@ void validate_field_at_points(
                                expect_read_accel(icomp)
                         << std::fixed << "rel)";
                   }
-
-                  EXPECT_TRUE(false) << oss.str();
+                  // I can't get gtest to capture the failure, so change to RTE
+                  // and catch it.
+                  throw std::runtime_error(oss.str());
+                  // FAIL() << oss.str();
                 }
 
                 // ================================
@@ -358,8 +362,19 @@ using NonconformingConformingMeshes =
 
 TEST_F(NonconformingConformingMeshes, Test) {
   for (auto &test_config : *this) {
+    // xfail -- remove when kernel implemented
 
-    // xmarkfail -- remove when kernel implemented
-    EXPECT_NO_FATAL_FAILURE(nonconforming_kernel_comparison(test_config););
+    // not sure why EXPECT_NO_FATAL_FAILURE doesn't compile. Substitute for
+    // this:
+    try {
+
+      nonconforming_kernel_comparison(test_config);
+
+      FAIL() << "Test marked fail until kernel is implemented. No incorrect "
+                "values / errors thrown -- was the kernel implemented?";
+    } catch (const std::runtime_error &e) {
+    }
+
+    // EXPECT_NO_FATAL_FAILURE(nonconforming_kernel_comparison(test_config));
   }
 }
