@@ -15,7 +15,7 @@ namespace specfem::datatype::impl {
  *
  * @tparam ViewType The type of the parent view this subview accesses
  */
-template <typename ViewType> struct VectorChunkElementSubview {
+template <typename ViewType> struct VectorChunkEdgeSubview {
   /// Index type from the parent view
   using index_type = typename ViewType::index_type;
   /// Point view type for component access
@@ -35,7 +35,7 @@ template <typename ViewType> struct VectorChunkElementSubview {
    * @param index Reference to the index within the parent view
    */
   KOKKOS_INLINE_FUNCTION
-  VectorChunkElementSubview(ViewType &view, const index_type &index)
+  VectorChunkEdgeSubview(ViewType &view, const index_type &index)
       : view(view), index(index) {}
 
   /**
@@ -51,7 +51,7 @@ template <typename ViewType> struct VectorChunkElementSubview {
       specfem::dimension::type D = index_type::dimension_tag,
       typename std::enable_if_t<D == specfem::dimension::type::dim2, int> = 0>
   KOKKOS_INLINE_FUNCTION constexpr auto &operator()(const int &icomp) {
-    return view(index.ispec, index.iz, index.ix, icomp);
+    return view(index.ispec, index.ipoint, icomp);
   }
 
   /**
@@ -67,7 +67,7 @@ template <typename ViewType> struct VectorChunkElementSubview {
       specfem::dimension::type D = index_type::dimension_tag,
       typename std::enable_if_t<D == specfem::dimension::type::dim2, int> = 0>
   KOKKOS_INLINE_FUNCTION constexpr auto operator()(const int &icomp) const {
-    return view(index.ispec, index.iz, index.ix, icomp);
+    return view(index.ispec, index.ipoint, icomp);
   }
 
   /**
@@ -96,7 +96,7 @@ template <typename ViewType> struct VectorChunkElementSubview {
  *
  * @tparam ViewType The type of the parent view this subview accesses
  */
-template <typename ViewType> struct TensorChunkElementSubview {
+template <typename ViewType> struct TensorChunkEdgeSubview {
   /// Index type from the parent view
   using index_type = typename ViewType::index_type;
   /// Point view type for tensor component access
@@ -146,7 +146,7 @@ template <typename ViewType> struct TensorChunkElementSubview {
    * @param index Reference to the index within the parent view
    */
   KOKKOS_INLINE_FUNCTION
-  TensorChunkElementSubview(ViewType &view, const index_type &index)
+  TensorChunkEdgeSubview(ViewType &view, const index_type &index)
       : view(view), index(index) {}
 
   /**
@@ -163,7 +163,7 @@ template <typename ViewType> struct TensorChunkElementSubview {
       typename std::enable_if_t<D == specfem::dimension::type::dim2, int> = 0>
   KOKKOS_INLINE_FUNCTION constexpr auto &operator()(const int &icomp,
                                                     const int &idim) {
-    return view(index.ispec, index.iz, index.ix, icomp, idim);
+    return view(index.ispec, index.ipoint, icomp, idim);
   }
 
   /**
@@ -182,7 +182,7 @@ template <typename ViewType> struct TensorChunkElementSubview {
       typename std::enable_if_t<D == specfem::dimension::type::dim2, int> = 0>
   KOKKOS_INLINE_FUNCTION constexpr auto operator()(const int &icomp,
                                                    const int &idim) const {
-    return view(index.ispec, index.iz, index.ix, icomp, idim);
+    return view(index.ispec, index.ipoint, icomp, idim);
   }
 
   /**

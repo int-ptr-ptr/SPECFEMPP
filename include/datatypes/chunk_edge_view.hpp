@@ -1,7 +1,7 @@
 #pragma once
 
 #include "enumerations/dimension.hpp"
-#include "impl/chunk_element_subview.hpp"
+#include "impl/chunk_edge_subview.hpp"
 #include "simd.hpp"
 #include <Kokkos_Core.hpp>
 
@@ -14,34 +14,33 @@ namespace specfem {
 namespace datatype {
 
 /**
- * @brief Datatype used to scalar values within chunk of elements. Data is
+ * @brief Datatype used to scalar values within chunk of edges. Data is
  * stored within a Kokkos view located in the memory space specified by
  * MemorySpace.
  *
  * @tparam T Data type of the scalar values
- * @tparam NumberOfElements Number of elements in the chunk
+ * @tparam NumberOfEdges Number of edges in the chunk
  * @tparam NumberOfGLLPoints Number of GLL points in each element
  * @tparam MemorySpace Memory space of the view
  * @tparam MemoryTraits Memory traits of the view
  * @tparam UseSIMD Use SIMD datatypes for the array. If true, value_type is a
  * SIMD type
  */
-template <typename T, specfem::dimension::type DimensionTag,
-          int NumberOfElements, int NumberOfGLLPoints, bool UseSIMD = false,
+template <typename T, specfem::dimension::type DimensionTag, int NumberOfEdges,
+          int NumberOfGLLPoints, bool UseSIMD = false,
           typename MemorySpace =
               Kokkos::DefaultExecutionSpace::scratch_memory_space,
           typename MemoryTraits = Kokkos::MemoryTraits<Kokkos::Unmanaged> >
-struct ScalarChunkElementViewType;
+struct ScalarChunkEdgeViewType;
 
-template <typename T, int NumberOfElements, int NumberOfGLLPoints, bool UseSIMD,
+template <typename T, int NumberOfEdges, int NumberOfGLLPoints, bool UseSIMD,
           typename MemorySpace, typename MemoryTraits>
-struct ScalarChunkElementViewType<T, specfem::dimension::type::dim2,
-                                  NumberOfElements, NumberOfGLLPoints, UseSIMD,
-                                  MemorySpace, MemoryTraits>
-    : public Kokkos::View<
-          typename specfem::datatype::simd<T, UseSIMD>::datatype
-              [NumberOfElements][NumberOfGLLPoints][NumberOfGLLPoints],
-          MemorySpace, MemoryTraits> {
+struct ScalarChunkEdgeViewType<T, specfem::dimension::type::dim2, NumberOfEdges,
+                               NumberOfGLLPoints, UseSIMD, MemorySpace,
+                               MemoryTraits>
+    : public Kokkos::View<typename specfem::datatype::simd<T, UseSIMD>::datatype
+                              [NumberOfEdges][NumberOfGLLPoints],
+                          MemorySpace, MemoryTraits> {
   /**
    * @name Typedefs
    *
@@ -49,8 +48,7 @@ struct ScalarChunkElementViewType<T, specfem::dimension::type::dim2,
   ///@{
   using simd = specfem::datatype::simd<T, UseSIMD>; ///< SIMD data type
   using type =
-      Kokkos::View<typename simd::datatype[NumberOfElements][NumberOfGLLPoints]
-                                          [NumberOfGLLPoints],
+      Kokkos::View<typename simd::datatype[NumberOfEdges][NumberOfGLLPoints],
                    MemorySpace, MemoryTraits>; ///< Underlying data type used to
                                                ///< store values
   using value_type = typename type::value_type; ///< Value type used to store
@@ -72,12 +70,12 @@ struct ScalarChunkElementViewType<T, specfem::dimension::type::dim2,
    */
   ///@{
   constexpr static auto accessor_type =
-      specfem::data_access::AccessorType::chunk_element; ///< Accessor type for
-                                                         ///< identifying the
-                                                         ///< class
+      specfem::data_access::AccessorType::chunk_edge; ///< Accessor type for
+                                                      ///< identifying the
+                                                      ///< class
 
-  constexpr static int nelements = NumberOfElements; ///< Number of elements in
-                                                     ///< the chunk
+  constexpr static int nedges = NumberOfEdges;   ///< Number of edges in
+                                                 ///< the chunk
   constexpr static int ngll = NumberOfGLLPoints; ///< Number of GLL points in
                                                  ///< each element
   constexpr static bool isChunkViewType = true;
@@ -92,10 +90,10 @@ struct ScalarChunkElementViewType<T, specfem::dimension::type::dim2,
    * @brief Default constructor
    */
   KOKKOS_FUNCTION
-  ScalarChunkElementViewType() = default;
+  ScalarChunkEdgeViewType() = default;
 
   /**
-   * @brief Construct a new ScalarChunkElementViewType object within
+   * @brief Construct a new ScalarChunkViewType object within
    * ScratchMemorySpace.
    * Allocates an unmanaged view within ScratchMemorySpace. Useful for
    * generating scratch views.
@@ -105,9 +103,9 @@ struct ScalarChunkElementViewType<T, specfem::dimension::type::dim2,
    */
   template <typename ScratchMemorySpace>
   KOKKOS_FUNCTION
-  ScalarChunkElementViewType(const ScratchMemorySpace &scratch_memory_space)
+  ScalarChunkEdgeViewType(const ScratchMemorySpace &scratch_memory_space)
       : Kokkos::View<
-            value_type[NumberOfElements][NumberOfGLLPoints][NumberOfGLLPoints],
+            value_type[NumberOfEdges][NumberOfGLLPoints][NumberOfGLLPoints],
             MemorySpace, MemoryTraits>(scratch_memory_space) {}
   ///@}
 
@@ -120,17 +118,17 @@ struct ScalarChunkElementViewType<T, specfem::dimension::type::dim2,
    */
   KOKKOS_INLINE_FUNCTION
   constexpr value_type &operator()(index_type index) {
-    return (*this)(index.ispec, index.iz, index.ix);
+    return (*this)(index.ispec, index.ipoint);
   }
 };
 
 /**
- * @brief Datatype used to vector values within chunk of elements. Data is
+ * @brief Datatype used to vector values within chunk of edges. Data is
  * stored within a Kokkos view located in the memory space specified by
  * MemorySpace.
  *
  * @tparam T Data type of the vector values
- * @tparam NumberOfElements Number of elements in the chunk
+ * @tparam NumberOfEdges Number of edges in the chunk
  * @tparam NumberOfGLLPoints Number of GLL points in each element
  * @tparam Components Number of vector values (components) at each GLL point
  * @tparam MemorySpace Memory space of the view
@@ -138,22 +136,20 @@ struct ScalarChunkElementViewType<T, specfem::dimension::type::dim2,
  * @tparam UseSIMD Use SIMD datatypes for the array. If true, value_type is a
  * SIMD type
  */
-template <
-    typename T, specfem::dimension::type DimensionTag, int NumberOfElements,
-    int NumberOfGLLPoints, int Components, bool UseSIMD = false,
-    typename MemorySpace = Kokkos::DefaultExecutionSpace::scratch_memory_space,
-    typename MemoryTraits = Kokkos::MemoryTraits<Kokkos::Unmanaged> >
-struct VectorChunkElementViewType;
+template <typename T, specfem::dimension::type DimensionTag, int NumberOfEdges,
+          int NumberOfGLLPoints, int Components, bool UseSIMD = false,
+          typename MemorySpace =
+              Kokkos::DefaultExecutionSpace::scratch_memory_space,
+          typename MemoryTraits = Kokkos::MemoryTraits<Kokkos::Unmanaged> >
+struct VectorChunkEdgeViewType;
 
-template <typename T, int NumberOfElements, int NumberOfGLLPoints,
-          int Components, bool UseSIMD, typename MemorySpace,
-          typename MemoryTraits>
-struct VectorChunkElementViewType<
-    T, specfem::dimension::type::dim2, NumberOfElements, NumberOfGLLPoints,
-    Components, UseSIMD, MemorySpace, MemoryTraits>
+template <typename T, int NumberOfEdges, int NumberOfGLLPoints, int Components,
+          bool UseSIMD, typename MemorySpace, typename MemoryTraits>
+struct VectorChunkEdgeViewType<T, specfem::dimension::type::dim2, NumberOfEdges,
+                               NumberOfGLLPoints, Components, UseSIMD,
+                               MemorySpace, MemoryTraits>
     : public Kokkos::View<typename specfem::datatype::simd<T, UseSIMD>::datatype
-                              [NumberOfElements][NumberOfGLLPoints]
-                              [NumberOfGLLPoints][Components],
+                              [NumberOfEdges][NumberOfGLLPoints][Components],
                           MemorySpace, MemoryTraits> {
   /**
    * @name Typedefs
@@ -161,11 +157,10 @@ struct VectorChunkElementViewType<
    */
   ///@{
   using simd = specfem::datatype::simd<T, UseSIMD>; ///< SIMD data type
-  using type =
-      Kokkos::View<typename simd::datatype[NumberOfElements][NumberOfGLLPoints]
-                                          [NumberOfGLLPoints][Components],
-                   MemorySpace, MemoryTraits>; ///< Underlying data type used to
-                                               ///< store values
+  using type = Kokkos::View<
+      typename simd::datatype[NumberOfEdges][NumberOfGLLPoints][Components],
+      MemorySpace, MemoryTraits>; ///< Underlying data type used to
+                                  ///< store values
   using value_type = typename type::value_type; ///< Value type used to store
                                                 ///< the elements of the array
   using base_type = T;                          ///< Base type of the array
@@ -185,11 +180,11 @@ struct VectorChunkElementViewType<
    */
   ///@{
   constexpr static auto accessor_type =
-      specfem::data_access::AccessorType::chunk_element; ///< Accessor type for
-                                                         ///< identifying the
-                                                         ///< class
-  constexpr static int nelements = NumberOfElements; ///< Number of elements in
-                                                     ///< the chunk
+      specfem::data_access::AccessorType::chunk_edge; ///< Accessor type for
+                                                      ///< identifying the
+                                                      ///< class
+  constexpr static int nedges = NumberOfEdges;        ///< Number of edges in
+                                                      ///< the chunk
   constexpr static int ngll = NumberOfGLLPoints; ///< Number of GLL points in
                                                  ///< each element
   constexpr static int components = Components;  ///< Number of vector values at
@@ -207,10 +202,10 @@ struct VectorChunkElementViewType<
    * @brief Default constructor
    */
   KOKKOS_FUNCTION
-  VectorChunkElementViewType() = default;
+  VectorChunkEdgeViewType() = default;
 
   /**
-   * @brief Construct a new VectorChunkElementViewType object within
+   * @brief Construct a new VectorChunkEdgeViewType object within
    * ScratchMemorySpace.
    * Allocates an unmanaged view within ScratchMemorySpace. Useful for
    * generating scratch views.
@@ -220,9 +215,8 @@ struct VectorChunkElementViewType<
    */
   template <typename ScratchMemorySpace>
   KOKKOS_FUNCTION
-  VectorChunkElementViewType(const ScratchMemorySpace &scratch_memory_space)
-      : Kokkos::View<value_type[NumberOfElements][NumberOfGLLPoints]
-                               [NumberOfGLLPoints][Components],
+  VectorChunkEdgeViewType(const ScratchMemorySpace &scratch_memory_space)
+      : Kokkos::View<value_type[NumberOfEdges][NumberOfGLLPoints][Components],
                      MemorySpace, MemoryTraits>(scratch_memory_space) {}
   ///@}
 
@@ -236,7 +230,7 @@ struct VectorChunkElementViewType<
    */
   KOKKOS_INLINE_FUNCTION
   constexpr value_type &operator()(const index_type &index, const int &icomp) {
-    return (*this)(index.ispec, index.iz, index.ix, icomp);
+    return (*this)(index.ispec, index.ipoint, icomp);
   }
 
   /**
@@ -245,19 +239,19 @@ struct VectorChunkElementViewType<
    * @param index Point index
    */
   KOKKOS_INLINE_FUNCTION
-  impl::VectorChunkElementSubview<VectorChunkElementViewType>
+  impl::VectorChunkEdgeSubview<VectorChunkEdgeViewType>
   operator()(const index_type &index) {
     return { *this, index };
   }
 };
 
 /**
- * @brief Datatype used to tensor values within chunk of elements. Data is
+ * @brief Datatype used to tensor values within chunk of edges. Data is
  * stored within a Kokkos view located in the memory space specified by
  * MemorySpace.
  *
  * @tparam T Data type of the tensor values
- * @tparam NumberOfElements Number of elements in the chunk
+ * @tparam NumberOfEdges Number of edges in the chunk
  * @tparam NumberOfGLLPoints Number of GLL points in each element
  * @tparam Components Number of vector values (components) at each GLL point
  * @tparam NumberOfDimensions Number of dimensions of the tensor
@@ -266,25 +260,24 @@ struct VectorChunkElementViewType<
  * @tparam UseSIMD Use SIMD datatypes for the array. If true, value_type is a
  * SIMD type
  */
-template <typename T, specfem::dimension::type DimensionTag,
-          int NumberOfElements, int NumberOfGLLPoints, int Components,
-          int NumberOfDimensions, bool UseSIMD = false,
+template <typename T, specfem::dimension::type DimensionTag, int NumberOfEdges,
+          int NumberOfGLLPoints, int Components, int NumberOfDimensions,
+          bool UseSIMD = false,
           typename MemorySpace =
               Kokkos::DefaultExecutionSpace::scratch_memory_space,
           typename MemoryTraits = Kokkos::MemoryTraits<Kokkos::Unmanaged> >
-struct TensorChunkElementViewType;
+struct TensorChunkEdgeViewType;
 
-template <typename T, int NumberOfElements, int NumberOfGLLPoints,
-          int Components, int NumberOfDimensions, bool UseSIMD,
-          typename MemorySpace, typename MemoryTraits>
-struct TensorChunkElementViewType<
-    T, specfem::dimension::type::dim2, NumberOfElements, NumberOfGLLPoints,
+template <typename T, int NumberOfEdges, int NumberOfGLLPoints, int Components,
+          int NumberOfDimensions, bool UseSIMD, typename MemorySpace,
+          typename MemoryTraits>
+struct TensorChunkEdgeViewType<
+    T, specfem::dimension::type::dim2, NumberOfEdges, NumberOfGLLPoints,
     Components, NumberOfDimensions, UseSIMD, MemorySpace, MemoryTraits>
-    : public Kokkos::View<
-          typename specfem::datatype::simd<T, UseSIMD>::datatype
-              [NumberOfElements][NumberOfGLLPoints][NumberOfGLLPoints]
-              [Components][NumberOfDimensions],
-          MemorySpace, MemoryTraits> {
+    : public Kokkos::View<typename specfem::datatype::simd<T, UseSIMD>::datatype
+                              [NumberOfEdges][NumberOfGLLPoints][Components]
+                              [NumberOfDimensions],
+                          MemorySpace, MemoryTraits> {
   /**
    * @name Typedefs
    *
@@ -292,8 +285,7 @@ struct TensorChunkElementViewType<
   ///@{
   using simd = specfem::datatype::simd<T, UseSIMD>; ///< SIMD data type
   using type = typename Kokkos::View<
-      typename simd::datatype[NumberOfElements][NumberOfGLLPoints]
-                             [NumberOfGLLPoints][Components]
+      typename simd::datatype[NumberOfEdges][NumberOfGLLPoints][Components]
                              [NumberOfDimensions],
       MemorySpace, MemoryTraits>; ///< Underlying data type used to store values
   using value_type = typename type::value_type; ///< Value type used to store
@@ -315,12 +307,12 @@ struct TensorChunkElementViewType<
    */
   ///@{
   constexpr static auto accessor_type =
-      specfem::data_access::AccessorType::chunk_element; ///< Accessor type for
-                                                         ///< identifying the
-                                                         ///< class
+      specfem::data_access::AccessorType::chunk_edge; ///< Accessor type for
+                                                      ///< identifying the
+                                                      ///< class
 
-  constexpr static int nelements = NumberOfElements; ///< Number of elements in
-                                                     ///< the chunk
+  constexpr static int nedges = NumberOfEdges;   ///< Number of edges in
+                                                 ///< the chunk
   constexpr static int ngll = NumberOfGLLPoints; ///< Number of GLL points in
                                                  ///< each element
   constexpr static int components = Components;  ///< Number of tensor values at
@@ -343,10 +335,10 @@ struct TensorChunkElementViewType<
    *
    */
   KOKKOS_FUNCTION
-  TensorChunkElementViewType() = default;
+  TensorChunkEdgeViewType() = default;
 
   /**
-   * @brief Construct a new TensorChunkElementViewType object within
+   * @brief Construct a new TensorChunkEdgeViewType object within
    * ScratchMemorySpace.
    * Allocates an unmanaged view within ScratchMemorySpace. Useful for
    * generating scratch views.
@@ -359,11 +351,10 @@ struct TensorChunkElementViewType<
                 std::is_same<MemorySpace, ScratchMemorySpace>::value,
                 bool>::type = true>
   KOKKOS_FUNCTION
-  TensorChunkElementViewType(const ScratchMemorySpace &scratch_memory_space)
-      : Kokkos::View<
-            value_type[NumberOfElements][NumberOfGLLPoints][NumberOfGLLPoints]
-                      [Components][NumberOfDimensions],
-            MemorySpace, MemoryTraits>(scratch_memory_space) {}
+  TensorChunkEdgeViewType(const ScratchMemorySpace &scratch_memory_space)
+      : Kokkos::View<value_type[NumberOfEdges][NumberOfGLLPoints][Components]
+                               [NumberOfDimensions],
+                     MemorySpace, MemoryTraits>(scratch_memory_space) {}
   ///@}
 
   using type::operator();
@@ -378,7 +369,7 @@ struct TensorChunkElementViewType<
   KOKKOS_INLINE_FUNCTION
   constexpr value_type &operator()(const index_type &index, const int &icomp,
                                    const int &idim) {
-    return (*this)(index.ispec, index.iz, index.ix, icomp, idim);
+    return (*this)(index.ispec, index.ipoint, icomp, idim);
   }
 
   /**
@@ -387,7 +378,7 @@ struct TensorChunkElementViewType<
    * @param index Point index
    */
   KOKKOS_INLINE_FUNCTION
-  impl::TensorChunkElementSubview<TensorChunkElementViewType>
+  impl::TensorChunkEdgeSubview<TensorChunkEdgeViewType>
   operator()(const index_type &index) {
     return { *this, index };
   }

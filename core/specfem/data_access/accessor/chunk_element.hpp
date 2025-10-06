@@ -22,18 +22,17 @@ struct Accessor<specfem::data_access::AccessorType::chunk_element, DataClass,
 
   template <typename T, int nelements, int ngll>
   using scalar_type =
-      specfem::datatype::ScalarChunkViewType<T, DimensionTag, nelements, ngll,
-                                             UseSIMD>;
+      specfem::datatype::ScalarChunkElementViewType<T, DimensionTag, nelements,
+                                                    ngll, UseSIMD>;
 
   template <typename T, int nelements, int ngll, int components>
   using vector_type =
-      specfem::datatype::VectorChunkViewType<T, DimensionTag, nelements, ngll,
-                                             components, UseSIMD>;
+      specfem::datatype::VectorChunkElementViewType<T, DimensionTag, nelements,
+                                                    ngll, components, UseSIMD>;
 
   template <typename T, int nelements, int ngll, int components, int dimension>
-  using tensor_type =
-      specfem::datatype::TensorChunkViewType<T, DimensionTag, nelements, ngll,
-                                             components, dimension, UseSIMD>;
+  using tensor_type = specfem::datatype::TensorChunkElementViewType<
+      T, DimensionTag, nelements, ngll, components, dimension, UseSIMD>;
 };
 
 template <typename T, typename = void>
