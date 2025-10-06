@@ -192,3 +192,19 @@ void specfem::kokkos_kernels::impl::compute_coupling(
 
   return;
 }
+
+template <specfem::dimension::type DimensionTag,
+          specfem::connections::type ConnectionTag,
+          specfem::wavefield::simulation_field WavefieldType,
+          specfem::interface::interface_tag InterfaceTag,
+          specfem::element::boundary_tag BoundaryTag>
+void specfem::kokkos_kernels::impl::compute_coupling(
+    const specfem::assembly::assembly<DimensionTag> &assembly) {
+  // Create dispatch tag for connection type
+  using connection_dispatch =
+      std::integral_constant<specfem::connections::type, ConnectionTag>;
+
+  // Forward to implementation with dispatch tag
+  compute_coupling<DimensionTag, WavefieldType, InterfaceTag, BoundaryTag>(
+      connection_dispatch(), assembly);
+}

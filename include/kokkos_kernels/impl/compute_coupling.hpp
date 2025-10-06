@@ -49,13 +49,5 @@ template <specfem::dimension::type DimensionTag,
           specfem::interface::interface_tag InterfaceTag,
           specfem::element::boundary_tag BoundaryTag>
 void compute_coupling(
-    const specfem::assembly::assembly<DimensionTag> &assembly) {
-  // Create dispatch tag for connection type
-  using connection_dispatch =
-      std::integral_constant<specfem::connections::type, ConnectionTag>;
-
-  // Forward to implementation with dispatch tag
-  compute_coupling<DimensionTag, WavefieldType, InterfaceTag, BoundaryTag>(
-      connection_dispatch(), assembly);
-}
+    const specfem::assembly::assembly<DimensionTag> &assembly);
 } // namespace specfem::kokkos_kernels::impl
