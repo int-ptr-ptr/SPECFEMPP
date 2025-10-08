@@ -169,20 +169,20 @@ void specfem::kokkos_kernels::impl::compute_coupling(
       KOKKOS_LAMBDA(
           const typename decltype(chunk)::index_type &chunk_iterator_index) {
         const auto &chunk_index = chunk_iterator_index.get_index();
+        const auto &team = chunk_index.get_policy_index();
         const auto &self_chunk_iterator_index = chunk_index.get_self_index();
         const auto &coupled_chunk_iterator_index =
             chunk_index.get_coupled_index();
         const auto coupled_chunk_index =
             coupled_chunk_iterator_index.get_index();
 
-        CoupledFieldType coupled_field; //< Coupled field type should be chunk
-                                        //edge field type
+        CoupledFieldType coupled_field(team.team_scratch(0));
         specfem::assembly::load_on_device(coupled_chunk_index, field,
                                           coupled_field);
 
         // TODO add point access for mortar transfer function and replace self
         // side of this:
-        CoupledInterfaceDataType interface_data;
+        CoupledInterfaceDataType interface_data(team);
         // the way it's implemented right now, self and coupled indices should
         // both work.
         specfem::assembly::load_on_device(coupled_chunk_index,
@@ -197,15 +197,17 @@ void specfem::kokkos_kernels::impl::compute_coupling(
               const auto self_index = index.self_index;
 
               SelfFieldType self_field;
-              specfem::medium::compute_coupling(self_index, interface_data, coupled_field, self_field);
+              specfem::medium::compute_coupling(self_index, interface_data,
+                                                coupled_field, self_field);
 
-              if constexpr(BoundaryTag == specfem::element::boundary_tag::acoustic_free_surface) {
+              if constexpr (BoundaryTag == specfem::element::boundary_tag::
+                                               acoustic_free_surface) {
                 specfem::point::boundary<boundary_tag, dimension_tag, false>
                     point_boundary;
                 specfem::assembly::load_on_device(
                     self_index, assembly.boundaries, point_boundary);
-                specfem::boundary_conditions::apply_boundary_conditions(point_boundary,
-                                                           self_field);
+                specfem::boundary_conditions::apply_boundary_conditions(
+                    point_boundary, self_field);
               }
 
               specfem::assembly::atomic_add_on_device(self_index, field,

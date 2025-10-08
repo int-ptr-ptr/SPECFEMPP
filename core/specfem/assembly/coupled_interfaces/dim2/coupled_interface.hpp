@@ -131,7 +131,8 @@ public:
       InterfaceContainerType<InterfaceTag, BoundaryTag, ConnectionTag> &
       get_interface_container() const {
     // Compile-time dispatch using FOR_EACH_IN_PRODUCT macro
-    FOR_EACH_IN_PRODUCT((DIMENSION_TAG(DIM2), CONNECTION_TAG(WEAKLY_CONFORMING),
+    FOR_EACH_IN_PRODUCT((DIMENSION_TAG(DIM2),
+                         CONNECTION_TAG(WEAKLY_CONFORMING, NONCONFORMING),
                          INTERFACE_TAG(ELASTIC_ACOUSTIC, ACOUSTIC_ELASTIC),
                          BOUNDARY_TAG(NONE, ACOUSTIC_FREE_SURFACE, STACEY,
                                       COMPOSITE_STACEY_DIRICHLET)),

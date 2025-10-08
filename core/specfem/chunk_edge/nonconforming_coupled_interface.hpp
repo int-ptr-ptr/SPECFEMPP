@@ -136,6 +136,19 @@ public:
   nonconforming_coupled_interface() = default;
 
   /**
+   * @brief Constructor that initializes data views in Scratch
+   * Memory.
+   *
+   * @tparam MemberType Kokos team member type.
+   * @param team Kokkos team member.
+   */
+  template <typename MemberType>
+  KOKKOS_FUNCTION nonconforming_coupled_interface(const MemberType &team)
+      : mortar_factor(team.team_scratch(0)), edge_normal(team.team_scratch(0)),
+        transfer_function_self(team.team_scratch(0)),
+        transfer_function_coupled(team.team_scratch(0)) {}
+
+  /**
    * @brief Get the amount memory in bytes required for shared memory
    *
    * @return int Amount of shared memory in bytes

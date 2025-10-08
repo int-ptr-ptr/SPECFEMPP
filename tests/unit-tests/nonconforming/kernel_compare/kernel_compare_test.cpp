@@ -1,3 +1,4 @@
+#include "enumerations/medium.hpp"
 #include "fixture.hpp"
 #include "kokkos_kernels/domain_kernels.hpp"
 
@@ -61,10 +62,35 @@ void validate_field_at_points(
                      specfem::point::index<specfem::dimension::type::dim2>,
                      specfem::point::index<specfem::dimension::type::dim2> > > >
         &nodes_to_check_per_medium,
-    const int &current_mesh_iglob, const int &current_icomp) {
+    const int &current_mesh_iglob, const int &current_icomp,
+    const type_real &acceleration_scale) {
 
+  specfem::point::acceleration<specfem::dimension::type::dim2,
+                               specfem::element::medium_tag::acoustic, false>
+      test_field;
+  specfem::assembly::load_on_device(
+      specfem::point::index<specfem::dimension::type::dim2>(8, 0, 3), tested,
+      test_field);
+  test_field(0) += std::sin(std::asin(1e-10 * test_field(0)));
   expected.copy_to_host();
   tested.copy_to_host();
+
+  // give extra information only on the first failure
+  bool first_failure = true;
+
+  const auto iglob_elaboration =
+      [&nodes_to_check_per_medium](std::ostringstream &oss, const int &iglob) {
+        for (const auto &[medium, nodes_to_check] : nodes_to_check_per_medium) {
+          const auto &found = nodes_to_check.find(iglob);
+          if (found != nodes_to_check.end()) {
+            const auto &index = found->second.first;
+            oss << "[ispec = " << index.ispec << " ("
+                << specfem::element::to_string(medium) << "), ix = " << index.ix
+                << ", iz = " << index.iz << "]";
+            break;
+          }
+        }
+      };
 
   // ==================================
   // begin(foreach degree of freedom j)
@@ -94,8 +120,10 @@ void validate_field_at_points(
                 // (foreach degree of freedom j) then:
                 // ===================================
 
-                if (!specfem::utilities::is_close(expect_read_accel(icomp),
-                                                  test_read_accel(icomp))) {
+                if (!specfem::utilities::is_close(
+                        expect_read_accel(icomp), test_read_accel(icomp),
+                        type_real(1e-4) * acceleration_scale,
+                        type_real(1e-6) * acceleration_scale)) {
 
                   // overhaul this erroring if its needed when implementing
                   // kernels.
@@ -103,21 +131,31 @@ void validate_field_at_points(
                   std::ostringstream oss;
 
                   oss << "shape function (iglob = " << current_mesh_iglob
-                      << ", icomp = " << current_icomp
-                      << ") with values at (iglob = " << nc_iglob
-                      << ", icomp = " << icomp << ")\n";
+                      << " ";
+                  iglob_elaboration(oss, current_mesh_iglob);
+                  oss << ", icomp = " << current_icomp
+                      << ") with values at (iglob = " << nc_iglob << " ";
+                  iglob_elaboration(oss, nc_iglob);
+                  oss << ", icomp = " << icomp << ")\n";
                   oss << "    Got " << test_read_accel(icomp)
                       << "\n    Expected " << expect_read_accel(icomp);
-                  if (std::abs(expect_read_accel(icomp)) > 1e-5) {
-                    oss << "  (" << std::showpos << std::scientific
-                        << (test_read_accel(icomp) - expect_read_accel(icomp)) /
+
+                  oss << "  (" << std::showpos << std::scientific;
+                  if (std::abs(expect_read_accel(icomp)) /
+                          std::abs(1e-10 + test_read_accel(icomp)) >
+                      1e-5) {
+                    oss << (test_read_accel(icomp) - expect_read_accel(icomp)) /
                                expect_read_accel(icomp)
-                        << std::fixed << "rel)";
+                        << " rel, ";
                   }
-                  // I can't get gtest to capture the failure, so change to RTE
-                  // and catch it.
-                  throw std::runtime_error(oss.str());
-                  // FAIL() << oss.str();
+                  oss << (test_read_accel(icomp) - expect_read_accel(icomp)) /
+                             acceleration_scale
+                      << " * est. accel scale)" << std::fixed;
+                  if (first_failure) {
+                    oss << "\nshape function full index";
+                    first_failure = false;
+                  }
+                  ADD_FAILURE() << oss.str();
                 }
 
                 // ================================
@@ -339,9 +377,33 @@ void nonconforming_kernel_comparison(
                 c_kernels.template update_wavefields<
                     specfem::element::medium_tag::elastic_psv>(1);
 
+                // recover the maximum expected value for a scale
+                type_real acceleration_scale = 1e-6;
+
+                constexpr specfem::element::medium_tag other_side_medium =
+                    (_medium_tag_ == specfem::element::medium_tag::acoustic)
+                        ? specfem::element::medium_tag::elastic_psv
+                        : specfem::element::medium_tag::acoustic;
+                using PointAccelType =
+                    specfem::point::acceleration<_dimension_tag_,
+                                                 other_side_medium, false>;
+                PointAccelType accel_sample;
+                for (const auto &[nc_iglob_, inds_] :
+                     nodes_to_check_per_medium[other_side_medium]) {
+                  const auto &[nc_index_, c_index_] = inds_;
+
+                  specfem::assembly::load_on_host(c_index_, c_field,
+                                                  accel_sample);
+                  for (int icomp_ = 0; icomp_ < PointAccelType::components;
+                       icomp_++) {
+                    acceleration_scale = std::max(
+                        acceleration_scale, std::abs(accel_sample(icomp_)));
+                  }
+                }
+
                 validate_field_at_points(c_field, nc_field,
                                          nodes_to_check_per_medium, nc_iglob,
-                                         icomp);
+                                         icomp, acceleration_scale);
                 // ================================
                 // end(foreach degree of freedom i)
                 // ================================
@@ -362,19 +424,7 @@ using NonconformingConformingMeshes =
 
 TEST_F(NonconformingConformingMeshes, Test) {
   for (auto &test_config : *this) {
-    // xfail -- remove when kernel implemented
 
-    // not sure why EXPECT_NO_FATAL_FAILURE doesn't compile. Substitute for
-    // this:
-    try {
-
-      nonconforming_kernel_comparison(test_config);
-
-      FAIL() << "Test marked fail until kernel is implemented. No incorrect "
-                "values / errors thrown -- was the kernel implemented?";
-    } catch (const std::runtime_error &e) {
-    }
-
-    // EXPECT_NO_FATAL_FAILURE(nonconforming_kernel_comparison(test_config));
+    nonconforming_kernel_comparison(test_config);
   }
 }

@@ -104,9 +104,8 @@ struct ScalarChunkEdgeViewType<T, specfem::dimension::type::dim2, NumberOfEdges,
   template <typename ScratchMemorySpace>
   KOKKOS_FUNCTION
   ScalarChunkEdgeViewType(const ScratchMemorySpace &scratch_memory_space)
-      : Kokkos::View<
-            value_type[NumberOfEdges][NumberOfGLLPoints][NumberOfGLLPoints],
-            MemorySpace, MemoryTraits>(scratch_memory_space) {}
+      : Kokkos::View<value_type[NumberOfEdges][NumberOfGLLPoints], MemorySpace,
+                     MemoryTraits>(scratch_memory_space) {}
   ///@}
 
   using type::operator();
