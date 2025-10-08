@@ -2,12 +2,14 @@
 
 #include "boundary_conditions/boundary_conditions.hpp"
 #include "compute_coupling.hpp"
+#include "enumerations/connections.hpp"
 #include "enumerations/interface.hpp"
 #include "execution/chunked_intersection_iterator.hpp"
 #include "execution/for_all.hpp"
 #include "medium/compute_coupling.hpp"
 #include "parallel_configuration/chunk_edge_config.hpp"
 #include "specfem/assembly.hpp"
+#include "specfem/chunk_edge.hpp"
 #include "specfem/point.hpp"
 #include <Kokkos_Core.hpp>
 #include <type_traits>
@@ -97,14 +99,16 @@ void specfem::kokkos_kernels::impl::compute_coupling(
 }
 
 template <specfem::dimension::type DimensionTag,
-          specfem::wavefield::simulation_field WavefieldType,
-          specfem::interface::interface_tag InterfaceTag,
+          specfem::wavefield::simulation_field WavefieldType, int NGLL,
+          int NQuad_interface, specfem::interface::interface_tag InterfaceTag,
           specfem::element::boundary_tag BoundaryTag>
 void specfem::kokkos_kernels::impl::compute_coupling(
     std::integral_constant<
         specfem::connections::type,
         specfem::connections::type::nonconforming> /*unused*/,
     const specfem::assembly::assembly<DimensionTag> &assembly) {
+
+  constexpr bool using_simd = false;
 
   constexpr static auto dimension_tag = DimensionTag;
   constexpr static auto connection_tag =
@@ -127,76 +131,95 @@ void specfem::kokkos_kernels::impl::compute_coupling(
   using parallel_config = specfem::parallel_config::default_chunk_edge_config<
       DimensionTag, Kokkos::DefaultExecutionSpace>;
 
-  using CoupledFieldType = typename specfem::interface::attributes<
-      dimension_tag, interface_tag>::template coupled_field_t<connection_tag>;
-  using SelfFieldType = typename specfem::interface::attributes<
-      dimension_tag, interface_tag>::template self_field_t<connection_tag>;
+  // As written, field types cannot readily be defined in attributes. Define
+  // them here.
+  constexpr specfem::element::medium_tag self_medium =
+      specfem::interface::attributes<dimension_tag,
+                                     interface_tag>::self_medium();
+  constexpr specfem::element::medium_tag coupled_medium =
+      specfem::interface::attributes<dimension_tag,
+                                     interface_tag>::coupled_medium();
+  using CoupledFieldType = std::conditional_t<
+      InterfaceTag == specfem::interface::interface_tag::acoustic_elastic,
+      specfem::chunk_edge::displacement<parallel_config::chunk_size, NGLL,
+                                        dimension_tag, coupled_medium,
+                                        using_simd>,
+      specfem::chunk_edge::acceleration<parallel_config::chunk_size, NGLL,
+                                        dimension_tag, coupled_medium,
+                                        using_simd> >;
 
-    // specfem::execution::ChunkedIntersectionIterator chunk(
-    //     parallel_config(), self_edges, coupled_edges, num_points);
+  using SelfFieldType =
+      specfem::point::acceleration<dimension_tag, self_medium, using_simd>;
+  using CoupledInterfaceDataType =
+      typename specfem::chunk_edge::nonconforming_coupled_interface<
+          parallel_config::chunk_size, NGLL, NQuad_interface, dimension_tag,
+          connection_tag, interface_tag, boundary_tag,
+          specfem::kokkos::DevScratchSpace,
+          Kokkos::MemoryTraits<Kokkos::Unmanaged>, using_simd>;
 
-    // specfem::execution::for_each_level(
-    //     "specfem::kokkos_kernels::impl::compute_coupling", chunk,
-    //     KOKKOS_LAMBDA(
-    //         const typename decltype(chunk)::index_type &chunk_iterator_index)
-    //         {
-    //       const auto &chunk_index = chunk_iterator_index.get_index();
-    //       const auto &self_chunk_index = chunk_index.self_index;
-    //       const auto &coupled_chunk_index = chunk_index.coupled_index;
+  specfem::execution::ChunkedIntersectionIterator chunk(
+      parallel_config(), self_edges, coupled_edges, num_points);
 
-    //       CoupledFieldType coupled_field; //< Coupled field type should be chunk
-                                          // edge field type
-  //         specfem::assembly::load_on_device(coupled_chunk_index, field,
-  //                                           coupled_field);
+  int scratch_size =
+      CoupledFieldType::shmem_size() + CoupledInterfaceDataType::shmem_size();
 
-  //         specfem::chunk_element::coupled_interface<dimension_tag,
-  //         connection_tag,
-  //                                                   interface_tag,
-  //                                                   boundary_tag>
-  //             interface_data;
-  //         specfem::assembly::load_on_device(self_chunk_index,
-  //         coupled_interfaces,
-  //                                           interface_data);
+  specfem::execution::for_each_level(
+      "specfem::kokkos_kernels::impl::compute_coupling",
+      chunk.set_scratch_size(0, Kokkos::PerTeam(scratch_size)),
+      KOKKOS_LAMBDA(
+          const typename decltype(chunk)::index_type &chunk_iterator_index) {
+        const auto &chunk_index = chunk_iterator_index.get_index();
+        const auto &self_chunk_iterator_index = chunk_index.get_self_index();
+        const auto &coupled_chunk_iterator_index =
+            chunk_index.get_coupled_index();
+        const auto coupled_chunk_index =
+            coupled_chunk_iterator_index.get_index();
 
-  //         specfem::execution::for_each_level(
-  //             chunk_index.get_iterator(),
-  //             [&](const typename decltype(
-  //                 chunk_index)::iterator_type::index_type &iterator_index) {
-  //               const auto index = iterator_index.get_index();
-  //               const auto self_index = index.self_index;
+        CoupledFieldType coupled_field; //< Coupled field type should be chunk
+                                        //edge field type
+        specfem::assembly::load_on_device(coupled_chunk_index, field,
+                                          coupled_field);
 
-  //               // @ Kentaro compute the coupling using edge data and
-  //               transfer
-  //               // functions here
+        // TODO add point access for mortar transfer function and replace self
+        // side of this:
+        CoupledInterfaceDataType interface_data;
+        // the way it's implemented right now, self and coupled indices should
+        // both work.
+        specfem::assembly::load_on_device(coupled_chunk_index,
+                                          coupled_interfaces, interface_data);
 
-  //               SelfFieldType self_field;
-  //               specfem::medium::compute_coupling(index,
-  //               point_interface_data,
-  //                                                 coupled_field, self_field);
+        specfem::execution::for_each_level(
+            chunk_index.get_iterator(),
+            [&](const typename std::remove_const_t<std::remove_reference_t<
+                    decltype(chunk_index)> >::iterator_type::index_type
+                    &iterator_index) {
+              const auto index = iterator_index.get_index();
+              const auto self_index = index.self_index;
 
-  //               if (BoundaryTag ==
-  //                   specfem::element::boundary_tag::acoustic_free_surface) {
-  //                 specfem::point::boundary<dimension_tag, boundary_tag,
-  //                 false>
-  //                     point_boundary;
-  //                 specfem::assembly::load_on_device(
-  //                     self_index, assembly.boundaries, point_boundary);
-  //                 specfem::medium::apply_boundary_conditions(point_boundary,
-  //                                                            self_field);
-  //               }
+              SelfFieldType self_field;
+              specfem::medium::compute_coupling(self_index, interface_data, coupled_field, self_field);
 
-  //               specfem::assembly::atomic_add_on_device(self_index, field,
-  //                                                       self_field);
-  //             });
-        // });
+              if constexpr(BoundaryTag == specfem::element::boundary_tag::acoustic_free_surface) {
+                specfem::point::boundary<boundary_tag, dimension_tag, false>
+                    point_boundary;
+                specfem::assembly::load_on_device(
+                    self_index, assembly.boundaries, point_boundary);
+                specfem::boundary_conditions::apply_boundary_conditions(point_boundary,
+                                                           self_field);
+              }
+
+              specfem::assembly::atomic_add_on_device(self_index, field,
+                                                      self_field);
+            });
+      });
 
   return;
 }
 
 template <specfem::dimension::type DimensionTag,
           specfem::connections::type ConnectionTag,
-          specfem::wavefield::simulation_field WavefieldType,
-          specfem::interface::interface_tag InterfaceTag,
+          specfem::wavefield::simulation_field WavefieldType, int NGLL,
+          int NQuad_interface, specfem::interface::interface_tag InterfaceTag,
           specfem::element::boundary_tag BoundaryTag>
 void specfem::kokkos_kernels::impl::compute_coupling(
     const specfem::assembly::assembly<DimensionTag> &assembly) {
@@ -205,6 +228,12 @@ void specfem::kokkos_kernels::impl::compute_coupling(
       std::integral_constant<specfem::connections::type, ConnectionTag>;
 
   // Forward to implementation with dispatch tag
-  compute_coupling<DimensionTag, WavefieldType, InterfaceTag, BoundaryTag>(
-      connection_dispatch(), assembly);
+  if constexpr (ConnectionTag == specfem::connections::type::nonconforming) {
+    compute_coupling<DimensionTag, WavefieldType, NGLL, NQuad_interface,
+                     InterfaceTag, BoundaryTag>(connection_dispatch(),
+                                                assembly);
+  } else {
+    compute_coupling<DimensionTag, WavefieldType, InterfaceTag, BoundaryTag>(
+        connection_dispatch(), assembly);
+  }
 }

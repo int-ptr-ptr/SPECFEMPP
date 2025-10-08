@@ -184,31 +184,6 @@ struct attributes<specfem::dimension::type::dim2,
                                    false>;
 };
 
-/*
- * Other flux schemes require other components (for example, upwind needs
- * velocity), but for now, we are equating the NC scheme to the C scheme.
- */
-
-template <>
-struct attributes<specfem::dimension::type::dim2,
-                  specfem::interface::interface_tag::elastic_acoustic>::
-    self_field<specfem::connections::type::nonconforming> {
-  using type =
-      specfem::point::acceleration<specfem::dimension::type::dim2,
-                                   specfem::element::medium_tag::elastic_psv,
-                                   false>;
-};
-
-template <>
-struct attributes<specfem::dimension::type::dim2,
-                  specfem::interface::interface_tag::elastic_acoustic>::
-    coupled_field<specfem::connections::type::nonconforming> {
-  using type =
-      specfem::point::acceleration<specfem::dimension::type::dim2,
-                                   specfem::element::medium_tag::acoustic,
-                                   false>;
-};
-
 /**
  * @brief Attributes specialization for 2D acoustic-to-elastic coupling
  *
@@ -286,31 +261,6 @@ struct attributes<specfem::dimension::type::dim2,
     coupled_field<specfem::connections::type::weakly_conforming> {
   using type =
       specfem::point::displacement<specfem::dimension::type::dim2,
-                                   specfem::element::medium_tag::elastic_psv,
-                                   false>;
-};
-
-/*
- * Other flux schemes require other components (for example, upwind needs
- * velocity), but for now, we are equating the NC scheme to the C scheme.
- */
-
-template <>
-struct attributes<specfem::dimension::type::dim2,
-                  specfem::interface::interface_tag::acoustic_elastic>::
-    self_field<specfem::connections::type::nonconforming> {
-  using type =
-      specfem::point::acceleration<specfem::dimension::type::dim2,
-                                   specfem::element::medium_tag::acoustic,
-                                   false>;
-};
-
-template <>
-struct attributes<specfem::dimension::type::dim2,
-                  specfem::interface::interface_tag::acoustic_elastic>::
-    coupled_field<specfem::connections::type::nonconforming> {
-  using type =
-      specfem::point::acceleration<specfem::dimension::type::dim2,
                                    specfem::element::medium_tag::elastic_psv,
                                    false>;
 };

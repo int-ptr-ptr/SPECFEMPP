@@ -81,7 +81,9 @@ public:
           if constexpr (dimension_tag == _dimension_tag_ &&
                         self_medium == medium) {
             impl::compute_coupling<_dimension_tag_, _connection_tag_, wavefield,
-                                   _interface_tag_, _boundary_tag_>(assembly);
+                                   ngll, ngll, _interface_tag_, _boundary_tag_>(
+                assembly);
+            // second ngll is the number of quadrature points on the mortar.
           }
         })
 

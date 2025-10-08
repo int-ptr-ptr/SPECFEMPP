@@ -336,7 +336,7 @@ public:
    *         metadata about this specific chunk of edges
    */
   KOKKOS_INLINE_FUNCTION
-  const index_type &get_index() const { return { *this }; }
+  const index_type get_index() const { return { *this }; }
 
   /**
    * @brief Get the team-level iterator for processing edges in this chunk

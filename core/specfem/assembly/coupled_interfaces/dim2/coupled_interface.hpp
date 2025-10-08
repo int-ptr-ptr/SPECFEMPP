@@ -229,7 +229,8 @@ template <
     typename IndexType, typename ContainerType, typename PointType,
     typename std::enable_if_t<
         ((specfem::data_access::is_edge_index<IndexType>::value) &&
-         (specfem::data_access::is_coupled_interface<ContainerType>::value)),
+         (specfem::data_access::is_coupled_interface<ContainerType>::value) &&
+         (specfem::data_access::is_point<PointType>::value)),
         int> = 0>
 KOKKOS_FORCEINLINE_FUNCTION void load_on_device(const IndexType &index,
                                                 const ContainerType &container,
@@ -248,6 +249,46 @@ KOKKOS_FORCEINLINE_FUNCTION void load_on_device(const IndexType &index,
                                 // PointType::connection_tag
                                 // later
           >()
+      .template impl_load<true>(index, point);
+}
+
+/**
+ * @brief Load interface data from container to edge on device
+ *
+ * Loads coupled interface data using compile-time dispatch based on the edge's
+ * template parameters (connection, interface, and boundary types).
+ *
+ * @ingroup CoupledInterfaceDataAccess
+ *
+ * @tparam IndexType Edge index type
+ * @tparam ContainerType Coupled interfaces container type
+ * @tparam EdgeType Interface edge type
+ *
+ * @param index Edge index specifying the interface location
+ * @param container Coupled interfaces container holding interface data
+ * @param point Point object where loaded data will be stored
+ *
+ * @pre index refers to valid mesh edge
+ * @pre container is properly initialized
+ * @pre point type matches supported interface combinations
+ *
+ * @note For device-side computations only. Use load_on_host for host code.
+ */
+template <
+    typename IndexType, typename ContainerType, typename EdgeType,
+    typename std::enable_if_t<
+        ((specfem::data_access::is_edge_index<IndexType>::value) &&
+         (specfem::data_access::is_coupled_interface<ContainerType>::value) &&
+         (specfem::data_access::is_chunk_edge<EdgeType>::value)),
+        int> = 0>
+KOKKOS_FORCEINLINE_FUNCTION void load_on_device(const IndexType &index,
+                                                const ContainerType &container,
+                                                EdgeType &point) {
+  // TODO more complicated checking?
+  container
+      .template get_interface_container<EdgeType::interface_tag,
+                                        EdgeType::boundary_tag,
+                                        EdgeType::connection_tag>()
       .template impl_load<true>(index, point);
 }
 

@@ -17,8 +17,8 @@ void compute_coupling(
     const specfem::assembly::assembly<DimensionTag> &assembly);
 
 template <specfem::dimension::type DimensionTag,
-          specfem::wavefield::simulation_field WavefieldType,
-          specfem::interface::interface_tag InterfaceTag,
+          specfem::wavefield::simulation_field WavefieldType, int NGLL,
+          int NQuad_interface, specfem::interface::interface_tag InterfaceTag,
           specfem::element::boundary_tag BoundaryTag>
 void compute_coupling(
     std::integral_constant<
@@ -45,8 +45,8 @@ void compute_coupling(
  */
 template <specfem::dimension::type DimensionTag,
           specfem::connections::type ConnectionTag,
-          specfem::wavefield::simulation_field WavefieldType,
-          specfem::interface::interface_tag InterfaceTag,
+          specfem::wavefield::simulation_field WavefieldType, int NGLL,
+          int NQuad_interface, specfem::interface::interface_tag InterfaceTag,
           specfem::element::boundary_tag BoundaryTag>
 void compute_coupling(
     const specfem::assembly::assembly<DimensionTag> &assembly);

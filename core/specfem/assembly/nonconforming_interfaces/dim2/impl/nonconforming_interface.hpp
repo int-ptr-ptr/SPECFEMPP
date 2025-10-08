@@ -2,6 +2,7 @@
 #pragma once
 
 #include "enumerations/interface.hpp"
+#include "execution/for_each_level.hpp"
 #include "specfem/assembly/edge_types.hpp"
 #include "specfem/assembly/jacobian_matrix.hpp"
 #include "specfem/assembly/mesh.hpp"
@@ -113,7 +114,9 @@ public:
    * @param index Edge and point indices for data location
    * @param point Output point object to store loaded data
    */
-  template <bool on_device, typename IndexType, typename PointType>
+  template <bool on_device, typename IndexType, typename PointType,
+            typename std::enable_if_t<
+                specfem::data_access::is_point<PointType>::value, int> = 0>
   KOKKOS_FORCEINLINE_FUNCTION void impl_load(const IndexType &index,
                                              PointType &point) const {
     if constexpr (on_device) {
@@ -126,6 +129,71 @@ public:
       point.edge_normal(1) = h_edge_normal(index.iedge, index.ipoint, 1);
     }
     return;
+  }
+
+  /**
+   * @brief Loads interface data at specified index into edge
+   *
+   * Template function that loads edge factor and normal vector data
+   * from either device or host memory into the provided edge object.
+   *
+   * @tparam on_device If true, loads from device memory; if false, from host
+   * @tparam IndexType Type of index
+   * @tparam EdgeType Type of edge (must have intersection_factor and
+   * edge_normal)
+   * @param index Edge and point indices for data location
+   * @param edge Output edge object to store loaded data
+   */
+  template <bool on_device, typename IndexType, typename EdgeType,
+            typename std::enable_if_t<
+                specfem::data_access::is_chunk_edge<EdgeType>::value, int> = 0>
+  KOKKOS_FORCEINLINE_FUNCTION void impl_load(const IndexType &index,
+                                             EdgeType &edge) const {
+    // is there a better way of recovering global index?
+    const int &offset =
+        index.get_policy_index().league_rank() * edge.mortar_factor.extent(0);
+    specfem::execution::for_each_level(
+        index.get_iterator(),
+        [&](const typename IndexType::iterator_type::index_type
+                &iterator_index) {
+          const auto point_index = iterator_index.get_index();
+
+          const int &local_slot = point_index.iedge;
+          const int &container_slot = point_index.iedge;
+          const int &ipoint = point_index.ipoint;
+
+          if constexpr (on_device) {
+            edge.mortar_factor(local_slot, ipoint) =
+                intersection_factor(container_slot, ipoint);
+            edge.edge_normal(local_slot, ipoint, 0) =
+                edge_normal(container_slot, ipoint, 0);
+            edge.edge_normal(local_slot, ipoint, 1) =
+                edge_normal(container_slot, ipoint, 1);
+            for (int i = 0; i < EdgeType::n_quad_element; i++) {
+              // replace ternary later with some other means of accessing which
+              // side we want.
+              edge.transfer_function_self(local_slot, ipoint, i) =
+                  transfer_function(container_slot, ipoint, i);
+              edge.transfer_function_coupled(local_slot, ipoint, i) =
+                  transfer_function_other(container_slot, ipoint, i);
+            }
+          } else {
+            edge.mortar_factor(local_slot, ipoint) =
+                h_intersection_factor(container_slot, ipoint);
+            edge.edge_normal(local_slot, ipoint, 0) =
+                h_edge_normal(container_slot, ipoint, 0);
+            edge.edge_normal(local_slot, ipoint, 1) =
+                h_edge_normal(container_slot, ipoint, 1);
+            for (int i = 0; i < EdgeType::n_quad_element; i++) {
+              // replace ternary later with some other means of accessing which
+              // side we want.
+              edge.transfer_function_self(local_slot, ipoint, i) =
+                  h_transfer_function(container_slot, ipoint, i);
+              edge.transfer_function_coupled(local_slot, ipoint, i) =
+                  h_transfer_function_other(container_slot, ipoint, i);
+            }
+          }
+        });
   }
 };
 } // namespace specfem::assembly::coupled_interfaces_impl

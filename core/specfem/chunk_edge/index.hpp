@@ -8,16 +8,15 @@ namespace specfem::chunk_edge {
 
 template <specfem::dimension::type DimensionTag, typename ViewType,
           typename TeamMemberType>
-class Index
-    : public specfem::execution::ChunkEdgeIndex<DimensionTag, TeamMemberType,
-                                                ViewType>,
-      public specfem::data_access::Accessor<
-          specfem::data_access::AccessorType::chunk_edge,
-          specfem::data_access::DataClassType::index, DimensionTag, false> {
+class Index : public specfem::execution::ChunkEdgeIndex<DimensionTag, ViewType,
+                                                        TeamMemberType>,
+              public specfem::data_access::Accessor<
+                  specfem::data_access::AccessorType::chunk_edge,
+                  specfem::data_access::DataClassType::edge_index, DimensionTag,
+                  false> {
 private:
-  using base_type =
-      specfem::execution::ChunkEdgeIndex<DimensionTag, TeamMemberType,
-                                         ViewType>;
+  using base_type = specfem::execution::ChunkEdgeIndex<DimensionTag, ViewType,
+                                                       TeamMemberType>;
 
 public:
   /// @brief Iterator type for traversing elements in the chunk
