@@ -264,7 +264,7 @@ def quadratic_beziers_intersect(
         edge1 (np.ndarray): 3x2 array of positions: [start, middle, end]
         edge2 (np.ndarray): 3x2 array of positions: [start, middle, end]
         eps1 (float | None): eps1 value, defaults to a quarter of eps2
-            if eps2 is defined, or (1% of max|start - end|)^2 between the
+            if eps2 is defined, or (1% of min|start - end|)^2 between the
             curves if not.
         eps2 (float | None): eps2 value, defaults to quadruple eps1.
         delta (float): parameter space argument for whether an interval
@@ -276,7 +276,7 @@ def quadratic_beziers_intersect(
         eps1 = (
             (
                 1e-4
-                * max(
+                * min(
                     sum((edge1[0, :] - edge1[2, :]) ** 2),
                     sum((edge2[0, :] - edge2[2, :]) ** 2),
                 )

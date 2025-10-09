@@ -159,7 +159,7 @@ public:
           const auto point_index = iterator_index.get_index();
 
           const int &local_slot = point_index.iedge;
-          const int &container_slot = point_index.iedge;
+          const int &container_slot = offset + point_index.iedge;
           const int &ipoint = point_index.ipoint;
 
           if constexpr (on_device) {
@@ -170,12 +170,10 @@ public:
             edge.edge_normal(local_slot, ipoint, 1) =
                 edge_normal(container_slot, ipoint, 1);
             for (int i = 0; i < EdgeType::n_quad_element; i++) {
-              // replace ternary later with some other means of accessing which
-              // side we want.
               edge.transfer_function_self(local_slot, ipoint, i) =
-                  transfer_function(container_slot, ipoint, i);
+                  transfer_function(container_slot, i, ipoint);
               edge.transfer_function_coupled(local_slot, ipoint, i) =
-                  transfer_function_other(container_slot, ipoint, i);
+                  transfer_function_other(container_slot, i, ipoint);
             }
           } else {
             edge.mortar_factor(local_slot, ipoint) =
@@ -185,12 +183,10 @@ public:
             edge.edge_normal(local_slot, ipoint, 1) =
                 h_edge_normal(container_slot, ipoint, 1);
             for (int i = 0; i < EdgeType::n_quad_element; i++) {
-              // replace ternary later with some other means of accessing which
-              // side we want.
               edge.transfer_function_self(local_slot, ipoint, i) =
-                  h_transfer_function(container_slot, ipoint, i);
+                  h_transfer_function(container_slot, i, ipoint);
               edge.transfer_function_coupled(local_slot, ipoint, i) =
-                  h_transfer_function_other(container_slot, ipoint, i);
+                  h_transfer_function_other(container_slot, i, ipoint);
             }
           }
         });

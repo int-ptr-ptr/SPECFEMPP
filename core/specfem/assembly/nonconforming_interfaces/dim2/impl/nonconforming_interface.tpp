@@ -186,7 +186,7 @@ specfem::assembly::coupled_interfaces_impl::interface_container<
 
     // convert dr to ds and multiply by weights
     for (int iquad = 0; iquad < nquad_intersection; iquad++) {
-      this->h_intersection_factor(i,iquad) +=
+      this->h_intersection_factor(i,iquad) =
           interface_weights(iquad) * std::sqrt(
               dr_intersection(iquad,0) * dr_intersection(iquad,0) +
               dr_intersection(iquad,1) * dr_intersection(iquad,1));

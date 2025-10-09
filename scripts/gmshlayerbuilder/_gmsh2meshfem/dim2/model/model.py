@@ -90,10 +90,14 @@ class Model:
             pg1 = model1.physical_groups.get(name, NullPhysicalGroup(name))
             pg2 = model2.physical_groups.get(name, NullPhysicalGroup(name))
 
-            pg1.remap_nodes(nodemapu.left_to_joined)
-            pg2.remap_nodes(nodemapu.right_to_joined)
-            pg1.remap_elements(elem_ind_remap.left_to_joined)
-            pg2.remap_elements(elem_ind_remap.right_to_joined)
+            pg1 = pg1.remap_indices(
+                node_mapping=nodemapu.left_to_joined,
+                element_mapping=elem_ind_remap.left_to_joined,
+            )
+            pg2 = pg2.remap_indices(
+                node_mapping=nodemapu.right_to_joined,
+                element_mapping=elem_ind_remap.right_to_joined,
+            )
 
             combined_physical_groups[name] = UnionPhysicalGroup(name, pg1, pg2)
 

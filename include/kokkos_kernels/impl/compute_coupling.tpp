@@ -175,6 +175,8 @@ void specfem::kokkos_kernels::impl::compute_coupling(
             chunk_index.get_coupled_index();
         const auto coupled_chunk_index =
             coupled_chunk_iterator_index.get_index();
+            const auto self_chunk_index =
+                self_chunk_iterator_index.get_index();
 
         CoupledFieldType coupled_field(team.team_scratch(0));
         specfem::assembly::load_on_device(coupled_chunk_index, field,
@@ -183,9 +185,9 @@ void specfem::kokkos_kernels::impl::compute_coupling(
         // TODO add point access for mortar transfer function and replace self
         // side of this:
         CoupledInterfaceDataType interface_data(team);
-        // the way it's implemented right now, self and coupled indices should
-        // both work.
-        specfem::assembly::load_on_device(coupled_chunk_index,
+
+        // self_chunk_index has data on coupled side. consider changing?
+        specfem::assembly::load_on_device(self_chunk_index,
                                           coupled_interfaces, interface_data);
 
         specfem::execution::for_each_level(
