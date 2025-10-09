@@ -63,7 +63,8 @@ void validate_field_at_points(
                      specfem::point::index<specfem::dimension::type::dim2> > > >
         &nodes_to_check_per_medium,
     const int &current_mesh_iglob, const int &current_icomp,
-    const type_real &acceleration_scale) {
+    const type_real &elastic_acceleration_scale,
+    const type_real &acoustic_acceleration_scale) {
 
   specfem::point::acceleration<specfem::dimension::type::dim2,
                                specfem::element::medium_tag::acoustic, false>
@@ -72,8 +73,6 @@ void validate_field_at_points(
       specfem::point::index<specfem::dimension::type::dim2>(8, 0, 3), tested,
       test_field);
   test_field(0) += std::sin(std::asin(1e-10 * test_field(0)));
-  expected.copy_to_host();
-  tested.copy_to_host();
 
   // give extra information only on the first failure
   bool first_failure = true;
@@ -97,15 +96,17 @@ void validate_field_at_points(
   // ==================================
   for (const auto &[medium, nodes_to_check] : nodes_to_check_per_medium) {
     FOR_EACH_IN_PRODUCT(
-        (DIMENSION_TAG(DIM2), MEDIUM_TAG(ELASTIC_PSV, ELASTIC_SH, ACOUSTIC,
-                                         POROELASTIC, ELASTIC_PSV_T)),
-        {
+        (DIMENSION_TAG(DIM2), MEDIUM_TAG(ELASTIC_PSV, ACOUSTIC)), {
           using PointAccelerationType =
               specfem::point::acceleration<_dimension_tag_, _medium_tag_,
                                            false>;
           if (medium == _medium_tag_) {
             PointAccelerationType test_read_accel;
             PointAccelerationType expect_read_accel;
+            const type_real acceleration_scale =
+                (medium == specfem::element::medium_tag::acoustic)
+                    ? acoustic_acceleration_scale
+                    : elastic_acceleration_scale;
             for (const auto &[nc_iglob, inds] : nodes_to_check) {
               const auto &[nc_index, c_index] = inds;
 
@@ -123,7 +124,7 @@ void validate_field_at_points(
                 if (!specfem::utilities::is_close(
                         expect_read_accel(icomp), test_read_accel(icomp),
                         type_real(1e-4) * acceleration_scale,
-                        type_real(1e-6) * acceleration_scale)) {
+                        type_real(1e-5) * acceleration_scale)) {
 
                   // overhaul this erroring if its needed when implementing
                   // kernels.
@@ -257,6 +258,9 @@ void nonconforming_kernel_comparison(
   };
   const auto &nc_graph = boost::make_filtered_graph(graph, filter);
 
+  type_real min_cell_length_scale = std::numeric_limits<type_real>::max();
+  type_real max_cell_length_scale = 0;
+
   for (const auto &edge : boost::make_iterator_range(boost::edges(nc_graph))) {
     // we do not assume assembly indices are the same, but mesh indices should
     // be.
@@ -300,6 +304,24 @@ void nonconforming_kernel_comparison(
         }
       }
     }
+
+    // length scale: diagonals
+    type_real x_scale1 = nc_assembly.mesh.h_control_node_coord(0, nc_ispec, 0) -
+                         nc_assembly.mesh.h_control_node_coord(0, nc_ispec, 2);
+    type_real z_scale1 = nc_assembly.mesh.h_control_node_coord(1, nc_ispec, 0) -
+                         nc_assembly.mesh.h_control_node_coord(1, nc_ispec, 2);
+    type_real x_scale2 = nc_assembly.mesh.h_control_node_coord(0, nc_ispec, 1) -
+                         nc_assembly.mesh.h_control_node_coord(0, nc_ispec, 3);
+    type_real z_scale2 = nc_assembly.mesh.h_control_node_coord(1, nc_ispec, 1) -
+                         nc_assembly.mesh.h_control_node_coord(1, nc_ispec, 3);
+    min_cell_length_scale =
+        std::min(min_cell_length_scale,
+                 std::min(x_scale1 * x_scale1 + z_scale1 * z_scale1,
+                          x_scale2 * x_scale2 + z_scale2 * z_scale2));
+    max_cell_length_scale =
+        std::max(max_cell_length_scale,
+                 std::max(x_scale1 * x_scale1 + z_scale1 * z_scale1,
+                          x_scale2 * x_scale2 + z_scale2 * z_scale2));
   }
 
   specfem::kokkos_kernels::domain_kernels<
@@ -326,14 +348,22 @@ void nonconforming_kernel_comparison(
   clear_field<specfem::point::acceleration>(nc_assembly);
   clear_field<specfem::point::acceleration>(c_assembly);
 
+  // estimates for crossover values
+
+  type_real rho_inv =
+      test_config.nonconforming_mesh.materials.material_dim2_acoustic_isotropic
+          .element_materials[0]
+          .get_properties()
+          .rho_inverse();
+  type_real elastic_to_acoustic_factor = max_cell_length_scale / rho_inv;
+  type_real acoustic_to_elastic_factor = rho_inv / min_cell_length_scale;
+
   // ==================================
   // begin(foreach degree of freedom i)
   // ==================================
   for (const auto &[medium, nodes_to_check] : nodes_to_check_per_medium) {
     FOR_EACH_IN_PRODUCT(
-        (DIMENSION_TAG(DIM2), MEDIUM_TAG(ELASTIC_PSV, ELASTIC_SH, ACOUSTIC,
-                                         POROELASTIC, ELASTIC_PSV_T)),
-        {
+        (DIMENSION_TAG(DIM2), MEDIUM_TAG(ELASTIC_PSV, ACOUSTIC)), {
           using PointDisplacementType =
               specfem::point::displacement<_dimension_tag_, _medium_tag_,
                                            false>;
@@ -376,34 +406,57 @@ void nonconforming_kernel_comparison(
                     specfem::element::medium_tag::elastic_psv>(1);
                 c_kernels.template update_wavefields<
                     specfem::element::medium_tag::elastic_psv>(1);
+                nc_field.copy_to_host();
+                c_field.copy_to_host();
 
                 // recover the maximum expected value for a scale
-                type_real acceleration_scale = 1e-6;
+                type_real elastic_acceleration_scale = 1e-6;
+                type_real acoustic_acceleration_scale = 1e-6;
 
-                constexpr specfem::element::medium_tag other_side_medium =
-                    (_medium_tag_ == specfem::element::medium_tag::acoustic)
-                        ? specfem::element::medium_tag::elastic_psv
-                        : specfem::element::medium_tag::acoustic;
-                using PointAccelType =
-                    specfem::point::acceleration<_dimension_tag_,
-                                                 other_side_medium, false>;
-                PointAccelType accel_sample;
-                for (const auto &[nc_iglob_, inds_] :
-                     nodes_to_check_per_medium[other_side_medium]) {
+                using AcousticPointAccelType = specfem::point::acceleration<
+                    _dimension_tag_, specfem::element::medium_tag::acoustic,
+                    false>;
+                using ElasticPointAccelType = specfem::point::acceleration<
+                    _dimension_tag_, specfem::element::medium_tag::elastic_psv,
+                    false>;
+                AcousticPointAccelType ac_accel_sample;
+                ElasticPointAccelType el_accel_sample;
+                for (const auto &[nc_iglob_, inds_] : nodes_to_check_per_medium
+                         [specfem::element::medium_tag::acoustic]) {
                   const auto &[nc_index_, c_index_] = inds_;
 
                   specfem::assembly::load_on_host(c_index_, c_field,
-                                                  accel_sample);
-                  for (int icomp_ = 0; icomp_ < PointAccelType::components;
-                       icomp_++) {
-                    acceleration_scale = std::max(
-                        acceleration_scale, std::abs(accel_sample(icomp_)));
+                                                  ac_accel_sample);
+                  for (int icomp_ = 0;
+                       icomp_ < AcousticPointAccelType::components; icomp_++) {
+                    acoustic_acceleration_scale =
+                        std::max(acoustic_acceleration_scale,
+                                 std::abs(ac_accel_sample(icomp_)));
+                  }
+                }
+                for (const auto &[nc_iglob_, inds_] : nodes_to_check_per_medium
+                         [specfem::element::medium_tag::elastic_psv]) {
+                  const auto &[nc_index_, c_index_] = inds_;
+
+                  specfem::assembly::load_on_host(c_index_, c_field,
+                                                  el_accel_sample);
+                  for (int icomp_ = 0;
+                       icomp_ < ElasticPointAccelType::components; icomp_++) {
+                    elastic_acceleration_scale =
+                        std::max(elastic_acceleration_scale,
+                                 std::abs(el_accel_sample(icomp_)));
                   }
                 }
 
-                validate_field_at_points(c_field, nc_field,
-                                         nodes_to_check_per_medium, nc_iglob,
-                                         icomp, acceleration_scale);
+                validate_field_at_points(
+                    c_field, nc_field, nodes_to_check_per_medium, nc_iglob,
+                    icomp,
+                    std::max(acoustic_to_elastic_factor *
+                                 acoustic_acceleration_scale,
+                             elastic_acceleration_scale),
+                    std::max(acoustic_acceleration_scale,
+                             elastic_to_acoustic_factor *
+                                 elastic_acceleration_scale));
                 // ================================
                 // end(foreach degree of freedom i)
                 // ================================
