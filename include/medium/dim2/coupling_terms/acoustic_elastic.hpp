@@ -68,6 +68,12 @@ KOKKOS_INLINE_FUNCTION void compute_coupling(
                       interface_data.transfer_function_self(
                           index.iedge, ipoint_self, ipoint_mortar);
     }
+    // renormalize (nx,nz) -- we should probably store mortar values of normal
+    // in the future
+    type_real magn =
+        std::sqrt(nx_at_mortar * nx_at_mortar + nz_at_mortar * nz_at_mortar);
+    nx_at_mortar /= magn;
+    nz_at_mortar /= magn;
 
     type_real sx_at_mortar = 0;
     type_real sz_at_mortar = 0;
