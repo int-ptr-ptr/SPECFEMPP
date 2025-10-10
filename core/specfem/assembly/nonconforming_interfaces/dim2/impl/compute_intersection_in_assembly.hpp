@@ -23,9 +23,9 @@ namespace specfem::assembly::nonconforming_interfaces_impl {
  * Kokkos::View<
  * specfem::point::global_coordinates<specfem::dimension::type::dim2> *,
  * Kokkos::HostSpace>,
- * specfem::mesh_entity::type, specfem::mesh_entity::type> - in order: the
- * cooordinates of the source element, the coordinates of the target element,
- * the orientation on the source element in the intersection, and the
+ * specfem::mesh_entity::dim2::type, specfem::mesh_entity::dim2::type> - in
+ * order: the cooordinates of the source element, the coordinates of the target
+ * element, the orientation on the source element in the intersection, and the
  * orientation on the target element in the intersection.
  */
 template <typename EdgeType>
@@ -36,7 +36,7 @@ std::tuple<
     Kokkos::View<
         specfem::point::global_coordinates<specfem::dimension::type::dim2> *,
         Kokkos::HostSpace>,
-    specfem::mesh_entity::type, specfem::mesh_entity::type>
+    specfem::mesh_entity::dim2::type, specfem::mesh_entity::dim2::type>
 expand_edge_index(
     const specfem::assembly::mesh<specfem::dimension::type::dim2> &mesh,
     const EdgeType &edge);

@@ -14,7 +14,7 @@ inline std::tuple<
     Kokkos::View<
         specfem::point::global_coordinates<specfem::dimension::type::dim2> *,
         Kokkos::HostSpace>,
-    specfem::mesh_entity::type, specfem::mesh_entity::type>
+    specfem::mesh_entity::dim2::type, specfem::mesh_entity::dim2::type>
 expand_edge_index(
     const specfem::assembly::mesh<specfem::dimension::type::dim2> &mesh,
     const EdgeType &edge,
@@ -26,13 +26,13 @@ expand_edge_index(
   const int ispec = boost::source(edge, graph);
   const int jspec = boost::target(edge, graph);
 
-  const specfem::mesh_entity::type iorientation = graph[edge].orientation;
+  const specfem::mesh_entity::dim2::type iorientation = graph[edge].orientation;
   const auto [edge_inv, exists] = boost::edge(jspec, ispec, graph);
   if (!exists) {
     throw std::runtime_error(
         "Non-symmetric adjacency graph detected in `compute_intersection`.");
   }
-  const specfem::mesh_entity::type jorientation = graph[edge_inv].orientation;
+  const specfem::mesh_entity::dim2::type jorientation = graph[edge_inv].orientation;
 
   const int ngnod = mesh.ngnod;
 
