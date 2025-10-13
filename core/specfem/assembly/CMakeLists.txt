@@ -21,8 +21,8 @@ target_link_libraries(
 )
 
 set_target_properties(assembly PROPERTIES
-    # UNITY_BUILD $<NOT:$<BOOL:${__INTEL_LLVM__}>>
-    UNITY_BUILD_BATCH_SIZE $<IF:$<BOOL:${__INTEL_LLVM__}>,2,8>
+    UNITY_BUILD $<NOT:$<BOOL:${__INTEL_LLVM__}>>
+    UNITY_BUILD_BATCH_SIZE $<IF:$<BOOL:${__INTEL_LLVM__}>,0,8>
 )
 
 
