@@ -78,7 +78,6 @@ struct ScalarChunkEdgeViewType<T, specfem::dimension::type::dim2, NumberOfEdges,
                                                  ///< the chunk
   constexpr static int ngll = NumberOfGLLPoints; ///< Number of GLL points in
                                                  ///< each element
-  constexpr static bool isChunkViewType = true;
   ///@}
 
   /**
@@ -188,8 +187,6 @@ struct VectorChunkEdgeViewType<T, specfem::dimension::type::dim2, NumberOfEdges,
                                                  ///< each element
   constexpr static int components = Components;  ///< Number of vector values at
                                                  ///< each GLL point
-  constexpr static bool isChunkViewType = true;
-  constexpr static bool isScalarViewType = true;
   ///@}
 
   /**
@@ -319,8 +316,6 @@ struct TensorChunkEdgeViewType<
   constexpr static int dimensions =
       NumberOfDimensions; ///< Number of dimensions
                           ///< of the tensor values
-  constexpr static bool isChunkViewType = true;
-  constexpr static bool isScalarViewType = false;
   ///@}
 
   /**

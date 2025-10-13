@@ -19,9 +19,7 @@ template <typename ViewType> struct VectorChunkEdgeSubview {
   /// Index type from the parent view
   using index_type = typename ViewType::index_type;
   /// Point view type for component access
-  using point_view_type =
-      VectorPointViewType<typename ViewType::base_type, ViewType::components,
-                          ViewType::using_simd>;
+  using point_view_type = typename ViewType::point_view_type;
 
   /// Reference to the parent view
   ViewType &view;
@@ -43,7 +41,6 @@ template <typename ViewType> struct VectorChunkEdgeSubview {
    *
    * Specialized for 2D case, providing element access with proper indexing.
    *
-   * @tparam D Dimension tag, defaulted to the index type's dimension tag
    * @param icomp Component index to access
    * @return Reference to the component value
    */
@@ -100,9 +97,7 @@ template <typename ViewType> struct TensorChunkEdgeSubview {
   /// Index type from the parent view
   using index_type = typename ViewType::index_type;
   /// Point view type for tensor component access
-  using point_view_type =
-      TensorPointViewType<typename ViewType::base_type, ViewType::components,
-                          ViewType::dimensions, ViewType::using_simd>;
+  using point_view_type = typename ViewType::point_view_type;
 
   /// Reference to the parent view
   ViewType &view;
@@ -125,7 +120,7 @@ template <typename ViewType> struct TensorChunkEdgeSubview {
    */
   KOKKOS_INLINE_FUNCTION
   constexpr std::size_t extent(const size_t &i) const {
-    return view.extent(i + 3);
+    return view.extent(i + 2);
   }
 
   /**
@@ -136,7 +131,7 @@ template <typename ViewType> struct TensorChunkEdgeSubview {
    */
   KOKKOS_INLINE_FUNCTION
   constexpr static std::size_t static_extent(const size_t &i) {
-    return ViewType::static_extent(i + 3);
+    return ViewType::static_extent(i + 2);
   }
 
   /**

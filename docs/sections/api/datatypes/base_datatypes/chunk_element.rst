@@ -6,8 +6,8 @@ Chunk Element View Types
 
 Elementary datatypes used to store field values within a chunk of elements.
 
-.. doxygenstruct:: specfem::datatype::VectorChunkViewType
+.. doxygenstruct:: specfem::datatype::VectorChunkElementViewType
     :members:
 
-.. doxygenstruct:: specfem::datatype::TensorChunkViewType
+.. doxygenstruct:: specfem::datatype::TensorChunkElementViewType
     :members:
