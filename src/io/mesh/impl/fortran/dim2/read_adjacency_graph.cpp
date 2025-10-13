@@ -48,7 +48,7 @@ specfem::io::mesh::impl::fortran::dim2::read_adjacency_graph(
     if (connection_type == specfem::connections::type::strongly_conforming ||
         connection_type == specfem::connections::type::nonconforming) {
       const auto edge_orientation =
-          static_cast<specfem::mesh_entity::type>(orientation_int);
+          static_cast<specfem::mesh_entity::dim2::type>(orientation_int);
       boost::add_edge(current_element - 1, neighbor_element - 1,
                       EdgeProperties{ connection_type, edge_orientation }, g);
     } else {

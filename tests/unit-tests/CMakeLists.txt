@@ -251,18 +251,18 @@ target_link_libraries(
 )
 
 add_executable(
-  mesh_tests
-  mesh/test_fixture/test_fixture.cpp
-  mesh/materials/materials.cpp
-  mesh/materials/properties.cpp
-  mesh/runner.cpp
-  mesh/adjacency_graph/adjacency_graph.cpp
-  mesh/adjacency_graph/adjacency_graph_regular_mesh.cpp
-  mesh/adjacency_graph/adjacency_graph_irregular_mesh.cpp
+  mesh_dim2_tests
+  mesh/dim2/test_fixture/test_fixture.cpp
+  mesh/dim2/materials/materials.cpp
+  mesh/dim2/materials/properties.cpp
+  mesh/dim2/runner.cpp
+  mesh/dim2/adjacency_graph/adjacency_graph.cpp
+  mesh/dim2/adjacency_graph/adjacency_graph_regular_mesh.cpp
+  mesh/dim2/adjacency_graph/adjacency_graph_irregular_mesh.cpp
 )
 
 target_link_libraries(
-  mesh_tests
+  mesh_dim2_tests
   gtest_main
   mesh
   mpi_environment
@@ -271,6 +271,26 @@ target_link_libraries(
   io
   utilities
   # material_class
+  -lpthread -lm
+)
+
+add_executable(
+  mesh_dim3_tests
+  mesh/dim3/control_nodes.cpp
+  mesh/dim3/materials.cpp
+  mesh/dim3/boundaries.cpp
+  mesh/dim3/adjacency_graph.cpp
+  mesh/dim3/test.cpp
+)
+
+target_link_libraries(
+  mesh_dim3_tests
+  gtest_main
+  mesh
+  mpi_environment
+  kokkos_environment
+  io
+  utilities
   -lpthread -lm
 )
 
@@ -825,7 +845,8 @@ if(NOT MPI_PARALLEL)
     locate_point_fixture_3d
     mass_matrix_tests
     compute_coupling_tests
-    mesh_tests
+    mesh_dim2_tests
+    mesh_dim3_tests
     nonconforming_tests
     point_tests
     policies_tests

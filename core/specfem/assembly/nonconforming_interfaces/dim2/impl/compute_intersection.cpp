@@ -17,24 +17,24 @@ edge_extents(
     const Kokkos::View<
         specfem::point::global_coordinates<specfem::dimension::type::dim2> *,
         Kokkos::HostSpace> &element_coordinates,
-    const specfem::mesh_entity::type &side) {
+    const specfem::mesh_entity::dim2::type &side) {
   switch (side) {
-  case specfem::mesh_entity::type::bottom:
+  case specfem::mesh_entity::dim2::type::bottom:
     // control nodes 0 and 1
     return { element_coordinates(0), element_coordinates(1) };
-  case specfem::mesh_entity::type::right:
+  case specfem::mesh_entity::dim2::type::right:
     // control nodes 1 and 2
     return { element_coordinates(1), element_coordinates(2) };
-  case specfem::mesh_entity::type::top:
+  case specfem::mesh_entity::dim2::type::top:
     // control nodes 3 and 2 (order for increasing xi)
     return { element_coordinates(3), element_coordinates(2) };
-  case specfem::mesh_entity::type::left:
+  case specfem::mesh_entity::dim2::type::left:
     // control nodes 0 and 3 (order for increasing gamma)
     return { element_coordinates(0), element_coordinates(3) };
   default:
     throw std::runtime_error(
         "compute_intersection must be given edges. Found " +
-        specfem::mesh_entity::to_string(side) + ", instead.");
+        specfem::mesh_entity::dim2::to_string(side) + ", instead.");
   }
 }
 
@@ -46,8 +46,8 @@ specfem::assembly::nonconforming_interfaces_impl::compute_intersection(
     const Kokkos::View<
         specfem::point::global_coordinates<specfem::dimension::type::dim2> *,
         Kokkos::HostSpace> &element2,
-    const specfem::mesh_entity::type &edge1,
-    const specfem::mesh_entity::type &edge2,
+    const specfem::mesh_entity::dim2::type &edge1,
+    const specfem::mesh_entity::dim2::type &edge2,
     const Kokkos::View<type_real *, Kokkos::HostSpace> &mortar_quadrature) {
   constexpr type_real eps = 1e-5;
   const int nquad = mortar_quadrature.extent(0);
@@ -111,8 +111,8 @@ specfem::assembly::nonconforming_interfaces_impl::compute_intersection(
     }
 
     oss << "When computing intersections between element A ("
-        << specfem::mesh_entity::to_string(edge1) << ") and element B ("
-        << specfem::mesh_entity::to_string(edge2)
+        << specfem::mesh_entity::dim2::to_string(edge1) << ") and element B ("
+        << specfem::mesh_entity::dim2::to_string(edge2)
         << "), no intersection was found.\n"
         << "\n"
         << "Element A center: " << center1 << "\n"
@@ -142,11 +142,11 @@ specfem::assembly::nonconforming_interfaces_impl::compute_intersection(
     // find corresponding coordinate on jspec through global mapping:
 
     const auto [xi, gamma] = [&]() -> std::pair<type_real, type_real> {
-      if (edge1 == specfem::mesh_entity::type::bottom) {
+      if (edge1 == specfem::mesh_entity::dim2::type::bottom) {
         return { xi_i, -1 };
-      } else if (edge1 == specfem::mesh_entity::type::right) {
+      } else if (edge1 == specfem::mesh_entity::dim2::type::right) {
         return { 1, xi_i };
-      } else if (edge1 == specfem::mesh_entity::type::top) {
+      } else if (edge1 == specfem::mesh_entity::dim2::type::top) {
         return { xi_i, 1 };
       } else {
         return { -1, xi_i };

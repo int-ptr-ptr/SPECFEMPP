@@ -57,7 +57,7 @@ std::pair<type_real, bool> locate_point_on_edge(
     const specfem::point::global_coordinates<specfem::dimension::type::dim2>
         &coordinates,
     const specfem::assembly::mesh<specfem::dimension::type::dim2> &mesh,
-    const int &ispec, const specfem::mesh_entity::type &constraint);
+    const int &ispec, const specfem::mesh_entity::dim2::type &constraint);
 /**
  * @brief Given an edge (ispec, constraint) and the coordinate along it, finds
  * the global coordinates.
@@ -73,7 +73,7 @@ specfem::point::global_coordinates<specfem::dimension::type::dim2>
 locate_point_on_edge(
     const type_real &coordinate,
     const specfem::assembly::mesh<specfem::dimension::type::dim2> &mesh,
-    const int &ispec, const specfem::mesh_entity::type &constraint);
+    const int &ispec, const specfem::mesh_entity::dim2::type &constraint);
 
 } // namespace algorithms
 } // namespace specfem

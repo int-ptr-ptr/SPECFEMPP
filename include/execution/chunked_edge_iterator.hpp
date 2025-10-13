@@ -20,13 +20,14 @@
  * // Create views for storage and edges
  * constexpr int num_points = 5;
  * Kokkos::View<int*[num_points], Kokkos::DefaultExecutionSpace>
- * storage("storage", num_edges); Kokkos::View<specfem::mesh_entity::edge*,
+ * storage("storage", num_edges);
+ * Kokkos::View<specfem::mesh_entity::edge<specfem::dimension::type::dim2>*,
  * Kokkos::DefaultExecutionSpace> edges("edges", num_edges);
  *
  * // Initialize edges
  * Kokkos::parallel_for("init_edges", num_edges, KOKKOS_LAMBDA(int i) {
- *     edges(i) = specfem::mesh_entity::edge(i,
- * specfem::mesh_entity::type::top);
+ *     edges(i) = specfem::mesh_entity::edge<specfem::dimension::type::dim2>(i,
+ * specfem::mesh_entity::dim2::type::top);
  * });
  *
  * // Create chunked iterator and process edges
@@ -200,7 +201,7 @@ public:
     const int iedge = i % nedges;
     const int ipoint = i / nedges;
     const int ispec = edges(iedge).ispec;
-    const specfem::mesh_entity::type edge_type = edges(iedge).edge_type;
+    const specfem::mesh_entity::dim2::type edge_type = edges(iedge).edge_type;
     const auto index =
         (edges(iedge).reverse_orientation)
             ? ChunkEdgeIterator::compute_index(ispec, num_points - 1 - ipoint,
@@ -244,18 +245,18 @@ private:
   KOKKOS_INLINE_FUNCTION
   static specfem::point::index<DimensionTag, false>
   compute_index(const int ispec, const int ipoint, const int num_points,
-                const specfem::mesh_entity::type edge) {
+                const specfem::mesh_entity::dim2::type edge) {
     switch (edge) {
-    case specfem::mesh_entity::type::bottom:
+    case specfem::mesh_entity::dim2::type::bottom:
       return { ispec, 0, ipoint };
       break;
-    case specfem::mesh_entity::type::top:
+    case specfem::mesh_entity::dim2::type::top:
       return { ispec, num_points - 1, ipoint };
       break;
-    case specfem::mesh_entity::type::left:
+    case specfem::mesh_entity::dim2::type::left:
       return { ispec, ipoint, 0 };
       break;
-    case specfem::mesh_entity::type::right:
+    case specfem::mesh_entity::dim2::type::right:
       return { ispec, ipoint, num_points - 1 };
       break;
     default:
@@ -399,12 +400,13 @@ private:
  * // Create edge view and initialize
  * constexpr int num_edges = 10000;
  * constexpr int num_points = 5;
- * Kokkos::View<specfem::mesh_entity::edge*> edges("edges", num_edges);
+ * Kokkos::View<specfem::mesh_entity::edge<specfem::dimension::type::dim2>*>
+ * edges("edges", num_edges);
  *
  * // Initialize edges with proper element indices and types
  * Kokkos::parallel_for("init_edges", num_edges, KOKKOS_LAMBDA(int i) {
- *     edges(i) = specfem::mesh_entity::edge(i,
- * specfem::mesh_entity::type::top);
+ *     edges(i) = specfem::mesh_entity::edge<specfem::dimension::type::dim2>(i,
+ * specfem::mesh_entity::dim2::type::top);
  * });
  *
  * // Create storage for computation results

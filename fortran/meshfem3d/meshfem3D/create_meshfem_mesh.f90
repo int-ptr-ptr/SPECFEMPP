@@ -86,6 +86,8 @@ end module create_meshfem_par
   !! setting up wavefield discontinuity interface
   use shared_parameters, only: IS_WAVEFIELD_DISCONTINUITY
 
+  use adjacency_graph, only: compute_adjacency_graph
+
   implicit none
 
   ! local parameters
@@ -129,6 +131,9 @@ end module create_meshfem_par
 
   ! determine cavity
   call cmm_determine_cavity(nglob)
+
+  ! Build the adjacency graph
+  call compute_adjacency_graph(nglob)
 
   ! CPML initialization
   call create_CPML_regions(nspec,nglob,nodes_coords)

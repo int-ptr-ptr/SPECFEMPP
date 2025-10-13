@@ -322,3 +322,14 @@ std::string specfem::runtime_configuration::setup::print_header(
 
   return message.str();
 }
+
+// Explicit template instantiations for instantiate_timescheme
+template std::shared_ptr<specfem::time_scheme::time_scheme>
+specfem::runtime_configuration::setup::instantiate_timescheme<
+    specfem::assembly::fields<specfem::dimension::type::dim2> >(
+    specfem::assembly::fields<specfem::dimension::type::dim2> &fields) const;
+
+template std::shared_ptr<specfem::time_scheme::time_scheme>
+specfem::runtime_configuration::setup::instantiate_timescheme<
+    specfem::assembly::fields<specfem::dimension::type::dim3> >(
+    specfem::assembly::fields<specfem::dimension::type::dim3> &fields) const;

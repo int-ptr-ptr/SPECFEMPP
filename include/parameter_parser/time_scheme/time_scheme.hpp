@@ -1,7 +1,7 @@
 #pragma once
 
+#include "specfem/timescheme/newmark.hpp"
 #include "specfem_setup.hpp"
-#include "timescheme/newmark.hpp"
 #include "yaml-cpp/yaml.h"
 #include <tuple>
 
@@ -53,8 +53,9 @@ public:
    object
    * used in the solver algorithm
    */
+  template <typename AssemblyFields>
   std::shared_ptr<specfem::time_scheme::time_scheme>
-  instantiate(const int nstep_between_samples);
+  instantiate(AssemblyFields &fields, const int nstep_between_samples);
   /**
    * @brief Get the value of time increment
    *

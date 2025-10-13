@@ -30,7 +30,7 @@ template <> struct absorbing_boundary<specfem::dimension::type::dim2> {
                                                         ///< on the absorbing
                                                         ///< boundary
 
-  Kokkos::View<specfem::mesh_entity::type *, Kokkos::HostSpace>
+  Kokkos::View<specfem::mesh_entity::dim2::type *, Kokkos::HostSpace>
       type; ///< Which edge of the element is on the absorbing boundary
 
   /**

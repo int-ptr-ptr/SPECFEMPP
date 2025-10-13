@@ -3,7 +3,7 @@
 
 #include "solver.hpp"
 #include "time_marching.hpp"
-#include "timescheme/newmark.hpp"
+#include "specfem/timescheme/newmark.hpp"
 #include <Kokkos_Core.hpp>
 
 template <specfem::dimension::type DimensionTag, int NGLL>

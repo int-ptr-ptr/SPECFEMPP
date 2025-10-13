@@ -86,8 +86,11 @@ class LayerBoundary(ABC):
                 layer_above is None
                 or layer_below is None
                 # for now, don't repeat geometry -- we will just assume users want nonconforming.
+                # uncomment this line below:
+
                 # or layer_above.is_conforming(layer_below)
             ):
+                # prevent duplication by setting copied entity fields to reference original.
                 object.__setattr__(self, "_curve_copy", self.curve)
                 object.__setattr__(self, "_left_vertex_copy", self.left_vertex)
                 object.__setattr__(self, "_right_vertex_copy", self.right_vertex)

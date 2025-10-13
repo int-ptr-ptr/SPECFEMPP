@@ -164,11 +164,11 @@ specfem::assembly::coupled_interfaces_impl::interface_container<
 
       // get global coordinate -- we interpolate against shape prime
       const auto [xi, gamma] = [&]() -> std::pair<type_real, type_real> {
-        if (iedge_type == specfem::mesh_entity::type::bottom) {
+        if (iedge_type == specfem::mesh_entity::dim2::type::bottom) {
           return { local_coord, -1 };
-        } else if (iedge_type == specfem::mesh_entity::type::right) {
+        } else if (iedge_type == specfem::mesh_entity::dim2::type::right) {
           return { 1, local_coord };
-        } else if (iedge_type == specfem::mesh_entity::type::top) {
+        } else if (iedge_type == specfem::mesh_entity::dim2::type::top) {
           return { local_coord, 1 };
         } else {
           return { -1, local_coord };

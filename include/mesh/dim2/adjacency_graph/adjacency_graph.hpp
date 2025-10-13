@@ -31,7 +31,7 @@ public:
 
     /** @brief Orientation of the shared mesh entity (left, right, ...,
      * bottom_left, bottom_right, etc.) */
-    specfem::mesh_entity::type orientation;
+    specfem::mesh_entity::dim2::type orientation;
 
     /**
      * @brief Default constructor
@@ -47,7 +47,7 @@ public:
      * @param orient Orientation of the shared mesh entity
      */
     EdgeProperties(const specfem::connections::type conn,
-                   const specfem::mesh_entity::type orient)
+                   const specfem::mesh_entity::dim2::type orient)
         : connection(conn), orientation(orient) {}
   };
 

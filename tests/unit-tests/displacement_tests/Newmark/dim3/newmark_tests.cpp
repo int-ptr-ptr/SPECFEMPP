@@ -9,7 +9,7 @@
 #include "quadrature/interface.hpp"
 #include "solver/solver.hpp"
 #include "specfem/assembly.hpp"
-#include "timescheme/timescheme.hpp"
+#include "specfem/timescheme.hpp"
 #include "yaml-cpp/yaml.h"
 #include <algorithm>
 #include <boost/filesystem.hpp>
@@ -139,9 +139,6 @@ TEST_P(Newmark, 3D) {
 
   setup.update_t0(t0);
 
-  // Instantiate the solver and timescheme
-  auto it = setup.instantiate_timescheme();
-
   // --------------------------------------------------------------
   //                   Get receivers
   // --------------------------------------------------------------
@@ -174,19 +171,21 @@ TEST_P(Newmark, 3D) {
            << std::endl;
   }
 
-  const int max_sig_step = it->get_max_seismogram_step();
-  const int nstep_between_samples = it->get_nstep_between_samples();
+  const int max_sig_step = setup.get_max_seismogram_step();
+  const int nstep_between_samples = setup.get_nstep_between_samples();
+
   specfem::assembly::assembly<specfem::dimension::type::dim3> assembly(
       mesh, quadratures, sources, receivers, setup.get_seismogram_types(),
       setup.get_t0(), dt, nsteps, max_sig_step, nstep_between_samples,
       setup.get_simulation_type(), setup.allocate_boundary_values(),
       setup.instantiate_property_reader());
 
-  // it->link_assembly(assembly);
+  // Instantiate the solver and timescheme
+  auto it = setup.instantiate_timescheme(assembly.fields);
 
-  // // User output
-  // if (mpi->main_proc())
-  //   std::cout << *it << std::endl;
+  // User output
+  if (mpi->main_proc())
+    std::cout << *it << std::endl;
 
   // std::shared_ptr<specfem::solver::solver> solver =
   //     setup.instantiate_solver<5>(setup.get_dt(), assembly, it, {});

@@ -122,7 +122,7 @@ void specfem::assembly::mesh<specfem::dimension::type::dim2>::assemble() {
   // Now lets iterate over all edges
   // We only take interior edge points, corners will be treated later
   for (int ichunk = 0; ichunk < nspec; ichunk += chunk_size) {
-    for (auto iedge : specfem::mesh_entity::edges) {
+    for (auto iedge : specfem::mesh_entity::dim2::edges) {
       const auto npoints =
           element_connections.number_of_points_on_orientation(iedge);
       for (int ipoint = 1; ipoint < npoints - 1;
@@ -187,7 +187,7 @@ void specfem::assembly::mesh<specfem::dimension::type::dim2>::assemble() {
 
   // Finally we need to treat corner points
   for (int ichunk = 0; ichunk < nspec; ichunk += chunk_size) {
-    for (auto corner : specfem::mesh_entity::corners) {
+    for (auto corner : specfem::mesh_entity::dim2::corners) {
       for (int ielement = 0; ielement < chunk_size; ielement++) {
         int ispec = ichunk + ielement;
         if (ispec >= nspec)
@@ -198,7 +198,7 @@ void specfem::assembly::mesh<specfem::dimension::type::dim2>::assemble() {
         bool previously_assigned = false;
 
         // Get the edges that are connected to this corner
-        auto valid_connections = specfem::mesh_entity::edges_of_corner(corner);
+        auto valid_connections = specfem::mesh_entity::dim2::edges_of_corner(corner);
 
         // We also need to add the corner itself to the valid connections
         // This is necessary to handle cases where a corner connection is made
@@ -217,7 +217,7 @@ void specfem::assembly::mesh<specfem::dimension::type::dim2>::assemble() {
             const auto mapped_iedge = fg[other_edge].orientation;
 
             // Check if the connection is an edge connection
-            if (specfem::mesh_entity::contains(specfem::mesh_entity::edges,
+            if (specfem::mesh_entity::contains(specfem::mesh_entity::dim2::edges,
                                                fg[edge].orientation)) {
               const auto point = element_connections.find_corner_on_edge(
                   corner, fg[edge].orientation);

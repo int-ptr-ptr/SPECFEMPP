@@ -17,3 +17,10 @@ To regenerate the database, convert the topography file into the files in `MESH`
 python scripts/gmshlayerbuilder simple_dg_topo.dat MESH
 xmeshfem2D -p Par_file
 ```
+
+Relative to `provenance`:
+
+```bash
+python ../../../../../../scripts/gmshlayerbuilder simple_dg_topo.dat MESH
+../../../../../../bin/xmeshfem2D -p Par_file
+```

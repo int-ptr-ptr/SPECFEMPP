@@ -1,4 +1,7 @@
 #include "mesh/dim2/adjacency_graph/adjacency_graph.hpp"
+#include <boost/range/iterator_range.hpp>
+#include <sstream>
+#include <stdexcept>
 
 template <>
 void specfem::mesh::adjacency_graph<

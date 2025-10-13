@@ -36,8 +36,8 @@ std::vector<std::pair<type_real, type_real> > compute_intersection(
     const Kokkos::View<
         specfem::point::global_coordinates<specfem::dimension::type::dim2> *,
         Kokkos::HostSpace> &element2,
-    const specfem::mesh_entity::type &edge1,
-    const specfem::mesh_entity::type &edge2,
+    const specfem::mesh_entity::dim2::type &edge1,
+    const specfem::mesh_entity::dim2::type &edge2,
     const Kokkos::View<type_real *, Kokkos::HostSpace> &mortar_quadrature);
 
 /**
@@ -64,8 +64,8 @@ void set_transfer_functions(
     const Kokkos::View<
         specfem::point::global_coordinates<specfem::dimension::type::dim2> *,
         Kokkos::HostSpace> &element2,
-    const specfem::mesh_entity::type &edge1,
-    const specfem::mesh_entity::type &edge2,
+    const specfem::mesh_entity::dim2::type &edge1,
+    const specfem::mesh_entity::dim2::type &edge2,
     const Kokkos::View<type_real *, Kokkos::HostSpace> &mortar_quadrature,
     const Kokkos::View<type_real *, Kokkos::HostSpace> &element_quadrature,
     TransferView1 &transfer_function1, TransferView2 &transfer_function2);
@@ -99,8 +99,8 @@ void set_transfer_functions(
     const Kokkos::View<
         specfem::point::global_coordinates<specfem::dimension::type::dim2> *,
         Kokkos::HostSpace> &element2,
-    const specfem::mesh_entity::type &edge1,
-    const specfem::mesh_entity::type &edge2,
+    const specfem::mesh_entity::dim2::type &edge1,
+    const specfem::mesh_entity::dim2::type &edge2,
     const Kokkos::View<type_real *, Kokkos::HostSpace> &mortar_quadrature,
     const Kokkos::View<type_real *, Kokkos::HostSpace> &element_quadrature,
     TransferView1 &transfer_function1, TransferView2 &transfer_function1_prime,

@@ -3,11 +3,118 @@
 #include "execution/for_each_level.hpp"
 #include "kokkos_abstractions.h"
 #include "specfem/assembly.hpp"
+#include "specfem/data_access.hpp"
 #include "specfem/point.hpp"
 #include <Kokkos_Core.hpp>
 
 namespace specfem {
 namespace algorithms {
+namespace impl {
+template <typename VectorFieldType, typename QuadratureType,
+          typename std::enable_if_t<VectorFieldType::dimension_tag ==
+                                        specfem::dimension::type::dim2,
+                                    int> = 0>
+KOKKOS_FORCEINLINE_FUNCTION auto element_gradient(
+    const VectorFieldType &f,
+    const specfem::point::index<specfem::dimension::type::dim2,
+                                VectorFieldType::using_simd> &local_index,
+    const specfem::point::jacobian_matrix<specfem::dimension::type::dim2, false,
+                                          VectorFieldType::using_simd>
+        &point_jacobian_matrix,
+    const QuadratureType &quadrature,
+    typename VectorFieldType::simd::datatype (
+        &df_dxi)[VectorFieldType::components],
+    typename VectorFieldType::simd::datatype (
+        &df_dgamma)[VectorFieldType::components]) {
+
+  constexpr int dimension = 2;
+  constexpr int components = VectorFieldType::components;
+  constexpr int ngll = VectorFieldType::ngll;
+  using TensorPointViewType = specfem::datatype::TensorPointViewType<
+      type_real, VectorFieldType::components, dimension,
+      VectorFieldType::simd::using_simd>;
+  const int ielement = local_index.ispec;
+  const int iz = local_index.iz;
+  const int ix = local_index.ix;
+
+  for (int l = 0; l < ngll; ++l) {
+    for (int icomponent = 0; icomponent < components; ++icomponent) {
+      df_dxi[icomponent] += quadrature(ix, l) * f(ielement, iz, l, icomponent);
+      df_dgamma[icomponent] +=
+          quadrature(iz, l) * f(ielement, l, ix, icomponent);
+    }
+  }
+
+  TensorPointViewType df;
+
+  for (int icomponent = 0; icomponent < components; ++icomponent) {
+    df(icomponent, 0) = point_jacobian_matrix.xix * df_dxi[icomponent] +
+                        point_jacobian_matrix.gammax * df_dgamma[icomponent];
+
+    df(icomponent, 1) = point_jacobian_matrix.xiz * df_dxi[icomponent] +
+                        point_jacobian_matrix.gammaz * df_dgamma[icomponent];
+  }
+  return df;
+}
+template <typename VectorFieldType, typename QuadratureType,
+          typename std::enable_if_t<VectorFieldType::dimension_tag ==
+                                        specfem::dimension::type::dim3,
+                                    int> = 0>
+KOKKOS_FORCEINLINE_FUNCTION auto element_gradient(
+    const VectorFieldType &f,
+    const specfem::point::index<specfem::dimension::type::dim3,
+                                VectorFieldType::using_simd> &local_index,
+    const specfem::point::jacobian_matrix<specfem::dimension::type::dim3, false,
+                                          VectorFieldType::using_simd>
+        &point_jacobian_matrix,
+    const QuadratureType &quadrature,
+    typename VectorFieldType::simd::datatype (
+        &df_dxi)[VectorFieldType::components],
+    typename VectorFieldType::simd::datatype (
+        &df_deta)[VectorFieldType::components],
+    typename VectorFieldType::simd::datatype (
+        &df_dgamma)[VectorFieldType::components]) {
+
+  constexpr int dimension = 3;
+  constexpr int components = VectorFieldType::components;
+  constexpr int ngll = VectorFieldType::ngll;
+  using TensorPointViewType = specfem::datatype::TensorPointViewType<
+      type_real, VectorFieldType::components, dimension,
+      VectorFieldType::simd::using_simd>;
+  const int ielement = local_index.ispec;
+  const int iz = local_index.iz;
+  const int iy = local_index.iy;
+  const int ix = local_index.ix;
+
+  for (int l = 0; l < ngll; ++l) {
+    for (int icomponent = 0; icomponent < components; ++icomponent) {
+      df_dxi[icomponent] +=
+          quadrature(ix, l) * f(ielement, iz, iy, l, icomponent);
+      df_deta[icomponent] +=
+          quadrature(iy, l) * f(ielement, iz, l, ix, icomponent);
+      df_dgamma[icomponent] +=
+          quadrature(iz, l) * f(ielement, l, iy, ix, icomponent);
+    }
+  }
+
+  TensorPointViewType df;
+
+  for (int icomponent = 0; icomponent < components; ++icomponent) {
+    df(icomponent, 0) = point_jacobian_matrix.xix * df_dxi[icomponent] +
+                        point_jacobian_matrix.etax * df_deta[icomponent] +
+                        point_jacobian_matrix.gammax * df_dgamma[icomponent];
+
+    df(icomponent, 1) = point_jacobian_matrix.xiy * df_dxi[icomponent] +
+                        point_jacobian_matrix.etay * df_deta[icomponent] +
+                        point_jacobian_matrix.gammay * df_dgamma[icomponent];
+
+    df(icomponent, 2) = point_jacobian_matrix.xiz * df_dxi[icomponent] +
+                        point_jacobian_matrix.etaz * df_deta[icomponent] +
+                        point_jacobian_matrix.gammaz * df_dgamma[icomponent];
+  }
+  return df;
+}
+} // namespace impl
 
 /**
  * @defgroup AlgorithmsGradient
@@ -21,7 +128,7 @@ namespace algorithms {
  * @ingroup AlgorithmsGradient
  *
  * @tparam ChunkIndexType Chunk index type
- * @tparam ViewType Field view type (Chunk view)
+ * @tparam VectorFieldType Field view type (Chunk view)
  * @tparam QuadratureType Quadrature view type
  * @tparam CallbackFunctor Callback functor type
  * @param chunk_index Chunk index specifying the elements within this chunk
@@ -30,32 +137,32 @@ namespace algorithms {
  * @param f Field to compute the gradient of
  * @param callback Callback functor. Callback signature must be:
  * @code void(const typename IteratorType::index_type, const
- * specfem::datatype::TensorPointViewType<type_real, 2, ViewType::components>)
+ * specfem::datatype::TensorPointViewType<type_real, 2,
+ * VectorFieldType::components>)
  * @endcode
  */
-template <typename ChunkIndexType, typename ViewType, typename QuadratureType,
-          typename CallbackFunctor,
-          std::enable_if_t<ViewType::isChunkViewType, int> = 0>
+template <
+    typename ChunkIndexType, typename VectorFieldType, typename QuadratureType,
+    typename CallbackFunctor,
+    std::enable_if_t<
+        specfem::data_access::is_chunk_element<VectorFieldType>::value &&
+            VectorFieldType::dimension_tag == specfem::dimension::type::dim2,
+        int> = 0>
 KOKKOS_FORCEINLINE_FUNCTION void gradient(
     const ChunkIndexType &chunk_index,
     const specfem::assembly::jacobian_matrix<specfem::dimension::type::dim2>
         &jacobian_matrix,
-    const QuadratureType &quadrature, const ViewType &f,
+    const QuadratureType &quadrature, const VectorFieldType &f,
     const CallbackFunctor &callback) {
-  constexpr int components = ViewType::components;
-  constexpr bool using_simd = ViewType::simd::using_simd;
+  constexpr int components = VectorFieldType::components;
   constexpr int dimension = 2;
-
-  constexpr int NGLL = ViewType::ngll;
+  constexpr bool using_simd = VectorFieldType::simd::using_simd;
 
   using TensorPointViewType =
       specfem::datatype::TensorPointViewType<type_real, components, dimension,
                                              using_simd>;
 
-  using datatype = typename ViewType::simd::datatype;
-
-  static_assert(ViewType::isScalarViewType,
-                "ViewType must be a scalar field view type");
+  using datatype = typename VectorFieldType::simd::datatype;
 
   static_assert(
       std::is_invocable_v<CallbackFunctor,
@@ -70,41 +177,19 @@ KOKKOS_FORCEINLINE_FUNCTION void gradient(
       chunk_index.get_iterator(),
       [&](const typename ChunkIndexType::iterator_type::index_type
               &iterator_index) {
-        const auto ielement = iterator_index.get_local_index().ispec;
-        const auto point_index = iterator_index.get_index();
-        const int ispec = point_index.ispec;
-        const int iz = point_index.iz;
-        const int ix = point_index.ix;
-
+        const auto local_index = iterator_index.get_local_index();
         datatype df_dxi[components] = { 0.0 };
         datatype df_dgamma[components] = { 0.0 };
-
-        for (int l = 0; l < NGLL; ++l) {
-          for (int icomponent = 0; icomponent < components; ++icomponent) {
-            df_dxi[icomponent] +=
-                quadrature(ix, l) * f(ielement, iz, l, icomponent);
-            df_dgamma[icomponent] +=
-                quadrature(iz, l) * f(ielement, l, ix, icomponent);
-          }
-        }
-
         specfem::point::jacobian_matrix<specfem::dimension::type::dim2, false,
                                         using_simd>
             point_jacobian_matrix;
 
-        specfem::assembly::load_on_device(point_index, jacobian_matrix,
+        specfem::assembly::load_on_device(local_index, jacobian_matrix,
                                           point_jacobian_matrix);
-        TensorPointViewType df;
-        for (int icomponent = 0; icomponent < components; ++icomponent) {
-          df(icomponent, 0) =
-              point_jacobian_matrix.xix * df_dxi[icomponent] +
-              point_jacobian_matrix.gammax * df_dgamma[icomponent];
 
-          df(icomponent, 1) =
-              point_jacobian_matrix.xiz * df_dxi[icomponent] +
-              point_jacobian_matrix.gammaz * df_dgamma[icomponent];
-        }
-
+        const auto df =
+            impl::element_gradient(f, local_index, point_jacobian_matrix,
+                                   quadrature, df_dxi, df_dgamma);
         callback(iterator_index, df);
       });
 
@@ -118,7 +203,7 @@ KOKKOS_FORCEINLINE_FUNCTION void gradient(
  * @ingroup AlgorithmsGradient
  *
  * @tparam ChunkIndexType Chunk index type
- * @tparam ViewType Field view type (Chunk view)
+ * @tparam VectorFieldType Field view type (Chunk view)
  * @tparam QuadratureType Quadrature view type
  * @tparam CallbackFunctor Callback functor type
  * @param chunk_index Chunk index specifying the elements within this chunk
@@ -128,34 +213,34 @@ KOKKOS_FORCEINLINE_FUNCTION void gradient(
  * @param g Field to compute the gradient of
  * @param callback Callback functor. Callback signature must be:
  * @code void(const typename IteratorType::index_type, const
- * specfem::datatype::TensorPointViewType<type_real, 2, ViewType::components>,
- * const specfem::datatype::TensorPointViewType<type_real, 2,
- * ViewType::components>)
+ * specfem::datatype::TensorPointViewType<type_real, 2,
+ * VectorFieldType::components>, const
+ * specfem::datatype::TensorPointViewType<type_real, 2,
+ * VectorFieldType::components>)
  * @endcode
  */
-template <typename ChunkIndexType, typename ViewType, typename QuadratureType,
-          typename CallbackFunctor,
-          std::enable_if_t<ViewType::isChunkViewType, int> = 0>
+template <
+    typename ChunkIndexType, typename VectorFieldType, typename QuadratureType,
+    typename CallbackFunctor,
+    std::enable_if_t<
+        specfem::data_access::is_chunk_element<VectorFieldType>::value &&
+            VectorFieldType::dimension_tag == specfem::dimension::type::dim2,
+        int> = 0>
 KOKKOS_FORCEINLINE_FUNCTION void gradient(
     const ChunkIndexType &chunk_index,
     const specfem::assembly::jacobian_matrix<specfem::dimension::type::dim2>
         &jacobian_matrix,
-    const QuadratureType &quadrature, const ViewType &f, const ViewType &g,
-    const CallbackFunctor &callback) {
-  constexpr int components = ViewType::components;
-  constexpr bool using_simd = ViewType::simd::using_simd;
+    const QuadratureType &quadrature, const VectorFieldType &f,
+    const VectorFieldType &g, const CallbackFunctor &callback) {
+  constexpr int components = VectorFieldType::components;
+  constexpr bool using_simd = VectorFieldType::simd::using_simd;
   constexpr int dimension = 2;
-
-  constexpr int NGLL = ViewType::ngll;
 
   using TensorPointViewType =
       specfem::datatype::TensorPointViewType<type_real, components, dimension,
                                              using_simd>;
 
-  static_assert(ViewType::isScalarViewType,
-                "ViewType must be a scalar field view type");
-
-  using datatype = typename ViewType::simd::datatype;
+  using datatype = typename VectorFieldType::simd::datatype;
 
   static_assert(
       std::is_invocable_v<CallbackFunctor,
@@ -171,67 +256,22 @@ KOKKOS_FORCEINLINE_FUNCTION void gradient(
       chunk_index.get_iterator(),
       [&](const typename ChunkIndexType::iterator_type::index_type
               &iterator_index) {
-        const auto ielement = iterator_index.get_local_index().ispec;
-        const auto point_index = iterator_index.get_index();
-        const int ispec = point_index.ispec;
-        const int iz = point_index.iz;
-        const int ix = point_index.ix;
-
+        const auto local_index = iterator_index.get_local_index();
         datatype df_dxi[components] = { 0.0 };
         datatype df_dgamma[components] = { 0.0 };
-
-        for (int l = 0; l < NGLL; ++l) {
-          for (int icomponent = 0; icomponent < components; ++icomponent) {
-            df_dxi[icomponent] +=
-                quadrature(ix, l) * f(ielement, iz, l, icomponent);
-            df_dgamma[icomponent] +=
-                quadrature(iz, l) * f(ielement, l, ix, icomponent);
-          }
-        }
-
         specfem::point::jacobian_matrix<specfem::dimension::type::dim2, false,
                                         using_simd>
             point_jacobian_matrix;
 
-        specfem::assembly::load_on_device(point_index, jacobian_matrix,
+        specfem::assembly::load_on_device(local_index, jacobian_matrix,
                                           point_jacobian_matrix);
 
-        TensorPointViewType df;
-
-        for (int icomponent = 0; icomponent < components; ++icomponent) {
-          df(icomponent, 0) =
-              point_jacobian_matrix.xix * df_dxi[icomponent] +
-              point_jacobian_matrix.gammax * df_dgamma[icomponent];
-
-          df(icomponent, 1) =
-              point_jacobian_matrix.xiz * df_dxi[icomponent] +
-              point_jacobian_matrix.gammaz * df_dgamma[icomponent];
-        }
-
-        for (int icomponent = 0; icomponent < components; ++icomponent) {
-          df_dxi[icomponent] = 0.0;
-          df_dgamma[icomponent] = 0.0;
-        }
-
-        for (int l = 0; l < NGLL; ++l) {
-          for (int icomponent = 0; icomponent < components; ++icomponent) {
-            df_dxi[icomponent] +=
-                quadrature(ix, l) * g(ielement, iz, l, icomponent);
-            df_dgamma[icomponent] +=
-                quadrature(iz, l) * g(ielement, l, ix, icomponent);
-          }
-        }
-
-        TensorPointViewType dg;
-        for (int icomponent = 0; icomponent < components; ++icomponent) {
-          dg(icomponent, 0) =
-              point_jacobian_matrix.xix * df_dxi[icomponent] +
-              point_jacobian_matrix.gammax * df_dgamma[icomponent];
-
-          dg(icomponent, 1) =
-              point_jacobian_matrix.xiz * df_dxi[icomponent] +
-              point_jacobian_matrix.gammaz * df_dgamma[icomponent];
-        }
+        const auto df =
+            impl::element_gradient(f, local_index, point_jacobian_matrix,
+                                   quadrature, df_dxi, df_dgamma);
+        const auto dg =
+            impl::element_gradient(g, local_index, point_jacobian_matrix,
+                                   quadrature, df_dxi, df_dgamma);
         callback(iterator_index, df, dg);
       });
 

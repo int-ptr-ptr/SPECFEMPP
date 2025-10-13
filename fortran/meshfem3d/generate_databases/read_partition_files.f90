@@ -40,6 +40,8 @@
   integer :: num_moho
   integer :: i,j,inode,imat,ispec,ie,dummy_node,dummy_elmnt,ier
   integer :: ngnod_mesh
+  integer :: total_adjacencies, iadj
+  integer :: dummy_elmnt1,dummy_elmnt2,dummy_type,dummy_value
 
   ! read databases about external mesh simulation
   call create_name_database(prname,myrank,LOCAL_PATH)
@@ -409,6 +411,13 @@
     write(IMAIN,*) 'number of MPI partition interfaces: ',num
   endif
   call synchronize_all()
+
+  ! adjancency information that we do not use
+  read(IIN) total_adjacencies
+
+  do iadj = 1,total_adjacencies
+    read(IIN) dummy_elmnt1, dummy_elmnt2, dummy_type, dummy_value
+  enddo
 
   ! from CUBIT/trelis decompose database
   ! decomposer adds additional mesh infos for Moho surface in case choosen

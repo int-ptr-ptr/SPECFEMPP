@@ -80,7 +80,7 @@ public:
    * @throws std::runtime_error if the edge type is invalid
    */
   int number_of_points_on_orientation(
-      const specfem::mesh_entity::type &edge) const;
+      const specfem::mesh_entity::dim2::type &edge) const;
 
   /**
    * @brief Maps coordinates between two mesh entities
@@ -101,8 +101,9 @@ public:
    * mapping
    */
   std::tuple<std::tuple<int, int>, std::tuple<int, int> >
-  map_coordinates(const specfem::mesh_entity::type &from,
-                  const specfem::mesh_entity::type &to, const int point) const;
+  map_coordinates(const specfem::mesh_entity::dim2::type &from,
+                  const specfem::mesh_entity::dim2::type &to,
+                  const int point) const;
 
   /**
    * @brief Finds the index of a corner point on a given edge
@@ -118,8 +119,8 @@ public:
    * @throws std::runtime_error if the second argument is not an edge
    * @throws std::runtime_error if the corner does not belong to the edge
    */
-  int find_corner_on_edge(const specfem::mesh_entity::type &corner,
-                          const specfem::mesh_entity::type &edge) const;
+  int find_corner_on_edge(const specfem::mesh_entity::dim2::type &corner,
+                          const specfem::mesh_entity::dim2::type &edge) const;
 
   /**
    * @brief Returns the coordinates of a point along an edge
@@ -131,7 +132,7 @@ public:
    * @throws std::runtime_error if the edge type is invalid
    */
   std::tuple<int, int>
-  coordinates_at_edge(const specfem::mesh_entity::type &edge,
+  coordinates_at_edge(const specfem::mesh_entity::dim2::type &edge,
                       const int point) const;
 
   /**
@@ -143,7 +144,7 @@ public:
    * @throws std::runtime_error if the corner type is invalid
    */
   std::tuple<int, int>
-  coordinates_at_corner(const specfem::mesh_entity::type &corner) const;
+  coordinates_at_corner(const specfem::mesh_entity::dim2::type &corner) const;
 
   /**
    * @brief Helper function to determine if orientation mapping requires
@@ -157,8 +158,8 @@ public:
    * mappings between edges require flipping to maintain proper orientation.
    * The flipping rules ensure consistent connectivity across mesh elements.
    */
-  bool flip_orientation(const specfem::mesh_entity::type &from,
-                        const specfem::mesh_entity::type &to) const;
+  bool flip_orientation(const specfem::mesh_entity::dim2::type &from,
+                        const specfem::mesh_entity::dim2::type &to) const;
 
 private:
   /// @brief Number of grid points in the x-direction
@@ -175,7 +176,7 @@ private:
    * - z=0 is bottom, z=ngllz-1 is top
    * - x=0 is left, x=ngllx-1 is right
    */
-  std::unordered_map<specfem::mesh_entity::type, std::tuple<int, int> >
+  std::unordered_map<specfem::mesh_entity::dim2::type, std::tuple<int, int> >
       corner_coordinates;
 
   /**
@@ -194,7 +195,7 @@ private:
    * @endcode
    *
    */
-  std::unordered_map<specfem::mesh_entity::type,
+  std::unordered_map<specfem::mesh_entity::dim2::type,
                      std::function<std::tuple<int, int>(int)> >
       edge_coordinates;
 };

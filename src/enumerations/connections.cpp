@@ -37,27 +37,27 @@ specfem::connections::to_string(const specfem::connections::type &conn) {
  * The flipping rules ensure consistent connectivity across mesh elements.
  */
 bool specfem::connections::connection_mapping::flip_orientation(
-    const specfem::mesh_entity::type &from,
-    const specfem::mesh_entity::type &to) const {
-  if ((from == specfem::mesh_entity::type::top &&
-       to == specfem::mesh_entity::type::bottom) ||
-      (from == specfem::mesh_entity::type::bottom &&
-       to == specfem::mesh_entity::type::top) ||
-      (from == specfem::mesh_entity::type::left &&
-       to == specfem::mesh_entity::type::right) ||
-      (from == specfem::mesh_entity::type::right &&
-       to == specfem::mesh_entity::type::left)) {
+    const specfem::mesh_entity::dim2::type &from,
+    const specfem::mesh_entity::dim2::type &to) const {
+  if ((from == specfem::mesh_entity::dim2::type::top &&
+       to == specfem::mesh_entity::dim2::type::bottom) ||
+      (from == specfem::mesh_entity::dim2::type::bottom &&
+       to == specfem::mesh_entity::dim2::type::top) ||
+      (from == specfem::mesh_entity::dim2::type::left &&
+       to == specfem::mesh_entity::dim2::type::right) ||
+      (from == specfem::mesh_entity::dim2::type::right &&
+       to == specfem::mesh_entity::dim2::type::left)) {
     return false;
   }
 
-  if ((from == specfem::mesh_entity::type::top &&
-       to == specfem::mesh_entity::type::right) ||
-      (from == specfem::mesh_entity::type::right &&
-       to == specfem::mesh_entity::type::top) ||
-      (from == specfem::mesh_entity::type::left &&
-       to == specfem::mesh_entity::type::bottom) ||
-      (from == specfem::mesh_entity::type::bottom &&
-       to == specfem::mesh_entity::type::left)) {
+  if ((from == specfem::mesh_entity::dim2::type::top &&
+       to == specfem::mesh_entity::dim2::type::right) ||
+      (from == specfem::mesh_entity::dim2::type::right &&
+       to == specfem::mesh_entity::dim2::type::top) ||
+      (from == specfem::mesh_entity::dim2::type::left &&
+       to == specfem::mesh_entity::dim2::type::bottom) ||
+      (from == specfem::mesh_entity::dim2::type::bottom &&
+       to == specfem::mesh_entity::dim2::type::left)) {
     return false;
   }
 
@@ -68,13 +68,13 @@ specfem::connections::connection_mapping::connection_mapping(const int ngllx,
                                                              const int ngllz)
     : ngllx(ngllx), ngllz(ngllz) {
   // corner coordinates
-  corner_coordinates[specfem::mesh_entity::type::top_left] =
+  corner_coordinates[specfem::mesh_entity::dim2::type::top_left] =
       std::make_tuple(ngllz - 1, 0);
-  corner_coordinates[specfem::mesh_entity::type::top_right] =
+  corner_coordinates[specfem::mesh_entity::dim2::type::top_right] =
       std::make_tuple(ngllz - 1, ngllx - 1);
-  corner_coordinates[specfem::mesh_entity::type::bottom_right] =
+  corner_coordinates[specfem::mesh_entity::dim2::type::bottom_right] =
       std::make_tuple(0, ngllx - 1);
-  corner_coordinates[specfem::mesh_entity::type::bottom_left] =
+  corner_coordinates[specfem::mesh_entity::dim2::type::bottom_left] =
       std::make_tuple(0, 0);
 
   // coordinates along edges
@@ -85,23 +85,23 @@ specfem::connections::connection_mapping::connection_mapping(const int ngllx,
   // |     |
   // 0 --- 1
 
-  edge_coordinates[specfem::mesh_entity::type::top] =
+  edge_coordinates[specfem::mesh_entity::dim2::type::top] =
       [ngllx, ngllz](int point) { return std::make_tuple(ngllz - 1, point); };
 
-  edge_coordinates[specfem::mesh_entity::type::bottom] =
+  edge_coordinates[specfem::mesh_entity::dim2::type::bottom] =
       [ngllx, ngllz](int point) { return std::make_tuple(0, point); };
 
-  edge_coordinates[specfem::mesh_entity::type::left] =
+  edge_coordinates[specfem::mesh_entity::dim2::type::left] =
       [ngllx, ngllz](int point) { return std::make_tuple(point, 0); };
 
-  edge_coordinates[specfem::mesh_entity::type::right] =
+  edge_coordinates[specfem::mesh_entity::dim2::type::right] =
       [ngllx, ngllz](int point) { return std::make_tuple(point, ngllx - 1); };
 }
 
 std::tuple<std::tuple<int, int>, std::tuple<int, int> >
 specfem::connections::connection_mapping::map_coordinates(
-    const specfem::mesh_entity::type &from,
-    const specfem::mesh_entity::type &to, const int point) const {
+    const specfem::mesh_entity::dim2::type &from,
+    const specfem::mesh_entity::dim2::type &to, const int point) const {
 
   if (corner_coordinates.find(from) != corner_coordinates.end() &&
       corner_coordinates.find(to) != corner_coordinates.end()) {
@@ -134,19 +134,20 @@ specfem::connections::connection_mapping::map_coordinates(
 }
 
 int specfem::connections::connection_mapping::number_of_points_on_orientation(
-    const specfem::mesh_entity::type &edge) const {
-  if ((edge == specfem::mesh_entity::type::top) ||
-      (edge == specfem::mesh_entity::type::bottom)) {
+    const specfem::mesh_entity::dim2::type &edge) const {
+  if ((edge == specfem::mesh_entity::dim2::type::top) ||
+      (edge == specfem::mesh_entity::dim2::type::bottom)) {
     return ngllx;
   }
 
-  if ((edge == specfem::mesh_entity::type::left) ||
-      (edge == specfem::mesh_entity::type::right)) {
+  if ((edge == specfem::mesh_entity::dim2::type::left) ||
+      (edge == specfem::mesh_entity::dim2::type::right)) {
     return ngllz;
   }
 
   // Corner points
-  if (specfem::mesh_entity::contains(specfem::mesh_entity::corners, edge)) {
+  if (specfem::mesh_entity::contains(specfem::mesh_entity::dim2::corners,
+                                     edge)) {
     return 1;
   }
 
@@ -154,55 +155,57 @@ int specfem::connections::connection_mapping::number_of_points_on_orientation(
 }
 
 int specfem::connections::connection_mapping::find_corner_on_edge(
-    const specfem::mesh_entity::type &corner,
-    const specfem::mesh_entity::type &edge) const {
+    const specfem::mesh_entity::dim2::type &corner,
+    const specfem::mesh_entity::dim2::type &edge) const {
   // Check if the corner is a corner
-  if (!specfem::mesh_entity::contains(specfem::mesh_entity::corners, corner)) {
+  if (!specfem::mesh_entity::contains(specfem::mesh_entity::dim2::corners,
+                                      corner)) {
     throw std::runtime_error("The first argument is not a corner");
   }
 
   // Check if the edge is an edge
-  if (!specfem::mesh_entity::contains(specfem::mesh_entity::edges, edge)) {
+  if (!specfem::mesh_entity::contains(specfem::mesh_entity::dim2::edges,
+                                      edge)) {
     throw std::runtime_error("The second argument is not an edge");
   }
 
   // Check if the corner belongs to the edge
   const auto edges_of_the_corner =
-      specfem::mesh_entity::edges_of_corner(corner);
+      specfem::mesh_entity::dim2::edges_of_corner(corner);
   if (std::find(edges_of_the_corner.begin(), edges_of_the_corner.end(), edge) ==
       edges_of_the_corner.end()) {
     throw std::runtime_error("The corner does not belong to the edge");
   }
 
   // Find the index of the corner on the edge
-  if (corner == specfem::mesh_entity::type::top_left) {
-    if (edge == specfem::mesh_entity::type::top) {
+  if (corner == specfem::mesh_entity::dim2::type::top_left) {
+    if (edge == specfem::mesh_entity::dim2::type::top) {
       return 0;
-    } else if (edge == specfem::mesh_entity::type::left) {
+    } else if (edge == specfem::mesh_entity::dim2::type::left) {
       return ngllz - 1;
     }
   }
 
-  if (corner == specfem::mesh_entity::type::top_right) {
-    if (edge == specfem::mesh_entity::type::top) {
+  if (corner == specfem::mesh_entity::dim2::type::top_right) {
+    if (edge == specfem::mesh_entity::dim2::type::top) {
       return ngllx - 1;
-    } else if (edge == specfem::mesh_entity::type::right) {
+    } else if (edge == specfem::mesh_entity::dim2::type::right) {
       return ngllz - 1;
     }
   }
 
-  if (corner == specfem::mesh_entity::type::bottom_right) {
-    if (edge == specfem::mesh_entity::type::bottom) {
+  if (corner == specfem::mesh_entity::dim2::type::bottom_right) {
+    if (edge == specfem::mesh_entity::dim2::type::bottom) {
       return ngllx - 1;
-    } else if (edge == specfem::mesh_entity::type::right) {
+    } else if (edge == specfem::mesh_entity::dim2::type::right) {
       return 0;
     }
   }
 
-  if (corner == specfem::mesh_entity::type::bottom_left) {
-    if (edge == specfem::mesh_entity::type::bottom) {
+  if (corner == specfem::mesh_entity::dim2::type::bottom_left) {
+    if (edge == specfem::mesh_entity::dim2::type::bottom) {
       return 0;
-    } else if (edge == specfem::mesh_entity::type::left) {
+    } else if (edge == specfem::mesh_entity::dim2::type::left) {
       return 0;
     }
   }
@@ -212,8 +215,9 @@ int specfem::connections::connection_mapping::find_corner_on_edge(
 
 std::tuple<int, int>
 specfem::connections::connection_mapping::coordinates_at_edge(
-    const specfem::mesh_entity::type &edge, const int point) const {
-  if (!specfem::mesh_entity::contains(specfem::mesh_entity::edges, edge)) {
+    const specfem::mesh_entity::dim2::type &edge, const int point) const {
+  if (!specfem::mesh_entity::contains(specfem::mesh_entity::dim2::edges,
+                                      edge)) {
     throw std::runtime_error("The argument is not an edge");
   }
 
@@ -222,32 +226,35 @@ specfem::connections::connection_mapping::coordinates_at_edge(
 
 std::tuple<int, int>
 specfem::connections::connection_mapping::coordinates_at_corner(
-    const specfem::mesh_entity::type &corner) const {
-  if (!specfem::mesh_entity::contains(specfem::mesh_entity::corners, corner)) {
+    const specfem::mesh_entity::dim2::type &corner) const {
+  if (!specfem::mesh_entity::contains(specfem::mesh_entity::dim2::corners,
+                                      corner)) {
     throw std::runtime_error("The argument is not a corner");
   }
 
   return corner_coordinates.at(corner);
 }
 
-std::list<specfem::mesh_entity::type>
-specfem::mesh_entity::corners_of_edge(const specfem::mesh_entity::type &edge) {
-  if (!specfem::mesh_entity::contains(specfem::mesh_entity::edges, edge)) {
+std::list<specfem::mesh_entity::dim2::type>
+specfem::mesh_entity::dim2::corners_of_edge(
+    const specfem::mesh_entity::dim2::type &edge) {
+  if (!specfem::mesh_entity::contains(specfem::mesh_entity::dim2::edges,
+                                      edge)) {
     throw std::runtime_error("The argument is not an edge");
   }
 
-  if (edge == specfem::mesh_entity::type::top) {
-    return { specfem::mesh_entity::type::top_left,
-             specfem::mesh_entity::type::top_right };
-  } else if (edge == specfem::mesh_entity::type::right) {
-    return { specfem::mesh_entity::type::top_right,
-             specfem::mesh_entity::type::bottom_right };
-  } else if (edge == specfem::mesh_entity::type::bottom) {
-    return { specfem::mesh_entity::type::bottom_right,
-             specfem::mesh_entity::type::bottom_left };
-  } else if (edge == specfem::mesh_entity::type::left) {
-    return { specfem::mesh_entity::type::bottom_left,
-             specfem::mesh_entity::type::top_left };
+  if (edge == specfem::mesh_entity::dim2::type::top) {
+    return { specfem::mesh_entity::dim2::type::top_left,
+             specfem::mesh_entity::dim2::type::top_right };
+  } else if (edge == specfem::mesh_entity::dim2::type::right) {
+    return { specfem::mesh_entity::dim2::type::top_right,
+             specfem::mesh_entity::dim2::type::bottom_right };
+  } else if (edge == specfem::mesh_entity::dim2::type::bottom) {
+    return { specfem::mesh_entity::dim2::type::bottom_right,
+             specfem::mesh_entity::dim2::type::bottom_left };
+  } else if (edge == specfem::mesh_entity::dim2::type::left) {
+    return { specfem::mesh_entity::dim2::type::bottom_left,
+             specfem::mesh_entity::dim2::type::top_left };
   }
 
   throw std::runtime_error("The edge does not have corners");

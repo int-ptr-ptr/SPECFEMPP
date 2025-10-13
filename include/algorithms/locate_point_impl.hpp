@@ -30,7 +30,7 @@ std::pair<type_real, bool> get_local_edge_coordinate(
     const Kokkos::View<
         specfem::point::global_coordinates<specfem::dimension::type::dim2> *,
         Kokkos::HostSpace> &coorg,
-    const specfem::mesh_entity::type &mesh_entity, type_real coord);
+    const specfem::mesh_entity::dim2::type &mesh_entity, type_real coord);
 
 // Core locate_point logic that can be tested with raw data arrays
 specfem::point::local_coordinates<specfem::dimension::type::dim2>

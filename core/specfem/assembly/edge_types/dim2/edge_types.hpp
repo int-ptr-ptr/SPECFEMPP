@@ -12,10 +12,11 @@ template <> class edge_types<specfem::dimension::type::dim2> {
 
 private:
   using EdgeViewType =
-      Kokkos::View<specfem::mesh_entity::edge *, Kokkos::DefaultExecutionSpace>;
+      Kokkos::View<specfem::mesh_entity::edge<specfem::dimension::type::dim2> *,
+                   Kokkos::DefaultExecutionSpace>;
 
 public:
-  constexpr static auto dimension = specfem::dimension::type::dim2;
+  constexpr static auto dimension_tag = specfem::dimension::type::dim2;
   std::tuple<typename EdgeViewType::HostMirror,
              typename EdgeViewType::HostMirror>
   get_edges_on_host(const specfem::connections::type connection,
@@ -29,9 +30,10 @@ public:
 
   edge_types(
       const int ngllx, const int ngllz,
-      const specfem::assembly::mesh<dimension> &mesh,
-      const specfem::assembly::element_types<dimension> &element_types,
-      const specfem::mesh::coupled_interfaces<dimension> &coupled_interfaces);
+      const specfem::assembly::mesh<dimension_tag> &mesh,
+      const specfem::assembly::element_types<dimension_tag> &element_types,
+      const specfem::mesh::coupled_interfaces<dimension_tag>
+          &coupled_interfaces);
 
   edge_types() = default;
 

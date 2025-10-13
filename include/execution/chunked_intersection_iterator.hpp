@@ -19,8 +19,9 @@
  * constexpr int num_intersections = 1000;
  * constexpr int num_points = 5;
  *
- * Kokkos::View<specfem::mesh_entity::edge*> self_edges("self_edges",
- * num_intersections); Kokkos::View<specfem::mesh_entity::edge*>
+ * Kokkos::View<specfem::mesh_entity::edge<specfem::dimension::type::dim2>*>
+ * self_edges("self_edges", num_intersections);
+ * Kokkos::View<specfem::mesh_entity::edge<specfem::dimension::type::dim2>*>
  * coupled_edges("coupled_edges", num_intersections);
  * Kokkos::View<int*[num_points]> self_storage("self_storage",
  * num_intersections); Kokkos::View<int*[num_points]>
@@ -28,10 +29,11 @@
  *
  * // Initialize intersection edges
  * Kokkos::parallel_for("init_intersections", num_intersections,
- * KOKKOS_LAMBDA(int i) { self_edges(i) = specfem::mesh_entity::edge(i,
- * specfem::mesh_entity::type::top); coupled_edges(i) =
- * specfem::mesh_entity::edge(num_intersections-i-1,
- *                                                   specfem::mesh_entity::type::bottom);
+ * KOKKOS_LAMBDA(int i) { self_edges(i) =
+ * specfem::mesh_entity::edge<specfem::dimension::type::dim2>(i,
+ * specfem::mesh_entity::dim2::type::top); coupled_edges(i) =
+ * specfem::mesh_entity::edge<specfem::dimension::type::dim2>(num_intersections-i-1,
+ *                                                   specfem::mesh_entity::dim2::type::bottom);
  * });
  *
  * // Create chunked intersection iterator and process
@@ -471,20 +473,23 @@ private:
  * constexpr int num_intersections = 5000;
  * constexpr int num_points = 5;
  *
- * Kokkos::View<specfem::mesh_entity::edge*> self_edges("self_edges",
- * num_intersections); Kokkos::View<specfem::mesh_entity::edge*>
+ * Kokkos::View<specfem::mesh_entity::edge<specfem::dimension::type::dim2>*>
+ * self_edges("self_edges", num_intersections);
+ * Kokkos::View<specfem::mesh_entity::edge<specfem::dimension::type::dim2>*>
  * coupled_edges("coupled_edges", num_intersections);
  *
  * // Initialize intersection pairs
  * Kokkos::parallel_for("init_intersections", num_intersections,
  * KOKKOS_LAMBDA(int i) {
  *     // Self edges from domain A
- *     self_edges(i) = specfem::mesh_entity::edge(i,
- * specfem::mesh_entity::type::top);
+ *     self_edges(i) =
+ * specfem::mesh_entity::edge<specfem::dimension::type::dim2>(i,
+ * specfem::mesh_entity::dim2::type::top);
  *
  *     // Coupled edges from domain B (often with different orientation)
- *     coupled_edges(i) = specfem::mesh_entity::edge(
- *         num_intersections - i - 1, specfem::mesh_entity::type::bottom);
+ *     coupled_edges(i) =
+ * specfem::mesh_entity::edge<specfem::dimension::type::dim2>( num_intersections
+ * - i - 1, specfem::mesh_entity::dim2::type::bottom);
  * });
  *
  * // Create storage for coupled calculations

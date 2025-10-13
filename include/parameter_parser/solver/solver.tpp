@@ -4,7 +4,7 @@
 #include "kokkos_kernels/domain_kernels.hpp"
 #include "solver.hpp"
 #include "solver/time_marching.hpp"
-#include "timescheme/newmark.hpp"
+#include "specfem/timescheme/newmark.hpp"
 #include <iostream>
 #include <memory>
 

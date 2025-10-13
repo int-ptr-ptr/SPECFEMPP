@@ -21,8 +21,8 @@
 // |    |
 // |    |
 // 1----2
-// We need to convert the corners from specfem::mesh_entity::type to mesher
-// indexing
+// We need to convert the corners from specfem::mesh_entity::dim2::type to
+// mesher indexing
 template <typename T>
 std::vector<int> convert_corners_to_mesher_index(const T corners) {
 
@@ -30,7 +30,7 @@ std::vector<int> convert_corners_to_mesher_index(const T corners) {
   std::transform(corners.begin(), corners.end(),
                  std::back_inserter(return_value), [](const auto &corner) {
                    if (!specfem::mesh_entity::contains(
-                           specfem::mesh_entity::corners, corner)) {
+                           specfem::mesh_entity::dim2::corners, corner)) {
                      throw std::runtime_error("The argument is not a corner");
                    }
 
@@ -102,14 +102,15 @@ void check_adjacency_graph(
 
     const auto iedge = g[edge].orientation;
 
-    if (specfem::mesh_entity::contains(specfem::mesh_entity::edges, iedge)) {
+    if (specfem::mesh_entity::contains(specfem::mesh_entity::dim2::edges,
+                                       iedge)) {
       const auto returned_edge = boost::edge(jspec_mesh, ispec_mesh, fg).first;
       const auto jedge = g[returned_edge].orientation;
 
       const auto corners1 = convert_corners_to_mesher_index(
-          specfem::mesh_entity::corners_of_edge(iedge));
+          specfem::mesh_entity::dim2::corners_of_edge(iedge));
       const auto corners2 = convert_corners_to_mesher_index(
-          specfem::mesh_entity::corners_of_edge(jedge));
+          specfem::mesh_entity::dim2::corners_of_edge(jedge));
 
       std::set<int> control_nodes1 = {
         control_nodes.knods(corners1[0], ispec_mesh),
@@ -145,9 +146,9 @@ void check_adjacency_graph(
       const auto returned_edge = boost::edge(jspec_mesh, ispec_mesh, fg).first;
       const auto jcorner = g[returned_edge].orientation;
       const auto corners1 = convert_corners_to_mesher_index(
-          std::list<specfem::mesh_entity::type>{ icorner });
+          std::list<specfem::mesh_entity::dim2::type>{ icorner });
       const auto corners2 = convert_corners_to_mesher_index(
-          std::list<specfem::mesh_entity::type>{ jcorner });
+          std::list<specfem::mesh_entity::dim2::type>{ jcorner });
 
       std::set<int> control_nodes1 = { control_nodes.knods(corners1[0],
                                                            ispec_mesh) };

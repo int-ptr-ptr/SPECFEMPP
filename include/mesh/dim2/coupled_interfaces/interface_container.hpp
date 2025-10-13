@@ -45,14 +45,14 @@ struct interface_container<specfem::dimension::type::dim2, Medium1, Medium2> {
   Kokkos::View<int *, Kokkos::HostSpace>
       medium1_index_mapping; ///< spectral element index for edges in medium 1
 
-  Kokkos::View<specfem::mesh_entity::type *,
+  Kokkos::View<specfem::mesh_entity::dim2::type *,
                Kokkos::HostSpace>
       medium1_edge_type; ///< Edge type for edges in medium 1
 
   Kokkos::View<int *, Kokkos::HostSpace>
       medium2_index_mapping; ///< spectral element index for edges in medium 2
 
-  Kokkos::View<specfem::mesh_entity::type *,
+  Kokkos::View<specfem::mesh_entity::dim2::type *,
                Kokkos::HostSpace>
       medium2_edge_type; ///< Edge type for edges in medium 2
 

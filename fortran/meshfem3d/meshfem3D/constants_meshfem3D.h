@@ -64,3 +64,6 @@
   integer, parameter :: NGLOB_DOUBLING_SUPERBRICK = 67
   integer, parameter :: NSPEC_SUPERBRICK_1L = 28
   integer, parameter :: NGLOB_SUPERBRICK_1L = 58
+
+  integer, parameter :: MAX_NEIGHBORS = 300
+  integer, parameter :: NCORNERS = 8

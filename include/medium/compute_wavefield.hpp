@@ -5,6 +5,7 @@
 #include "dim2/elastic/isotropic/wavefield.hpp"
 #include "dim2/elastic/isotropic_cosserat/wavefield.hpp"
 #include "dim2/poroelastic/isotropic/wavefield.hpp"
+#include "dim3/elastic/isotropic/wavefield.hpp"
 #include <Kokkos_Core.hpp>
 
 namespace specfem {
@@ -76,10 +77,11 @@ KOKKOS_INLINE_FUNCTION auto compute_wavefield(
                     specfem::dimension::type::dim2,
                 "AccelerationFieldType dimension tag must be dim2");
 
-  static_assert(DisplacementFieldType::isChunkViewType &&
-                    VelocityFieldType::isChunkViewType &&
-                    AccelerationFieldType::isChunkViewType,
-                "All field types must be chunk view types");
+  static_assert(
+      specfem::data_access::is_chunk_element<DisplacementFieldType>::value &&
+          specfem::data_access::is_chunk_element<VelocityFieldType>::value &&
+          specfem::data_access::is_chunk_element<AccelerationFieldType>::value,
+      "All field types must be chunk view types");
 
   using dimension_dispatch =
       std::integral_constant<specfem::dimension::type,

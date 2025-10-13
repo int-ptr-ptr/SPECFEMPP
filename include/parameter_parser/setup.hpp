@@ -63,14 +63,17 @@ public:
   /**
    * @brief Instantiate the Timescheme
    *
+   * @tparam AssemblyFields Assembly fields type (dimension-agnostic)
+   * @param fields Assembly fields to link with the timescheme
    * @return specfem::time_scheme::time_scheme* Pointer to the TimeScheme
    object
    * used in the solver algorithm
    */
+  template <typename AssemblyFields>
   std::shared_ptr<specfem::time_scheme::time_scheme>
-  instantiate_timescheme() const {
+  instantiate_timescheme(AssemblyFields &fields) const {
     return this->time_scheme->instantiate(
-        this->receivers->get_nstep_between_samples());
+        fields, this->receivers->get_nstep_between_samples());
   }
   // /**
   //  * @brief Update simulation start time.
@@ -176,6 +179,24 @@ public:
     } else {
       return nullptr;
     }
+  }
+
+  /**
+   * @brief Get number of samples between seismogram recordings
+   *
+   * @return int number of samples between seismogram recordings
+   */
+  int get_nstep_between_samples() const {
+    return this->receivers->get_nstep_between_samples();
+  }
+
+  /**
+   * @brief Get the maximum seismogram step
+   *
+   * @return int Maximum seismogram step
+   */
+  int get_max_seismogram_step() const {
+    return get_nsteps() / get_nstep_between_samples();
   }
 
   std::shared_ptr<specfem::periodic_tasks::periodic_task>

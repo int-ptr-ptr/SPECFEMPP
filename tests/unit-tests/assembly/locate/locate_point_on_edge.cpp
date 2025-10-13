@@ -44,13 +44,13 @@ void test_locate_point_on_edge(
   // sets xi,gamma constraint on edge, returns free (edge) coordinate.
   const auto get_edge_coordinate =
       [](type_real &xi, type_real &gamma,
-         const specfem::mesh_entity::type &edgetype) -> type_real & {
-    if (edgetype == specfem::mesh_entity::type::bottom ||
-        edgetype == specfem::mesh_entity::type::top) {
-      gamma = (edgetype == specfem::mesh_entity::type::bottom) ? -1 : 1;
+         const specfem::mesh_entity::dim2::type &edgetype) -> type_real & {
+    if (edgetype == specfem::mesh_entity::dim2::type::bottom ||
+        edgetype == specfem::mesh_entity::dim2::type::top) {
+      gamma = (edgetype == specfem::mesh_entity::dim2::type::bottom) ? -1 : 1;
       return xi;
     } else {
-      xi = (edgetype == specfem::mesh_entity::type::left) ? -1 : 1;
+      xi = (edgetype == specfem::mesh_entity::dim2::type::left) ? -1 : 1;
       return gamma;
     }
   };
@@ -61,15 +61,15 @@ void test_locate_point_on_edge(
   for (int itrial = 0; itrial < num_trials; itrial++) {
     const int ispec = std::rand() % nspec;
     const int edge_select = std::rand() % 4;
-    specfem::mesh_entity::type edge;
+    specfem::mesh_entity::dim2::type edge;
     if (edge_select == 0) {
-      edge = specfem::mesh_entity::type::bottom;
+      edge = specfem::mesh_entity::dim2::type::bottom;
     } else if (edge_select == 1) {
-      edge = specfem::mesh_entity::type::right;
+      edge = specfem::mesh_entity::dim2::type::right;
     } else if (edge_select == 2) {
-      edge = specfem::mesh_entity::type::top;
+      edge = specfem::mesh_entity::dim2::type::top;
     } else {
-      edge = specfem::mesh_entity::type::left;
+      edge = specfem::mesh_entity::dim2::type::left;
     }
 
     type_real xi_target, gamma_target;

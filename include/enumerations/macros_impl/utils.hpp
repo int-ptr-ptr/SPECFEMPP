@@ -205,46 +205,46 @@
  * @brief Compare each item in the sequence for a sequence pair of length 2, 3
  * and 4.
  */
-#define _IN_TUPLE_2(s, elem, tuple)                                            \
+#define _TYPE_MATCH_2(elem, seq)                                               \
   BOOST_PP_IF(                                                                 \
-      BOOST_PP_EQUAL(BOOST_PP_TUPLE_SIZE(tuple), 2),                           \
-      BOOST_PP_IF(_CHECK_ENUM(BOOST_PP_TUPLE_ELEM(0, tuple),                   \
-                              BOOST_PP_TUPLE_ELEM(0, elem)),                   \
-                  BOOST_PP_IF(_CHECK_ENUM(BOOST_PP_TUPLE_ELEM(1, tuple),       \
-                                          BOOST_PP_TUPLE_ELEM(1, elem)),       \
+      BOOST_PP_EQUAL(BOOST_PP_TUPLE_SIZE(seq), 2),                             \
+      BOOST_PP_IF(_TAG_IN_SEQ(BOOST_PP_TUPLE_ELEM(0, elem),                    \
+                              BOOST_PP_TUPLE_ELEM(0, seq)),                    \
+                  BOOST_PP_IF(_TAG_IN_SEQ(BOOST_PP_TUPLE_ELEM(1, elem),        \
+                                          BOOST_PP_TUPLE_ELEM(1, seq)),        \
                               1, 0),                                           \
                   0),                                                          \
       0)
 
-#define _IN_TUPLE_3(s, elem, tuple)                                            \
+#define _TYPE_MATCH_3(elem, seq)                                               \
   BOOST_PP_IF(                                                                 \
-      BOOST_PP_EQUAL(BOOST_PP_TUPLE_SIZE(tuple), 3),                           \
+      BOOST_PP_EQUAL(BOOST_PP_TUPLE_SIZE(seq), 3),                             \
       BOOST_PP_IF(                                                             \
-          _CHECK_ENUM(BOOST_PP_TUPLE_ELEM(0, tuple),                           \
-                      BOOST_PP_TUPLE_ELEM(0, elem)),                           \
-          BOOST_PP_IF(_CHECK_ENUM(BOOST_PP_TUPLE_ELEM(1, tuple),               \
-                                  BOOST_PP_TUPLE_ELEM(1, elem)),               \
-                      BOOST_PP_IF(_CHECK_ENUM(BOOST_PP_TUPLE_ELEM(2, tuple),   \
-                                              BOOST_PP_TUPLE_ELEM(2, elem)),   \
+          _TAG_IN_SEQ(BOOST_PP_TUPLE_ELEM(0, elem),                            \
+                      BOOST_PP_TUPLE_ELEM(0, seq)),                            \
+          BOOST_PP_IF(_TAG_IN_SEQ(BOOST_PP_TUPLE_ELEM(1, elem),                \
+                                  BOOST_PP_TUPLE_ELEM(1, seq)),                \
+                      BOOST_PP_IF(_TAG_IN_SEQ(BOOST_PP_TUPLE_ELEM(2, elem),    \
+                                              BOOST_PP_TUPLE_ELEM(2, seq)),    \
                                   1, 0),                                       \
                       0),                                                      \
           0),                                                                  \
       0)
 
-#define _IN_TUPLE_4(s, elem, tuple)                                            \
+#define _TYPE_MATCH_4(elem, seq)                                               \
   BOOST_PP_IF(                                                                 \
-      BOOST_PP_EQUAL(BOOST_PP_TUPLE_SIZE(tuple), 4),                           \
+      BOOST_PP_EQUAL(BOOST_PP_TUPLE_SIZE(seq), 4),                             \
       BOOST_PP_IF(                                                             \
-          _CHECK_ENUM(BOOST_PP_TUPLE_ELEM(0, tuple),                           \
-                      BOOST_PP_TUPLE_ELEM(0, elem)),                           \
+          _TAG_IN_SEQ(BOOST_PP_TUPLE_ELEM(0, elem),                            \
+                      BOOST_PP_TUPLE_ELEM(0, seq)),                            \
           BOOST_PP_IF(                                                         \
-              _CHECK_ENUM(BOOST_PP_TUPLE_ELEM(1, tuple),                       \
-                          BOOST_PP_TUPLE_ELEM(1, elem)),                       \
+              _TAG_IN_SEQ(BOOST_PP_TUPLE_ELEM(1, elem),                        \
+                          BOOST_PP_TUPLE_ELEM(1, seq)),                        \
               BOOST_PP_IF(                                                     \
-                  _CHECK_ENUM(BOOST_PP_TUPLE_ELEM(2, tuple),                   \
-                              BOOST_PP_TUPLE_ELEM(2, elem)),                   \
-                  BOOST_PP_IF(_CHECK_ENUM(BOOST_PP_TUPLE_ELEM(3, tuple),       \
-                                          BOOST_PP_TUPLE_ELEM(3, elem)),       \
+                  _TAG_IN_SEQ(BOOST_PP_TUPLE_ELEM(2, elem),                    \
+                              BOOST_PP_TUPLE_ELEM(2, seq)),                    \
+                  BOOST_PP_IF(_TAG_IN_SEQ(BOOST_PP_TUPLE_ELEM(3, elem),        \
+                                          BOOST_PP_TUPLE_ELEM(3, seq)),        \
                               1, 0),                                           \
                   0),                                                          \
               0),                                                              \
@@ -255,18 +255,16 @@
  * @brief Check if a given tag sequence is in the list of available tag
  * sequences.
  */
-#define _IN_SEQUENCE(n, elem)                                                  \
-  BOOST_PP_SEQ_FOLD_LEFT(                                                      \
-      _OP_OR, 0,                                                               \
-      BOOST_PP_SEQ_TRANSFORM(BOOST_PP_CAT(_IN_TUPLE_, n), elem,                \
-                             BOOST_PP_CAT(_SEQ_FOR_TAGS_, n)))
+#define _TAG_EQ(s, tag1, tag2) _CHECK_ENUM(tag1, tag2)
+#define _TAG_IN_SEQ(elem, seq)                                                 \
+  BOOST_PP_SEQ_FOLD_LEFT(_OP_OR, 0, BOOST_PP_SEQ_TRANSFORM(_TAG_EQ, elem, seq))
 
 /**
  * Check if a given tag sequence is in the list of available tag sequences,
  * write declaration and code block for the sequence if it is in the list.
  */
 #define _FOR_ONE_TAG_SEQ(s, code, elem)                                        \
-  BOOST_PP_IF(                                                                 \
-      _IN_SEQUENCE(BOOST_PP_SEQ_SIZE(elem), BOOST_PP_SEQ_TO_TUPLE(elem)),      \
-      _CHECK_DECLARE, _EMPTY_MACRO)                                            \
-  (BOOST_PP_SEQ_TO_TUPLE(elem), code)
+  BOOST_PP_IF(BOOST_PP_CAT(_TYPE_MATCH_, BOOST_PP_TUPLE_SIZE(elem))(           \
+                  elem, BOOST_PP_SEQ_HEAD(code)),                              \
+              _CHECK_DECLARE, _EMPTY_MACRO)                                    \
+  (elem, BOOST_PP_SEQ_TAIL(code))

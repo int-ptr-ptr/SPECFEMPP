@@ -29,16 +29,19 @@ TEST_F(LocatePoint2D, LocateEdgeOnCoreUnitSquare) {
   // Test point at center of each edge
   // Should map to local edge coordinate (0)
   for (auto [side, target] :
-       std::vector<std::pair<specfem::mesh_entity::type,
+       std::vector<std::pair<specfem::mesh_entity::dim2::type,
                              specfem::point::global_coordinates<
                                  specfem::dimension::type::dim2> > >{
-           { specfem::mesh_entity::type::bottom, { 0.5, 0.0 } }, // Bottom edge
-                                                                 // center
-           { specfem::mesh_entity::type::right, { 1.0, 0.5 } },  // Right edge
-                                                                 // center
-           { specfem::mesh_entity::type::top, { 0.5, 1.0 } }, // Top edge center
-           { specfem::mesh_entity::type::left, { 0.0, 0.5 } } // Left edge
-                                                              // center
+           { specfem::mesh_entity::dim2::type::bottom, { 0.5, 0.0 } }, // Bottom
+                                                                       // edge
+                                                                       // center
+           { specfem::mesh_entity::dim2::type::right, { 1.0, 0.5 } },  // Right
+                                                                       // edge
+                                                                       // center
+           { specfem::mesh_entity::dim2::type::top, { 0.5, 1.0 } }, // Top edge
+                                                                    // center
+           { specfem::mesh_entity::dim2::type::left, { 0.0, 0.5 } } // Left edge
+                                                                    // center
        }) {
 
     auto result =
@@ -57,14 +60,14 @@ TEST_F(LocatePoint2D, LocateEdgeOnCoreUnitSquare) {
   };
   auto result =
       specfem::algorithms::locate_point_impl::get_local_edge_coordinate(
-          target, coorg, specfem::mesh_entity::type::bottom, 0);
+          target, coorg, specfem::mesh_entity::dim2::type::bottom, 0);
 
   EXPECT_TRUE(is_close(result.first, type_real{ -1 }))
       << expected_got(0.0, result.first);
   EXPECT_TRUE(result.second); // inside edge (not out-of-bounds)
 
   result = specfem::algorithms::locate_point_impl::get_local_edge_coordinate(
-      target, coorg, specfem::mesh_entity::type::left, 0);
+      target, coorg, specfem::mesh_entity::dim2::type::left, 0);
   EXPECT_TRUE(is_close(result.first, type_real{ -1 }))
       << expected_got(0.0, result.first);
   EXPECT_TRUE(result.second); // inside edge (not out-of-bounds)
@@ -72,12 +75,12 @@ TEST_F(LocatePoint2D, LocateEdgeOnCoreUnitSquare) {
   // Test corner point (1, 1) should map to {top: 1, right: 1}
   target = { 1.0, 1.0 };
   result = specfem::algorithms::locate_point_impl::get_local_edge_coordinate(
-      target, coorg, specfem::mesh_entity::type::right, 0);
+      target, coorg, specfem::mesh_entity::dim2::type::right, 0);
   EXPECT_TRUE(is_close(result.first, type_real{ 1 }))
       << expected_got(0.0, result.first);
   EXPECT_TRUE(result.second); // inside edge (not out-of-bounds)
   result = specfem::algorithms::locate_point_impl::get_local_edge_coordinate(
-      target, coorg, specfem::mesh_entity::type::top, 0);
+      target, coorg, specfem::mesh_entity::dim2::type::top, 0);
   EXPECT_TRUE(is_close(result.first, type_real{ 1 }))
       << expected_got(0.0, result.first);
   EXPECT_TRUE(result.second); // inside edge (not out-of-bounds)
@@ -97,10 +100,11 @@ TEST_F(LocatePoint2D, LocateEdgeOnCoreOutsideMesh) {
     0.5, 0.5
   };
 
-  for (auto side : std::vector<specfem::mesh_entity::type>{
-           specfem::mesh_entity::type::bottom,
-           specfem::mesh_entity::type::right, specfem::mesh_entity::type::top,
-           specfem::mesh_entity::type::left }) {
+  for (auto side : std::vector<specfem::mesh_entity::dim2::type>{
+           specfem::mesh_entity::dim2::type::bottom,
+           specfem::mesh_entity::dim2::type::right,
+           specfem::mesh_entity::dim2::type::top,
+           specfem::mesh_entity::dim2::type::left }) {
     // target is center of element. Distance minimized on each edge at center,
     // so exception should be thrown
     EXPECT_THROW(
@@ -114,12 +118,12 @@ TEST_F(LocatePoint2D, LocateEdgeOnCoreOutsideMesh) {
   target = { 1.5, -0.5 };
   auto result =
       specfem::algorithms::locate_point_impl::get_local_edge_coordinate(
-          target, coorg, specfem::mesh_entity::type::right, 0);
+          target, coorg, specfem::mesh_entity::dim2::type::right, 0);
   EXPECT_TRUE(is_close(result.first, type_real{ -1 }))
       << expected_got(0.0, result.first);
   EXPECT_FALSE(result.second); // inside edge (not out-of-bounds)
   result = specfem::algorithms::locate_point_impl::get_local_edge_coordinate(
-      target, coorg, specfem::mesh_entity::type::bottom, 0);
+      target, coorg, specfem::mesh_entity::dim2::type::bottom, 0);
   EXPECT_TRUE(is_close(result.first, type_real{ 1 }))
       << expected_got(0.0, result.first);
   EXPECT_FALSE(result.second); // inside edge (not out-of-bounds)

@@ -41,6 +41,29 @@ read_3d_mesh(const std::string &mesh_parameters_file,
              const std::string &mesh_databases_file,
              const specfem::MPI::MPI *mpi);
 
+namespace meshfem3d {
+/**
+ * @brief Construct a 3D mesh object from MESHFEM3D Fortran binary database file
+ *
+ * @param database_file MESHFEM3D database file
+ * @param mpi pointer to MPI object to manage communication
+ * @return specfem::mesh::mesh<specfem::dimension::type::dim3>
+ *         Specfem mesh object for dimension type dim3
+ *
+ * @code
+ * // Read 3D mesh from MESHFEM3D database file
+ * auto mesh = specfem::io::meshfem3d::read_3d_mesh("DATABASES_MPI", mpi);
+ * @endcode
+ */
+specfem::mesh::meshfem3d::mesh<specfem::dimension::type::dim3>
+read_3d_mesh(const std::string &database_file, const specfem::MPI::MPI *mpi);
+} // namespace meshfem3d
+
+// namespace meshfem3d {
+// specfem::mesh::meshfem3d::mesh<specfem::dimension::type::dim3>
+// read_3d_mesh(const std::string &filename, const specfem::MPI::MPI *mpi);
+// } // namespace meshfem3d
+
 /**
  * @brief Read station file
  *

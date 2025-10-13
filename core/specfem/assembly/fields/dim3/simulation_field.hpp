@@ -139,7 +139,7 @@ public:
    * @brief Returns the assembled index given element index.
    *
    */
-  template <bool on_device, typename IndexType>
+  template <bool on_device>
   KOKKOS_INLINE_FUNCTION constexpr int
   get_iglob(const int &ispec, const int &iz, const int &iy, const int &ix,
             const specfem::element::medium_tag MediumTag) const {
@@ -161,6 +161,11 @@ public:
                             }
                           })
     }
+
+    // If we reach here, it means the medium type is not defined in the macro
+    Kokkos::abort("Medium type not defined in the macro");
+
+    return -1;
   }
 
   /**

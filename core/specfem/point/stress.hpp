@@ -5,7 +5,6 @@
 #include "jacobian_matrix.hpp"
 #include "specfem/data_access.hpp"
 #include <Kokkos_Core.hpp>
-#include <sstream>
 
 namespace specfem {
 namespace point {

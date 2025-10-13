@@ -70,11 +70,11 @@ specfem::assembly::coupled_interfaces_impl::interface_container<
       const std::array<type_real, 2> w{ weights(ix), weights(iz) };
       this->h_edge_factor(i, ipoint) = [&]() {
         switch (edge_type) {
-        case specfem::mesh_entity::type::bottom:
-        case specfem::mesh_entity::type::top:
+        case specfem::mesh_entity::dim2::type::bottom:
+        case specfem::mesh_entity::dim2::type::top:
           return w[0];
-        case specfem::mesh_entity::type::left:
-        case specfem::mesh_entity::type::right:
+        case specfem::mesh_entity::dim2::type::left:
+        case specfem::mesh_entity::dim2::type::right:
           return w[1];
         default:
           KOKKOS_ABORT_WITH_LOCATION("Invalid edge type");

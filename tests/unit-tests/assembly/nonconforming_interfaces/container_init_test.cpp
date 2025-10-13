@@ -12,7 +12,7 @@ template <typename TransferView, typename CoordView>
 specfem::point::global_coordinates<specfem::dimension::type::dim2>
 transfer_position_to_mortar(const TransferView &transfer_function,
                             const CoordView &coord_view, const int &ispec,
-                            const specfem::mesh_entity::type &edge_type,
+                            const specfem::mesh_entity::dim2::type &edge_type,
                             const int &iedge, const int &imortar) {
   specfem::point::global_coordinates<specfem::dimension::type::dim2> coords(0,
                                                                             0);
@@ -35,11 +35,11 @@ type_real estimate_intersection_length(
     const Kokkos::View<
         specfem::point::global_coordinates<specfem::dimension::type::dim2> *,
         Kokkos::HostSpace> &icoorg,
-    const int &ispec, const specfem::mesh_entity::type &iedge,
+    const int &ispec, const specfem::mesh_entity::dim2::type &iedge,
     const Kokkos::View<
         specfem::point::global_coordinates<specfem::dimension::type::dim2> *,
         Kokkos::HostSpace> &jcoorg,
-    const int &jspec, const specfem::mesh_entity::type &jedge) {
+    const int &jspec, const specfem::mesh_entity::dim2::type &jedge) {
   const int num_segments = 20;
   const int ngnod = icoorg.extent(0);
   const Kokkos::View<type_real *, Kokkos::HostSpace> mortar_quad("mortar_quad",
@@ -56,13 +56,13 @@ type_real estimate_intersection_length(
 
   type_real xi, gamma;
   auto &edgecoord = [&xi, &gamma, &iedge]() -> type_real & {
-    if (iedge == specfem::mesh_entity::type::bottom) {
+    if (iedge == specfem::mesh_entity::dim2::type::bottom) {
       gamma = -1;
       return xi;
-    } else if (iedge == specfem::mesh_entity::type::right) {
+    } else if (iedge == specfem::mesh_entity::dim2::type::right) {
       xi = 1;
       return gamma;
-    } else if (iedge == specfem::mesh_entity::type::top) {
+    } else if (iedge == specfem::mesh_entity::dim2::type::top) {
       gamma = 1;
       return xi;
     } else {
@@ -91,7 +91,7 @@ void estimate_verify_normal(
     const Kokkos::View<
         specfem::point::global_coordinates<specfem::dimension::type::dim2> *,
         Kokkos::HostSpace> &coorg,
-    const int &ispec, const specfem::mesh_entity::type &iedge,
+    const int &ispec, const specfem::mesh_entity::dim2::type &iedge,
     const type_real &edgecoord, const type_real &normal_x,
     const type_real &normal_z) {
   const type_real h = 1e-3;
@@ -116,15 +116,15 @@ void estimate_verify_normal(
       [&xi, &gamma, &iedge,
        &jacobian]() -> std::tuple<type_real &, type_real &, type_real &,
                                   type_real &, type_real &> {
-    if (iedge == specfem::mesh_entity::type::bottom) {
+    if (iedge == specfem::mesh_entity::dim2::type::bottom) {
       gamma = -1;
       return { gamma, jacobian.xix, jacobian.xiz, jacobian.gammax,
                jacobian.gammaz };
-    } else if (iedge == specfem::mesh_entity::type::right) {
+    } else if (iedge == specfem::mesh_entity::dim2::type::right) {
       xi = 1;
       return { xi, jacobian.gammax, jacobian.gammaz, jacobian.xix,
                jacobian.xiz };
-    } else if (iedge == specfem::mesh_entity::type::top) {
+    } else if (iedge == specfem::mesh_entity::dim2::type::top) {
       gamma = 1;
       return { gamma, jacobian.xix, jacobian.xiz, jacobian.gammax,
                jacobian.gammaz };
@@ -140,7 +140,7 @@ void estimate_verify_normal(
       << "Given normal (" << normal_x << ", " << normal_z
       << ") is not perpendicular to edge tangent vector ("
       << jacobian_edgecoordx << ", " << jacobian_edgecoordz << ") on spec "
-      << ispec << " edge " << specfem::mesh_entity::to_string(iedge)
+      << ispec << " edge " << specfem::mesh_entity::dim2::to_string(iedge)
       << " at local coordinate " << edgecoord << ".";
 
   // dot with dx/dorthcoord. at orthcoord (+/- 1), this would be outward facing
@@ -149,13 +149,13 @@ void estimate_verify_normal(
               0)
       << "Given normal (" << normal_x << ", " << normal_z
       << ") is not outward facing on spec " << ispec << " edge "
-      << specfem::mesh_entity::to_string(iedge) << " at local coordinate "
+      << specfem::mesh_entity::dim2::to_string(iedge) << " at local coordinate "
       << edgecoord << ".";
 
   EXPECT_TRUE(std::abs(normal_x * normal_x + normal_z * normal_z - 1) < eps)
       << "Given normal (" << normal_x << ", " << normal_z
       << ") is not unit length on spec " << ispec << " edge "
-      << specfem::mesh_entity::to_string(iedge) << " at local coordinate "
+      << specfem::mesh_entity::dim2::to_string(iedge) << " at local coordinate "
       << edgecoord << ".";
 }
 
@@ -248,10 +248,10 @@ void test_nonconforming_container_transfers(
 
   for (int iedge = 0; iedge < nedges; iedge++) {
     const int ac_spec = acoustic_edges(iedge).ispec;
-    const specfem::mesh_entity::type ac_edgetype =
+    const specfem::mesh_entity::dim2::type ac_edgetype =
         acoustic_edges(iedge).edge_type;
     const int el_spec = elastic_edges(iedge).ispec;
-    const specfem::mesh_entity::type el_edgetype =
+    const specfem::mesh_entity::dim2::type el_edgetype =
         elastic_edges(iedge).edge_type;
     for (int i = 0; i < assembly.mesh.ngnod; i++) {
       ac_coorg(i).x = assembly.mesh.h_control_node_coord(0, ac_spec, i);

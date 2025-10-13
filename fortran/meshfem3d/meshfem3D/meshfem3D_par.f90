@@ -67,6 +67,9 @@ module meshfem_par
   ! for loop on all the slices
   integer, dimension(:,:), allocatable :: addressing
 
+  ! Adjacency matrix
+  integer, dimension(:,:), allocatable :: adjacency_matrix
+
   ! addressing for all the slices
   integer, dimension(:), allocatable :: iproc_xi_slice,iproc_eta_slice
   integer :: iproc_xi_current,iproc_eta_current

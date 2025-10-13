@@ -47,8 +47,9 @@ TEST(impl__compute_intersection, KnotCorrectness) {
     if (coord_lo > 1 || coord_hi < 0) {
       EXPECT_THROW(specfem::assembly::nonconforming_interfaces_impl::
                        compute_intersection(
-                           coorg1, coorg2, specfem::mesh_entity::type::right,
-                           specfem::mesh_entity::type::left, mortar_quad),
+                           coorg1, coorg2,
+                           specfem::mesh_entity::dim2::type::right,
+                           specfem::mesh_entity::dim2::type::left, mortar_quad),
                    std::runtime_error)
           << "Global coordinate intervals:\n"
           << "   side 1: [0, 1]\n"
@@ -72,8 +73,8 @@ TEST(impl__compute_intersection, KnotCorrectness) {
 
     auto out =
         specfem::assembly::nonconforming_interfaces_impl::compute_intersection(
-            coorg1, coorg2, specfem::mesh_entity::type::right,
-            specfem::mesh_entity::type::left, mortar_quad);
+            coorg1, coorg2, specfem::mesh_entity::dim2::type::right,
+            specfem::mesh_entity::dim2::type::left, mortar_quad);
 
     // compare against ground truth
     std::vector<std::pair<type_real, type_real> > expectations{

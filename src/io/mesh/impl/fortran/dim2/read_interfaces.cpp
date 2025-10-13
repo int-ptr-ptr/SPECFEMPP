@@ -17,7 +17,7 @@ std::vector<int> get_common_nodes(std::vector<int> element1_nodes,
   return common_nodes;
 }
 
-std::tuple<specfem::mesh_entity::type, specfem::mesh_entity::type>
+std::tuple<specfem::mesh_entity::dim2::type, specfem::mesh_entity::dim2::type>
 compute_connected_edges(Kokkos::View<int **, Kokkos::HostSpace> knods,
                         const int ispec1, const int ispec2) {
   std::vector<int> element1_nodes{ knods(0, ispec1), knods(1, ispec1),
@@ -62,7 +62,7 @@ compute_connected_edges(Kokkos::View<int **, Kokkos::HostSpace> knods,
   if (edge1_node_indices.size() != 2 || edge2_node_indices.size() != 2)
     throw std::runtime_error("Error: Could not determine edge nodes.");
 
-  specfem::mesh_entity::type edge1, edge2;
+  specfem::mesh_entity::dim2::type edge1, edge2;
 
   // 0, 1 -> bottom
   // 1, 2 -> right
@@ -71,32 +71,32 @@ compute_connected_edges(Kokkos::View<int **, Kokkos::HostSpace> knods,
 
   if ((edge1_node_indices == std::vector<int>{ 0, 1 } ||
        edge1_node_indices == std::vector<int>{ 1, 0 })) {
-    edge1 = specfem::mesh_entity::type::bottom;
+    edge1 = specfem::mesh_entity::dim2::type::bottom;
   } else if ((edge1_node_indices == std::vector<int>{ 1, 2 } ||
               edge1_node_indices == std::vector<int>{ 2, 1 })) {
-    edge1 = specfem::mesh_entity::type::right;
+    edge1 = specfem::mesh_entity::dim2::type::right;
   } else if ((edge1_node_indices == std::vector<int>{ 2, 3 } ||
               edge1_node_indices == std::vector<int>{ 3, 2 })) {
-    edge1 = specfem::mesh_entity::type::top;
+    edge1 = specfem::mesh_entity::dim2::type::top;
   } else if ((edge1_node_indices == std::vector<int>{ 3, 0 } ||
               edge1_node_indices == std::vector<int>{ 0, 3 })) {
-    edge1 = specfem::mesh_entity::type::left;
+    edge1 = specfem::mesh_entity::dim2::type::left;
   } else {
     throw std::runtime_error("Error: Could not determine edge1 type.");
   }
 
   if ((edge2_node_indices == std::vector<int>{ 0, 1 } ||
        edge2_node_indices == std::vector<int>{ 1, 0 })) {
-    edge2 = specfem::mesh_entity::type::bottom;
+    edge2 = specfem::mesh_entity::dim2::type::bottom;
   } else if ((edge2_node_indices == std::vector<int>{ 1, 2 } ||
               edge2_node_indices == std::vector<int>{ 2, 1 })) {
-    edge2 = specfem::mesh_entity::type::right;
+    edge2 = specfem::mesh_entity::dim2::type::right;
   } else if ((edge2_node_indices == std::vector<int>{ 2, 3 } ||
               edge2_node_indices == std::vector<int>{ 3, 2 })) {
-    edge2 = specfem::mesh_entity::type::top;
+    edge2 = specfem::mesh_entity::dim2::type::top;
   } else if ((edge2_node_indices == std::vector<int>{ 3, 0 } ||
               edge2_node_indices == std::vector<int>{ 0, 3 })) {
-    edge2 = specfem::mesh_entity::type::left;
+    edge2 = specfem::mesh_entity::dim2::type::left;
   } else {
     throw std::runtime_error("Error: Could not determine edge2 type.");
   }

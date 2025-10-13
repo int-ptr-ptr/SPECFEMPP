@@ -74,11 +74,11 @@ private:
   int iedge;           ///< Index of the edge within the range of edges
   int self_element;    ///< Index of the element where the edge is defined
   int coupled_element; ///< Index of the element with whom the edge is shared
-  specfem::mesh_entity::type self_edge;    ///< Edge orientation for the current
-                                           ///< element
-  specfem::mesh_entity::type coupled_edge; ///< Edge orientation for the other
-                                           ///< element
-  int npoints;                             ///< Number of GLL points on the edge
+  specfem::mesh_entity::dim2::type self_edge;    ///< Edge orientation for the
+                                                 ///< current element
+  specfem::mesh_entity::dim2::type coupled_edge; ///< Edge orientation for the
+                                                 ///< other element
+  int npoints; ///< Number of GLL points on the edge
 
 public:
   /**
@@ -100,8 +100,8 @@ public:
    */
   KOKKOS_INLINE_FUNCTION
   edge(const int iedge, const int self_element, const int coupled_element,
-       const specfem::mesh_entity::type self_edge,
-       const specfem::mesh_entity::type coupled_edge, const int ngll)
+       const specfem::mesh_entity::dim2::type self_edge,
+       const specfem::mesh_entity::dim2::type coupled_edge, const int ngll)
       : iedge(iedge), self_element(self_element),
         coupled_element(coupled_element), self_edge(self_edge),
         coupled_edge(coupled_edge), npoints(ngll) {}
@@ -133,16 +133,16 @@ private:
   KOKKOS_INLINE_FUNCTION
   specfem::point::index<dimension> self_index(const int ipoint) const {
     switch (self_edge) {
-    case specfem::mesh_entity::type::bottom:
+    case specfem::mesh_entity::dim2::type::bottom:
       return { self_element, 0, ipoint };
       break;
-    case specfem::mesh_entity::type::top:
+    case specfem::mesh_entity::dim2::type::top:
       return { self_element, npoints - 1, npoints - 1 - ipoint };
       break;
-    case specfem::mesh_entity::type::left:
+    case specfem::mesh_entity::dim2::type::left:
       return { self_element, ipoint, 0 };
       break;
-    case specfem::mesh_entity::type::right:
+    case specfem::mesh_entity::dim2::type::right:
       return { self_element, npoints - 1 - ipoint, npoints - 1 };
       break;
     default:
@@ -154,16 +154,16 @@ private:
   KOKKOS_INLINE_FUNCTION
   specfem::point::index<dimension> coupled_index(const int ipoint) const {
     switch (coupled_edge) {
-    case specfem::mesh_entity::type::bottom:
+    case specfem::mesh_entity::dim2::type::bottom:
       return { coupled_element, 0, npoints - 1 - ipoint };
       break;
-    case specfem::mesh_entity::type::top:
+    case specfem::mesh_entity::dim2::type::top:
       return { coupled_element, npoints - 1, ipoint };
       break;
-    case specfem::mesh_entity::type::left:
+    case specfem::mesh_entity::dim2::type::left:
       return { coupled_element, npoints - 1 - ipoint, npoints - 1 };
       break;
-    case specfem::mesh_entity::type::right:
+    case specfem::mesh_entity::dim2::type::right:
       return { coupled_element, ipoint, 0 };
       break;
     default:
@@ -233,7 +233,7 @@ private:
                                                                    ///< storing
                                                                    ///< indices
   using EdgeViewType = Kokkos::View<
-      specfem::mesh_entity::type *,
+      specfem::mesh_entity::dim2::type *,
       typename member_type::execution_space::memory_space>; ///< View type for
                                                             ///< storing edge
                                                             ///< orientation

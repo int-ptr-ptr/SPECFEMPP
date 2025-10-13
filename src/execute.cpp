@@ -85,33 +85,32 @@ void execute(
   // --------------------------------------------------------------
 
   // --------------------------------------------------------------
-  //                   Instantiate Timescheme
-  // --------------------------------------------------------------
-  const auto time_scheme = setup.instantiate_timescheme();
-  if (mpi->main_proc())
-    std::cout << *time_scheme << std::endl;
-
-  const int max_seismogram_time_step = time_scheme->get_max_seismogram_step();
-
-  const int nstep_between_samples = time_scheme->get_nstep_between_samples();
-  // --------------------------------------------------------------
-
-  // --------------------------------------------------------------
   //                   Generate Assembly
   // --------------------------------------------------------------
   const type_real dt = setup.get_dt();
+  const int max_seismogram_time_step = setup.get_max_seismogram_step();
+  const int nstep_between_samples = setup.get_nstep_between_samples();
   specfem::assembly::assembly<specfem::dimension::type::dim2> assembly(
       mesh, quadrature, sources, receivers, setup.get_seismogram_types(),
       setup.get_t0(), dt, nsteps, max_seismogram_time_step,
       nstep_between_samples, setup.get_simulation_type(),
       setup.allocate_boundary_values(), setup.instantiate_property_reader());
 
-  time_scheme->link_assembly(assembly);
-  // --------------------------------------------------------------
-
   if (mpi->main_proc()) {
     mpi->cout(assembly.print());
   }
+
+  // --------------------------------------------------------------
+
+  // --------------------------------------------------------------
+  //                   Instantiate Timescheme
+  // --------------------------------------------------------------
+  const auto time_scheme = setup.instantiate_timescheme(assembly.fields);
+
+  if (mpi->main_proc())
+    std::cout << *time_scheme << std::endl;
+
+  // --------------------------------------------------------------
 
   // --------------------------------------------------------------
   //               Write properties

@@ -16,9 +16,7 @@
 
 #pragma once
 
-#include "enumerations/connections.hpp"
-#include "enumerations/dimension.hpp"
-#include "enumerations/medium.hpp"
+#include "enumerations/interface.hpp"
 
 /**
  * @brief Forward declarations for point field types

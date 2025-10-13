@@ -8,7 +8,7 @@ Time scheme is used to advance the wavefield in time. For the case of this tutor
 
 .. code:: cpp
 
-    #include "timescheme/timescheme.hpp"
+    #include "specfem/timescheme.hpp"
 
     class newmark : public time_scheme {
     public:

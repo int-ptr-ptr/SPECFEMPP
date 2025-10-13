@@ -7,7 +7,7 @@ from _gmsh2meshfem.gmsh_dep import GmshContext
 
 from .boundary import BoundarySpec
 from .edges import ConformingInterfaces
-from .index_mapping import ComposedIndexMapping, IndexMapping, JoinedIndexMapping
+from .index_mapping import IndexMapping, JoinedIndexMapping
 from .nonconforming_interfaces import (
     NonconformingInterfaces,
 )
@@ -28,17 +28,96 @@ class Model:
     """Result generated from LayeredBuilder. This does not need gmsh to be initialized."""
 
     nodes: np.ndarray
+    """
+    Shape `(num_nodes,3)` array of node positions.
+    The node index is referenced by `model.elements`.
+    """
+
     elements: np.ndarray
+    """
+    Shape `(num_elements,9)` array of node indices for each element.
+    The positions of each node can be recovered with
+    `model.nodes[model.elements[element_index, control_node_index], :]`
+    """
+
     materials: np.ndarray
+    """
+    Shape `num_elements` array with the material index for each element,
+    used by the meshfem par-file. The element index is shared with `model.elements`.
+    """
+
     boundaries: BoundarySpec
+    """
+    Categorizes the information of the external edges of the model, characterized by pairs
+    `(element_index, side_of_element)` for each.
+    """
+
     _node_gmshtag_to_index_mapping: IndexMapping
+    """
+    Stores the original tags for each node. This is used when merging models, where
+    two nodes are equated if they have the same tag.
+    """
+
     conforming_interfaces: ConformingInterfaces = field(
         default_factory=ConformingInterfaces
     )
+    """
+    Currently unused, but stores the adjacencies given by relating edges with the same
+    node indices.
+    """
+
     nonconforming_interfaces: NonconformingInterfaces = field(
         default_factory=NonconformingInterfaces
     )
+    """
+    Categorizes adjacencies by relating edges which have nontrival spatial intersection
+    (we do not care about corners) that are not categorized by `conforming_interfaces`.
+    """
+
     physical_groups: dict[str, PhysicalGroup] = field(default_factory=dict)
+    """
+    Stores labels (
+[physical groups](https://gmsh.info/doc/texinfo/gmsh.html#Elementary-entities-vs-physical-groups)
+    in `gmsh`) specified in the external mesher and the elements they point to.
+    """
+
+    bbox: np.ndarray = field(init=False)
+    """
+    A 2x3 array specifying the bounds of the model. bbox[0,:] are the minimums on each axis,
+    while bbox[1,:] are the maxima.
+    """
+
+    def __post_init__(self):
+        """Called after construction to clean/enforce certain things"""
+
+        self.bbox = np.stack(
+            [np.min(self.nodes, axis=0), np.max(self.nodes, axis=0)], axis=0
+        )
+
+        # characteristic length scale for dimensionalizing eps
+        charlen = np.linalg.norm(self.bbox[1, :] - self.bbox[0, :])
+
+        # verify nodes are on an x-z plane.
+        normal_vec = np.array([0, 1, 0])
+        offset = np.einsum("...i,i->...", self.nodes, normal_vec)
+        offset -= np.mean(offset)
+
+        max_offset_ind = np.argmax(np.abs(offset))
+        if offset[max_offset_ind] > charlen * 1e-3:
+            e = ValueError("Model is not in x-z plane")
+            e.add_note(
+                "The 2D Model object stores the 3d points from the mesher, "
+                "but requires all points to lie on the same x-z plane."
+            )
+            e.add_note(
+                "Please check that your mesh's points all have the same y-value."
+            )
+            e.add_note(
+                f"maximum deviation: {offset[max_offset_ind]:+e} by node "
+                f"{self._node_gmshtag_to_index_mapping.invert(max_offset_ind)}"
+                f" with position {self.nodes[max_offset_ind, :]}"
+            )
+            raise e
 
     def plot(self):
         """Displays, using matplotlib, the mesh corresponding to this model."""
@@ -71,7 +150,6 @@ class Model:
             axis=0,
         )
         num_elems1 = elem1_remapped.shape[0]
-        num_elems2 = elem2_remapped.shape[0]
 
         # we may want to consider updating JoinedIndexMapping to allow the
         # passing of index equivalencies. For now, hack it.

@@ -36,6 +36,7 @@ set(MESHFEM3D_MESH_MODULE
     save_databases.F90
     store_boundaries.f90
     store_coords.f90
+    adjacency_graph.f90
 )
 
 if (ADIOS)

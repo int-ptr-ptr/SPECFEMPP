@@ -6,38 +6,39 @@
 #include <Kokkos_Core.hpp>
 #include <vector>
 
-static std::tuple<specfem::kokkos::HostView1d<int>,
-                  specfem::kokkos::HostView1d<specfem::mesh_entity::type> >
-find_corners(
-    const specfem::kokkos::HostView1d<int> ispec_edge,
-    const specfem::kokkos::HostView1d<specfem::mesh_entity::type> type_edge) {
+static std::tuple<
+    specfem::kokkos::HostView1d<int>,
+    specfem::kokkos::HostView1d<specfem::mesh_entity::dim2::type> >
+find_corners(const specfem::kokkos::HostView1d<int> ispec_edge,
+             const specfem::kokkos::HostView1d<specfem::mesh_entity::dim2::type>
+                 type_edge) {
 
   int ncorner = 0;
   int num_abs_boundary_faces = ispec_edge.extent(0);
   for (int inum = 0; inum < num_abs_boundary_faces; inum++) {
-    if (type_edge(inum) == specfem::mesh_entity::type::bottom) {
+    if (type_edge(inum) == specfem::mesh_entity::dim2::type::bottom) {
       for (int inum_duplicate = 0; inum_duplicate < num_abs_boundary_faces;
            inum_duplicate++) {
         if (inum != inum_duplicate) {
           if (ispec_edge(inum) == ispec_edge(inum_duplicate)) {
-            if (type_edge(inum) == specfem::mesh_entity::type::left) {
+            if (type_edge(inum) == specfem::mesh_entity::dim2::type::left) {
               ncorner++;
             }
-            if (type_edge(inum) == specfem::mesh_entity::type::right) {
+            if (type_edge(inum) == specfem::mesh_entity::dim2::type::right) {
               ncorner++;
             }
           }
         }
       }
-      if (type_edge(inum) == specfem::mesh_entity::type::top) {
+      if (type_edge(inum) == specfem::mesh_entity::dim2::type::top) {
         for (int inum_duplicate = 0; inum_duplicate < num_abs_boundary_faces;
              inum_duplicate++) {
           if (inum != inum_duplicate) {
             if (ispec_edge(inum) == ispec_edge(inum_duplicate)) {
-              if (type_edge(inum) == specfem::mesh_entity::type::left) {
+              if (type_edge(inum) == specfem::mesh_entity::dim2::type::left) {
                 ncorner++;
               }
-              if (type_edge(inum) == specfem::mesh_entity::type::right) {
+              if (type_edge(inum) == specfem::mesh_entity::dim2::type::right) {
                 ncorner++;
               }
             }
@@ -52,7 +53,7 @@ find_corners(
       "corners",
       ncorner);
 
-  specfem::kokkos::HostView1d<specfem::mesh_entity::type> type_corners(
+  specfem::kokkos::HostView1d<specfem::mesh_entity::dim2::type> type_corners(
       "specfem:io::mesh::impl::fortran::read_boundaries::find_corners::type_"
       "corners",
       ncorner);
@@ -60,37 +61,41 @@ find_corners(
   int icorner = 0;
 
   for (int inum = 0; inum < num_abs_boundary_faces; inum++) {
-    if (type_edge(inum) == specfem::mesh_entity::type::bottom) {
+    if (type_edge(inum) == specfem::mesh_entity::dim2::type::bottom) {
       for (int inum_duplicate = 0; inum_duplicate < num_abs_boundary_faces;
            inum_duplicate++) {
         if (inum != inum_duplicate) {
           if (ispec_edge(inum) == ispec_edge(inum_duplicate)) {
-            if (type_edge(inum) == specfem::mesh_entity::type::left) {
+            if (type_edge(inum) == specfem::mesh_entity::dim2::type::left) {
               ispec_corners(icorner) = ispec_edge(inum);
-              type_corners(icorner) = specfem::mesh_entity::type::bottom_left;
+              type_corners(icorner) =
+                  specfem::mesh_entity::dim2::type::bottom_left;
               icorner++;
             }
-            if (type_edge(inum) == specfem::mesh_entity::type::right) {
+            if (type_edge(inum) == specfem::mesh_entity::dim2::type::right) {
               ispec_corners(icorner) = ispec_edge(inum);
-              type_corners(icorner) = specfem::mesh_entity::type::bottom_right;
+              type_corners(icorner) =
+                  specfem::mesh_entity::dim2::type::bottom_right;
               icorner++;
             }
           }
         }
       }
-      if (type_edge(inum) == specfem::mesh_entity::type::top) {
+      if (type_edge(inum) == specfem::mesh_entity::dim2::type::top) {
         for (int inum_duplicate = 0; inum_duplicate < num_abs_boundary_faces;
              inum_duplicate++) {
           if (inum != inum_duplicate) {
             if (ispec_edge(inum) == ispec_edge(inum_duplicate)) {
-              if (type_edge(inum) == specfem::mesh_entity::type::left) {
+              if (type_edge(inum) == specfem::mesh_entity::dim2::type::left) {
                 ispec_corners(icorner) = ispec_edge(inum);
-                type_corners(icorner) = specfem::mesh_entity::type::top_left;
+                type_corners(icorner) =
+                    specfem::mesh_entity::dim2::type::top_left;
                 icorner++;
               }
-              if (type_edge(inum) == specfem::mesh_entity::type::right) {
+              if (type_edge(inum) == specfem::mesh_entity::dim2::type::right) {
                 ispec_corners(icorner) = ispec_edge(inum);
-                type_corners(icorner) = specfem::mesh_entity::type::top_right;
+                type_corners(icorner) =
+                    specfem::mesh_entity::dim2::type::top_right;
                 icorner++;
               }
             }
@@ -151,7 +156,7 @@ read_absorbing_boundaries(std::ifstream &stream, int num_abs_boundary_faces,
     num_abs_boundary_faces = 0;
   }
 
-  specfem::kokkos::HostView1d<specfem::mesh_entity::type> type_edge(
+  specfem::kokkos::HostView1d<specfem::mesh_entity::dim2::type> type_edge(
       "specfem::mesh::absorbing_boundary::type_edge", num_abs_boundary_faces);
 
   specfem::kokkos::HostView1d<int> ispec_edge(
@@ -172,16 +177,16 @@ read_absorbing_boundaries(std::ifstream &stream, int num_abs_boundary_faces,
                                  "per absorbing line cited");
       }
       if (codeabsread1)
-        type_edge(inum) = specfem::mesh_entity::type::bottom;
+        type_edge(inum) = specfem::mesh_entity::dim2::type::bottom;
 
       if (codeabsread2)
-        type_edge(inum) = specfem::mesh_entity::type::right;
+        type_edge(inum) = specfem::mesh_entity::dim2::type::right;
 
       if (codeabsread3)
-        type_edge(inum) = specfem::mesh_entity::type::top;
+        type_edge(inum) = specfem::mesh_entity::dim2::type::top;
 
       if (codeabsread4)
-        type_edge(inum) = specfem::mesh_entity::type::left;
+        type_edge(inum) = specfem::mesh_entity::dim2::type::left;
     }
 
     // Find corner elements
@@ -195,7 +200,7 @@ read_absorbing_boundaries(std::ifstream &stream, int num_abs_boundary_faces,
         "specfem::mesh::absorbing_boundary::index_mapping", nelements);
 
     absorbing_boundary.type =
-        Kokkos::View<specfem::mesh_entity::type *, Kokkos::HostSpace>(
+        Kokkos::View<specfem::mesh_entity::dim2::type *, Kokkos::HostSpace>(
             "specfem::mesh::absorbing_boundary::type", nelements);
     // Populate ispec and type arrays
 
@@ -228,21 +233,21 @@ using view_type =
  * edge else control node index of the node if the boundary is node
  * @param e2 control node index for the ending node of the if the boundary is
  * edge
- * @return specfem::mesh_entity::type type of the boundary
+ * @return specfem::mesh_entity::dim2::type type of the boundary
  */
-specfem::mesh_entity::type get_boundary_type(const int type, const int e1,
-                                             const int e2,
-                                             const view_type &control_nodes) {
+specfem::mesh_entity::dim2::type
+get_boundary_type(const int type, const int e1, const int e2,
+                  const view_type &control_nodes) {
   // if this is a node type
   if (type == 1) {
     if (e1 == control_nodes(0)) {
-      return specfem::mesh_entity::type::bottom_left;
+      return specfem::mesh_entity::dim2::type::bottom_left;
     } else if (e1 == control_nodes(1)) {
-      return specfem::mesh_entity::type::bottom_right;
+      return specfem::mesh_entity::dim2::type::bottom_right;
     } else if (e1 == control_nodes(2)) {
-      return specfem::mesh_entity::type::top_right;
+      return specfem::mesh_entity::dim2::type::top_right;
     } else if (e1 == control_nodes(3)) {
-      return specfem::mesh_entity::type::top_left;
+      return specfem::mesh_entity::dim2::type::top_left;
     } else {
       throw std::invalid_argument(
           "Error: Could not generate type of acoustic free surface boundary");
@@ -250,16 +255,16 @@ specfem::mesh_entity::type get_boundary_type(const int type, const int e1,
   } else {
     if ((e1 == control_nodes(0) && e2 == control_nodes(1)) ||
         (e1 == control_nodes(1) && e2 == control_nodes(0))) {
-      return specfem::mesh_entity::type::bottom;
+      return specfem::mesh_entity::dim2::type::bottom;
     } else if ((e1 == control_nodes(0) && e2 == control_nodes(3)) ||
                (e1 == control_nodes(3) && e2 == control_nodes(0))) {
-      return specfem::mesh_entity::type::left;
+      return specfem::mesh_entity::dim2::type::left;
     } else if ((e1 == control_nodes(1) && e2 == control_nodes(2)) ||
                (e1 == control_nodes(2) && e2 == control_nodes(1))) {
-      return specfem::mesh_entity::type::right;
+      return specfem::mesh_entity::dim2::type::right;
     } else if ((e1 == control_nodes(2) && e2 == control_nodes(3)) ||
                (e1 == control_nodes(3) && e2 == control_nodes(2))) {
-      return specfem::mesh_entity::type::top;
+      return specfem::mesh_entity::dim2::type::top;
     } else {
       throw std::invalid_argument(
           "Error: Could not generate type of acoustic free surface boundary");

@@ -7,13 +7,15 @@
 #include <boost/graph/filtered_graph.hpp>
 
 using EdgeViewType =
-    Kokkos::View<specfem::mesh_entity::edge *, Kokkos::DefaultExecutionSpace>;
+    Kokkos::View<specfem::mesh_entity::edge<specfem::dimension::type::dim2> *,
+                 Kokkos::DefaultExecutionSpace>;
 
 specfem::assembly::edge_types<specfem::dimension::type::dim2>::edge_types(
     const int ngllx, const int ngllz,
-    const specfem::assembly::mesh<dimension> &mesh,
-    const specfem::assembly::element_types<dimension> &element_types,
-    const specfem::mesh::coupled_interfaces<dimension> &coupled_interfaces) {
+    const specfem::assembly::mesh<dimension_tag> &mesh,
+    const specfem::assembly::element_types<dimension_tag> &element_types,
+    const specfem::mesh::coupled_interfaces<dimension_tag>
+        &coupled_interfaces) {
 
   // Count the number of interfaces for each combination of connection
   FOR_EACH_IN_PRODUCT(
@@ -66,8 +68,9 @@ specfem::assembly::edge_types<specfem::dimension::type::dim2>::edge_types(
           // Create a filtered graph view
           const auto &nc_graph = boost::make_filtered_graph(graph, filter);
 
-          std::vector<specfem::mesh_entity::edge> self_collect;
-          std::vector<specfem::mesh_entity::edge> coupled_collect;
+          std::vector<specfem::mesh_entity::edge<dimension_tag> > self_collect;
+          std::vector<specfem::mesh_entity::edge<dimension_tag> >
+              coupled_collect;
 
           for (const auto &edge :
                boost::make_iterator_range(boost::edges(nc_graph))) {
@@ -79,7 +82,7 @@ specfem::assembly::edge_types<specfem::dimension::type::dim2>::edge_types(
             if (boundary_tag == _boundary_tag_ && medium1 == self_medium &&
                 medium2 == coupled_medium) {
 
-              const specfem::mesh_entity::type self_orientation =
+              const specfem::mesh_entity::dim2::type self_orientation =
                   nc_graph[edge].orientation;
               const auto [edge_inv, exists] =
                   boost::edge(ispec2, ispec1, nc_graph);
@@ -87,7 +90,7 @@ specfem::assembly::edge_types<specfem::dimension::type::dim2>::edge_types(
                 throw std::runtime_error("Non-symmetric adjacency graph "
                                          "detected in `compute_intersection`.");
               }
-              const specfem::mesh_entity::type coupled_orientation =
+              const specfem::mesh_entity::dim2::type coupled_orientation =
                   nc_graph[edge_inv].orientation;
               count++;
               // we do not need orientation flipping -- that's handled by
@@ -148,9 +151,13 @@ specfem::assembly::edge_types<specfem::dimension::type::dim2>::edge_types(
               const auto flip =
                   connection_mapping.flip_orientation(edge1, edge2);
               _h_self_edges_(index) =
-                  specfem::mesh_entity::edge{ ispec1, edge1, false };
+                  specfem::mesh_entity::edge<specfem::dimension::type::dim2>{
+                    ispec1, edge1, false
+                  };
               _h_coupled_edges_(index) =
-                  specfem::mesh_entity::edge{ ispec2, edge2, flip };
+                  specfem::mesh_entity::edge<specfem::dimension::type::dim2>{
+                    ispec2, edge2, flip
+                  };
               index++;
             }
           }

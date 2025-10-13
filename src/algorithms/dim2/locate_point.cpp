@@ -86,9 +86,9 @@ std::pair<type_real, bool> specfem::algorithms::locate_point_on_edge(
     const specfem::point::global_coordinates<specfem::dimension::type::dim2>
         &coordinates,
     const specfem::assembly::mesh<specfem::dimension::type::dim2> &mesh,
-    const int &ispec, const specfem::mesh_entity::type &mesh_entity) {
+    const int &ispec, const specfem::mesh_entity::dim2::type &mesh_entity) {
 
-  if (specfem::mesh_entity::contains(specfem::mesh_entity::corners,
+  if (specfem::mesh_entity::contains(specfem::mesh_entity::dim2::corners,
                                      mesh_entity)) {
     throw std::runtime_error(
         "locate_point_on_edge mesh_entity must be an edge. Found a corner.");
@@ -112,19 +112,19 @@ specfem::point::global_coordinates<specfem::dimension::type::dim2>
 specfem::algorithms::locate_point_on_edge(
     const type_real &coordinate,
     const specfem::assembly::mesh<specfem::dimension::type::dim2> &mesh,
-    const int &ispec, const specfem::mesh_entity::type &mesh_entity) {
-  if (specfem::mesh_entity::contains(specfem::mesh_entity::corners,
+    const int &ispec, const specfem::mesh_entity::dim2::type &mesh_entity) {
+  if (specfem::mesh_entity::contains(specfem::mesh_entity::dim2::corners,
                                      mesh_entity)) {
     throw std::runtime_error(
         "locate_point_on_edge mesh_entity must be an edge. Found a corner.");
     return { 0, 0 };
   }
   const auto [xi, gamma] = [&]() -> std::pair<type_real, type_real> {
-    if (mesh_entity == specfem::mesh_entity::type::bottom) {
+    if (mesh_entity == specfem::mesh_entity::dim2::type::bottom) {
       return { coordinate, -1 };
-    } else if (mesh_entity == specfem::mesh_entity::type::right) {
+    } else if (mesh_entity == specfem::mesh_entity::dim2::type::right) {
       return { 1, coordinate };
-    } else if (mesh_entity == specfem::mesh_entity::type::top) {
+    } else if (mesh_entity == specfem::mesh_entity::dim2::type::top) {
       return { coordinate, 1 };
     } else {
       return { -1, coordinate };
