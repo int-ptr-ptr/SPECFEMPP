@@ -18,8 +18,8 @@ specfem::mesh::mesh<specfem::dimension::type::dim2> convert_to_conforming(
   const auto &ncgraph = ncmesh.adjacency_graph.graph();
   auto &graph = mesh.adjacency_graph.graph();
 
-  std::unordered_map<int, std::tuple<int, specfem::mesh_entity::type, int,
-                                     specfem::mesh_entity::type> >
+  std::unordered_map<int, std::tuple<int, specfem::mesh_entity::dim2::type, int,
+                                     specfem::mesh_entity::dim2::type> >
       nc_to_c_interface;
   int num_nc_edges = 0;
 
@@ -39,9 +39,9 @@ specfem::mesh::mesh<specfem::dimension::type::dim2> convert_to_conforming(
             "kernel_compare test: Non-symmetric adjacency graph "
             "detected in `compute_intersection`.");
       }
-      if ((!specfem::mesh_entity::contains(specfem::mesh_entity::edges,
+      if ((!specfem::mesh_entity::contains(specfem::mesh_entity::dim2::edges,
                                            edge_conf.orientation)) ||
-          (!specfem::mesh_entity::contains(specfem::mesh_entity::edges,
+          (!specfem::mesh_entity::contains(specfem::mesh_entity::dim2::edges,
                                            ncgraph[inverse].orientation))) {
         continue;
       }
