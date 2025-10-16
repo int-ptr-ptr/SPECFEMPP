@@ -1,5 +1,4 @@
-#ifndef _SPECFEM_SOLVER_TIME_MARCHING_TPP
-#define _SPECFEM_SOLVER_TIME_MARCHING_TPP
+#pragma once
 
 #include "solver.hpp"
 #include "time_marching.hpp"
@@ -11,6 +10,7 @@ void specfem::solver::time_marching<specfem::simulation::type::forward,
                                     DimensionTag, NGLL>::run() {
 
   constexpr auto acoustic = specfem::element::medium_tag::acoustic;
+  constexpr auto elastic = specfem::element::medium_tag::elastic;
   constexpr auto elastic_psv = specfem::element::medium_tag::elastic_psv;
   constexpr auto elastic_sh = specfem::element::medium_tag::elastic_sh;
   constexpr auto poroelastic = specfem::element::medium_tag::poroelastic;
@@ -37,6 +37,8 @@ void specfem::solver::time_marching<specfem::simulation::type::forward,
     // Predictor phase forward
     dofs_updated += this->time_scheme->apply_predictor_phase_forward(acoustic);
     dofs_updated +=
+        this->time_scheme->apply_predictor_phase_forward(elastic);
+    dofs_updated +=
         this->time_scheme->apply_predictor_phase_forward(elastic_psv);
     dofs_updated +=
         this->time_scheme->apply_predictor_phase_forward(elastic_sh);
@@ -52,11 +54,14 @@ void specfem::solver::time_marching<specfem::simulation::type::forward,
 
     // Update wavefields for elastic wavefields:
     // coupling, source, stiffness, divide by mass matrix
+    elements_updated += this->kernels.template update_wavefields<elastic>(istep);
     elements_updated += this->kernels.template update_wavefields<elastic_psv>(istep);
     elements_updated += this->kernels.template update_wavefields<elastic_sh>(istep);
     elements_updated += this->kernels.template update_wavefields<elastic_psv_t>(istep);
 
     // Corrector phase forward for elastic
+    dofs_updated +=
+        this->time_scheme->apply_corrector_phase_forward(elastic);
     dofs_updated +=
         this->time_scheme->apply_corrector_phase_forward(elastic_psv);
     dofs_updated +=
@@ -128,6 +133,7 @@ void specfem::solver::time_marching<specfem::simulation::type::combined,
                                     DimensionTag, NGLL>::run() {
 
   constexpr auto acoustic = specfem::element::medium_tag::acoustic;
+  constexpr auto elastic = specfem::element::medium_tag::elastic;
   constexpr auto elastic_psv = specfem::element::medium_tag::elastic_psv;
   constexpr auto elastic_sh = specfem::element::medium_tag::elastic_sh;
   constexpr auto poroelastic = specfem::element::medium_tag::poroelastic;
@@ -163,6 +169,7 @@ void specfem::solver::time_marching<specfem::simulation::type::combined,
     int elements_updated = 0;
     // Adjoint time step
     dofs_updated += time_scheme->apply_predictor_phase_forward(acoustic);
+    dofs_updated += time_scheme->apply_predictor_phase_forward(elastic);
     dofs_updated += time_scheme->apply_predictor_phase_forward(elastic_psv);
     dofs_updated += time_scheme->apply_predictor_phase_forward(elastic_sh);
     dofs_updated += time_scheme->apply_predictor_phase_forward(poroelastic);
@@ -170,8 +177,10 @@ void specfem::solver::time_marching<specfem::simulation::type::combined,
     elements_updated += adjoint_kernels.template update_wavefields<acoustic>(istep);
     dofs_updated += time_scheme->apply_corrector_phase_forward(acoustic);
 
+    elements_updated += adjoint_kernels.template update_wavefields<elastic>(istep);
     elements_updated += adjoint_kernels.template update_wavefields<elastic_psv>(istep);
     elements_updated += adjoint_kernels.template update_wavefields<elastic_sh>(istep);
+    dofs_updated += time_scheme->apply_corrector_phase_forward(elastic);
     dofs_updated += time_scheme->apply_corrector_phase_forward(elastic_psv);
     dofs_updated += time_scheme->apply_corrector_phase_forward(elastic_sh);
 
@@ -179,12 +188,16 @@ void specfem::solver::time_marching<specfem::simulation::type::combined,
     dofs_updated += time_scheme->apply_corrector_phase_forward(poroelastic);
 
     // Backward time step
+    dofs_updated += time_scheme->apply_predictor_phase_backward(elastic);
     dofs_updated += time_scheme->apply_predictor_phase_backward(elastic_psv);
+    dofs_updated += time_scheme->apply_predictor_phase_backward(elastic_sh);
     dofs_updated += time_scheme->apply_predictor_phase_backward(acoustic);
     dofs_updated += time_scheme->apply_predictor_phase_backward(poroelastic);
 
+    elements_updated += backward_kernels.template update_wavefields<elastic>(istep);
     elements_updated += backward_kernels.template update_wavefields<elastic_psv>(istep);
     elements_updated += backward_kernels.template update_wavefields<elastic_sh>(istep);
+    dofs_updated += time_scheme->apply_corrector_phase_backward(elastic);
     dofs_updated += time_scheme->apply_corrector_phase_backward(elastic_psv);
     dofs_updated += time_scheme->apply_corrector_phase_backward(elastic_sh);
 
@@ -245,5 +258,3 @@ void specfem::solver::time_marching<specfem::simulation::type::combined,
 
   return;
 }
-
-#endif

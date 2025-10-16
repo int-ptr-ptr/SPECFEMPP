@@ -242,8 +242,8 @@ load_after_simd_dispatch(const std::false_type, const IndexType &index,
       index.get_iterator(),
       [&](const typename IndexType::iterator_type::index_type &iterator_index) {
         const auto point_index = iterator_index.get_index();
-        const int iglob = field.template get_iglob<on_device>(
-            point_index.ispec, point_index.iz, point_index.ix, MediumTag);
+        const int iglob =
+            field.template get_iglob<on_device>(point_index, MediumTag);
         for (int icomp = 0; icomp < ncomponents; ++icomp) {
           (specfem::assembly::fields_impl::base_load_accessor<
                on_device, AccessorTypes::data_class>(

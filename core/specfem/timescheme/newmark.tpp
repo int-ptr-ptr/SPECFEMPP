@@ -147,9 +147,6 @@ int specfem::time_scheme::newmark<AssemblyFields,
         }
       })
 
-  Kokkos::abort("Medium type not supported.");
-
-  /// Code path should never be reached
   return 0;
 }
 
@@ -173,9 +170,6 @@ int specfem::time_scheme::newmark<AssemblyFields,
         }
       })
 
-  Kokkos::abort("Medium type not supported.");
-
-  /// Code path should never be reached
   return 0;
 }
 
@@ -199,9 +193,6 @@ int specfem::time_scheme::newmark<AssemblyFields,
         }
       })
 
-  Kokkos::abort("Medium type not supported.");
-
-  /// Code path should never be reached
   return 0;
 }
 
@@ -225,9 +216,6 @@ int specfem::time_scheme::newmark<AssemblyFields,
         }
       })
 
-  Kokkos::abort("Medium type not supported.");
-
-  /// Code path should never be reached
   return 0;
 }
 
@@ -251,9 +239,6 @@ int specfem::time_scheme::newmark<AssemblyFields,
         }
       })
 
-  Kokkos::abort("Medium type not supported.");
-
-  /// Code path should never be reached
   return 0;
 }
 
@@ -278,8 +263,6 @@ int specfem::time_scheme::newmark<AssemblyFields,
         }
       })
 
-  Kokkos::abort("Medium type not supported.");
-  /// Code path should never be reached
   return 0;
 }
 
