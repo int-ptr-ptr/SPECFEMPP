@@ -224,11 +224,10 @@ public:
                     const int npoints)
       : num_points(npoints), nedges(edges.extent(0)),
         base_type(team_member, edges.extent(0) * npoints), edges(edges) {}
-
+  const int nedges; ///< Total number of edges in this chunk
 private:
   ViewType edges;         ///< View of mesh edges to iterate over
   std::size_t num_points; ///< Number of GLL points per edge
-  int nedges;             ///< Total number of edges in this chunk
 
   /**
    * @brief Compute element coordinates for an edge point
@@ -361,6 +360,8 @@ public:
   ChunkEdgeIndex(const ViewType &edges, const int num_points,
                  const KokkosIndexType &kokkos_index)
       : kokkos_index(kokkos_index), iterator(kokkos_index, edges, num_points) {}
+
+  KOKKOS_INLINE_FUNCTION int nedges() const { return iterator.nedges; }
 
 private:
   KokkosIndexType kokkos_index; ///< Kokkos team member for this chunk

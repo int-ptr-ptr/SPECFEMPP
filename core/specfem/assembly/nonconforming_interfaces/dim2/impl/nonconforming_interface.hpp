@@ -158,17 +158,17 @@ public:
     // is there a better way of recovering global index?
     const auto team = index.get_policy_index();
     const int &offset = team.league_rank() * EdgeType::chunk_size;
+    const int &num_edges = index.nedges();
 
     if constexpr (specfem::assembly::coupled_interfaces_impl::
                       stores_intersection_factor<EdgeType>::value ||
                   specfem::assembly::coupled_interfaces_impl::
                       stores_intersection_normal<EdgeType>::value) {
       Kokkos::parallel_for(
-          Kokkos::TeamThreadRange(team, EdgeType::chunk_size *
-                                            EdgeType::n_quad_interface),
+          Kokkos::TeamThreadRange(team, num_edges * EdgeType::n_quad_interface),
           [&](const int &ichunkmortar) {
-            const int imortar = ichunkmortar / EdgeType::chunk_size;
-            const int iedge = ichunkmortar % EdgeType::chunk_size;
+            const int imortar = ichunkmortar / EdgeType::n_quad_interface;
+            const int iedge = ichunkmortar % EdgeType::n_quad_interface;
 
             const int &local_slot = iedge;
             const int &container_slot = offset + iedge;
