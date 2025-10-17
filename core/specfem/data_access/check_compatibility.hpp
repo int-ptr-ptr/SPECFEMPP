@@ -2,7 +2,6 @@
 
 #include "accessor.hpp"
 #include "container.hpp"
-#include <format>
 #include <stdexcept>
 
 namespace specfem::data_access {
