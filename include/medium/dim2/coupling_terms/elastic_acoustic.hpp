@@ -62,23 +62,10 @@ KOKKOS_INLINE_FUNCTION void compute_coupling(
     type_real s_tilde = interface_data.transfer_function_self(
         index.iedge, index.ipoint, ipoint_mortar);
 
-    type_real nx_at_mortar = 0;
-    type_real nz_at_mortar = 0;
-    for (int ipoint_self = 0;
-         ipoint_self < CoupledInterfaceType::n_quad_element; ipoint_self++) {
-      nx_at_mortar += interface_data.edge_normal(index.iedge, ipoint_self, 0) *
-                      interface_data.transfer_function_self(
-                          index.iedge, ipoint_self, ipoint_mortar);
-      nz_at_mortar += interface_data.edge_normal(index.iedge, ipoint_self, 1) *
-                      interface_data.transfer_function_self(
-                          index.iedge, ipoint_self, ipoint_mortar);
-    }
-    // renormalize (nx,nz) -- we should probably store mortar values of normal
-    // in the future
-    type_real magn =
-        std::sqrt(nx_at_mortar * nx_at_mortar + nz_at_mortar * nz_at_mortar);
-    nx_at_mortar /= magn;
-    nz_at_mortar /= magn;
+    type_real nx_at_mortar =
+        interface_data.intersection_normal(index.iedge, ipoint_mortar, 0);
+    type_real nz_at_mortar =
+        interface_data.intersection_normal(index.iedge, ipoint_mortar, 1);
 
     type_real chitt_at_mortar = 0;
     for (int ipoint_coupled = 0;
@@ -91,7 +78,7 @@ KOKKOS_INLINE_FUNCTION void compute_coupling(
 
     type_real stilde_chitt_J =
         s_tilde * chitt_at_mortar *
-        interface_data.mortar_factor(index.iedge, ipoint_mortar);
+        interface_data.intersection_factor(index.iedge, ipoint_mortar);
 
     self_field(0) += stilde_chitt_J * nx_at_mortar;
     self_field(1) += stilde_chitt_J * nz_at_mortar;

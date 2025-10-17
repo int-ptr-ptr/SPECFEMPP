@@ -2,6 +2,7 @@
 
 #include "dim2/coupling_terms/acoustic_elastic.hpp"
 #include "dim2/coupling_terms/elastic_acoustic.hpp"
+#include "enumerations/connections.hpp"
 #include "enumerations/interface.hpp"
 #include "specfem/data_access.hpp"
 #include "specfem/data_access/check_compatibility.hpp"
@@ -29,8 +30,11 @@ namespace specfem::medium {
  * specfem::medium::compute_coupling(interface, coupled_field, self_field);
  * @endcode
  */
-template <typename CoupledInterfaceType, typename CoupledFieldType,
-          typename SelfFieldType>
+template <
+    typename CoupledInterfaceType, typename CoupledFieldType,
+    typename SelfFieldType,
+    typename = std::enable_if_t<CoupledInterfaceType::connection_tag !=
+                                specfem::connections::type::nonconforming> >
 KOKKOS_INLINE_FUNCTION void
 compute_coupling(const CoupledInterfaceType &interface_data,
                  const CoupledFieldType &coupled_field,
@@ -84,7 +88,7 @@ compute_coupling(const CoupledInterfaceType &interface_data,
  * @tparam IndexType type of the index (must be edge-index)
  * @tparam CoupledInterfaceType Interface data type (coupled interface)
  * @tparam CoupledFieldType Field type from coupled medium
- * @tparam SelfFieldType Field type from self medium (modified)
+ * @tparam IntersectionFieldType Field type on interface (modified)
  *
  * @param index Index of the field to set
  * @param interface_data Interface geometric data (factor, normal)
@@ -95,11 +99,16 @@ compute_coupling(const CoupledInterfaceType &interface_data,
  * specfem::medium::compute_coupling(interface, coupled_field, self_field);
  * @endcode
  */
-template <typename IndexType, typename CoupledInterfaceType,
-          typename CoupledFieldType, typename SelfFieldType>
-KOKKOS_INLINE_FUNCTION void compute_coupling(
-    const IndexType &index, const CoupledInterfaceType &interface_data,
-    const CoupledFieldType &coupled_field, SelfFieldType &self_field) {
+template <
+    typename IndexType, typename CoupledInterfaceType,
+    typename CoupledFieldType, typename IntersectionFieldType,
+    typename = std::enable_if_t<CoupledInterfaceType::connection_tag ==
+                                specfem::connections::type::nonconforming> >
+KOKKOS_INLINE_FUNCTION void
+compute_coupling(const IndexType &index,
+                 const CoupledInterfaceType &interface_data,
+                 const CoupledFieldType &coupled_field,
+                 IntersectionFieldType &intersection_field) {
 
   static_assert(specfem::data_access::is_edge_index<IndexType>::value,
                 "index is not of edge_index type");
@@ -109,13 +118,13 @@ KOKKOS_INLINE_FUNCTION void compute_coupling(
   static_assert(specfem::data_access::is_chunk_edge<CoupledFieldType>::value &&
                     specfem::data_access::is_field<CoupledFieldType>::value,
                 "coupled_field is not a point field type");
-  static_assert(specfem::data_access::is_field<SelfFieldType>::value,
+  static_assert(specfem::data_access::is_field<IntersectionFieldType>::value,
                 "self_field is not a field type");
 
   constexpr auto dimension_tag = CoupledInterfaceType::dimension_tag;
   constexpr auto interface_tag = CoupledInterfaceType::interface_tag;
   constexpr auto connection_tag = CoupledInterfaceType::connection_tag;
-  constexpr auto self_medium_tag = SelfFieldType::medium_tag;
+  constexpr auto self_medium_tag = IntersectionFieldType::medium_tag;
   constexpr auto coupled_medium_tag = CoupledFieldType::medium_tag;
 
   static_assert(
@@ -138,7 +147,7 @@ KOKKOS_INLINE_FUNCTION void compute_coupling(
 
   impl::compute_coupling(dimension_dispatch(), connection_dispatch(),
                          interface_dispatch(), index, interface_data,
-                         coupled_field, self_field);
+                         coupled_field, intersection_field);
 }
 
 } // namespace specfem::medium

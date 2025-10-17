@@ -2,6 +2,8 @@
 
 #include "accessor.hpp"
 #include "container.hpp"
+#include <format>
+#include <stdexcept>
 
 namespace specfem::data_access {
 
@@ -23,6 +25,26 @@ public:
                 "ContainerType is not a container");
 
   static_assert(specfem::data_access::is_point<AccessorType>::value,
+                "PointType is not an accessor");
+};
+
+template <typename IndexType, typename ContainerType, typename AccessorType>
+struct CheckCompatibility2 {
+private:
+  static constexpr bool check_dimension =
+      IndexType::dimension_tag == ContainerType::dimension_tag &&
+      IndexType::dimension_tag == AccessorType::dimension_tag;
+  static constexpr bool check_data_class =
+      ContainerType::data_class == AccessorType::data_class;
+
+public:
+  static constexpr bool value = check_dimension && check_data_class;
+
+  static_assert(check_dimension, "Dimension tags do not match");
+  static_assert(check_data_class, "Data classes do not match");
+  static_assert(specfem::data_access::is_container<ContainerType>::value,
+                "ContainerType is not a container");
+  static_assert(AccessorType::accessor_type == IndexType::accessor_type,
                 "PointType is not an accessor");
 };
 

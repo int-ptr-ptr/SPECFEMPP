@@ -3,7 +3,8 @@
 #include "enumerations/interface.hpp"
 #include "specfem/data_access.hpp"
 #include "specfem_setup.hpp"
-#include <Kokkos_Core.hpp>
+
+#include "nonconforming_coupled_interface/transfer.hpp"
 
 namespace specfem::chunk_edge {
 
@@ -59,13 +60,27 @@ struct nonconforming_coupled_interface<
     : public specfem::data_access::Accessor<
           specfem::data_access::AccessorType::chunk_edge,
           specfem::data_access::DataClassType::coupled_interface,
-          specfem::dimension::type::dim2, false> {
+          specfem::dimension::type::dim2, false>,
+      public specfem::chunk_edge::impl::nonconforming_transfer_function<
+          true, NumberElements, NQuadElement, NQuadInterface,
+          specfem::dimension::type::dim2, MemorySpace, MemoryTraits, UseSIMD>,
+      public specfem::chunk_edge::impl::nonconforming_transfer_function<
+          false, NumberElements, NQuadElement, NQuadInterface,
+          specfem::dimension::type::dim2, MemorySpace, MemoryTraits, UseSIMD> {
 private:
   /** @brief Base accessor type alias */
   using base_type = specfem::data_access::Accessor<
       specfem::data_access::AccessorType::chunk_edge,
       specfem::data_access::DataClassType::coupled_interface,
       specfem::dimension::type::dim2, false>;
+
+  template <bool is_self>
+  using transfer_type =
+      specfem::chunk_edge::impl::nonconforming_transfer_function<
+          is_self, NumberElements, NQuadElement, NQuadInterface,
+          specfem::dimension::type::dim2, MemorySpace, MemoryTraits, UseSIMD>;
+
+  using TransferViewType = typename transfer_type<true>::TransferViewType;
   /**
    * @name Typedefs
    *
@@ -73,25 +88,21 @@ private:
   ///@{
   using simd = specfem::datatype::simd<type_real, UseSIMD>; ///< SIMD type.
 
-  // We're using components here to index the mortar quadrature. Should we add a
-  // new index type for that?
-  using TransferViewType = specfem::datatype::VectorChunkEdgeViewType<
-      type_real, specfem::dimension::type::dim2, NumberElements, NQuadElement,
-      NQuadInterface, UseSIMD, MemorySpace,
-      MemoryTraits>; ///< Underlying view used to store data of the transfer
-                     ///< function.
-  using EdgeNormalViewType = specfem::datatype::VectorChunkEdgeViewType<
-      type_real, specfem::dimension::type::dim2, NumberElements, NQuadElement,
-      2, UseSIMD, MemorySpace,
-      MemoryTraits>; ///< Underlying view used to store data of the transfer
-                     ///< function.
-  using MortarFactorViewType = specfem::datatype::ScalarChunkEdgeViewType<
-      type_real, specfem::dimension::type::dim2, NumberElements, NQuadElement,
-      UseSIMD, MemorySpace,
-      MemoryTraits>; ///< Underlying view used to store data of the transfer
-                     ///< function.
+  using EdgeNormalViewType =
+      Kokkos::View<typename specfem::datatype::simd<type_real, UseSIMD>::
+                       datatype[NumberElements][NQuadInterface][2],
+                   MemorySpace, MemoryTraits>; ///< Underlying view used to
+                                               ///< store data of the transfer
+                                               ///< function.
+  using MortarFactorViewType =
+      Kokkos::View<typename specfem::datatype::simd<type_real, UseSIMD>::
+                       datatype[NumberElements][NQuadInterface],
+                   MemorySpace, MemoryTraits>; ///< Underlying view used to
+                                               ///< store data of the transfer
+                                               ///< function.
 
 public:
+  static constexpr int chunk_size = NumberElements;
   /** @brief Dimension tag for 2D specialization */
   static constexpr auto dimension_tag = specfem::dimension::type::dim2;
   /** @brief Connection type between elements */
@@ -107,30 +118,27 @@ public:
   static constexpr int n_quad_interface = NQuadInterface;
 
   /** @brief Edge scaling factor for interface computations */
-  MortarFactorViewType mortar_factor;
+  MortarFactorViewType intersection_factor;
   /** @brief Edge normal vector (2D) */
-  EdgeNormalViewType edge_normal;
-  /** @brief Transfer function (edge -> mortar) */
-  TransferViewType transfer_function_self;
-  /** @brief Transfer function (edge -> mortar) */
-  TransferViewType transfer_function_coupled;
+  EdgeNormalViewType intersection_normal;
 
   /**
    * @brief Constructs coupled interface point with geometric data
    *
-   * @param mortar_factor Scaling factor for the interface edge
-   * @param edge_normal_ Normal vector at the interface edge
+   * @param intersection_factor Scaling factor for the interface edge
+   * @param intersection_normal_ Normal vector at the interface edge
    * @param transfer_function Transfer function from the edge to the mortar
    */
   KOKKOS_INLINE_FUNCTION
   nonconforming_coupled_interface(
-      const MortarFactorViewType &mortar_factor,
-      const EdgeNormalViewType &edge_normal_,
+      const MortarFactorViewType &intersection_factor,
+      const EdgeNormalViewType &intersection_normal_,
       const TransferViewType &transfer_function_self,
       const TransferViewType &transfer_function_coupled)
-      : mortar_factor(mortar_factor), edge_normal(edge_normal_),
-        transfer_function_self(transfer_function_self),
-        transfer_function_coupled(transfer_function_coupled) {}
+      : transfer_type<true>(transfer_function_self),
+        transfer_type<false>(transfer_function_self),
+        intersection_factor(intersection_factor),
+        intersection_normal(intersection_normal_) {}
 
   KOKKOS_INLINE_FUNCTION
   nonconforming_coupled_interface() = default;
@@ -144,9 +152,9 @@ public:
    */
   template <typename MemberType>
   KOKKOS_FUNCTION nonconforming_coupled_interface(const MemberType &team)
-      : mortar_factor(team.team_scratch(0)), edge_normal(team.team_scratch(0)),
-        transfer_function_self(team.team_scratch(0)),
-        transfer_function_coupled(team.team_scratch(0)) {}
+      : transfer_type<true>(team), transfer_type<false>(team),
+        intersection_factor(team.team_scratch(0)),
+        intersection_normal(team.team_scratch(0)) {}
 
   /**
    * @brief Get the amount memory in bytes required for shared memory
@@ -156,7 +164,8 @@ public:
   constexpr static int shmem_size() {
     return MortarFactorViewType::shmem_size() +
            EdgeNormalViewType::shmem_size() +
-           TransferViewType::shmem_size() * 2;
+           transfer_type<true>::shmem_size() +
+           transfer_type<false>::shmem_size();
   }
 };
 

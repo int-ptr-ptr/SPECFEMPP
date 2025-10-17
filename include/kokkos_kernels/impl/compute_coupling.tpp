@@ -69,8 +69,7 @@ void specfem::kokkos_kernels::impl::compute_coupling(
       KOKKOS_LAMBDA(
           const typename decltype(chunk)::index_type &chunk_iterator_index) {
         const auto &chunk_index = chunk_iterator_index.get_index();
-        const int league_index =
-            chunk_index.get_policy_index().league_rank();
+        const int league_index = chunk_index.get_policy_index().league_rank();
 
         specfem::execution::for_each_level(
             chunk_index.get_iterator(),
@@ -81,9 +80,7 @@ void specfem::kokkos_kernels::impl::compute_coupling(
                   iterator_index.get_index();
               auto self_index = index.self_index;
               const auto coupled_index = index.coupled_index;
-              self_index.iedge +=
-                  league_index *
-                  parallel_config::chunk_size;
+              self_index.iedge += league_index * parallel_config::chunk_size;
 
               specfem::point::coupled_interface<dimension_tag, connection_tag,
                                                 interface_tag, boundary_tag>
@@ -175,12 +172,19 @@ void specfem::kokkos_kernels::impl::compute_coupling(
           connection_tag, interface_tag, boundary_tag,
           specfem::kokkos::DevScratchSpace,
           Kokkos::MemoryTraits<Kokkos::Unmanaged>, using_simd>;
+  using CoupledTransferFunctionType =
+      typename specfem::chunk_edge::nonconforming_transfer_function<
+          false, parallel_config::chunk_size, NGLL, NQuad_interface,
+          dimension_tag, connection_tag, interface_tag, boundary_tag,
+          specfem::kokkos::DevScratchSpace,
+          Kokkos::MemoryTraits<Kokkos::Unmanaged>, using_simd>;
 
   specfem::execution::ChunkedIntersectionIterator chunk(
       parallel_config(), self_edges, coupled_edges, num_points);
 
-  int scratch_size =
-      CoupledFieldType::shmem_size() + CoupledInterfaceDataType::shmem_size();
+  int scratch_size = CoupledFieldType::shmem_size() +
+                     CoupledInterfaceDataType::shmem_size() +
+                     CoupledTransferFunctionType::shmem_size();
 
   specfem::execution::for_each_level(
       "specfem::kokkos_kernels::impl::compute_coupling",
@@ -203,10 +207,13 @@ void specfem::kokkos_kernels::impl::compute_coupling(
         // TODO add point access for mortar transfer function and replace self
         // side of this:
         CoupledInterfaceDataType interface_data(team);
+        CoupledTransferFunctionType coupled_transfer_function(team);
 
         // self_chunk_index has data on coupled side. consider changing?
         specfem::assembly::load_on_device(self_chunk_index, coupled_interfaces,
                                           interface_data);
+        specfem::assembly::load_on_device(self_chunk_index, coupled_interfaces,
+                                          coupled_transfer_function);
 
         specfem::execution::for_each_level(
             chunk_index.get_iterator(),
@@ -220,12 +227,12 @@ void specfem::kokkos_kernels::impl::compute_coupling(
               specfem::medium::compute_coupling(self_index, interface_data,
                                                 coupled_field, self_field);
 
+              specfem::point::boundary<boundary_tag, dimension_tag, false>
+                  point_boundary;
+              specfem::assembly::load_on_device(self_index, assembly.boundaries,
+                                                point_boundary);
               if constexpr (BoundaryTag == specfem::element::boundary_tag::
                                                acoustic_free_surface) {
-                specfem::point::boundary<boundary_tag, dimension_tag, false>
-                    point_boundary;
-                specfem::assembly::load_on_device(
-                    self_index, assembly.boundaries, point_boundary);
                 specfem::boundary_conditions::apply_boundary_conditions(
                     point_boundary, self_field);
               }
