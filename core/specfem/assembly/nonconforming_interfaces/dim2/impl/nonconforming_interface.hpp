@@ -167,8 +167,8 @@ public:
       Kokkos::parallel_for(
           Kokkos::TeamThreadRange(team, num_edges * EdgeType::n_quad_interface),
           [&](const int &ichunkmortar) {
-            const int imortar = ichunkmortar / EdgeType::n_quad_interface;
-            const int iedge = ichunkmortar % EdgeType::n_quad_interface;
+            const int imortar = ichunkmortar % EdgeType::n_quad_interface;
+            const int iedge = ichunkmortar / EdgeType::n_quad_interface;
 
             const int &local_slot = iedge;
             const int &container_slot = offset + iedge;
