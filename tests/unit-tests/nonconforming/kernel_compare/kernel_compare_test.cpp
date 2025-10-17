@@ -66,14 +66,6 @@ void validate_field_at_points(
     const type_real &elastic_acceleration_scale,
     const type_real &acoustic_acceleration_scale) {
 
-  specfem::point::acceleration<specfem::dimension::type::dim2,
-                               specfem::element::medium_tag::acoustic, false>
-      test_field;
-  specfem::assembly::load_on_device(
-      specfem::point::index<specfem::dimension::type::dim2>(8, 0, 3), tested,
-      test_field);
-  test_field(0) += std::sin(std::asin(1e-10 * test_field(0)));
-
   // give extra information only on the first failure
   bool first_failure = true;
 
