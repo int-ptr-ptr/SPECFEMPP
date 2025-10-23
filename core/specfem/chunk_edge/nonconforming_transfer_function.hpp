@@ -1,6 +1,6 @@
 #pragma once
 
-#include "nonconforming_coupled_interface/transfer.hpp"
+#include "impl/nonconforming_transfer_function.hpp"
 
 namespace specfem::chunk_edge {
 
