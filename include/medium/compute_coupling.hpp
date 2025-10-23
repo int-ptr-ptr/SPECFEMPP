@@ -33,8 +33,9 @@ namespace specfem::medium {
 template <
     typename CoupledInterfaceType, typename CoupledFieldType,
     typename SelfFieldType,
-    typename = std::enable_if_t<CoupledInterfaceType::connection_tag !=
-                                specfem::connections::type::nonconforming> >
+    typename std::enable_if_t<CoupledInterfaceType::connection_tag !=
+                                  specfem::connections::type::nonconforming,
+                              int> = 0>
 KOKKOS_INLINE_FUNCTION void
 compute_coupling(const CoupledInterfaceType &interface_data,
                  const CoupledFieldType &coupled_field,
@@ -102,8 +103,9 @@ compute_coupling(const CoupledInterfaceType &interface_data,
 template <
     typename IndexType, typename CoupledInterfaceType,
     typename CoupledFieldType, typename IntersectionFieldType,
-    typename = std::enable_if_t<CoupledInterfaceType::connection_tag ==
-                                specfem::connections::type::nonconforming> >
+    typename std::enable_if_t<CoupledInterfaceType::connection_tag ==
+                                  specfem::connections::type::nonconforming,
+                              int> = 0>
 KOKKOS_INLINE_FUNCTION void
 compute_coupling(const IndexType &index,
                  const CoupledInterfaceType &interface_data,
@@ -172,8 +174,9 @@ compute_coupling(const IndexType &index,
 template <
     typename CoupledInterfaceType, typename CoupledFieldType,
     typename IntersectionFieldViewType,
-    typename = std::enable_if_t<CoupledInterfaceType::connection_tag ==
-                                specfem::connections::type::nonconforming> >
+    typename std::enable_if_t<CoupledInterfaceType::connection_tag ==
+                                  specfem::connections::type::nonconforming,
+                              int> = 0>
 KOKKOS_INLINE_FUNCTION void
 compute_coupling(const CoupledInterfaceType &interface_data,
                  const CoupledFieldType &coupled_field,
