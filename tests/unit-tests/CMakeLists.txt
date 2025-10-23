@@ -172,6 +172,24 @@ target_link_libraries(
 )
 
 add_executable(
+  enumerations_tests
+  enumerations/dim3/mesh_entity.cpp
+  enumerations/dim3/connections.cpp
+  enumerations/dim3/runner.cpp
+)
+
+target_link_libraries(
+  enumerations_tests
+  enumerations
+  quadrature
+  shape_functions
+  gtest_main
+  kokkos_environment
+  utilities
+  -lpthread -lm
+)
+
+add_executable(
   simd_tests
   datatypes/simd_tests.cpp
 )
@@ -834,6 +852,7 @@ if(NOT MPI_PARALLEL)
     displacement_newmark_2d_tests
     displacement_newmark_3d_tests
     fortranio_test
+    enumerations_tests
     gll_tests
     interpolate_function
     io_framework_tests

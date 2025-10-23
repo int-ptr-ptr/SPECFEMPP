@@ -1,4 +1,4 @@
-#include "periodic_tasks/check_signal.hpp"
+#include "check_signal.hpp"
 #include <signal.h>
 
 /**

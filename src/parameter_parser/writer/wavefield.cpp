@@ -5,8 +5,7 @@
 #include "io/NPY/NPY.hpp"
 #include "io/NPZ/NPZ.hpp"
 #include "io/reader.hpp"
-#include "periodic_tasks/wavefield_reader.hpp"
-#include "periodic_tasks/wavefield_writer.hpp"
+#include "specfem/periodic_tasks.hpp"
 #include "utilities/strings.hpp"
 #include <boost/filesystem.hpp>
 

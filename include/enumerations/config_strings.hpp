@@ -12,6 +12,7 @@
  ((te)) \
  ((tm)) \
  ((jpg, jpeg)) \
+ ((vtkhdf)) \
  ((png)) \
  ((sac)) \
  ((su, seismic_unix, seismic-unix)) \

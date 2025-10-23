@@ -221,9 +221,10 @@ public:
   instantiate_wavefield_plotter(
       const specfem::assembly::assembly<specfem::dimension::type::dim2>
           &assembly,
-      specfem::MPI::MPI *mpi) const {
+      const type_real &dt, specfem::MPI::MPI *mpi) const {
     if (this->plot_wavefield) {
-      return this->plot_wavefield->instantiate_wavefield_plotter(assembly, mpi);
+      return this->plot_wavefield->instantiate_wavefield_plotter(assembly, dt,
+                                                                 mpi);
     } else {
       return nullptr;
     }

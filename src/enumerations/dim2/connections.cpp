@@ -36,9 +36,9 @@ specfem::connections::to_string(const specfem::connections::type &conn) {
  * mappings between edges require flipping to maintain proper orientation.
  * The flipping rules ensure consistent connectivity across mesh elements.
  */
-bool specfem::connections::connection_mapping::flip_orientation(
-    const specfem::mesh_entity::dim2::type &from,
-    const specfem::mesh_entity::dim2::type &to) const {
+bool specfem::connections::connection_mapping<specfem::dimension::type::dim2>::
+    flip_orientation(const specfem::mesh_entity::dim2::type &from,
+                     const specfem::mesh_entity::dim2::type &to) const {
   if ((from == specfem::mesh_entity::dim2::type::top &&
        to == specfem::mesh_entity::dim2::type::bottom) ||
       (from == specfem::mesh_entity::dim2::type::bottom &&
@@ -64,8 +64,9 @@ bool specfem::connections::connection_mapping::flip_orientation(
   return true;
 }
 
-specfem::connections::connection_mapping::connection_mapping(const int ngllx,
-                                                             const int ngllz)
+specfem::connections::connection_mapping<
+    specfem::dimension::type::dim2>::connection_mapping(const int ngllx,
+                                                        const int ngllz)
     : ngllx(ngllx), ngllz(ngllz) {
   // corner coordinates
   corner_coordinates[specfem::mesh_entity::dim2::type::top_left] =
@@ -99,9 +100,10 @@ specfem::connections::connection_mapping::connection_mapping(const int ngllx,
 }
 
 std::tuple<std::tuple<int, int>, std::tuple<int, int> >
-specfem::connections::connection_mapping::map_coordinates(
-    const specfem::mesh_entity::dim2::type &from,
-    const specfem::mesh_entity::dim2::type &to, const int point) const {
+specfem::connections::connection_mapping<specfem::dimension::type::dim2>::
+    map_coordinates(const specfem::mesh_entity::dim2::type &from,
+                    const specfem::mesh_entity::dim2::type &to,
+                    const int point) const {
 
   if (corner_coordinates.find(from) != corner_coordinates.end() &&
       corner_coordinates.find(to) != corner_coordinates.end()) {
@@ -133,8 +135,9 @@ specfem::connections::connection_mapping::map_coordinates(
   return std::make_tuple(coord_from, coord_to);
 }
 
-int specfem::connections::connection_mapping::number_of_points_on_orientation(
-    const specfem::mesh_entity::dim2::type &edge) const {
+int specfem::connections::connection_mapping<specfem::dimension::type::dim2>::
+    number_of_points_on_orientation(
+        const specfem::mesh_entity::dim2::type &edge) const {
   if ((edge == specfem::mesh_entity::dim2::type::top) ||
       (edge == specfem::mesh_entity::dim2::type::bottom)) {
     return ngllx;
@@ -154,9 +157,9 @@ int specfem::connections::connection_mapping::number_of_points_on_orientation(
   throw std::runtime_error("Invalid edge orientation");
 }
 
-int specfem::connections::connection_mapping::find_corner_on_edge(
-    const specfem::mesh_entity::dim2::type &corner,
-    const specfem::mesh_entity::dim2::type &edge) const {
+int specfem::connections::connection_mapping<specfem::dimension::type::dim2>::
+    find_corner_on_edge(const specfem::mesh_entity::dim2::type &corner,
+                        const specfem::mesh_entity::dim2::type &edge) const {
   // Check if the corner is a corner
   if (!specfem::mesh_entity::contains(specfem::mesh_entity::dim2::corners,
                                       corner)) {
@@ -214,8 +217,9 @@ int specfem::connections::connection_mapping::find_corner_on_edge(
 }
 
 std::tuple<int, int>
-specfem::connections::connection_mapping::coordinates_at_edge(
-    const specfem::mesh_entity::dim2::type &edge, const int point) const {
+specfem::connections::connection_mapping<specfem::dimension::type::dim2>::
+    coordinates_at_edge(const specfem::mesh_entity::dim2::type &edge,
+                        const int point) const {
   if (!specfem::mesh_entity::contains(specfem::mesh_entity::dim2::edges,
                                       edge)) {
     throw std::runtime_error("The argument is not an edge");
@@ -224,9 +228,9 @@ specfem::connections::connection_mapping::coordinates_at_edge(
   return edge_coordinates.at(edge)(point);
 }
 
-std::tuple<int, int>
-specfem::connections::connection_mapping::coordinates_at_corner(
-    const specfem::mesh_entity::dim2::type &corner) const {
+std::tuple<int, int> specfem::connections::
+    connection_mapping<specfem::dimension::type::dim2>::coordinates_at_corner(
+        const specfem::mesh_entity::dim2::type &corner) const {
   if (!specfem::mesh_entity::contains(specfem::mesh_entity::dim2::corners,
                                       corner)) {
     throw std::runtime_error("The argument is not a corner");

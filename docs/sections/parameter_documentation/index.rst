@@ -436,7 +436,14 @@ Parameter definitions
 
                     .. dropdown:: ``display``
 
-                        Plot the wavefield during the forward simulation.
+                        Plot the wavefield during the forward simulation. Note
+                        that plotting the wavefield is only enabled for 2D
+                        simulations and requires specfem to be compiled with VTK
+                        support, ``-D SPECFEM_ENABLE_VTK=ON`` CMake option. For,
+                        3D simulations can write the wavefield to disk in VTKHDF
+                        format, for which both VTK and HDF5 support must be
+                        enabled, and ``-D SPECFEM_ENABLE_VTK=ON -D
+                        SPECFEM_ENABLE_HDF5=ON`` CMake options.
 
                         .. code-block:: yaml
                             :caption: Example
@@ -457,7 +464,7 @@ Parameter definitions
 
                             :default value: PNG
 
-                            :possible values: [PNG, JPG, on_screen]
+                            :possible values: [PNG, JPG, on_screen, vtkhdf]
 
 
                         .. dropdown:: ``directory`` [optional]
@@ -614,6 +621,7 @@ Parameter definitions
                     .. dropdown:: ``display`` [optional]
 
                         Plot the wavefield during the combined simulation.
+                        See forward section for details.
 
                         .. dropdown:: ``format`` [optional]
 

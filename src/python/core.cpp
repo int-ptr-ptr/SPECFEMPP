@@ -3,7 +3,7 @@
 #include <pybind11/stl.h>
 #define STRINGIFY(x) #x
 #define MACRO_STRINGIFY(x) STRINGIFY(x)
-#include "periodic_tasks/check_signal.hpp"
+#include "specfem/periodic_tasks.hpp"
 
 namespace py = pybind11;
 

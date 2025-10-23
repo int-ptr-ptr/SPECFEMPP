@@ -5,8 +5,8 @@
 #include "enumerations/wavefield.hpp"
 #include "kokkos_kernels/domain_kernels.hpp"
 #include "kokkos_kernels/frechet_kernels.hpp"
-#include "periodic_tasks/periodic_task.hpp"
 #include "solver.hpp"
+#include "specfem/periodic_tasks.hpp"
 #include "specfem/timescheme.hpp"
 #include "specfem/timescheme/newmark.hpp"
 

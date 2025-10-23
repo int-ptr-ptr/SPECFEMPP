@@ -21,3 +21,12 @@ template <specfem::dimension::type DimensionTag> struct element;
 
 #include "dim2/mesh_entities.hpp"
 #include "dim3/mesh_entities.hpp"
+
+// CTAD guides
+namespace specfem::mesh_entity {
+
+element(const int, const int) -> element<specfem::dimension::type::dim2>;
+
+element(const int, const int, const int)
+    -> element<specfem::dimension::type::dim3>;
+} // namespace specfem::mesh_entity

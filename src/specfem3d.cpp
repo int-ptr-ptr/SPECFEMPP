@@ -1,7 +1,7 @@
 #include "enumerations/dimension.hpp"
 #include "io/interface.hpp"
 #include "parameter_parser/interface.hpp"
-#include "periodic_tasks/periodic_task.hpp"
+#include "specfem/periodic_tasks.hpp"
 #include "specfem/receivers.hpp"
 #include "specfem_mpi/interface.hpp"
 #include "specfem_setup.hpp"

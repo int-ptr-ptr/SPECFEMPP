@@ -155,7 +155,7 @@ void execute(
   //                   Instantiate plotter
   // --------------------------------------------------------------
   const auto wavefield_plotter =
-      setup.instantiate_wavefield_plotter(assembly, mpi);
+      setup.instantiate_wavefield_plotter(assembly, dt, mpi);
   if (wavefield_plotter) {
     tasks.push_back(wavefield_plotter);
   }
