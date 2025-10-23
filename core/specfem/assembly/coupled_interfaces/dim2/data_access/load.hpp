@@ -43,8 +43,8 @@ inline void load_on_host(const IndexType &index, const ContainerType &container,
                          AccessorType &accessor) {
 
   static_assert(
-      specfem::data_access::CheckCompatibility2<IndexType, ContainerType,
-                                                AccessorType>::value,
+      specfem::data_access::CheckCompatibility<IndexType, ContainerType,
+                                               AccessorType>::value,
       "Incompatible types in load_on_host");
 
   container
@@ -86,8 +86,8 @@ KOKKOS_FORCEINLINE_FUNCTION void load_on_device(const IndexType &index,
                                                 const ContainerType &container,
                                                 AccessorType &accessor) {
   static_assert(
-      specfem::data_access::CheckCompatibility2<IndexType, ContainerType,
-                                                AccessorType>::value,
+      specfem::data_access::CheckCompatibility<IndexType, ContainerType,
+                                               AccessorType>::value,
       "Incompatible types in load_on_device");
   container
       .template get_interface_container<AccessorType::interface_tag,

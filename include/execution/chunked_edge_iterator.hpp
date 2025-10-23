@@ -224,6 +224,7 @@ public:
                     const int npoints)
       : num_points(npoints), nedges(edges.extent(0)),
         base_type(team_member, edges.extent(0) * npoints), edges(edges) {}
+
   const int nedges; ///< Total number of edges in this chunk
 private:
   ViewType edges;         ///< View of mesh edges to iterate over

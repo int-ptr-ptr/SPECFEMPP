@@ -22,9 +22,8 @@ public:
   static_assert(check_data_class, "Data classes do not match");
   static_assert(specfem::data_access::is_container<ContainerType>::value,
                 "ContainerType is not a container");
-
-  static_assert(specfem::data_access::is_point<AccessorType>::value,
-                "PointType is not an accessor");
+  static_assert(AccessorType::accessor_type == IndexType::accessor_type,
+                "AccessorType and IndexType have incompatible accessors");
 };
 
 template <typename IndexType, typename ContainerType, typename AccessorType>
