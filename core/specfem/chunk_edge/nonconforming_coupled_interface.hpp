@@ -14,7 +14,7 @@ namespace specfem::chunk_edge {
  * @tparam NumberElements Number of elements in the chunk.
  * @tparam NQuadElement Number of quadrature points (Gauss-Lobatto-Legendre) on
  * element edges.
- * @tparam NQuadInterface Number of quadrature points on each mortar element.
+ * @tparam NQuadIntersection Number of quadrature points on each mortar element.
  * @tparam DimensionTag Spatial dimension
  * @tparam ConnectionTag Connection type (strongly/weakly conforming)
  * @tparam InterfaceTag Interface type (elastic-acoustic, acoustic-elastic)
@@ -23,7 +23,7 @@ namespace specfem::chunk_edge {
  * @tparam MemoryTraits Memory traits for data storage.
  * @tparam UseSIMD Flag to indicate if SIMD should be used.
  */
-template <int NumberElements, int NQuadElement, int NQuadInterface,
+template <int NumberElements, int NQuadElement, int NQuadIntersection,
           specfem::dimension::type DimensionTag,
           specfem::connections::type ConnectionTag,
           specfem::interface::interface_tag InterfaceTag,
@@ -41,7 +41,7 @@ struct nonconforming_coupled_interface;
  * @tparam NumberElements Number of elements in the chunk.
  * @tparam NQuadElement Number of quadrature points (Gauss-Lobatto-Legendre) on
  * element edges.
- * @tparam NQuadInterface Number of quadrature points on each mortar element.
+ * @tparam NQuadIntersection Number of quadrature points on each mortar element.
  * @tparam ConnectionTag Connection type between elements
  * @tparam InterfaceTag Type of interface (elastic-acoustic or acoustic-elastic)
  * @tparam BoundaryTag Boundary condition applied to the interface
@@ -49,12 +49,12 @@ struct nonconforming_coupled_interface;
  * @tparam MemoryTraits Memory traits for data storage.
  * @tparam UseSIMD Flag to indicate if SIMD should be used.
  */
-template <int NumberElements, int NQuadElement, int NQuadInterface,
+template <int NumberElements, int NQuadElement, int NQuadIntersection,
           specfem::interface::interface_tag InterfaceTag,
           specfem::element::boundary_tag BoundaryTag, typename MemorySpace,
           typename MemoryTraits, bool UseSIMD>
 struct nonconforming_coupled_interface<
-    NumberElements, NQuadElement, NQuadInterface,
+    NumberElements, NQuadElement, NQuadIntersection,
     specfem::dimension::type::dim2, specfem::connections::type::nonconforming,
     InterfaceTag, BoundaryTag, MemorySpace, MemoryTraits, UseSIMD>
     : public specfem::data_access::Accessor<
@@ -62,10 +62,10 @@ struct nonconforming_coupled_interface<
           specfem::data_access::DataClassType::coupled_interface,
           specfem::dimension::type::dim2, false>,
       public specfem::chunk_edge::impl::nonconforming_transfer_function<
-          true, NumberElements, NQuadElement, NQuadInterface,
+          true, NumberElements, NQuadElement, NQuadIntersection,
           specfem::dimension::type::dim2, MemorySpace, MemoryTraits, UseSIMD>,
       public specfem::chunk_edge::impl::nonconforming_transfer_function<
-          false, NumberElements, NQuadElement, NQuadInterface,
+          false, NumberElements, NQuadElement, NQuadIntersection,
           specfem::dimension::type::dim2, MemorySpace, MemoryTraits, UseSIMD> {
 private:
   /** @brief Base accessor type alias */
@@ -77,7 +77,7 @@ private:
   template <bool is_self>
   using transfer_type =
       specfem::chunk_edge::impl::nonconforming_transfer_function<
-          is_self, NumberElements, NQuadElement, NQuadInterface,
+          is_self, NumberElements, NQuadElement, NQuadIntersection,
           specfem::dimension::type::dim2, MemorySpace, MemoryTraits, UseSIMD>;
 
   using TransferViewType = typename transfer_type<true>::TransferViewType;
@@ -90,13 +90,13 @@ private:
 
   using EdgeNormalViewType =
       Kokkos::View<typename specfem::datatype::simd<type_real, UseSIMD>::
-                       datatype[NumberElements][NQuadInterface][2],
+                       datatype[NumberElements][NQuadIntersection][2],
                    MemorySpace, MemoryTraits>; ///< Underlying view used to
                                                ///< store data of the transfer
                                                ///< function.
   using MortarFactorViewType =
       Kokkos::View<typename specfem::datatype::simd<type_real, UseSIMD>::
-                       datatype[NumberElements][NQuadInterface],
+                       datatype[NumberElements][NQuadIntersection],
                    MemorySpace, MemoryTraits>; ///< Underlying view used to
                                                ///< store data of the transfer
                                                ///< function.
@@ -115,7 +115,7 @@ public:
   /** @brief number of quadrature points on the element (NGLL) */
   static constexpr int n_quad_element = NQuadElement;
   /** @brief number of quadrature points on the interface */
-  static constexpr int n_quad_interface = NQuadInterface;
+  static constexpr int n_quad_intersection = NQuadIntersection;
 
   /** @brief Edge scaling factor for interface computations */
   MortarFactorViewType intersection_factor;

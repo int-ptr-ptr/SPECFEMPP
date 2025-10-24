@@ -648,12 +648,14 @@ add_executable(
   compute_coupling_tests
   compute_coupling/acoustic_elastic.cpp
   compute_coupling/elastic_acoustic.cpp
+  compute_coupling/nonconforming.cpp
 )
 
 target_link_libraries(
   compute_coupling_tests
   point
-  gtest_main
+  gtest
+  kokkos_environment
   Kokkos::kokkos
 )
 

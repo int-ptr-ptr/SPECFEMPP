@@ -57,7 +57,7 @@ KOKKOS_INLINE_FUNCTION void compute_coupling(
   self_field(0) = 0;
   self_field(1) = 0;
   for (int ipoint_mortar = 0;
-       ipoint_mortar < CoupledInterfaceType::n_quad_interface;
+       ipoint_mortar < CoupledInterfaceType::n_quad_intersection;
        ipoint_mortar++) {
     type_real s_tilde = interface_data.transfer_function_self(
         index.iedge, index.ipoint, ipoint_mortar);

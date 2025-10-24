@@ -179,12 +179,19 @@ void specfem::kokkos_kernels::impl::compute_coupling(
           specfem::kokkos::DevScratchSpace,
           Kokkos::MemoryTraits<Kokkos::Unmanaged>, using_simd>;
 
+
+  using InterfaceFieldViewType = specfem::datatype::VectorChunkEdgeViewType<
+      type_real, specfem::dimension::type::dim2, parallel_config::chunk_size, NQuad_interface,
+      specfem::element::attributes<DimensionTag, coupled_medium>::components, using_simd,
+          specfem::kokkos::DevScratchSpace,
+          Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
+
   specfem::execution::ChunkedIntersectionIterator chunk(
       parallel_config(), self_edges, coupled_edges, num_points);
 
   int scratch_size = CoupledFieldType::shmem_size() +
                      CoupledInterfaceDataType::shmem_size() +
-                     CoupledTransferFunctionType::shmem_size();
+                     CoupledTransferFunctionType::shmem_size() + InterfaceFieldViewType::shmem_size();
 
   specfem::execution::for_each_level(
       "specfem::kokkos_kernels::impl::compute_coupling",
@@ -214,6 +221,8 @@ void specfem::kokkos_kernels::impl::compute_coupling(
                                           interface_data);
         specfem::assembly::load_on_device(self_chunk_index, coupled_interfaces,
                                           coupled_transfer_function);
+        InterfaceFieldViewType interface_field;
+        specfem::medium::compute_coupling(coupled_transfer_function, coupled_field, interface_field);
 
         specfem::execution::for_each_level(
             chunk_index.get_iterator(),

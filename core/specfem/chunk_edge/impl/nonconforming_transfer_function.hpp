@@ -22,7 +22,7 @@ namespace impl {
  * @tparam NumberElements Number of elements in the chunk.
  * @tparam NQuadElement Number of quadrature points (Gauss-Lobatto-Legendre) on
  * element edges.
- * @tparam NQuadInterface Number of quadrature points on each mortar element.
+ * @tparam NQuadIntersection Number of quadrature points on each mortar element.
  * @tparam DimensionTag Spatial dimension
  * @tparam ConnectionTag Connection type (strongly/weakly conforming)
  * @tparam InterfaceTag Interface type (elastic-acoustic, acoustic-elastic)
@@ -31,15 +31,15 @@ namespace impl {
  * @tparam MemoryTraits Memory traits for data storage.
  * @tparam UseSIMD Flag to indicate if SIMD should be used.
  */
-template <bool IsSelf, int NumberElements, int NQuadElement, int NQuadInterface,
-          specfem::dimension::type DimensionTag, typename MemorySpace,
-          typename MemoryTraits, bool UseSIMD>
+template <bool IsSelf, int NumberElements, int NQuadElement,
+          int NQuadIntersection, specfem::dimension::type DimensionTag,
+          typename MemorySpace, typename MemoryTraits, bool UseSIMD>
 struct nonconforming_transfer_function;
 
-template <int NumberElements, int NQuadElement, int NQuadInterface,
+template <int NumberElements, int NQuadElement, int NQuadIntersection,
           typename MemorySpace, typename MemoryTraits, bool UseSIMD>
 struct nonconforming_transfer_function<
-    true, NumberElements, NQuadElement, NQuadInterface,
+    true, NumberElements, NQuadElement, NQuadIntersection,
     specfem::dimension::type::dim2, MemorySpace, MemoryTraits, UseSIMD> {
 private:
   /**
@@ -52,7 +52,7 @@ private:
 protected:
   using TransferViewType = specfem::datatype::VectorChunkEdgeViewType<
       type_real, specfem::dimension::type::dim2, NumberElements, NQuadElement,
-      NQuadInterface, UseSIMD, MemorySpace,
+      NQuadIntersection, UseSIMD, MemorySpace,
       MemoryTraits>; ///< Underlying view used to store data of the transfer
                      ///< function.
 
@@ -64,7 +64,9 @@ public:
    * enabled.
    */
   TransferViewType transfer_function_self;
-
+  KOKKOS_INLINE_FUNCTION const TransferViewType &get_transfer_function() const {
+    return transfer_function_self;
+  }
   /**
    * @brief Constructs coupled interface point with geometric data
    *
@@ -96,10 +98,10 @@ public:
   constexpr static int shmem_size() { return TransferViewType::shmem_size(); }
 };
 
-template <int NumberElements, int NQuadElement, int NQuadInterface,
+template <int NumberElements, int NQuadElement, int NQuadIntersection,
           typename MemorySpace, typename MemoryTraits, bool UseSIMD>
 struct nonconforming_transfer_function<
-    false, NumberElements, NQuadElement, NQuadInterface,
+    false, NumberElements, NQuadElement, NQuadIntersection,
     specfem::dimension::type::dim2, MemorySpace, MemoryTraits, UseSIMD> {
 private:
   /**
@@ -112,7 +114,7 @@ private:
 protected:
   using TransferViewType = specfem::datatype::VectorChunkEdgeViewType<
       type_real, specfem::dimension::type::dim2, NumberElements, NQuadElement,
-      NQuadInterface, UseSIMD, MemorySpace,
+      NQuadIntersection, UseSIMD, MemorySpace,
       MemoryTraits>; ///< Underlying view used to store data of the transfer
                      ///< function.
 
@@ -124,6 +126,9 @@ public:
    * enabled.
    */
   TransferViewType transfer_function_coupled;
+  KOKKOS_INLINE_FUNCTION const TransferViewType &get_transfer_function() const {
+    return transfer_function_coupled;
+  }
 
   /**
    * @brief Constructs coupled interface point with geometric data

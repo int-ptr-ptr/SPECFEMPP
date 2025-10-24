@@ -165,10 +165,11 @@ public:
                   specfem::assembly::coupled_interfaces_impl::
                       stores_intersection_normal<EdgeType>::value) {
       Kokkos::parallel_for(
-          Kokkos::TeamThreadRange(team, num_edges * EdgeType::n_quad_interface),
+          Kokkos::TeamThreadRange(team,
+                                  num_edges * EdgeType::n_quad_intersection),
           [&](const int &ichunkmortar) {
-            const int imortar = ichunkmortar % EdgeType::n_quad_interface;
-            const int iedge = ichunkmortar / EdgeType::n_quad_interface;
+            const int imortar = ichunkmortar % EdgeType::n_quad_intersection;
+            const int iedge = ichunkmortar / EdgeType::n_quad_intersection;
 
             const int &local_slot = iedge;
             const int &container_slot = offset + iedge;
@@ -216,7 +217,7 @@ public:
             const int &ipoint = point_index.ipoint;
 
             if constexpr (on_device) {
-              for (int i = 0; i < EdgeType::n_quad_interface; i++) {
+              for (int i = 0; i < EdgeType::n_quad_intersection; i++) {
                 if constexpr (specfem::assembly::coupled_interfaces_impl::
                                   stores_transfer_function_self<
                                       EdgeType>::value) {
@@ -231,7 +232,7 @@ public:
                 }
               }
             } else {
-              for (int i = 0; i < EdgeType::n_quad_interface; i++) {
+              for (int i = 0; i < EdgeType::n_quad_intersection; i++) {
                 if constexpr (specfem::assembly::coupled_interfaces_impl::
                                   stores_transfer_function_self<
                                       EdgeType>::value) {
