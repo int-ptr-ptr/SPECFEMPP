@@ -148,9 +148,9 @@ compute_interfacial_force(const IndexType &index,
   using interface_dispatch =
       std::integral_constant<specfem::interface::interface_tag, interface_tag>;
 
-  impl::compute_coupling(dimension_dispatch(), connection_dispatch(),
-                         interface_dispatch(), index, interface_data,
-                         coupled_field, intersection_field);
+  impl::compute_interfacial_force(dimension_dispatch(), connection_dispatch(),
+                                  interface_dispatch(), index, interface_data,
+                                  coupled_field, intersection_field);
 }
 
 } // namespace specfem::medium
