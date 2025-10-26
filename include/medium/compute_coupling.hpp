@@ -108,10 +108,10 @@ template <
                                   specfem::connections::type::nonconforming,
                               int> = 0>
 KOKKOS_INLINE_FUNCTION void
-compute_coupling(const IndexType &index,
-                 const CoupledInterfaceType &interface_data,
-                 const CoupledFieldType &coupled_field,
-                 IntersectionFieldType &intersection_field) {
+compute_interfacial_force(const IndexType &index,
+                          const CoupledInterfaceType &interface_data,
+                          const CoupledFieldType &coupled_field,
+                          IntersectionFieldType &intersection_field) {
 
   static_assert(specfem::data_access::is_edge_index<IndexType>::value,
                 "index is not of edge_index type");

@@ -233,7 +233,7 @@ void specfem::kokkos_kernels::impl::compute_coupling(
               const auto self_index = index.self_index;
 
               SelfFieldType self_field;
-              specfem::medium::compute_coupling(self_index, interface_data,
+              specfem::medium::compute_interfacial_force(self_index, interface_data,
                                                 coupled_field, self_field);
 
               specfem::point::boundary<boundary_tag, dimension_tag, false>
