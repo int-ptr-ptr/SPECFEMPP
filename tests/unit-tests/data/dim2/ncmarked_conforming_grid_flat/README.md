@@ -1,10 +1,10 @@
-## Nonconforming-marked Conforming mesh: Curved
+## Nonconforming-marked Conforming mesh: Flat
 
 `Nonconforming-marked Conforming mesh`es are test meshes that are conforming, but are labelled as nonconforming for the purposes of the database and `specfem`. These meshes help compare conforming and nonconforming kernels, especially when they should be equivalent.
 
-### Curved
+### Flat
 
-An 8 x 8 grid of elements with the bottom half as elastic and the top half as acoustic. This mesh has a sinusoidal surface of 1 wavelength and amplitude of 20% of the domain.
+A 4 x 4 grid of elements with the bottom two rows as elastic and the top two as acoustic.
 
 To regenerate the database, convert the topography file into the files in `MESH` through `gmsh`, then run meshfem over `Par_file`:
 
