@@ -36,7 +36,7 @@ KOKKOS_INLINE_FUNCTION void compute_coupling(
 
 template <typename IndexType, typename CoupledInterfaceType,
           typename CoupledFieldType, typename SelfFieldType>
-KOKKOS_INLINE_FUNCTION void compute_coupling(
+KOKKOS_INLINE_FUNCTION void compute_interfacial_force(
     const std::integral_constant<
         specfem::dimension::type,
         specfem::dimension::type::dim2> /*dimension_dispatch*/,
