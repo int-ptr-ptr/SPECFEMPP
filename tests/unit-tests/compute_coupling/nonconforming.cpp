@@ -153,6 +153,9 @@ struct EdgeToInterfaceParams : EdgeToInterfaceParamsBase {
     // check for failures through this.
     // We only store the last fail in each thread. (there may be a better way of
     // doing this)
+
+    // we should switch out this tuple for something else. TODO address this in
+    // issue #1226
     using CheckContainer = Kokkos::View<
         std::tuple<bool, type_real, type_real, type_real, int, int, int> **,
         Kokkos::DefaultExecutionSpace>;
@@ -164,10 +167,9 @@ struct EdgeToInterfaceParams : EdgeToInterfaceParamsBase {
     // initialize failure arrays to not-fail state.
     Kokkos::parallel_for(
         Kokkos::TeamPolicy<>(num_iters, num_edges),
-        KOKKOS_LAMBDA(const auto &team) {
+        KOKKOS_LAMBDA(const Kokkos::TeamPolicy<>::member_type &team) {
           Kokkos::parallel_for(
-              Kokkos::TeamThreadRange(team, num_edges),
-              KOKKOS_LAMBDA(const auto &iedge) {
+              Kokkos::TeamThreadRange(team, num_edges), [&](const auto &iedge) {
                 std::get<0>(self_check_container(team.league_rank(), iedge)) =
                     false;
                 std::get<0>(
@@ -184,7 +186,7 @@ struct EdgeToInterfaceParams : EdgeToInterfaceParamsBase {
                                    CoupledDisplacementType::shmem_size() +
                                    SelfOnInterfaceType::shmem_size() +
                                    CoupledOnInterfaceType::shmem_size())),
-        KOKKOS_LAMBDA(const auto &team) {
+        KOKKOS_LAMBDA(const Kokkos::TeamPolicy<>::member_type &team) {
           const int deg_start =
               team.league_rank() * num_edges; // edge0 is x^deg_start
 
@@ -199,8 +201,7 @@ struct EdgeToInterfaceParams : EdgeToInterfaceParamsBase {
           // check any transfer-function cross-contamination
 
           Kokkos::parallel_for(
-              Kokkos::TeamThreadRange(team, num_edges),
-              KOKKOS_LAMBDA(const auto &iedge) {
+              Kokkos::TeamThreadRange(team, num_edges), [&](const auto &iedge) {
                 for (int ipoint = 0; ipoint < nquad_edge; ipoint++) {
                   for (int iintersection = 0;
                        iintersection < nquad_intersection; iintersection++) {
@@ -220,8 +221,7 @@ struct EdgeToInterfaceParams : EdgeToInterfaceParamsBase {
           // populate fields with polynomials
 
           Kokkos::parallel_for(
-              Kokkos::TeamThreadRange(team, num_edges),
-              KOKKOS_LAMBDA(const auto &iedge) {
+              Kokkos::TeamThreadRange(team, num_edges), [&](const auto &iedge) {
                 for (int ipoint = 0; ipoint < nquad_edge; ipoint++) {
                   for (int icomp = 0; icomp < SelfDisplacementType::components;
                        icomp++)
@@ -249,8 +249,7 @@ struct EdgeToInterfaceParams : EdgeToInterfaceParamsBase {
           // the expectation is just the intersection quadrature point to the
           // same power.
           Kokkos::parallel_for(
-              Kokkos::TeamThreadRange(team, num_edges),
-              KOKKOS_LAMBDA(const auto &iedge) {
+              Kokkos::TeamThreadRange(team, num_edges), [&](const auto &iedge) {
                 for (int iintersection = 0; iintersection < nquad_intersection;
                      iintersection++) {
                   const type_real x =
