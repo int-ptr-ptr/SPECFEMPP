@@ -43,18 +43,21 @@
 
 namespace specfem::algorithms {
 
-template <typename IndexType, typename ResultPointFieldType, int NQUAD>
+template <typename IndexType, typename ResultPointFieldType,
+          typename ChunkEdgeWeightJacobianType, typename CallableType>
 KOKKOS_FUNCTION void integrate_fieldtilde_1d(
-    const IndexType &index, ResultPointFieldType result,
-    const ChunkEdgeWeightJacobianType &weight_jacobian,
-    const CallableType &integrand_callback,
-    const ChunkEdgeTransferFunctionType &transfer_function) {
+    const IndexType &index, const ChunkEdgeWeightJacobianType &weight_jacobian,
+    const PointTransferFunctionType &transfer_function,
+    ResultPointFieldType result, const CallableType &integrand_callback) {
   static_assert(std::is_invocable_v<CallableType, int, ResultPointFieldType>,
                 "CallableType must be invocable with arguments (int, "
                 "ResultPointFieldType)");
 
-  ResultPointFieldType integrand;
   constexpr int ncomp = ResultPointFieldType::components;
+  constexpr int nquad_intersection =
+      ChunkEdgeWeightJacobianType::n_quad_intersection;
+
+  ResultPointFieldType integrand;
 
   const int &iedge = index.iedge;
   const int &ipoint = index.ipoint;

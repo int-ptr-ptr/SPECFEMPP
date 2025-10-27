@@ -14,6 +14,7 @@
 #include "point/kernels.hpp"
 #include "point/mapped_index.hpp"
 #include "point/mass_inverse.hpp"
+#include "point/nonconforming_transfer_function.hpp"
 #include "point/properties.hpp"
 #include "point/source.hpp"
 #include "point/stress.hpp"

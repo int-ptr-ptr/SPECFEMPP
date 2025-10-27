@@ -116,7 +116,7 @@ void specfem::kokkos_kernels::impl::compute_coupling(
 
 template <specfem::dimension::type DimensionTag,
           specfem::wavefield::simulation_field WavefieldType, int NGLL,
-          int NQuad_interface, specfem::interface::interface_tag InterfaceTag,
+          int NQuad_intersection, specfem::interface::interface_tag InterfaceTag,
           specfem::element::boundary_tag BoundaryTag>
 void specfem::kokkos_kernels::impl::compute_coupling(
     std::integral_constant<
@@ -168,20 +168,25 @@ void specfem::kokkos_kernels::impl::compute_coupling(
       specfem::point::acceleration<dimension_tag, self_medium, using_simd>;
   using CoupledInterfaceDataType =
       typename specfem::chunk_edge::nonconforming_coupled_interface<
-          parallel_config::chunk_size, NGLL, NQuad_interface, dimension_tag,
+          parallel_config::chunk_size, NGLL, NQuad_intersection, dimension_tag,
           connection_tag, interface_tag, boundary_tag,
           specfem::kokkos::DevScratchSpace,
           Kokkos::MemoryTraits<Kokkos::Unmanaged>, using_simd>;
   using CoupledTransferFunctionType =
       typename specfem::chunk_edge::nonconforming_transfer_function<
-          false, parallel_config::chunk_size, NGLL, NQuad_interface,
+          false, parallel_config::chunk_size, NGLL, NQuad_intersection,
+          dimension_tag, connection_tag, interface_tag, boundary_tag,
+          specfem::kokkos::DevScratchSpace,
+          Kokkos::MemoryTraits<Kokkos::Unmanaged>, using_simd>;
+  using SelfTransferFunctionType = typename specfem::point::nonconforming_transfer_function<
+            false, NQuad_intersection,
           dimension_tag, connection_tag, interface_tag, boundary_tag,
           specfem::kokkos::DevScratchSpace,
           Kokkos::MemoryTraits<Kokkos::Unmanaged>, using_simd>;
 
 
   using InterfaceFieldViewType = specfem::datatype::VectorChunkEdgeViewType<
-      type_real, specfem::dimension::type::dim2, parallel_config::chunk_size, NQuad_interface,
+      type_real, specfem::dimension::type::dim2, parallel_config::chunk_size, NQuad_intersection,
       specfem::element::attributes<DimensionTag, coupled_medium>::components, using_simd,
           specfem::kokkos::DevScratchSpace,
           Kokkos::MemoryTraits<Kokkos::Unmanaged>>;
@@ -231,8 +236,15 @@ void specfem::kokkos_kernels::impl::compute_coupling(
                     &iterator_index) {
               const auto index = iterator_index.get_index();
               const auto self_index = index.self_index;
+              auto self_index_with_global = self_index;
+              self_index_with_global.iedge += team.league_rank() * parallel_config::chunk_size;
 
+              SelfTransferFunctionType self_transfer_function;
+              specfem::assembly::load_on_device(self_index_with_global, coupled_interfaces,
+                                                self_transfer_function);
               SelfFieldType self_field;
+
+              // maybe this should be called compute_traction?
               specfem::medium::compute_interfacial_force(self_index, interface_data,
                                                 coupled_field, self_field);
 
@@ -257,7 +269,7 @@ void specfem::kokkos_kernels::impl::compute_coupling(
 template <specfem::dimension::type DimensionTag,
           specfem::connections::type ConnectionTag,
           specfem::wavefield::simulation_field WavefieldType, int NGLL,
-          int NQuad_interface, specfem::interface::interface_tag InterfaceTag,
+          int NQuad_intersection, specfem::interface::interface_tag InterfaceTag,
           specfem::element::boundary_tag BoundaryTag>
 void specfem::kokkos_kernels::impl::compute_coupling(
     const specfem::assembly::assembly<DimensionTag> &assembly) {
@@ -267,7 +279,7 @@ void specfem::kokkos_kernels::impl::compute_coupling(
 
   // Forward to implementation with dispatch tag
   if constexpr (ConnectionTag == specfem::connections::type::nonconforming) {
-    compute_coupling<DimensionTag, WavefieldType, NGLL, NQuad_interface,
+    compute_coupling<DimensionTag, WavefieldType, NGLL, NQuad_intersection,
                      InterfaceTag, BoundaryTag>(connection_dispatch(),
                                                 assembly);
   } else {
