@@ -1,6 +1,7 @@
 - "HomogeneousElasticDomain"
 - "HomogeneousAcousticDomain"
 - "AcousticElasticCoupledDomain"
+# - "AcousticElasticNonconformingCoupledDomain"
 # - "AcousticElasticCoupledDomainVariant2"
 - "HomogeneousAcousticDomainDirichletBC"
 - "HomogeneousElasticDomainStaceyBC"

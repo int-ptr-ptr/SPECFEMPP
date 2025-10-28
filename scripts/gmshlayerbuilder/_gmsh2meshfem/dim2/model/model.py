@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from dataclasses import replace as dataclass_replace
 from typing import Iterable
 
+import numpy as np
 from _gmsh2meshfem.gmsh_dep import GmshContext
 
 from .boundary import BoundarySpec
