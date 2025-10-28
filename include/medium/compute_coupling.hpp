@@ -32,11 +32,15 @@ namespace specfem::medium {
  * specfem::medium::compute_coupling(interface, coupled_field, self_field);
  * @endcode
  */
-template <typename... IndexPack, typename CoupledInterfaceType,
-          typename CoupledFieldType, typename SelfFieldType>
-KOKKOS_INLINE_FUNCTION void compute_coupling(
-    const IndexPack &...index_pack, const CoupledInterfaceType &interface_data,
-    const CoupledFieldType &coupled_field, SelfFieldType &self_field) {
+template <typename CoupledInterfaceType, typename CoupledFieldType,
+          typename SelfFieldType,
+          std::enable_if_t<CoupledInterfaceType::connection_tag !=
+                               specfem::connections::type::nonconforming,
+                           int> = 0>
+KOKKOS_INLINE_FUNCTION void
+compute_coupling(const CoupledInterfaceType &interface_data,
+                 const CoupledFieldType &coupled_field,
+                 SelfFieldType &self_field) {
 
   static_assert(
       specfem::data_access::is_coupled_interface<CoupledInterfaceType>::value,
@@ -44,42 +48,21 @@ KOKKOS_INLINE_FUNCTION void compute_coupling(
   constexpr auto dimension_tag = CoupledInterfaceType::dimension_tag;
   constexpr auto interface_tag = CoupledInterfaceType::interface_tag;
   constexpr auto connection_tag = CoupledInterfaceType::connection_tag;
-  if constexpr (connection_tag ==
-                specfem::connections::type::weakly_conforming) {
 
-    static_assert(sizeof...(IndexPack) == 0,
-                  "compute_coupling should not take an index in the "
-                  "weakly_conforming context.");
-    static_assert(specfem::data_access::is_point<CoupledFieldType>::value &&
-                      specfem::data_access::is_field<CoupledFieldType>::value,
-                  "coupled_field is not a point field type");
+  static_assert(specfem::data_access::is_point<CoupledFieldType>::value &&
+                    specfem::data_access::is_field<CoupledFieldType>::value,
+                "coupled_field is not a point field type");
 
-    static_assert(specfem::data_access::is_field<SelfFieldType>::value,
-                  "self_field is not a field type");
+  static_assert(specfem::data_access::is_field<SelfFieldType>::value,
+                "self_field is not a field type");
 
-    constexpr auto self_medium_tag = SelfFieldType::medium_tag;
-    static_assert(
-        specfem::interface::attributes<dimension_tag,
-                                       interface_tag>::self_medium() ==
-            self_medium_tag,
-        "Inconsistent self medium tag between interface and self field");
-  } else {
+  constexpr auto self_medium_tag = SelfFieldType::medium_tag;
+  static_assert(
+      specfem::interface::attributes<dimension_tag,
+                                     interface_tag>::self_medium() ==
+          self_medium_tag,
+      "Inconsistent self medium tag between interface and self field");
 
-    static_assert(sizeof...(IndexPack) == 1,
-                  "compute_coupling must take one index in the "
-                  "nonconforming context.");
-
-    using IndexType =
-        typename std::tuple_element<0, std::tuple<IndexPack...> >::type;
-    static_assert(
-        specfem::data_access::is_chunk_edge<IndexType>::value,
-        "The index for a nonconforming compute_coupling must be a chunk_edge.");
-
-    static_assert(
-        specfem::data_access::is_chunk_edge<CoupledFieldType>::value &&
-            specfem::data_access::is_field<CoupledFieldType>::value,
-        "coupled_field is not a chunk_edge field type");
-  }
   constexpr auto coupled_medium_tag = CoupledFieldType::medium_tag;
 
   static_assert(
@@ -96,83 +79,8 @@ KOKKOS_INLINE_FUNCTION void compute_coupling(
       std::integral_constant<specfem::interface::interface_tag, interface_tag>;
 
   impl::compute_coupling(dimension_dispatch(), connection_dispatch(),
-                         interface_dispatch(), index_pack..., interface_data,
-                         coupled_field, self_field);
-}
-
-} // namespace specfem::medium
-
-// yeah... disgusting, I know. But, I need the compatibility information of
-// CoupledInterfaceType. this will be refactored with that.
-#include "specfem/assembly/coupled_interfaces/dim2/data_access/impl/load_access_compatibility.hpp"
-namespace specfem::medium {
-/**
- * @brief Computes coupling terms between different physical media
- *
- * Handles coupling interactions at interfaces between acoustic and elastic
- * media in spectral element simulations. Uses compile-time dispatch and
- * type validation to ensure consistent medium types.
- *
- * @tparam CoupledInterfaceType Interface data type (coupled interface)
- * @tparam EdgeFieldType Field type from one side
- * @tparam IntersectionFieldViewType Field type on interface (modified)
- *
- * @param interface_data Interface geometric data (factor, normal)
- * @param coupled_field Field data from one side
- * @param self_field Field data from self medium (output)
- *
- * @code{.cpp}
- * specfem::medium::compute_coupling(interface, coupled_field, self_field);
- * @endcode
- */
-template <typename CoupledInterfaceType, typename EdgeFieldType,
-          typename IntersectionFieldViewType,
-          typename std::enable_if_t<
-              CoupledInterfaceType::connection_tag ==
-                      specfem::connections::type::nonconforming &&
-                  specfem::assembly::coupled_interfaces_impl::
-                      stores_transfer_function_single_side<
-                          CoupledInterfaceType>::value,
-              int> = 0>
-KOKKOS_INLINE_FUNCTION void
-compute_coupling(const CoupledInterfaceType &interface_data,
-                 const EdgeFieldType &coupled_field,
-                 IntersectionFieldViewType &intersection_field) {
-  static_assert(
-      specfem::data_access::is_coupled_interface<CoupledInterfaceType>::value,
-      "interface_data is not a coupled interface type");
-  static_assert(specfem::data_access::is_chunk_edge<EdgeFieldType>::value &&
-                    specfem::data_access::is_field<EdgeFieldType>::value,
-                "coupled_field is not a point field type");
-
-  constexpr auto dimension_tag = CoupledInterfaceType::dimension_tag;
-  constexpr auto interface_tag = CoupledInterfaceType::interface_tag;
-  constexpr auto connection_tag = CoupledInterfaceType::connection_tag;
-  constexpr auto edge_medium_tag = EdgeFieldType::medium_tag;
-
-  // no medium check for intersection.
-  static_assert(
-      (specfem::assembly::coupled_interfaces_impl::
-               stores_transfer_function_self<CoupledInterfaceType>::value
-           ? specfem::interface::attributes<dimension_tag,
-                                            interface_tag>::self_medium()
-           : specfem::interface::attributes<dimension_tag,
-                                            interface_tag>::coupled_medium()) ==
-          edge_medium_tag,
-      "Inconsistent medium tag between CoupledInterfaceType's side of the "
-      "interface and EdgeFieldType");
-
-  // check number of axes match
-  // This will change.
-  static_assert(IntersectionFieldViewType::rank == 3,
-                "IntersectionFieldViewType must be a view with 3 axes: "
-                "view(local_iedge, ipoint, field_idim)");
-
-  using connection_dispatch =
-      std::integral_constant<specfem::connections::type, connection_tag>;
-
-  impl::compute_coupling(connection_dispatch(), interface_data, coupled_field,
-                         intersection_field);
+                         interface_dispatch(), interface_data, coupled_field,
+                         self_field);
 }
 
 /**
@@ -182,12 +90,10 @@ compute_coupling(const CoupledInterfaceType &interface_data,
  * media in spectral element simulations. Uses compile-time dispatch and
  * type validation to ensure consistent medium types.
  *
- * @tparam IndexType type of the index (must be edge-index)
  * @tparam CoupledInterfaceType Interface data type (coupled interface)
  * @tparam CoupledFieldType Field type from coupled medium
- * @tparam IntersectionFieldType Field type on interface (modified)
+ * @tparam SelfFieldType Field type from self medium (modified)
  *
- * @param index Index of the field to set
  * @param interface_data Interface geometric data (factor, normal)
  * @param coupled_field Field data from coupled medium
  * @param self_field Field data from self medium (output)
@@ -196,40 +102,31 @@ compute_coupling(const CoupledInterfaceType &interface_data,
  * specfem::medium::compute_coupling(interface, coupled_field, self_field);
  * @endcode
  */
-template <
-    typename IndexType, typename CoupledInterfaceType,
-    typename CoupledFieldType, typename IntersectionFieldType,
-    typename std::enable_if_t<CoupledInterfaceType::connection_tag ==
-                                  specfem::connections::type::nonconforming,
-                              int> = 0>
-KOKKOS_INLINE_FUNCTION void
-compute_interfacial_force(const IndexType &index,
-                          const CoupledInterfaceType &interface_data,
-                          const CoupledFieldType &coupled_field,
-                          IntersectionFieldType &intersection_field) {
+template <typename IndexType, typename CoupledInterfaceType,
+          typename CoupledFieldType, typename SelfFieldType,
+          std::enable_if_t<CoupledInterfaceType::connection_tag ==
+                               specfem::connections::type::nonconforming,
+                           int> = 0>
+KOKKOS_INLINE_FUNCTION void compute_coupling(
+    const IndexType &index, const CoupledInterfaceType &interface_data,
+    const CoupledFieldType &coupled_field, SelfFieldType &self_field) {
 
-  static_assert(specfem::data_access::is_edge_index<IndexType>::value,
-                "index is not of edge_index type");
   static_assert(
       specfem::data_access::is_coupled_interface<CoupledInterfaceType>::value,
       "interface_data is not a coupled interface type");
-  static_assert(specfem::data_access::is_chunk_edge<CoupledFieldType>::value &&
-                    specfem::data_access::is_field<CoupledFieldType>::value,
-                "coupled_field is not a point field type");
-  static_assert(specfem::data_access::is_field<IntersectionFieldType>::value,
-                "self_field is not a field type");
-
   constexpr auto dimension_tag = CoupledInterfaceType::dimension_tag;
   constexpr auto interface_tag = CoupledInterfaceType::interface_tag;
   constexpr auto connection_tag = CoupledInterfaceType::connection_tag;
-  constexpr auto self_medium_tag = IntersectionFieldType::medium_tag;
-  constexpr auto coupled_medium_tag = CoupledFieldType::medium_tag;
 
   static_assert(
-      specfem::interface::attributes<dimension_tag,
-                                     interface_tag>::self_medium() ==
-          self_medium_tag,
-      "Inconsistent self medium tag between interface and self field");
+      specfem::data_access::is_chunk_edge<IndexType>::value,
+      "The index for a nonconforming compute_coupling must be a chunk_edge.");
+
+  static_assert(specfem::data_access::is_chunk_edge<CoupledFieldType>::value &&
+                    specfem::data_access::is_field<CoupledFieldType>::value,
+                "coupled_field is not a chunk_edge field type");
+  constexpr auto coupled_medium_tag = CoupledFieldType::medium_tag;
+
   static_assert(
       specfem::interface::attributes<dimension_tag,
                                      interface_tag>::coupled_medium() ==
@@ -243,9 +140,9 @@ compute_interfacial_force(const IndexType &index,
   using interface_dispatch =
       std::integral_constant<specfem::interface::interface_tag, interface_tag>;
 
-  impl::compute_interfacial_force(dimension_dispatch(), connection_dispatch(),
-                                  interface_dispatch(), index, interface_data,
-                                  coupled_field, intersection_field);
+  impl::compute_coupling(dimension_dispatch(), connection_dispatch(),
+                         interface_dispatch(), index, interface_data,
+                         coupled_field, self_field);
 }
 
 } // namespace specfem::medium
