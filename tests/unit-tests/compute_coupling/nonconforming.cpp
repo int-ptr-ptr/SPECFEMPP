@@ -1,10 +1,34 @@
 #include "Kokkos_Environment.hpp"
+#include "algorithms/transfer.hpp"
 #include "medium/compute_coupling.hpp"
 #include "parallel_configuration/chunk_edge_config.hpp"
 #include "specfem/chunk_edge.hpp"
 #include <Kokkos_Core.hpp>
 #include <gtest/gtest.h>
 #include <memory>
+
+// We need to simulate a chunk_edge iteration:
+template <specfem::dimension::type DimensionTag> class ChunkEdgeIndexSimulator {
+public:
+  static constexpr auto accessor_type =
+      specfem::data_access::AccessorType::chunk_edge;
+  using KokkosIndexType = Kokkos::TeamPolicy<>::member_type;
+
+  KOKKOS_INLINE_FUNCTION
+  constexpr const KokkosIndexType &get_policy_index() const {
+    return this->kokkos_index;
+  }
+
+  KOKKOS_INLINE_FUNCTION
+  ChunkEdgeIndexSimulator(const int nedges, const KokkosIndexType &kokkos_index)
+      : kokkos_index(kokkos_index), _nedges(nedges) {}
+
+  KOKKOS_INLINE_FUNCTION int nedges() const { return _nedges; }
+
+private:
+  int _nedges;
+  KokkosIndexType kokkos_index; ///< Kokkos team member for this chunk
+};
 
 // base type so that we can use a single value-parameterized test for different
 // kernels
@@ -129,6 +153,10 @@ struct EdgeToInterfaceParams : EdgeToInterfaceParamsBase {
     using CoupledDisplacementType =
         specfem::chunk_edge::displacement<num_edges, nquad_edge, dimension_tag,
                                           coupled_medium, false>;
+    using PointSelfDisplacementType =
+        specfem::point::displacement<dimension_tag, self_medium, false>;
+    using PointCoupledDisplacementType =
+        specfem::point::displacement<dimension_tag, coupled_medium, false>;
 
     using SelfOnInterfaceType = specfem::datatype::VectorChunkEdgeViewType<
         type_real, specfem::dimension::type::dim2, num_edges,
@@ -238,12 +266,32 @@ struct EdgeToInterfaceParams : EdgeToInterfaceParamsBase {
 
           team.team_barrier();
 
-          // validate
+          // specfem::datatype::VectorPointViewType<type_real,
+          // SelfDisplacementType::components, SelfDisplacementType::using_simd>
 
-          specfem::medium::compute_coupling(self_transfer, self_disp,
-                                            self_on_interface);
-          specfem::medium::compute_coupling(coupled_transfer, coupled_disp,
-                                            coupled_on_interface);
+          // validate (self and coupled are independent, so we shouldn't need a
+          // barrier in between them)
+
+          specfem::algorithms::transfer(
+              ChunkEdgeIndexSimulator<dimension_tag>(num_edges, team),
+              self_transfer, self_disp,
+              [&](const int &iedge, const int &iinterface,
+                  const PointSelfDisplacementType &point) {
+                for (int icomp = 0; icomp < SelfDisplacementType::components;
+                     icomp++)
+                  self_on_interface(iedge, iinterface, icomp) = point(icomp);
+              });
+          specfem::algorithms::transfer(
+              ChunkEdgeIndexSimulator<dimension_tag>(num_edges, team),
+              coupled_transfer, coupled_disp,
+              [&](const int &iedge, const int &iinterface,
+                  const PointCoupledDisplacementType &point) {
+                for (int icomp = 0; icomp < CoupledDisplacementType::components;
+                     icomp++)
+                  coupled_on_interface(iedge, iinterface, icomp) = point(icomp);
+              });
+
+          team.team_barrier();
 
           // transfer should send polys to themselves, but in the new basis.
           // the expectation is just the intersection quadrature point to the
