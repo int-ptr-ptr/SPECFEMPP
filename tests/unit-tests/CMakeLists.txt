@@ -926,3 +926,7 @@ if(NOT MPI_PARALLEL)
   # gtest_discover_tests(seismogram_elastic_tests)
   # gtest_discover_tests(seismogram_acoustic_tests)
 endif()
+
+
+add_subdirectory(data/dim2/ncmarked_conforming_grid_curved/provenance)
+add_subdirectory(data/dim2/ncmarked_conforming_grid_flat/provenance)

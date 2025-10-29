@@ -1,0 +1,6 @@
+*.cmake
+Makefile
+Par_file
+Snakefile
+**/CMakeFiles/progress.marks
+.snakemake_timestamp

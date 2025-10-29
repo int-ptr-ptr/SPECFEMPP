@@ -13,4 +13,9 @@ python scripts/gmshlayerbuilder simple_dg_topo.dat MESH
 xmeshfem2D -p Par_file
 ```
 
-A bash script `generate_database.sh`, which can be run from anywhere, does this automatically.
+Relative to `provenance`:
+
+```bash
+python ../../../../../../scripts/gmshlayerbuilder simple_dg_topo.dat MESH
+../../../../../../bin/xmeshfem2D -p Par_file
+```

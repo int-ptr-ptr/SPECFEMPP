@@ -1,0 +1,44 @@
+ROOT_DIR = "@CMAKE_SOURCE_DIR@"
+
+PROV_DIR = "@CMAKE_CURRENT_SOURCE_DIR@"
+
+# check important tools exist
+GMSH_SCRIPT = f"{ROOT_DIR}/scripts/gmshlayerbuilder"
+
+XMESH_BIN = "xmeshfem2D"
+
+# working directory used by the original script
+WORKDIR = PROV_DIR
+
+# targets: MESH (directory created by gmshlayerbuilder) and a sentinel for xmeshfem2D
+MESH_DIR =  f"{WORKDIR}/MESH"
+XMESH_SENTINEL =  f"{WORKDIR}/OUTPUT_FILES/xmeshfem2D.done"
+PAR_FILE = f"{WORKDIR}/Par_file"
+
+rule all:
+    input:
+        XMESH_SENTINEL
+
+rule gmshlayerbuilder:
+    input:
+        GMSH_SCRIPT
+    output:
+        directory(str(MESH_DIR))
+    shell:
+        """
+            cd {WORKDIR}
+            python {GMSH_SCRIPT} simple_dg_topo.dat MESH
+        """
+
+rule xmeshfem2D:
+    input:
+        mesh = rules.gmshlayerbuilder.output,
+        parfile = str(PAR_FILE)
+    output:
+        log = XMESH_SENTINEL
+    shell:
+        """
+            cd {WORKDIR}
+            {XMESH_BIN} -p Par_file
+            echo done > {output.log}
+        """
