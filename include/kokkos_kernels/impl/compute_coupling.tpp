@@ -229,6 +229,8 @@ void specfem::kokkos_kernels::impl::compute_coupling(
         specfem::assembly::load_on_device(self_chunk_index, coupled_interfaces,
                                           coupled_transfer_function);
         InterfaceFieldViewType interface_field(team.team_scratch(0));
+
+        team.team_barrier();
         specfem::medium::compute_coupling(self_chunk_index,
                                           coupled_transfer_function,
                                           coupled_field, interface_field);
