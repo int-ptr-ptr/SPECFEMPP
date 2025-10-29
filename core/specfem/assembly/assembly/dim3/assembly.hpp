@@ -99,6 +99,8 @@ template <> struct assembly<specfem::dimension::type::dim3> {
       const bool allocate_boundary_values,
       const std::shared_ptr<specfem::io::reader> &property_reader);
 
+  assembly() = default;
+
   /**
    * @brief Maps the component of wavefield on the entire spectral element grid
    *

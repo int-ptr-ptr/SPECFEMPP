@@ -453,6 +453,12 @@ add_executable(
   assembly/compute_source_array/dim2/compute_source_array_from_vector.cpp
   assembly/compute_source_array/dim2/compute_source_array_from_tensor.cpp
   assembly/compute_source_array/dim3/compute_source_array_from_vector.cpp
+
+  # New dim3 tests
+  assembly/dim3/mesh/shape_functions.cpp
+  assembly/dim3/mesh/points.cpp
+  assembly/dim3/mesh/control_nodes.cpp
+  assembly/dim3/jacobian_matrix/jacobian_matrix.cpp
 )
 
 target_compile_definitions(assembly_tests PRIVATE TEST_OUTPUT_DIR=${TEST_OUTPUT_DIR})
@@ -469,9 +475,13 @@ target_link_libraries(
   kokkos_environment
   yaml-cpp
   utilities
+  enumerations
+  shape_functions
+  quadrature
   boost
   -lpthread -lm
   gtest_main
+  ${BOOST_LIBS}
 )
 
 add_executable(

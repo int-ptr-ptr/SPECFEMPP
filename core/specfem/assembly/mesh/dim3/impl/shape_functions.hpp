@@ -46,6 +46,14 @@ public:
 
   shape_functions() = default;
 
+  shape_functions(const int ngllz, const int nglly, const int ngllx,
+                  const int ngnod,
+                  const specfem::assembly::mesh_impl::quadrature<
+                      specfem::dimension::type::dim3> &quadrature,
+                  const specfem::assembly::mesh_impl::control_nodes<
+                      specfem::dimension::type::dim3>
+                      control_nodes);
+
   ShapeFunctionViewType shape3D;                 ///< Shape functions
   DShapeFunctionViewType dshape3D;               ///< Shape function
                                                  ///< derivatives

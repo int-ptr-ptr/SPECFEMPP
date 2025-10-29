@@ -18,4 +18,5 @@ template <specfem::dimension::type DimensionTag> struct jacobian_matrix;
 // Data access functions
 #include "jacobian_matrix/dim3/load_on_device.hpp"
 #include "jacobian_matrix/dim3/load_on_host.hpp"
+#include "jacobian_matrix/dim3/store_on_device.hpp"
 #include "jacobian_matrix/dim3/store_on_host.hpp"

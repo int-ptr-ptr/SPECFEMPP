@@ -590,3 +590,140 @@ specfem::mesh_entity::corners_of_face(
     throw std::runtime_error("Invalid face type");
   }
 }
+
+std::list<specfem::mesh_entity::dim3::type>
+specfem::mesh_entity::faces_of_corner(
+    const specfem::mesh_entity::dim3::type &corner) {
+
+  if (!specfem::mesh_entity::contains(specfem::mesh_entity::dim3::corners,
+                                      corner)) {
+    throw std::runtime_error("The argument is not a corner");
+  }
+
+  switch (corner) {
+  case specfem::mesh_entity::dim3::type::bottom_front_left:
+    return { specfem::mesh_entity::dim3::type::bottom,
+             specfem::mesh_entity::dim3::type::front,
+             specfem::mesh_entity::dim3::type::left };
+  case specfem::mesh_entity::dim3::type::bottom_front_right:
+    return { specfem::mesh_entity::dim3::type::bottom,
+             specfem::mesh_entity::dim3::type::front,
+             specfem::mesh_entity::dim3::type::right };
+  case specfem::mesh_entity::dim3::type::bottom_back_left:
+    return { specfem::mesh_entity::dim3::type::bottom,
+             specfem::mesh_entity::dim3::type::back,
+             specfem::mesh_entity::dim3::type::left };
+  case specfem::mesh_entity::dim3::type::bottom_back_right:
+    return { specfem::mesh_entity::dim3::type::bottom,
+             specfem::mesh_entity::dim3::type::back,
+             specfem::mesh_entity::dim3::type::right };
+  case specfem::mesh_entity::dim3::type::top_front_left:
+    return { specfem::mesh_entity::dim3::type::top,
+             specfem::mesh_entity::dim3::type::front,
+             specfem::mesh_entity::dim3::type::left };
+  case specfem::mesh_entity::dim3::type::top_front_right:
+    return { specfem::mesh_entity::dim3::type::top,
+             specfem::mesh_entity::dim3::type::front,
+             specfem::mesh_entity::dim3::type::right };
+  case specfem::mesh_entity::dim3::type::top_back_left:
+    return { specfem::mesh_entity::dim3::type::top,
+             specfem::mesh_entity::dim3::type::back,
+             specfem::mesh_entity::dim3::type::left };
+  case specfem::mesh_entity::dim3::type::top_back_right:
+    return { specfem::mesh_entity::dim3::type::top,
+             specfem::mesh_entity::dim3::type::back,
+             specfem::mesh_entity::dim3::type::right };
+  default:
+    throw std::runtime_error("Invalid corner type");
+  }
+}
+
+std::list<specfem::mesh_entity::dim3::type>
+specfem::mesh_entity::edges_of_corner(
+    const specfem::mesh_entity::dim3::type &corner) {
+  switch (corner) {
+  case specfem::mesh_entity::dim3::type::bottom_front_left:
+    return { specfem::mesh_entity::dim3::type::bottom_left,
+             specfem::mesh_entity::dim3::type::front_left,
+             specfem::mesh_entity::dim3::type::front_bottom };
+  case specfem::mesh_entity::dim3::type::bottom_front_right:
+    return { specfem::mesh_entity::dim3::type::bottom_right,
+             specfem::mesh_entity::dim3::type::front_right,
+             specfem::mesh_entity::dim3::type::front_bottom };
+  case specfem::mesh_entity::dim3::type::bottom_back_left:
+    return { specfem::mesh_entity::dim3::type::bottom_left,
+             specfem::mesh_entity::dim3::type::back_left,
+             specfem::mesh_entity::dim3::type::back_bottom };
+  case specfem::mesh_entity::dim3::type::bottom_back_right:
+    return { specfem::mesh_entity::dim3::type::bottom_right,
+             specfem::mesh_entity::dim3::type::back_right,
+             specfem::mesh_entity::dim3::type::back_bottom };
+  case specfem::mesh_entity::dim3::type::top_front_left:
+    return { specfem::mesh_entity::dim3::type::top_left,
+             specfem::mesh_entity::dim3::type::front_left,
+             specfem::mesh_entity::dim3::type::front_top };
+  case specfem::mesh_entity::dim3::type::top_front_right:
+    return { specfem::mesh_entity::dim3::type::top_right,
+             specfem::mesh_entity::dim3::type::front_right,
+             specfem::mesh_entity::dim3::type::front_top };
+  case specfem::mesh_entity::dim3::type::top_back_left:
+    return { specfem::mesh_entity::dim3::type::top_left,
+             specfem::mesh_entity::dim3::type::back_left,
+             specfem::mesh_entity::dim3::type::back_top };
+  case specfem::mesh_entity::dim3::type::top_back_right:
+    return { specfem::mesh_entity::dim3::type::top_right,
+             specfem::mesh_entity::dim3::type::back_right,
+             specfem::mesh_entity::dim3::type::back_top };
+  default:
+    throw std::runtime_error("Invalid corner type");
+  }
+}
+
+std::list<specfem::mesh_entity::dim3::type> specfem::mesh_entity::faces_of_edge(
+    const specfem::mesh_entity::dim3::type &edge) {
+  if (!specfem::mesh_entity::contains(specfem::mesh_entity::dim3::edges,
+                                      edge)) {
+    throw std::runtime_error("The argument is not an edge");
+  }
+
+  switch (edge) {
+  case specfem::mesh_entity::dim3::type::bottom_left:
+    return { specfem::mesh_entity::dim3::type::bottom,
+             specfem::mesh_entity::dim3::type::left };
+  case specfem::mesh_entity::dim3::type::bottom_right:
+    return { specfem::mesh_entity::dim3::type::bottom,
+             specfem::mesh_entity::dim3::type::right };
+  case specfem::mesh_entity::dim3::type::top_left:
+    return { specfem::mesh_entity::dim3::type::top,
+             specfem::mesh_entity::dim3::type::left };
+  case specfem::mesh_entity::dim3::type::top_right:
+    return { specfem::mesh_entity::dim3::type::top,
+             specfem::mesh_entity::dim3::type::right };
+  case specfem::mesh_entity::dim3::type::front_bottom:
+    return { specfem::mesh_entity::dim3::type::bottom,
+             specfem::mesh_entity::dim3::type::front };
+  case specfem::mesh_entity::dim3::type::front_top:
+    return { specfem::mesh_entity::dim3::type::top,
+             specfem::mesh_entity::dim3::type::front };
+  case specfem::mesh_entity::dim3::type::front_left:
+    return { specfem::mesh_entity::dim3::type::left,
+             specfem::mesh_entity::dim3::type::front };
+  case specfem::mesh_entity::dim3::type::front_right:
+    return { specfem::mesh_entity::dim3::type::right,
+             specfem::mesh_entity::dim3::type::front };
+  case specfem::mesh_entity::dim3::type::back_bottom:
+    return { specfem::mesh_entity::dim3::type::bottom,
+             specfem::mesh_entity::dim3::type::back };
+  case specfem::mesh_entity::dim3::type::back_top:
+    return { specfem::mesh_entity::dim3::type::top,
+             specfem::mesh_entity::dim3::type::back };
+  case specfem::mesh_entity::dim3::type::back_left:
+    return { specfem::mesh_entity::dim3::type::left,
+             specfem::mesh_entity::dim3::type::back };
+  case specfem::mesh_entity::dim3::type::back_right:
+    return { specfem::mesh_entity::dim3::type::right,
+             specfem::mesh_entity::dim3::type::back };
+  default:
+    throw std::runtime_error("Invalid edge type");
+  }
+}

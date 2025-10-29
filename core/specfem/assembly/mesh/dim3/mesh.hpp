@@ -46,6 +46,14 @@ public:
        const specfem::mesh::mapping<dimension_tag> &mapping,
        const specfem::mesh::control_nodes<dimension_tag> &control_nodes,
        const specfem::quadrature::quadratures &quadrature);
+
+  mesh(const int nspec, const int ngnod, const int ngllz, const int nglly,
+       const int ngllx,
+       const specfem::mesh::meshfem3d::adjacency_graph<dimension_tag>
+           &adjacency_graph,
+       const specfem::mesh::meshfem3d::ControlNodes<dimension_tag>
+           &control_nodes,
+       const specfem::quadrature::quadratures &quadrature);
 };
 
 } // namespace specfem::assembly

@@ -96,8 +96,9 @@ const std::string to_string(const specfem::mesh_entity::dim3::type &entity);
  * - front: y-positive boundary
  * - back: y-negative boundary
  */
-const std::list<type> faces = { type::bottom, type::right, type::top,
-                                type::left,   type::front, type::back };
+const std::list<specfem::mesh_entity::dim3::type> faces = {
+  type::bottom, type::right, type::top, type::left, type::front, type::back
+};
 
 /**
  * @brief List of all edge types in a hexahedral element
@@ -112,7 +113,7 @@ const std::list<type> faces = { type::bottom, type::right, type::top,
  * - Front vertical edges: front_bottom, front_top, front_left, front_right
  * - Back vertical edges: back_bottom, back_top, back_left, back_right
  */
-const std::list<type> edges = {
+const std::list<specfem::mesh_entity::dim3::type> edges = {
   type::bottom_left,  type::bottom_right, type::top_right,  type::top_left,
   type::front_bottom, type::front_top,    type::front_left, type::front_right,
   type::back_bottom,  type::back_top,     type::back_left,  type::back_right
@@ -132,7 +133,7 @@ const std::list<type> edges = {
  * - Top corners (z-positive): top_front_left, top_front_right,
  *   top_back_left, top_back_right
  */
-const std::list<type> corners = {
+const std::list<specfem::mesh_entity::dim3::type> corners = {
   type::bottom_front_left, type::bottom_front_right, type::bottom_back_left,
   type::bottom_back_right, type::top_front_left,     type::top_front_right,
   type::top_back_left,     type::top_back_right
@@ -465,4 +466,66 @@ edges_of_face(const specfem::mesh_entity::dim3::type &face);
  */
 std::array<specfem::mesh_entity::dim3::type, 4>
 corners_of_face(const specfem::mesh_entity::dim3::type &face);
+
+/**
+ * @brief Returns the faces that meet at a given corner
+ *
+ * @param corner The corner mesh entity type
+ * @return std::list<specfem::mesh_entity::dim3::type> List of face types
+ * connected at the corner
+ *
+ * For each corner of a hexahedral element, this function returns the three
+ * faces that converge at that corner. The faces are returned in a consistent
+ * order.
+ *
+ * @throws std::runtime_error if the input is not a valid corner type
+ *
+ * @code
+ * auto faces = faces_of_corner(type::bottom_front_left);
+ * // Returns the three faces meeting at bottom_front_left corner
+ * @endcode
+ */
+std::list<specfem::mesh_entity::dim3::type>
+faces_of_corner(const specfem::mesh_entity::dim3::type &corner);
+
+/**
+ * @brief Returns the edges that meet at a given corner
+ *
+ * @param corner The corner mesh entity type
+ * @return std::list<specfem::mesh_entity::dim3::type> List of edge types that
+ * meet at the corner
+ *
+ * For each corner of a hexahedral element, this function returns the three
+ * edges that converge at that corner. The edges are returned in a consistent
+ * order.
+ *
+ * @throws std::runtime_error if the input is not a valid corner type
+ *
+ * @code
+ * auto edges = edges_of_corner(type::bottom_front_left);
+ * // Returns the three edges meeting at bottom_front_left corner
+ * @endcode
+ */
+std::list<specfem::mesh_entity::dim3::type>
+edges_of_corner(const specfem::mesh_entity::dim3::type &corner);
+
+/**
+ * @brief Returns the faces that are connected by a given edge
+ *
+ * @param edge The edge mesh entity type
+ * @return std::list<specfem::mesh_entity::dim3::type> List of face types
+ * connected by the edge
+ *
+ * For each edge of a hexahedral element, this function returns the two faces
+ * that meet at that edge. The faces are returned in a consistent order.
+ *
+ * @throws std::runtime_error if the input is not a valid edge type
+ *
+ * @code
+ * auto faces = faces_of_edge(type::bottom_left);
+ * // Returns faces that share the bottom_left edge
+ * @endcode
+ */
+std::list<specfem::mesh_entity::dim3::type>
+faces_of_edge(const specfem::mesh_entity::dim3::type &edge);
 } // namespace specfem::mesh_entity

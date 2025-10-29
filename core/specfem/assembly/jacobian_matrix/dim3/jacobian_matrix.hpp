@@ -52,6 +52,8 @@ struct jacobian_matrix<specfem::dimension::type::dim3>
   jacobian_matrix(
       const specfem::mesh::jacobian_matrix<dimension_tag> &mesh_jacobian);
 
+  jacobian_matrix(const specfem::assembly::mesh<dimension_tag> &assembly_mesh);
+
   void sync_views();
 
   std::tuple<bool, Kokkos::View<bool *, Kokkos::DefaultHostExecutionSpace> >
