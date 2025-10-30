@@ -394,10 +394,15 @@ void nonconforming_kernel_comparison(
                 c_kernels.template update_wavefields<
                     specfem::element::medium_tag::acoustic>(1);
 
+                Kokkos::fence();
+
                 nc_kernels.template update_wavefields<
                     specfem::element::medium_tag::elastic_psv>(1);
                 c_kernels.template update_wavefields<
                     specfem::element::medium_tag::elastic_psv>(1);
+
+                Kokkos::fence();
+
                 nc_field.copy_to_host();
                 c_field.copy_to_host();
 
