@@ -250,7 +250,7 @@ void specfem::kokkos_kernels::impl::compute_coupling(
                   point_boundary;
               specfem::assembly::load_on_device(self_index, assembly.boundaries,
                                                 point_boundary);
-              if constexpr (BoundaryTag == specfem::element::boundary_tag::
+              if constexpr (boundary_tag == specfem::element::boundary_tag::
                                                acoustic_free_surface) {
                 specfem::boundary_conditions::apply_boundary_conditions(
                     point_boundary, self_field);
