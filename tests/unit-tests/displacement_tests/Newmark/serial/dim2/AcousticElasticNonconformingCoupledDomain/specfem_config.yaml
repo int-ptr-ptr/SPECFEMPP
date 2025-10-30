@@ -50,6 +50,6 @@ parameters:
 
   ## databases
   databases:
-    mesh-database: "displacement_tests/Newmark/serial/dim2/AcousticElasticNonconformingCoupledDomain/database.bin"
+    mesh-database: "data/dim2/fluid_solid_mesh_flat_ocean_bottom/database_nc.bin"
 
   sources: "displacement_tests/Newmark/serial/dim2/AcousticElasticCoupledDomain/sources.yaml"
