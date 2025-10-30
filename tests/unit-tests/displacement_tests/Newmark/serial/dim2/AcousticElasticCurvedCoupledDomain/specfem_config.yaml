@@ -34,7 +34,7 @@ parameters:
         writer:
           seismogram:
             format: ascii
-            directory: "."
+            directory: "displacement_tests/Newmark/serial/dim2/AcousticElasticCurvedCoupledDomain/provenance/OUTPUT_FILES/seismo"
           display:
             format: PNG
             directory: "displacement_tests/Newmark/serial/dim2/AcousticElasticCurvedCoupledDomain/provenance/OUTPUT_FILES/display"
