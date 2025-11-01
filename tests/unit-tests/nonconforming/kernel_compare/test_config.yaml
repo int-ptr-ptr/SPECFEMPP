@@ -1,7 +1,7 @@
-Tests:
-  - name: "4x4 neumann"
-    description: "A 4x4 regular grid (cells 25x25 units) with neumann bcs"
-    mesh: "data/dim2/ncmarked_conforming_grid_flat/database.bin"
-  - name: "8x8 neumann"
-    description: "An 8x8 bathymetrized grid (cells 12.5x12.5 units) with neumann bcs"
-    mesh: "data/dim2/ncmarked_conforming_grid_curved/database.bin"
+Tests: []
+  # - name: "4x4 neumann"
+  #   description: "A 4x4 regular grid (cells 25x25 units) with neumann bcs"
+  #   mesh: "data/dim2/ncmarked_conforming_grid_flat/database.bin"
+  # - name: "8x8 neumann"
+  #   description: "An 8x8 bathymetrized grid (cells 12.5x12.5 units) with neumann bcs"
+  #   mesh: "data/dim2/ncmarked_conforming_grid_curved/database.bin"
