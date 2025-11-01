@@ -316,16 +316,20 @@ add_executable(
   nonconforming_tests
   nonconforming/reparameterizations/compute_intersection_test.cpp
   nonconforming/reparameterizations/set_transfer_functions_test.cpp
+  nonconforming/kernel_compare/fixture.cpp
+  nonconforming/kernel_compare/kernel_compare_test.cpp
   nonconforming/runner.cpp
 )
 
 target_link_libraries(
   nonconforming_tests
+  io
   mesh
   assembly
   quadrature
   mpi_environment
   kokkos_environment
+  kokkos_kernels
   yaml-cpp
   utilities
   boost
@@ -932,6 +936,7 @@ if(NOT MPI_PARALLEL)
     io
     mesh
     policies
+    nonconforming
   )
 
   foreach(dir_name IN LISTS LINK_DIRS)
