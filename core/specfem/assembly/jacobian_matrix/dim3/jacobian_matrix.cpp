@@ -2,6 +2,43 @@
 #include "mesh/mesh.hpp"
 #include "specfem/jacobian.hpp"
 
+specfem::assembly::jacobian_matrix<
+    specfem::dimension::type::dim3>::jacobian_matrix(const int nspec,
+                                                     const int ngllx,
+                                                     const int nglly,
+                                                     const int ngllz)
+    : nspec(nspec), ngllx(ngllx), nglly(nglly), ngllz(ngllz),
+      xix("specfem::assembly::jacobian_matrix::xix", nspec, ngllz, nglly,
+          ngllx),
+      xiy("specfem::assembly::jacobian_matrix::xiy", nspec, ngllz, nglly,
+          ngllx),
+      xiz("specfem::assembly::jacobian_matrix::xiz", nspec, ngllz, nglly,
+          ngllx),
+      etax("specfem::assembly::jacobian_matrix::etax", nspec, ngllz, nglly,
+           ngllx),
+      etay("specfem::assembly::jacobian_matrix::etay", nspec, ngllz, nglly,
+           ngllx),
+      etaz("specfem::assembly::jacobian_matrix::etaz", nspec, ngllz, nglly,
+           ngllx),
+      gammax("specfem::assembly::jacobian_matrix::gammax", nspec, ngllz, nglly,
+             ngllx),
+      gammay("specfem::assembly::jacobian_matrix::gammay", nspec, ngllz, nglly,
+             ngllx),
+      gammaz("specfem::assembly::jacobian_matrix::gammaz", nspec, ngllz, nglly,
+             ngllx),
+      jacobian("specfem::assembly::jacobian_matrix::jacobian", nspec, ngllz,
+               nglly, ngllx),
+      h_xix(Kokkos::create_mirror_view(xix)),
+      h_xiy(Kokkos::create_mirror_view(xiy)),
+      h_xiz(Kokkos::create_mirror_view(xiz)),
+      h_etax(Kokkos::create_mirror_view(etax)),
+      h_etay(Kokkos::create_mirror_view(etay)),
+      h_etaz(Kokkos::create_mirror_view(etaz)),
+      h_gammax(Kokkos::create_mirror_view(gammax)),
+      h_gammay(Kokkos::create_mirror_view(gammay)),
+      h_gammaz(Kokkos::create_mirror_view(gammaz)),
+      h_jacobian(Kokkos::create_mirror_view(jacobian)) {}
+
 template <typename ShapeFunctionView, typename CoordinateView>
 void initialize_jacobian_matrix(
     const int nspec, const int ngllz, const int nglly, const int ngllx,

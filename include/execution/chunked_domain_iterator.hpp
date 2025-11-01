@@ -266,8 +266,8 @@ public:
     int ielement = i % num_elements;
     int ispec = indices(ielement);
     int xz = i / num_elements;
-    const int iz = xz / element_grid.ngllz;
-    const int ix = xz % element_grid.ngllz;
+    const int iz = xz / element_grid.ngllx;
+    const int ix = xz % element_grid.ngllx;
 #else
     const int ix = i % element_grid.ngllx;
     const int iz = (i / element_grid.ngllx) % element_grid.ngllz;

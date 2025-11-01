@@ -65,7 +65,7 @@ public:
     int elements_updated = 0;
 
     FOR_EACH_IN_PRODUCT(
-        (DIMENSION_TAG(DIM2), CONNECTION_TAG(WEAKLY_CONFORMING, NONCONFORMING),
+        (DIMENSION_TAG(DIM2), CONNECTION_TAG(WEAKLY_CONFORMING),
          INTERFACE_TAG(ELASTIC_ACOUSTIC, ACOUSTIC_ELASTIC),
          BOUNDARY_TAG(NONE, ACOUSTIC_FREE_SURFACE, STACEY,
                       COMPOSITE_STACEY_DIRICHLET)),
@@ -76,9 +76,7 @@ public:
           if constexpr (dimension_tag == _dimension_tag_ &&
                         self_medium == medium) {
             impl::compute_coupling<_dimension_tag_, _connection_tag_, wavefield,
-                                   ngll, ngll, _interface_tag_, _boundary_tag_>(
-                assembly);
-            // second ngll is the number of quadrature points on the mortar.
+                                   _interface_tag_, _boundary_tag_>(assembly);
           }
         })
 

@@ -49,6 +49,9 @@ struct jacobian_matrix<specfem::dimension::type::dim3>
 
   jacobian_matrix() = default;
 
+  jacobian_matrix(const int nspec, const int ngllx, const int nglly,
+                  const int ngllz);
+
   jacobian_matrix(
       const specfem::mesh::jacobian_matrix<dimension_tag> &mesh_jacobian);
 

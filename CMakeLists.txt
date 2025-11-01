@@ -102,6 +102,16 @@ else(${CMAKE_CXX_COMPILER_ID} MATCHES "IntelLLVM")
     message(STATUS "IntelLLVM not detected -- setting __INTEL_LLVM__ FALSE")
 endif()
 
+# Check if Windows
+# https://cmake.org/cmake/help/latest/variable/MSVC.html
+if(MSVC)
+    set(__MSVC__ TRUE)
+    message(STATUS "MSVC detected -- setting __MSVC__ TRUE")
+else(MSVC)
+    set(__MSVC__ FALSE)
+    message(STATUS "MSVC not detected -- setting __MSVC__ FALSE")
+endif()
+
 # Install Kokkos as a dependency
 include("${CMAKE_SOURCE_DIR}/cmake/kokkos.cmake")
 
@@ -447,6 +457,10 @@ set_target_properties(kokkos_kernels PROPERTIES
         UNITY_BUILD $<NOT:$<BOOL:${__APPLE__}>>
         UNITY_BUILD_BATCH_SIZE $<IF:$<BOOL:${__APPLE__}>,0,4>
 )
+
+if(__MSVC__)
+target_compile_definitions(kokkos_kernels PRIVATE __MSVC__)
+endif(__MSVC__)
 
 target_link_libraries(
         kokkos_kernels

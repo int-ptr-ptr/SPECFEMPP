@@ -1,7 +1,6 @@
 #pragma once
 
 #include "dim2/coupling_terms/acoustic_elastic.hpp"
-#include "dim2/coupling_terms/edge_to_interface.hpp"
 #include "dim2/coupling_terms/elastic_acoustic.hpp"
 #include "enumerations/connections.hpp"
 #include "enumerations/interface.hpp"

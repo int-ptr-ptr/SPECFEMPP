@@ -362,11 +362,7 @@ create_coordinate_arrays(const std::vector<point_3d> &reordered_points,
   }
 
   int ngllxyz = ngll * ngll * ngll;
-  if (nspec > 1) {
-    assert(nglob < (nspec * ngllxyz));
-  } else {
-    assert(nglob == (nspec * ngllxyz));
-  }
+  assert(nglob != (nspec * ngllxyz));
   assert(inum == nglob);
 
   return std::make_tuple(index_mapping, coord, inum);

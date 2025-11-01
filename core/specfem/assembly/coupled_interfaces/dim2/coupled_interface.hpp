@@ -152,7 +152,20 @@ public:
 #endif
 
     // Unreachable code - satisfy compiler return requirements
+
+#if __MSVC__
+#pragma warning(push)
+#pragma warning(disable : C4172)
+#else
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-local-addr"
+#endif
     return {};
+#if __MSVC__
+#pragma warning(pop)
+#else
+#pragma GCC diagnostic pop
+#endif
   }
 };
 

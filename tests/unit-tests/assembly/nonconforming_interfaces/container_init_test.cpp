@@ -113,27 +113,23 @@ void estimate_verify_normal(
    */
   auto [orthcoord, jacobian_edgecoordx, jacobian_edgecoordz,
         jacobian_orthcoordx, jacobian_orthcoordz] =
-      [&xi, &gamma, &iedge, &edgecoord,
+      [&xi, &gamma, &iedge,
        &jacobian]() -> std::tuple<type_real &, type_real &, type_real &,
                                   type_real &, type_real &> {
     if (iedge == specfem::mesh_entity::dim2::type::bottom) {
       gamma = -1;
-      xi = edgecoord;
       return { gamma, jacobian.xix, jacobian.xiz, jacobian.gammax,
                jacobian.gammaz };
     } else if (iedge == specfem::mesh_entity::dim2::type::right) {
       xi = 1;
-      gamma = edgecoord;
       return { xi, jacobian.gammax, jacobian.gammaz, jacobian.xix,
                jacobian.xiz };
     } else if (iedge == specfem::mesh_entity::dim2::type::top) {
       gamma = 1;
-      xi = edgecoord;
       return { gamma, jacobian.xix, jacobian.xiz, jacobian.gammax,
                jacobian.gammaz };
     } else {
       xi = -1;
-      gamma = edgecoord;
       return { xi, jacobian.gammax, jacobian.gammaz, jacobian.xix,
                jacobian.xiz };
     }

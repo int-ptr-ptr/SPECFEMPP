@@ -585,6 +585,29 @@ target_link_libraries(
 )
 
 add_executable(
+  gradient_tests
+  algorithms/dim2/gradient.cpp
+  algorithms/dim3/gradient.cpp
+)
+
+target_link_libraries(
+  gradient_tests
+  quadrature
+  algorithms
+  kokkos_environment
+  gtest_main
+  Kokkos::kokkos
+  mpi_environment
+  assembly
+  quadrature
+  utilities
+  -lpthread -lm
+)
+
+# Turn unity build off for gradient_tests
+set_target_properties(gradient_tests PROPERTIES UNITY_BUILD OFF)
+
+add_executable(
   policies_tests
   policies/policies.cpp
 )
@@ -874,6 +897,7 @@ if(NOT MPI_PARALLEL)
     lagrange_tests
     locate_point_fixture_2d
     locate_point_fixture_3d
+    gradient_tests
     mass_matrix_tests
     compute_coupling_tests
     mesh_dim2_tests
