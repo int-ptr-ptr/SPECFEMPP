@@ -131,14 +131,14 @@ struct EdgeToInterfaceParams : EdgeToInterfaceParamsBase {
             specfem::connections::type::nonconforming, interface_tag,
             specfem::element::boundary_tag::none,
             specfem::kokkos::DevScratchSpace,
-            Kokkos::MemoryTraits<Kokkos::Unmanaged>, false>;
+            Kokkos::MemoryTraits<Kokkos::Unmanaged> >;
     using CoupledTransferType =
         specfem::chunk_edge::nonconforming_transfer_function<
             false, num_edges, nquad_edge, nquad_intersection, dimension_tag,
             specfem::connections::type::nonconforming, interface_tag,
             specfem::element::boundary_tag::none,
             specfem::kokkos::DevScratchSpace,
-            Kokkos::MemoryTraits<Kokkos::Unmanaged>, false>;
+            Kokkos::MemoryTraits<Kokkos::Unmanaged> >;
 
     constexpr auto self_medium =
         specfem::interface::attributes<dimension_tag,
@@ -272,7 +272,7 @@ struct EdgeToInterfaceParams : EdgeToInterfaceParamsBase {
           // validate (self and coupled are independent, so we shouldn't need a
           // barrier in between them)
 
-          specfem::algorithms::transfer(
+          specfem::algorithms::transfer_self(
               ChunkEdgeIndexSimulator<dimension_tag>(num_edges, team),
               self_transfer, self_disp,
               [&](const int &iedge, const int &iinterface,
@@ -281,7 +281,7 @@ struct EdgeToInterfaceParams : EdgeToInterfaceParamsBase {
                      icomp++)
                   self_on_interface(iedge, iinterface, icomp) = point(icomp);
               });
-          specfem::algorithms::transfer(
+          specfem::algorithms::transfer_coupled(
               ChunkEdgeIndexSimulator<dimension_tag>(num_edges, team),
               coupled_transfer, coupled_disp,
               [&](const int &iedge, const int &iinterface,

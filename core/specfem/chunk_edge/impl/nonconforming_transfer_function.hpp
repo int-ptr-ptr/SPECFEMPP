@@ -29,19 +29,19 @@ namespace impl {
  * @tparam BoundaryTag Boundary condition type
  * @tparam MemorySpace Memory space for data storage.
  * @tparam MemoryTraits Memory traits for data storage.
- * @tparam UseSIMD Flag to indicate if SIMD should be used.
  */
 template <bool IsSelf, int NumberElements, int NQuadElement,
           int NQuadIntersection, specfem::dimension::type DimensionTag,
-          typename MemorySpace, typename MemoryTraits, bool UseSIMD>
+          typename MemorySpace, typename MemoryTraits>
 struct nonconforming_transfer_function;
 
 template <int NumberElements, int NQuadElement, int NQuadIntersection,
-          typename MemorySpace, typename MemoryTraits, bool UseSIMD>
+          typename MemorySpace, typename MemoryTraits>
 struct nonconforming_transfer_function<
     true, NumberElements, NQuadElement, NQuadIntersection,
-    specfem::dimension::type::dim2, MemorySpace, MemoryTraits, UseSIMD> {
+    specfem::dimension::type::dim2, MemorySpace, MemoryTraits> {
 private:
+  static constexpr bool UseSIMD = false;
   /**
    * @name Typedefs
    *
@@ -64,9 +64,6 @@ public:
    * enabled.
    */
   TransferViewType transfer_function_self;
-  KOKKOS_INLINE_FUNCTION const TransferViewType &get_transfer_function() const {
-    return transfer_function_self;
-  }
   /**
    * @brief Constructs coupled interface point with geometric data
    *
@@ -99,11 +96,12 @@ public:
 };
 
 template <int NumberElements, int NQuadElement, int NQuadIntersection,
-          typename MemorySpace, typename MemoryTraits, bool UseSIMD>
+          typename MemorySpace, typename MemoryTraits>
 struct nonconforming_transfer_function<
     false, NumberElements, NQuadElement, NQuadIntersection,
-    specfem::dimension::type::dim2, MemorySpace, MemoryTraits, UseSIMD> {
+    specfem::dimension::type::dim2, MemorySpace, MemoryTraits> {
 private:
+  static constexpr bool UseSIMD = false;
   /**
    * @name Typedefs
    *
@@ -126,9 +124,6 @@ public:
    * enabled.
    */
   TransferViewType transfer_function_coupled;
-  KOKKOS_INLINE_FUNCTION const TransferViewType &get_transfer_function() const {
-    return transfer_function_coupled;
-  }
 
   /**
    * @brief Constructs coupled interface point with geometric data
