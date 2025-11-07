@@ -1,5 +1,5 @@
-#include "Kokkos_Environment.hpp"
 #include "algorithms/transfer.hpp"
+#include "enumerations/dimension.hpp"
 #include "medium/compute_coupling.hpp"
 #include "parallel_configuration/chunk_edge_config.hpp"
 #include "specfem/chunk_edge.hpp"
@@ -7,8 +7,12 @@
 #include <gtest/gtest.h>
 #include <memory>
 
+// leave dim2 tag up here, in case this test is generalized
+static constexpr specfem::dimension::type DimensionTag =
+    specfem::dimension::type::dim2;
+
 // We need to simulate a chunk_edge iteration:
-template <specfem::dimension::type DimensionTag> class ChunkEdgeIndexSimulator {
+class ChunkEdgeIndexSimulator {
 public:
   static constexpr auto accessor_type =
       specfem::data_access::AccessorType::chunk_edge;
@@ -32,11 +36,11 @@ private:
 
 // base type so that we can use a single value-parameterized test for different
 // kernels
-struct EdgeToInterfaceParamsBase {
+struct CrossEqualizerParamsBase {
   virtual void run_test(const std::string &testname) const {
     throw std::runtime_error(
         testname +
-        std::string(": Called EdgeToInterfaceParamsBase::run_test(). No test "
+        std::string(": Called CrossEqualizerParamsBase::run_test(). No test "
                     "should be initialized with this type."));
   }
 };
@@ -68,12 +72,11 @@ eval_lagrange(const std::array<type_real, nquad> &quadrature_points,
 }
 
 /**
- * @brief Specialized version of EdgeToInterfaceParamsBase, containing the
+ * @brief Specialized version of CrossEqualizerParamsBase, containing the
  * quadrature points of both the intersection and edge. The virtual method
  * `run_test()` is specialized to the given template parameters
  *
  * @tparam num_edges_ - the chunk size of the chunk_edge views
- * @tparam DimensionTag - dimension of the simulation
  * @tparam InterfaceTag - the interface being modelled. This should not have any
  * bearing on the test, except to set the number of components on either side.
  * @tparam nquad_edge_ - the number of quadrature points on (dimension of) the
@@ -81,11 +84,11 @@ eval_lagrange(const std::array<type_real, nquad> &quadrature_points,
  * @tparam nquad_intersection_ - the number of quadrature points on (dimension
  * of) the intersections
  */
-template <int num_edges_, specfem::dimension::type DimensionTag,
-          specfem::interface::interface_tag InterfaceTag, int nquad_edge_,
-          int nquad_intersection_>
-struct EdgeToInterfaceParams : EdgeToInterfaceParamsBase {
+template <int num_edges_, specfem::interface::interface_tag InterfaceTag,
+          int nquad_edge_, int nquad_intersection_>
+struct CrossEqualizerParams : CrossEqualizerParamsBase {
   static constexpr specfem::dimension::type dimension_tag = DimensionTag;
+  static constexpr int ndim = specfem::dimension::dimension<DimensionTag>::dim;
   static constexpr specfem::interface::interface_tag interface_tag =
       InterfaceTag;
   static constexpr int num_edges = num_edges_;
@@ -94,19 +97,28 @@ struct EdgeToInterfaceParams : EdgeToInterfaceParamsBase {
 
   std::array<type_real, nquad_edge_> edge_quadrature_points;
   std::array<type_real, nquad_intersection_> intersection_quadrature_points;
+  std::array<std::array<type_real, 2>, nquad_intersection_>
+      intersection_normals;
 
   // takes const array& (lvalue), converts to std::array, which requires data
   // copying. for some reason, I could not get initializer lists to work with
   // std::array.
-  EdgeToInterfaceParams(
+  CrossEqualizerParams(
       const type_real (&edge_quadrature_points)[nquad_edge_],
-      const type_real (&intersection_quadrature_points)[nquad_intersection_]) {
+      const type_real (&intersection_quadrature_points)[nquad_intersection_],
+      const type_real (&intersection_normals)[nquad_intersection_][ndim]) {
     std::copy(std::begin(edge_quadrature_points),
               std::end(edge_quadrature_points),
               std::begin(this->edge_quadrature_points));
     std::copy(std::begin(intersection_quadrature_points),
               std::end(intersection_quadrature_points),
               std::begin(this->intersection_quadrature_points));
+    for (int iquad = 0; iquad < nquad_intersection_; iquad++) {
+      for (int idim = 0; idim < ndim; idim++) {
+        this->intersection_normals[iquad][idim] =
+            intersection_normals[iquad][idim];
+      }
+    }
   }
 
   // tolerance for function evaluations (no integration or differentiation, so
@@ -182,8 +194,6 @@ struct EdgeToInterfaceParams : EdgeToInterfaceParamsBase {
     // We only store the last fail in each thread. (there may be a better way of
     // doing this)
 
-    // we should switch out this tuple for something else. TODO address this in
-    // issue #1226
     using CheckContainer = Kokkos::View<
         std::tuple<bool, type_real, type_real, type_real, int, int, int> **,
         Kokkos::DefaultExecutionSpace>;
@@ -273,8 +283,8 @@ struct EdgeToInterfaceParams : EdgeToInterfaceParamsBase {
           // barrier in between them)
 
           specfem::algorithms::transfer_self(
-              ChunkEdgeIndexSimulator<dimension_tag>(num_edges, team),
-              self_transfer, self_disp,
+              ChunkEdgeIndexSimulator(num_edges, team), self_transfer,
+              self_disp,
               [&](const int &iedge, const int &iinterface,
                   const PointSelfDisplacementType &point) {
                 for (int icomp = 0; icomp < SelfDisplacementType::components;
@@ -282,8 +292,8 @@ struct EdgeToInterfaceParams : EdgeToInterfaceParamsBase {
                   self_on_interface(iedge, iinterface, icomp) = point(icomp);
               });
           specfem::algorithms::transfer_coupled(
-              ChunkEdgeIndexSimulator<dimension_tag>(num_edges, team),
-              coupled_transfer, coupled_disp,
+              ChunkEdgeIndexSimulator(num_edges, team), coupled_transfer,
+              coupled_disp,
               [&](const int &iedge, const int &iinterface,
                   const PointCoupledDisplacementType &point) {
                 for (int icomp = 0; icomp < CoupledDisplacementType::components;
@@ -374,8 +384,37 @@ struct EdgeToInterfaceCouplingTestParams {
 
   void run_test() const { params->run_test(name); }
 
-  template <specfem::dimension::type DimensionTag,
-            specfem::interface::interface_tag InterfaceTag,
+  /**
+   * @brief Builds a test from the given parameters, properly populating the
+   * shared pointer and virtual methods to the given configuration. Usage:
+   *
+   * EdgeToInterfaceCouplingTestParams::from<dimension_tag, interface_tag>(name,
+   *          edge_quadrature_points, intersection_quadrature_points)
+   *
+   * Rather than a reparameterization, the quadrature points specify the global
+   * coordinates for the Lagrange polynomial nodes, and, by corollary, the basis
+   * of polynomials on the corresponding space of test functions. The
+   * `EdgeToInterfaceCouplingTest` computes the coefficients of $\{x^k: k=1,K\}$
+   * in the edge basis, maps them to the intersection basis, and verifies (by
+   * evaluation at intersection quadrature points) that the polynomials are the
+   * same.
+   *
+   * @tparam InterfaceTag - the interface being simulated (determines
+   * self/coupled media)
+   * @tparam nquad_edge - number of quadrature points on the edge (inferred,
+   * leave blank)
+   * @tparam nquad_intersection - number of quadrature points on the
+   * intersection (inferred, leave blank)
+   * @tparam num_edges - chunk size of the chunk_edge accessors (defaults to
+   * default parallel configuration chunk_size).
+   * @param name name of the test parameter
+   * @param edge array (or initializer list) of the knots (quadrature points)
+   * for the edge.
+   * @param intersection array (or initializer list) of the knots (quadrature
+   * points) for the intersection.
+   * @return EdgeToInterfaceCouplingTestParams
+   */
+  template <specfem::interface::interface_tag InterfaceTag,
             std::size_t nquad_edge, std::size_t nquad_intersection,
             int num_edges = specfem::parallel_config::default_chunk_edge_config<
                 DimensionTag, Kokkos::DefaultExecutionSpace>::chunk_size>
@@ -383,9 +422,8 @@ struct EdgeToInterfaceCouplingTestParams {
   from(const std::string &name, const type_real (&edge)[nquad_edge],
        const type_real (&intersection)[nquad_intersection]) {
     return { name,
-             std::make_shared<
-                 EdgeToInterfaceParams<num_edges, DimensionTag, InterfaceTag,
-                                       nquad_edge, nquad_intersection> >(
+             std::make_shared<EdgeToInterfaceParams<
+                 num_edges, InterfaceTag, nquad_edge, nquad_intersection> >(
                  edge, intersection) };
   }
 };
@@ -408,17 +446,9 @@ using init_type = std::tuple<std::string, EdgeToInterfaceParamsBase>;
 INSTANTIATE_TEST_SUITE_P(
     NonconformingVariations, EdgeToInterfaceCouplingTest,
     ::testing::Values(EdgeToInterfaceCouplingTestParams::from<
-                          specfem::dimension::type::dim2,
                           specfem::interface::interface_tag::elastic_acoustic>(
                           "dim2 elastic-acoustic", { -1, 1 }, { -0.5, 0, 0.5 }),
                       EdgeToInterfaceCouplingTestParams::from<
-                          specfem::dimension::type::dim2,
                           specfem::interface::interface_tag::acoustic_elastic>(
                           "dim2 acoustic-elastic", { -1, -0.5, 0, 0.7, 1.2 },
                           { -0.3, 0, 0.4, 0.6 })));
-
-int main(int argc, char *argv[]) {
-  ::testing::InitGoogleTest(&argc, argv);
-  ::testing::AddGlobalTestEnvironment(new KokkosEnvironment);
-  return RUN_ALL_TESTS();
-}

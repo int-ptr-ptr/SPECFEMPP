@@ -8,6 +8,7 @@
 
 // TODO replace when this gets reworked.
 #include "specfem/assembly/coupled_interfaces/dim2/data_access/impl/load_access_compatibility.hpp"
+#include "specfem/data_access/check_compatibility.hpp"
 namespace specfem::medium::impl {
 
 template <typename CoupledInterfaceType, typename CoupledFieldType,
@@ -62,8 +63,8 @@ KOKKOS_INLINE_FUNCTION void compute_coupling(
       "acoustic_elastic compute_coupling needs CoupledInterfaceType to have "
       "the normal vector.");
 
-  static_assert(specfem::data_access::is_displacement<CoupledFieldType>::value,
-                "CoupledFieldType must be a displacement type");
+  static_assert(specfem::data_access::is_acceleration<CoupledFieldType>::value,
+                "CoupledFieldType must be a acceleration type");
 
   specfem::algorithms::transfer_coupled(
       chunk_edge_index, interface_data, coupled_field,

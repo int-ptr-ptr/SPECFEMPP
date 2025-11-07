@@ -595,7 +595,22 @@ target_link_libraries(
   Kokkos::kokkos
   mpi_environment
   assembly
-  quadrature
+  utilities
+  -lpthread -lm
+)
+
+add_executable(
+  transfer_tests
+  algorithms/dim2/transfer_test.cpp
+)
+
+target_link_libraries(
+  transfer_tests
+  algorithms
+  kokkos_environment
+  gtest_main
+  Kokkos::kokkos
+  mpi_environment
   utilities
   -lpthread -lm
 )
@@ -675,9 +690,11 @@ target_link_libraries(
 
 add_executable(
   compute_coupling_tests
-  compute_coupling/acoustic_elastic.cpp
-  compute_coupling/elastic_acoustic.cpp
-  compute_coupling/nonconforming.cpp
+  compute_coupling/main.cpp
+  compute_coupling/conforming/acoustic_elastic.cpp
+  compute_coupling/conforming/elastic_acoustic.cpp
+  compute_coupling/nonconforming/acoustic_elastic.cpp
+  compute_coupling/nonconforming/elastic_acoustic.cpp
 )
 
 target_link_libraries(
