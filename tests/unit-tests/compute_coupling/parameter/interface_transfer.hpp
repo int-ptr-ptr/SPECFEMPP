@@ -2,20 +2,6 @@
 
 namespace specfem::testing::interface_transfer {
 
-template <specfem::dimension::type DimensionTag, typename Visitor>
-struct InterfaceTransferBase {
-public:
-  virtual void accept(Visitor &) const = 0;
-};
-
-template <specfem::dimension::type DimensionTag, typename Visitor>
-class Generator {
-public:
-  virtual const InterfaceTransferBase<DimensionTag, Visitor> &
-  get_interface_transfer(const int &index) const = 0;
-  virtual int get_generator_size() const = 0;
-};
-
 /**
  * @brief Specialized version of InterfaceTransferBase, containing the
  * quadrature points of both the intersection and edges. The virtual method
@@ -25,12 +11,10 @@ public:
  * edge
  * @tparam nquad_intersection_ - the number of quadrature points on (dimension
  * of) the intersections
- * @tparam Visitor - a class that accepts InterfaceTransfer instances with a
- * templated call operator.
  */
-template <specfem::dimension::type DimensionTag, typename Visitor,
-          int nquad_edge_, int nquad_intersection_>
-class InterfaceTransfer : public InterfaceTransferBase<DimensionTag, Visitor> {
+template <specfem::dimension::type DimensionTag, int nquad_edge_,
+          int nquad_intersection_>
+class InterfaceTransfer {
 public:
   static constexpr specfem::dimension::type dimension_tag = DimensionTag;
   static constexpr int nquad_edge = nquad_edge_;
@@ -58,22 +42,37 @@ public:
               std::begin(this->intersection_quadrature_points));
   }
 
-  virtual void accept(Visitor &visitor) const { visitor(*this); }
-
-  InterfaceTransfer(const InterfaceTransfer<DimensionTag, Visitor, nquad_edge,
+  InterfaceTransfer(const InterfaceTransfer<DimensionTag, nquad_edge,
                                             nquad_intersection> &orig)
       : edge_quadrature_points_self(orig.edge_quadrature_points_self),
         intersection_quadrature_points(orig.intersection_quadrature_points),
         edge_quadrature_points_coupled(orig.edge_quadrature_points_coupled) {}
 };
 
-template <specfem::dimension::type DimensionTag, typename Visitor>
-class Vector
-    : public Generator<DimensionTag, Visitor>,
-      public std::vector<
-          std::shared_ptr<InterfaceTransferBase<DimensionTag, Visitor> > > {
+template <specfem::dimension::type DimensionTag, int nquad_edge,
+          int nquad_intersection>
+class Generator {
+protected:
+  using InterfaceTransferType =
+      InterfaceTransfer<DimensionTag, nquad_edge, nquad_intersection>;
+
 public:
-  virtual const InterfaceTransferBase<DimensionTag, Visitor> &
+  virtual const InterfaceTransferType &
+  get_interface_transfer(const int &index) const = 0;
+  virtual int get_generator_size() const = 0;
+};
+
+template <specfem::dimension::type DimensionTag, int nquad_edge,
+          int nquad_intersection>
+class Vector
+    : public Generator<DimensionTag, nquad_edge, nquad_intersection>,
+      public std::vector<std::shared_ptr<
+          InterfaceTransfer<DimensionTag, nquad_edge, nquad_intersection> > > {
+  using InterfaceTransferType =
+      InterfaceTransfer<DimensionTag, nquad_edge, nquad_intersection>;
+
+public:
+  virtual const InterfaceTransferType &
   get_interface_transfer(const int &index) const {
     return *((*this)[this->get_generator_size() - index - 1]);
   }

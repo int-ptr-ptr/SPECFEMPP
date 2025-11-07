@@ -39,39 +39,22 @@ std::array<type_real, PointData<DimensionTag, InterfaceTag>::ncomp_self>
 compute_coupling_expected(
     const PointData<DimensionTag, InterfaceTag> &point_data);
 
-template <specfem::dimension::type DimensionTag,
-          specfem::interface::interface_tag InterfaceTag>
-class compute_kernel_visitor {
-  int num_chunks;
-
-public:
-  compute_kernel_visitor(const int &num_chunks) : num_chunks(num_chunks) {}
-
-  template <typename T> void operator()(const T &transfer_type) {
-    constexpr int nquad_edge = T::nquad_edge;
-    constexpr int nquad_intersection = T::nquad_intersection;
-
-    using parallel_config = specfem::parallel_config::default_chunk_edge_config<
-        DimensionTag, Kokkos::DefaultExecutionSpace>;
-    compute_kernel<DimensionTag, InterfaceTag, parallel_config::chunk_size,
-                   nquad_edge, nquad_intersection>(num_chunks);
-  };
-};
-
-template <specfem::dimension::type DimensionTag,
-          specfem::interface::interface_tag InterfaceTag>
+template <specfem::interface::interface_tag InterfaceTag,
+          specfem::dimension::type DimensionTag, int nquad_edge,
+          int nquad_intersection>
 void test_interface(
     const specfem::testing::interface_shape::Generator<DimensionTag>
         &interface_shape_generator,
     const specfem::testing::field::Generator<DimensionTag> &field_generator,
     const specfem::testing::interface_transfer::Generator<
-        DimensionTag, compute_kernel_visitor<DimensionTag, InterfaceTag> >
+        DimensionTag, nquad_edge, nquad_intersection>
         &interface_transfer_generator,
     const int &num_chunks) {
   for (int i = 0; i < interface_transfer_generator.get_generator_size(); i++) {
-    compute_kernel_visitor<DimensionTag, InterfaceTag> kernel_visitor(
-        num_chunks);
-    interface_transfer_generator.get_interface_transfer(i).accept(
-        kernel_visitor);
+    interface_transfer_generator.get_interface_transfer(i);
+    using parallel_config = specfem::parallel_config::default_chunk_edge_config<
+        DimensionTag, Kokkos::DefaultExecutionSpace>;
+    compute_kernel<DimensionTag, InterfaceTag, parallel_config::chunk_size,
+                   nquad_edge, nquad_intersection>(num_chunks);
   }
 }
