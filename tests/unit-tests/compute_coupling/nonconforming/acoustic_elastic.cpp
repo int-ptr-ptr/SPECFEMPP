@@ -18,8 +18,8 @@ compute_coupling_expected<specfem::dimension::type::dim2,
 TEST(NonconformingComputeCoupling, AcousticElastic) {
 
   test_interface<specfem::interface::interface_tag::acoustic_elastic>(
-      specfem::testing::interface_shape::RandomFlat2DGenerator(5, 50352),
-      specfem::testing::field::RandomPolynomial2DGenerator(10, 4, 39522),
+      specfem::testing::interface_shape::RandomFlat2DGenerator(50352),
+      specfem::testing::field::RandomPolynomial2DGenerator(4, 39522),
       specfem::testing::interface_transfer::Vector<
           specfem::dimension::type::dim2, 5, 4>(
           specfem::testing::interface_transfer::InterfaceTransfer<
@@ -28,8 +28,8 @@ TEST(NonconformingComputeCoupling, AcousticElastic) {
                                                     { -1, -0.5, 0, 0.5, 1 })),
       3);
   test_interface<specfem::interface::interface_tag::acoustic_elastic>(
-      specfem::testing::interface_shape::RandomFlat2DGenerator(5, 50352),
-      specfem::testing::field::RandomPolynomial2DGenerator(10, 4, 39522),
+      specfem::testing::interface_shape::RandomFlat2DGenerator(50352),
+      specfem::testing::field::RandomPolynomial2DGenerator(4, 39522),
       specfem::testing::interface_transfer::Vector<
           specfem::dimension::type::dim2, 2, 2>(
           specfem::testing::interface_transfer::InterfaceTransfer<

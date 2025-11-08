@@ -1,3 +1,4 @@
+#pragma once
 #include "specfem/chunk_edge.hpp"
 
 namespace specfem::testing::interface_transfer {
@@ -57,9 +58,7 @@ protected:
       InterfaceTransfer<DimensionTag, nquad_edge, nquad_intersection>;
 
 public:
-  virtual const InterfaceTransferType &
-  get_interface_transfer(const int &index) const = 0;
-  virtual int get_generator_size() const = 0;
+  virtual const InterfaceTransferType &next() = 0;
 };
 
 template <specfem::dimension::type DimensionTag, int nquad_edge,
@@ -70,19 +69,22 @@ class Vector
           InterfaceTransfer<DimensionTag, nquad_edge, nquad_intersection> > > {
   using InterfaceTransferType =
       InterfaceTransfer<DimensionTag, nquad_edge, nquad_intersection>;
+  int current_element;
 
 public:
-  virtual const InterfaceTransferType &
-  get_interface_transfer(const int &index) const {
-    return *((*this)[this->get_generator_size() - index - 1]);
+  virtual const InterfaceTransferType &next() {
+    current_element--;
+    if (current_element < 0) {
+      current_element = this->size() - 1;
+    }
+    return *((*this)[current_element]);
   }
-  virtual int get_generator_size() const { return this->size(); }
 
   template <typename... Args, typename tail_type>
   Vector(const tail_type &head, const Args &...args) : Vector(args...) {
     this->push_back(std::make_shared<tail_type>(head));
   }
-  Vector() = default;
+  Vector() : current_element(0) {}
 };
 
 } // namespace specfem::testing::interface_transfer

@@ -16,18 +16,15 @@ compute_coupling_expected<specfem::dimension::type::dim2,
 }
 
 TEST(NonconformingComputeCoupling, ElasticAcoustic) {
-  //   using CKV = compute_kernel_visitor<
-  //       specfem::dimension::type::dim2,
-  //       specfem::interface::interface_tag::elastic_acoustic>;
-  //   specfem::testing::interface_transfer::Vector<specfem::dimension::type::dim2,
-  //                                                CKV>
-  //       transfers(specfem::testing::interface_transfer::InterfaceTransfer<
-  //                 specfem::dimension::type::dim2, CKV, 5, 4>(
-  //           { -1, -0.5, 0, 0.5, 1 }, { -0.8, -0.4, 0.4, 0.8 },
-  //           { -1, -0.5, 0, 0.5, 1 }));
-  //   test_interface<specfem::dimension::type::dim2,
-  //                  specfem::interface::interface_tag::elastic_acoustic>(
-  //       specfem::testing::interface_shape::RandomFlat2DGenerator(5, 33576),
-  //       specfem::testing::field::RandomPolynomial2DGenerator(10, 4, 34631),
-  //       transfers, 3);
+
+  test_interface<specfem::interface::interface_tag::elastic_acoustic>(
+      specfem::testing::interface_shape::RandomFlat2DGenerator(33576),
+      specfem::testing::field::RandomPolynomial2DGenerator(4, 34631),
+      specfem::testing::interface_transfer::Vector<
+          specfem::dimension::type::dim2, 5, 4>(
+          specfem::testing::interface_transfer::InterfaceTransfer<
+              specfem::dimension::type::dim2, 5, 4>({ -1, -0.5, 0, 0.5, 1 },
+                                                    { -0.8, -0.4, 0.4, 0.8 },
+                                                    { -1, -0.5, 0, 0.5, 1 })),
+      3);
 }

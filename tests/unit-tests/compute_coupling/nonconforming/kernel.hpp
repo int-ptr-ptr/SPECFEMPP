@@ -4,6 +4,63 @@
 #include "specfem/chunk_edge/nonconforming_transfer_and_normal.hpp"
 #include <Kokkos_Core.hpp>
 
+template <specfem::dimension::type DimensionTag,
+          specfem::interface::interface_tag InterfaceTag, int chunk_size,
+          int nquad_edge, int nquad_intersection>
+struct ComputeCouplingKernelStorage {
+public:
+  static constexpr auto self_medium =
+      specfem::interface::attributes<DimensionTag, InterfaceTag>::self_medium();
+  static constexpr auto coupled_medium =
+      specfem::interface::attributes<DimensionTag,
+                                     InterfaceTag>::coupled_medium();
+  static constexpr int ndim = specfem::dimension::dimension<DimensionTag>::dim;
+  static constexpr int ncomp_self =
+      specfem::element::attributes<DimensionTag, self_medium>::components;
+  static constexpr int ncomp_coupled =
+      specfem::element::attributes<DimensionTag, coupled_medium>::components;
+
+  const Kokkos::View<type_real *[chunk_size][nquad_intersection][ndim],
+                     Kokkos::DefaultExecutionSpace>
+      normals;
+  const Kokkos::View<type_real *[chunk_size][nquad_edge][ncomp_self],
+                     Kokkos::DefaultExecutionSpace>
+      field_self;
+  const Kokkos::View<type_real *[chunk_size][nquad_edge][ncomp_coupled],
+                     Kokkos::DefaultExecutionSpace>
+      field_coupled;
+  const Kokkos::View<type_real *[chunk_size][nquad_edge][nquad_intersection],
+                     Kokkos::DefaultExecutionSpace>
+      transfer_self;
+  const Kokkos::View<type_real *[chunk_size][nquad_edge][nquad_intersection],
+                     Kokkos::DefaultExecutionSpace>
+      transfer_coupled;
+  const Kokkos::View<type_real *[chunk_size][nquad_intersection][ncomp_self],
+                     Kokkos::DefaultExecutionSpace>
+      computed_coupling;
+  const typename decltype(normals)::HostMirror h_normals;
+  const typename decltype(field_self)::HostMirror h_field_self;
+  const typename decltype(field_coupled)::HostMirror h_field_coupled;
+  const typename decltype(transfer_self)::HostMirror h_transfer_self;
+  const typename decltype(transfer_coupled)::HostMirror h_transfer_coupled;
+  const typename decltype(computed_coupling)::HostMirror h_computed_coupling;
+  const int num_chunks;
+
+  ComputeCouplingKernelStorage(const int &num_chunks)
+      : num_chunks(num_chunks), normals("normals", num_chunks),
+        field_self("field_self", num_chunks),
+        field_coupled("field_coupled", num_chunks),
+        transfer_self("transfer_self", num_chunks),
+        transfer_coupled("transfer_coupled", num_chunks),
+        computed_coupling("computed_coupling", num_chunks),
+        h_normals(Kokkos::create_mirror_view(normals)),
+        h_field_self(Kokkos::create_mirror_view(field_self)),
+        h_field_coupled(Kokkos::create_mirror_view(field_coupled)),
+        h_transfer_self(Kokkos::create_mirror_view(transfer_self)),
+        h_transfer_coupled(Kokkos::create_mirror_view(transfer_coupled)),
+        h_computed_coupling(Kokkos::create_mirror_view(computed_coupling)) {}
+};
+
 class ChunkEdgeIndexSimulator {
 public:
   static constexpr auto accessor_type =
@@ -29,9 +86,17 @@ private:
 template <specfem::dimension::type DimensionTag,
           specfem::interface::interface_tag InterfaceTag, int chunk_size,
           int nquad_edge, int nquad_intersection>
-void compute_kernel(const int &num_chunks) {
+void compute_kernel(
+    const ComputeCouplingKernelStorage<DimensionTag, InterfaceTag, chunk_size,
+                                       nquad_edge, nquad_intersection>
+        &kernel_data) {
 
   constexpr bool using_simd = false;
+  static constexpr auto self_medium =
+      specfem::interface::attributes<DimensionTag, InterfaceTag>::self_medium();
+  static constexpr auto coupled_medium =
+      specfem::interface::attributes<DimensionTag,
+                                     InterfaceTag>::coupled_medium();
 
   using InterfaceDataType =
       specfem::chunk_edge::nonconforming_transfer_and_normal<
@@ -40,16 +105,6 @@ void compute_kernel(const int &num_chunks) {
           specfem::element::boundary_tag::none,
           specfem::kokkos::DevScratchSpace,
           Kokkos::MemoryTraits<Kokkos::Unmanaged> >;
-  constexpr auto self_medium =
-      specfem::interface::attributes<DimensionTag, InterfaceTag>::self_medium();
-  constexpr auto coupled_medium =
-      specfem::interface::attributes<DimensionTag,
-                                     InterfaceTag>::coupled_medium();
-  static constexpr int ndim = specfem::dimension::dimension<DimensionTag>::dim;
-  static constexpr int ncomp_self =
-      specfem::element::attributes<DimensionTag, self_medium>::components;
-  static constexpr int ncomp_coupled =
-      specfem::element::attributes<DimensionTag, coupled_medium>::components;
   using CoupledFieldType = std::conditional_t<
       InterfaceTag == specfem::interface::interface_tag::acoustic_elastic,
       specfem::chunk_edge::displacement<chunk_size, nquad_edge, DimensionTag,
@@ -63,49 +118,10 @@ void compute_kernel(const int &num_chunks) {
       using_simd, specfem::kokkos::DevScratchSpace,
       Kokkos::MemoryTraits<Kokkos::Unmanaged> >;
 
-  // ====================================================================
-  // views for inputs / outputs
-  // ====================================================================
-  Kokkos::View<type_real *[chunk_size][nquad_intersection][ndim],
-               Kokkos::DefaultExecutionSpace>
-      normals("normals", num_chunks);
-  Kokkos::View<type_real *[chunk_size][nquad_edge][ncomp_self],
-               Kokkos::DefaultExecutionSpace>
-      field_self("field_self", num_chunks);
-  Kokkos::View<type_real *[chunk_size][nquad_edge][ncomp_coupled],
-               Kokkos::DefaultExecutionSpace>
-      field_coupled("field_coupled", num_chunks);
-  Kokkos::View<type_real *[chunk_size][nquad_edge][nquad_intersection],
-               Kokkos::DefaultExecutionSpace>
-      transfer_self("transfer_self", num_chunks);
-  Kokkos::View<type_real *[chunk_size][nquad_edge][nquad_intersection],
-               Kokkos::DefaultExecutionSpace>
-      transfer_coupled("transfer_coupled", num_chunks);
-  Kokkos::View<type_real *[chunk_size][nquad_intersection][ncomp_self],
-               Kokkos::DefaultExecutionSpace>
-      computed_coupling("computed_coupling", num_chunks);
-  typename decltype(normals)::HostMirror h_normals =
-      Kokkos::create_mirror_view(normals);
-  typename decltype(field_self)::HostMirror h_field_self =
-      Kokkos::create_mirror_view(field_self);
-  typename decltype(field_coupled)::HostMirror h_field_coupled =
-      Kokkos::create_mirror_view(field_coupled);
-  typename decltype(transfer_self)::HostMirror h_transfer_self =
-      Kokkos::create_mirror_view(transfer_self);
-  typename decltype(transfer_coupled)::HostMirror h_transfer_coupled =
-      Kokkos::create_mirror_view(transfer_coupled);
-  typename decltype(computed_coupling)::HostMirror h_computed_coupling =
-      Kokkos::create_mirror_view(computed_coupling);
+  const int &num_chunks = kernel_data.num_chunks;
+  const int &ncomp_coupled = kernel_data.ncomp_coupled;
+  const int &ncomp_self = kernel_data.ncomp_self;
 
-  // ====================================================================
-  // initialize views
-  // ====================================================================
-
-  // TODO
-
-  // ====================================================================
-  // run kernel
-  // ====================================================================
   Kokkos::parallel_for(
       Kokkos::TeamPolicy<>(num_chunks, chunk_size)
           .set_scratch_size(
@@ -162,7 +178,8 @@ void compute_kernel(const int &num_chunks) {
               int tmp = i / ncomp_self;
               const int iintersection = i % nquad_intersection;
               const int iedge = i / nquad_intersection;
-              computed_coupling(ichunk, iedge, iintersection, icomp) =
+              kernel_data.computed_coupling(ichunk, iedge, iintersection,
+                                            icomp) =
                   interface_field(iedge, iintersection, icomp);
             });
       });

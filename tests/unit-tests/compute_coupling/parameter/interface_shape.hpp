@@ -1,7 +1,9 @@
+#pragma once
 #include "datatypes/point_view.hpp"
 #include "enumerations/dimension.hpp"
 #include "specfem/chunk_edge.hpp"
 #include "specfem/point/coordinates.hpp"
+#include <memory>
 
 namespace specfem::testing::interface_shape {
 
@@ -20,9 +22,7 @@ public:
 
 template <specfem::dimension::type DimensionTag> class Generator {
 public:
-  virtual const InterfaceShapeBase<DimensionTag> &
-  get_interface_shape(const int &index) const = 0;
-  virtual int get_generator_size() const = 0;
+  virtual const InterfaceShapeBase<DimensionTag> &next_shape() = 0;
 };
 
 /**
@@ -78,22 +78,23 @@ public:
 };
 
 class RandomFlat2DGenerator : public Generator<specfem::dimension::type::dim2> {
-  std::vector<Flat2D> entries;
+private:
+  std::shared_ptr<InterfaceShapeBase<specfem::dimension::type::dim2> >
+      current_shape;
+  int next_seed;
 
 public:
-  RandomFlat2DGenerator(int generator_size, int seed_offset = 0) {
-
-    std::srand(seed_offset + generator_size);
-    for (int i = 0; i < generator_size; i++) {
-      entries.push_back(Flat2D((((type_real)std::rand()) / RAND_MAX)));
-    }
-  }
+  RandomFlat2DGenerator(int seed_offset = 0) : next_seed(seed_offset) {}
 
   virtual const InterfaceShapeBase<specfem::dimension::type::dim2> &
-  get_interface_shape(const int &index) const {
-    return entries[index];
+  next_shape() {
+    std::srand(next_seed);
+    current_shape =
+        std::make_shared<Flat2D>(((type_real)std::rand()) / RAND_MAX);
+
+    next_seed = std::rand();
+    return *current_shape;
   }
-  virtual int get_generator_size() const { return entries.size(); };
 };
 
 } // namespace specfem::testing::interface_shape

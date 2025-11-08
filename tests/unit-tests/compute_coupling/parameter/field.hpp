@@ -1,3 +1,4 @@
+#pragma once
 #include "datatypes/point_view.hpp"
 #include "specfem/chunk_edge.hpp"
 #include "specfem/point/coordinates.hpp"
@@ -20,8 +21,7 @@ public:
 };
 template <specfem::dimension::type DimensionTag> class Generator {
 public:
-  virtual const FieldBase<DimensionTag> &get_field(const int &index) const = 0;
-  virtual int get_generator_size() const = 0;
+  virtual const FieldBase<DimensionTag> &next_field() = 0;
 };
 
 class Polynomial2D : public FieldBase<specfem::dimension::type::dim2> {
@@ -61,25 +61,25 @@ public:
 
 class RandomPolynomial2DGenerator
     : public Generator<specfem::dimension::type::dim2> {
-  std::vector<Polynomial2D> entries;
+private:
+  std::shared_ptr<FieldBase<specfem::dimension::type::dim2> > current_field;
+  int next_seed;
+  int max_degree;
 
 public:
-  RandomPolynomial2DGenerator(int generator_size, int max_degree,
-                              int seed_offset = 0) {
+  RandomPolynomial2DGenerator(const int &max_degree, const int &seed_offset = 0)
+      : max_degree(max_degree),
+        next_seed(seed_offset + max_degree * 3723392557) {}
 
-    std::srand(seed_offset + generator_size + max_degree * 3723392557);
-    for (int i = 0; i < generator_size; i++) {
-      int degree = std::rand() % max_degree;
-      int deg_x = std::rand() % (degree + 1);
-      entries.push_back(Polynomial2D({ { { deg_x, degree - deg_x }, 1 } }));
-    }
+  virtual const FieldBase<specfem::dimension::type::dim2> &next_field() {
+    std::srand(next_seed);
+    int degree = std::rand() % max_degree;
+    int deg_x = std::rand() % (degree + 1);
+    current_field =
+        std::make_shared<Polynomial2D>(std::map<std::pair<int, int>, type_real>{
+            { { deg_x, degree - deg_x }, 1 } });
+    return *current_field;
   }
-
-  virtual const FieldBase<specfem::dimension::type::dim2> &
-  get_field(const int &index) const {
-    return entries[index];
-  }
-  virtual int get_generator_size() const { return entries.size(); };
 };
 
 } // namespace specfem::testing::field
