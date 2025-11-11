@@ -38,12 +38,16 @@ public:
   const Kokkos::View<type_real *[chunk_size][nquad_intersection][ncomp_self],
                      Kokkos::DefaultExecutionSpace>
       computed_coupling;
+  const Kokkos::View<type_real *[chunk_size][nquad_intersection][ncomp_self],
+                     Kokkos::DefaultExecutionSpace>
+      expected_coupling;
   const typename decltype(normals)::HostMirror h_normals;
   const typename decltype(field_self)::HostMirror h_field_self;
   const typename decltype(field_coupled)::HostMirror h_field_coupled;
   const typename decltype(transfer_self)::HostMirror h_transfer_self;
   const typename decltype(transfer_coupled)::HostMirror h_transfer_coupled;
   const typename decltype(computed_coupling)::HostMirror h_computed_coupling;
+  const typename decltype(expected_coupling)::HostMirror h_expected_coupling;
   const int num_chunks;
 
   ComputeCouplingKernelStorage(const int &num_chunks)
@@ -53,12 +57,33 @@ public:
         transfer_self("transfer_self", num_chunks),
         transfer_coupled("transfer_coupled", num_chunks),
         computed_coupling("computed_coupling", num_chunks),
+        expected_coupling("expected_coupling", num_chunks),
         h_normals(Kokkos::create_mirror_view(normals)),
         h_field_self(Kokkos::create_mirror_view(field_self)),
         h_field_coupled(Kokkos::create_mirror_view(field_coupled)),
         h_transfer_self(Kokkos::create_mirror_view(transfer_self)),
         h_transfer_coupled(Kokkos::create_mirror_view(transfer_coupled)),
-        h_computed_coupling(Kokkos::create_mirror_view(computed_coupling)) {}
+        h_computed_coupling(Kokkos::create_mirror_view(computed_coupling)),
+        h_expected_coupling(Kokkos::create_mirror_view(expected_coupling)) {}
+
+  void sync_to_device() const {
+    Kokkos::deep_copy(normals, h_normals);
+    Kokkos::deep_copy(field_self, h_field_self);
+    Kokkos::deep_copy(field_coupled, h_field_coupled);
+    Kokkos::deep_copy(transfer_self, h_transfer_self);
+    Kokkos::deep_copy(transfer_coupled, h_transfer_coupled);
+    Kokkos::deep_copy(computed_coupling, h_computed_coupling);
+    Kokkos::deep_copy(expected_coupling, h_expected_coupling);
+  }
+  void sync_to_host() const {
+    Kokkos::deep_copy(h_normals, normals);
+    Kokkos::deep_copy(h_field_self, field_self);
+    Kokkos::deep_copy(h_field_coupled, field_coupled);
+    Kokkos::deep_copy(h_transfer_self, transfer_self);
+    Kokkos::deep_copy(h_transfer_coupled, transfer_coupled);
+    Kokkos::deep_copy(h_computed_coupling, computed_coupling);
+    Kokkos::deep_copy(h_expected_coupling, expected_coupling);
+  }
 };
 
 class ChunkEdgeIndexSimulator {
@@ -139,6 +164,8 @@ void compute_kernel(
         // initialize chunk_edge views
         // ====================================================================
 
+        // we will need to load more things for different schemes. Handle that
+        // later.
         Kokkos::parallel_for(
             Kokkos::TeamThreadRange(team, chunk_size), [&](const auto &iedge) {
               for (int ipoint = 0; ipoint < nquad_edge; ipoint++) {
@@ -146,19 +173,23 @@ void compute_kernel(
                      iintersection++) {
                   interface_data.transfer_function_coupled(iedge, ipoint,
                                                            iintersection) =
-                      transfer_self(ichunk, iedge, ipoint, iintersection);
+                      kernel_data.transfer_coupled(ichunk, iedge, ipoint,
+                                                   iintersection);
                 }
 
                 for (int icomp = 0; icomp < ncomp_coupled; icomp++) {
                   coupled_field(iedge, ipoint, icomp) =
-                      field_coupled(ichunk, iedge, ipoint, icomp);
+                      kernel_data.field_coupled(ichunk, iedge, ipoint, icomp);
                 }
               }
 
               for (int iintersection = 0; iintersection < nquad_intersection;
                    iintersection++) {
-                interface_data.interface_normal(iedge, iintersection, 2) =
-                    normals(ichunk, iedge, iintersection, 2);
+                for (int icomp = 0; icomp < ndim; icomp++) {
+                  interface_data.intersection_normal(iedge, iintersection,
+                                                     icomp) =
+                      kernel_data.normals(ichunk, iedge, iintersection, icomp);
+                }
               }
             });
 
@@ -176,8 +207,8 @@ void compute_kernel(
             [&](const auto &i) {
               const int icomp = i % ncomp_self;
               int tmp = i / ncomp_self;
-              const int iintersection = i % nquad_intersection;
-              const int iedge = i / nquad_intersection;
+              const int iintersection = tmp % nquad_intersection;
+              const int iedge = tmp / nquad_intersection;
               kernel_data.computed_coupling(ichunk, iedge, iintersection,
                                             icomp) =
                   interface_field(iedge, iintersection, icomp);

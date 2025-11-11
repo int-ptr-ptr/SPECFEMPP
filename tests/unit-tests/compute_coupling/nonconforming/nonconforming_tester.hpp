@@ -4,6 +4,7 @@
 #include "datatypes/point_view.hpp"
 #include "specfem/point/field_derivatives.hpp"
 
+#include "compute_coupling/parameter/interface_configuration.hpp"
 #include "kernel.hpp"
 
 template <specfem::dimension::type DimensionTag,
@@ -62,10 +63,13 @@ void test_interface(
     const specfem::testing::interface_transfer::Generator<
         DimensionTag, nquad_edge, nquad_intersection>
         &interface_transfer_generator,
-    const int &num_chunks) {
+    const int &num_edges) {
   using parallel_config = specfem::parallel_config::default_chunk_edge_config<
       DimensionTag, Kokkos::DefaultExecutionSpace>;
   static constexpr int chunk_size = parallel_config::chunk_size;
+
+  // smallest number of chunks that has at least this many edges
+  const int num_chunks = ((num_edges - 1) / chunk_size) + 1;
 
   // ====================================================================
   // views for inputs / outputs
@@ -73,12 +77,51 @@ void test_interface(
   ComputeCouplingKernelStorage<DimensionTag, InterfaceTag, chunk_size,
                                nquad_edge, nquad_intersection>
       kernel_data(num_chunks);
+  specfem::testing::interface_configuration::InterfaceConfiguration<
+      false, InterfaceTag, DimensionTag, nquad_edge, nquad_intersection>
+      interface_config(field_generator, interface_shape_generator,
+                       interface_transfer_generator, num_chunks * chunk_size);
 
   // ====================================================================
   // initialize views
   // ====================================================================
 
-  // TODO
+  auto field_iter = field_generator.iterator();
+  auto interface_transfer_iter = interface_transfer_generator.iterator();
+  auto interface_shape_iter = interface_shape_generator.iterator();
+
+  // consider putting this into some kind of function with a generalized (or
+  // further templated) ComputeCouplingKernelStorage
+
+  // we will need to load more things for different schemes. Handle that
+  // later.
+  for (auto intersection : interface_config.edges) {
+    const int ichunk = intersection.iedge / chunk_size;
+    const int iedge = intersection.iedge % chunk_size;
+
+    intersection.interface_transfer.template set_transfer_function<true>(
+        Kokkos::subview(kernel_data.h_transfer_self, ichunk, iedge, Kokkos::ALL,
+                        Kokkos::ALL));
+    intersection.interface_transfer.template set_transfer_function<false>(
+        Kokkos::subview(kernel_data.h_transfer_coupled, ichunk, iedge,
+                        Kokkos::ALL, Kokkos::ALL));
+    intersection.interface_shape.set_intersection_normal(
+        Kokkos::subview(kernel_data.h_normals, ichunk, iedge, Kokkos::ALL,
+                        Kokkos::ALL),
+        intersection.interface_transfer);
+    for (int icomp = 0; icomp < interface_config.ncomp_self; icomp++) {
+      intersection.interface_shape.template set_edge_field<true>(
+          Kokkos::subview(kernel_data.field_self, ichunk, iedge, Kokkos::ALL,
+                          icomp),
+          intersection.field_self(icomp), intersection.interface_transfer);
+    }
+    for (int icomp = 0; icomp < interface_config.ncomp_coupled; icomp++) {
+      intersection.interface_shape.template set_edge_field<false>(
+          Kokkos::subview(kernel_data.field_coupled, ichunk, iedge, Kokkos::ALL,
+                          icomp),
+          intersection.field_coupled(icomp), intersection.interface_transfer);
+    }
+  }
 
   // ====================================================================
   // run kernel
