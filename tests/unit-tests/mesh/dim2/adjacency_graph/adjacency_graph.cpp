@@ -54,7 +54,7 @@ void add_unidirectional_edge(
 TEST(AdjacencyGraphTest, DefaultConstructor) {
   specfem::mesh::adjacency_graph<specfem::dimension::type::dim2> graph;
 
-  EXPECT_TRUE(graph.empty());
+  EXPECT_EQ(boost::num_vertices(graph.graph()), 0);
 }
 
 /**
@@ -64,7 +64,6 @@ TEST(AdjacencyGraphTest, ConstructorWithElements) {
   const int nspec = 10;
   specfem::mesh::adjacency_graph<specfem::dimension::type::dim2> graph(nspec);
 
-  EXPECT_FALSE(graph.empty());
   EXPECT_EQ(boost::num_vertices(graph.graph()), nspec);
   EXPECT_EQ(boost::num_edges(graph.graph()), 0);
 }
@@ -75,7 +74,6 @@ TEST(AdjacencyGraphTest, ConstructorWithElements) {
 TEST(AdjacencyGraphTest, ConstructorWithZeroElements) {
   specfem::mesh::adjacency_graph<specfem::dimension::type::dim2> graph(0);
 
-  EXPECT_TRUE(graph.empty());
   EXPECT_EQ(boost::num_vertices(graph.graph()), 0);
   EXPECT_EQ(boost::num_edges(graph.graph()), 0);
 }
@@ -384,7 +382,6 @@ TEST(AdjacencyGraphTest, LargeGraph) {
   specfem::mesh::adjacency_graph<specfem::dimension::type::dim2> graph(
       large_size);
 
-  EXPECT_FALSE(graph.empty());
   EXPECT_EQ(boost::num_vertices(graph.graph()), large_size);
 
   // Add a few edges to test functionality with large graphs

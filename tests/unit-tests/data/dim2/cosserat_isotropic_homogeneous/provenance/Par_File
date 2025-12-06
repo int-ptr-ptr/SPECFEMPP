@@ -27,7 +27,7 @@ PARTITIONING_TYPE               = 3              # SCOTCH = 3, ascending order (
 NGNOD                           = 9
 
 # location to store the mesh
-database_filename               = OUTPUT_FILES/database.bin
+database_filename               = ../database.bin
 
 #-----------------------------------------------------------
 #

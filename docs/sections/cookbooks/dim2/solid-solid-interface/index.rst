@@ -1,5 +1,5 @@
-Wave propagration through solid-solid interface
-===============================================
+Wave propagation through solid-solid interface
+==============================================
 
 In this cookbook we are simulating a medium with two solids. This is a classic
 example from the computational seismology class at Princeton University, in which

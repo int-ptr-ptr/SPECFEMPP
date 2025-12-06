@@ -17,8 +17,7 @@ std::enable_if_t<
                      Kokkos::DefaultHostExecutionSpace>)),
     void>
 impl_for_all(const IndexType &index, const ClosureType &closure) {
-  const auto i = index.get_index();
-  closure(i);
+  closure(index);
 }
 
 #if defined(KOKKOS_ENABLE_CUDA) || defined(KOKKOS_ENABLE_HIP)
@@ -32,8 +31,7 @@ KOKKOS_FORCEINLINE_FUNCTION std::enable_if_t<
                      Kokkos::DefaultExecutionSpace>)),
     void>
 impl_for_all(const IndexType &index, const ClosureType &closure) {
-  const auto i = index.get_index();
-  closure(i);
+  closure(index);
 }
 
 #endif

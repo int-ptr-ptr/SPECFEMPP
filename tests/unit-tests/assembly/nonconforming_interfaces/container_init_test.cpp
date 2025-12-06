@@ -18,12 +18,10 @@ transfer_position_to_mortar(const TransferView &transfer_function,
                                                                             0);
   const int ngllz = coord_view.extent(2);
   const int ngllx = coord_view.extent(3);
-  const auto connection_mapping =
-      specfem::connections::connection_mapping(ngllx, ngllz);
+  const auto element = specfem::mesh_entity::element(ngllz, ngllx);
 
   for (int ipoint = 0; ipoint < transfer_function.extent(2); ipoint++) {
-    const auto [iz, ix] =
-        connection_mapping.coordinates_at_edge(edge_type, ipoint);
+    const auto [iz, ix] = element.map_coordinates(edge_type, ipoint);
     const type_real transfer = transfer_function(iedge, imortar, ipoint);
     coords.x += transfer * coord_view(0, ispec, iz, ix);
     coords.z += transfer * coord_view(1, ispec, iz, ix);
@@ -185,7 +183,7 @@ void test_nonconforming_container_transfers(
           specfem::interface::interface_tag::acoustic_elastic,
           specfem::element::boundary_tag::none);
 
-  const int nedges = acoustic_edges.size();
+  const int nedges = acoustic_edges.n_edges;
   ASSERT_EQ(nc_interface_acoustic_elastic.h_transfer_function.extent(0), nedges)
       << "acoustic side of the the acoustic-elastic interface does not have "
          "the correct number of intersections.";
@@ -247,10 +245,10 @@ void test_nonconforming_container_transfers(
       el_coorg("el_coorg", assembly.mesh.ngnod);
 
   for (int iedge = 0; iedge < nedges; iedge++) {
-    const int ac_spec = acoustic_edges(iedge).ispec;
+    const int ac_spec = acoustic_edges(iedge).element_index;
     const specfem::mesh_entity::dim2::type ac_edgetype =
         acoustic_edges(iedge).edge_type;
-    const int el_spec = elastic_edges(iedge).ispec;
+    const int el_spec = elastic_edges(iedge).element_index;
     const specfem::mesh_entity::dim2::type el_edgetype =
         elastic_edges(iedge).edge_type;
     for (int i = 0; i < assembly.mesh.ngnod; i++) {

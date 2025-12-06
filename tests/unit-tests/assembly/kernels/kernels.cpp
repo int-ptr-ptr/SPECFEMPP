@@ -1,9 +1,9 @@
 #include "../test_fixture/test_fixture.hpp"
 #include "datatypes/simd.hpp"
 #include "enumerations/dimension.hpp"
-#include "enumerations/material_definitions.hpp"
 #include "execution/chunked_domain_iterator.hpp"
 #include "execution/for_all.hpp"
+#include "specfem/macros.hpp"
 #include "specfem_setup.hpp"
 #include <gtest/gtest.h>
 
@@ -36,7 +36,8 @@ set_kernel_value(
 
   specfem::execution::for_all(
       "set_to_value", policy,
-      [=](const specfem::point::index<dimension, using_simd> &index) {
+      [=](const typename decltype(policy)::base_index_type &iterator_index) {
+        const auto index = iterator_index.get_index();
         PointType point(static_cast<type_real>(index.ispec + offset));
         specfem::assembly::store_on_host(index, point, kernels);
       });
@@ -68,7 +69,8 @@ check_kernel_value(
   // Iterate over the elements
   specfem::execution::for_all(
       "check_to_value", policy,
-      [=](const specfem::point::index<dimension, using_simd> &index) {
+      [=](const typename decltype(policy)::base_index_type &iterator_index) {
+        const auto index = iterator_index.get_index();
         using datatype = typename PointType::value_type;
         datatype value(static_cast<datatype>(0.0));
         const auto l_offset = offset;
@@ -125,7 +127,8 @@ add_value(const ViewType elements,
   // Iterate over the elements
   specfem::execution::for_all(
       "add_to_value", policy,
-      [=](const specfem::point::index<dimension, using_simd> &index) {
+      [=](const typename decltype(policy)::base_index_type &iterator_index) {
+        const auto index = iterator_index.get_index();
         PointType point(static_cast<type_real>(offset));
         specfem::assembly::add_on_host(index, point, kernels);
       });
@@ -159,7 +162,9 @@ set_kernel_value(
   // Iterate over the elements
   specfem::execution::for_all(
       "set_to_value", policy,
-      KOKKOS_LAMBDA(const specfem::point::index<dimension, using_simd> &index) {
+      KOKKOS_LAMBDA(
+          const typename decltype(policy)::base_index_type &iterator_index) {
+        const auto index = iterator_index.get_index();
         PointType point(static_cast<type_real>(index.ispec + offset));
         specfem::assembly::store_on_device(index, point, kernels);
       });
@@ -196,7 +201,9 @@ check_kernel_value(
   // Iterate over the elements
   specfem::execution::for_all(
       "check_to_value", policy,
-      KOKKOS_LAMBDA(const specfem::point::index<dimension, using_simd> &index) {
+      KOKKOS_LAMBDA(
+          const typename decltype(policy)::base_index_type &iterator_index) {
+        const auto index = iterator_index.get_index();
         PointType computed;
         specfem::assembly::load_on_device(index, kernels, computed);
 
@@ -222,7 +229,9 @@ check_kernel_value(
   // Iterate over the elements
   specfem::execution::for_all(
       "check_to_value", host_policy,
-      [=](const specfem::point::index<dimension, using_simd> &index) {
+      [=](const typename decltype(
+          host_policy)::base_index_type &iterator_index) {
+        const auto index = iterator_index.get_index();
         using datatype = typename PointType::value_type;
         datatype value(static_cast<datatype>(0.0));
 
@@ -278,7 +287,9 @@ add_value(const ViewType elements,
   // Iterate over the elements
   specfem::execution::for_all(
       "add_to_value", policy,
-      KOKKOS_LAMBDA(const specfem::point::index<dimension, using_simd> &index) {
+      KOKKOS_LAMBDA(
+          const typename decltype(policy)::base_index_type &iterator_index) {
+        const auto index = iterator_index.get_index();
         PointType point(static_cast<type_real>(offset));
         specfem::assembly::add_on_device(index, point, kernels);
       });

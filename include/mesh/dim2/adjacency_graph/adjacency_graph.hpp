@@ -107,18 +107,6 @@ public:
    */
   const Graph &graph() const { return *p_graph_; }
 
-  // TODO(Rohit: ADJ_GRAPH_DEFAULT)
-  // Graph should never be empty after it is made as default
-  /**
-   * @brief Check if the adjacency graph is empty
-   *
-   * Determines whether the graph contains any vertices. An empty graph
-   * has no spectral elements and therefore no adjacency relationships.
-   *
-   * @return true if the graph has no vertices, false otherwise
-   */
-  bool empty() const { return (boost::num_vertices(*p_graph_) == 0); }
-
   /**
    * @brief Assert that the adjacency graph is symmetric
    *

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "enumerations/interface.hpp"
+#include "specfem/macros.hpp"
 #include <Kokkos_Core.hpp>
 
 namespace specfem::assembly::impl {
@@ -81,10 +82,7 @@ struct value_containers<specfem::dimension::type::dim2, containers_type> {
 
     /// code path should never be reached
 
-    auto return_value =
-        new containers_type<dimension_tag, MediumTag, PropertyTag>();
-
-    return *return_value;
+    SUPPRESS_TEMPORARY_REF(return {};)
   }
 
   /**

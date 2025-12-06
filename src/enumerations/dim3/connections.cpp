@@ -173,16 +173,9 @@ affine_transform(const std::array<int, 4> &permutation, const type_real j,
   return { j_prime, i_prime };
 }
 
-int edge_transform(const std::array<int, 2> &from_nodes,
-                   const std::array<int, 2> &to_nodes, const int index) {
-  if (from_nodes[0] == to_nodes[0] && from_nodes[1] == to_nodes[1]) {
-    return index;
-  } else if (from_nodes[0] == to_nodes[1] && from_nodes[1] == to_nodes[0]) {
-    return 1 - index;
-  } else {
-    throw std::runtime_error("Edges do not match for transformation.");
-  }
-}
+extern int edge_transform(const std::array<int, 2> &from_nodes,
+                          const std::array<int, 2> &to_nodes, const int index,
+                          const int ngll);
 
 std::tuple<int, int, int>
 specfem::connections::connection_mapping<specfem::dimension::type::dim3>::
@@ -271,29 +264,29 @@ specfem::connections::connection_mapping<specfem::dimension::type::dim3>::
     auto edge1_nodes = get_edge_nodes(from, element1);
     auto edge2_nodes = get_edge_nodes(to, element2);
 
-    const int i = [=]() {
+    const auto [i, n] = [=]() {
       switch (from) {
       case specfem::mesh_entity::dim3::type::front_bottom:
       case specfem::mesh_entity::dim3::type::front_top:
       case specfem::mesh_entity::dim3::type::back_bottom:
       case specfem::mesh_entity::dim3::type::back_top:
-        return ix;
+        return std::make_pair(ix, ngllx);
       case specfem::mesh_entity::dim3::type::bottom_left:
       case specfem::mesh_entity::dim3::type::top_left:
       case specfem::mesh_entity::dim3::type::bottom_right:
       case specfem::mesh_entity::dim3::type::top_right:
-        return iy;
+        return std::make_pair(iy, nglly);
       case specfem::mesh_entity::dim3::type::front_left:
       case specfem::mesh_entity::dim3::type::front_right:
       case specfem::mesh_entity::dim3::type::back_left:
       case specfem::mesh_entity::dim3::type::back_right:
-        return iz;
+        return std::make_pair(iz, ngllz);
       default:
         throw std::runtime_error("Invalid edge orientation.");
       }
     }();
 
-    const int i_prime = edge_transform(edge1_nodes, edge2_nodes, i);
+    const int i_prime = edge_transform(edge1_nodes, edge2_nodes, i, n);
 
     return [=](const int i_prime) {
       switch (to) {

@@ -1,8 +1,6 @@
 #pragma once
 
 #include "enumerations/interface.hpp"
-#include "enumerations/interface_definitions.hpp"
-#include "enumerations/material_definitions.hpp"
 #include "impl/interface_container.hpp"
 #include "specfem/assembly/coupled_interfaces.hpp"
 #include "specfem/assembly/edge_types.hpp"
@@ -10,6 +8,7 @@
 #include "specfem/assembly/mesh.hpp"
 #include "specfem/assembly/nonconforming_interfaces/dim2/impl/nonconforming_interface.hpp"
 #include "specfem/data_access.hpp"
+#include "specfem/macros.hpp"
 #include <Kokkos_Core.hpp>
 #include <type_traits>
 
@@ -153,19 +152,7 @@ public:
 
     // Unreachable code - satisfy compiler return requirements
 
-#if __MSVC__
-#pragma warning(push)
-#pragma warning(disable : C4172)
-#else
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wreturn-local-addr"
-#endif
-    return {};
-#if __MSVC__
-#pragma warning(pop)
-#else
-#pragma GCC diagnostic pop
-#endif
+    SUPPRESS_TEMPORARY_REF(return {};)
   }
 };
 

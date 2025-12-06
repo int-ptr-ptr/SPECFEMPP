@@ -1,12 +1,12 @@
 #include "../test_fixture/test_fixture.hpp"
 #include "datatypes/simd.hpp"
 #include "enumerations/dimension.hpp"
-#include "enumerations/material_definitions.hpp"
 #include "execution/chunked_domain_iterator.hpp"
 #include "execution/for_all.hpp"
 #include "io/ASCII/ASCII.hpp"
 #include "io/property/reader.hpp"
 #include "io/property/writer.hpp"
+#include "specfem/macros.hpp"
 #include "specfem_setup.hpp"
 #include <gtest/gtest.h>
 
@@ -41,7 +41,8 @@ set_property_value(
 
   specfem::execution::for_all(
       "set_to_value", policy,
-      [=](const specfem::point::index<dimension, using_simd> &index) {
+      [=](const typename decltype(policy)::base_index_type &iterator_index) {
+        const auto index = iterator_index.get_index();
         PointPropertiesType point(static_cast<type_real>(index.ispec + offset));
         specfem::assembly::store_on_host(index, point, properties);
       });
@@ -72,7 +73,8 @@ check_property_value(
 
   specfem::execution::for_all(
       "set_to_value", policy,
-      [=](const specfem::point::index<dimension, using_simd> &index) {
+      [=](const typename decltype(policy)::base_index_type &iterator_index) {
+        const auto index = iterator_index.get_index();
         using datatype = typename PointType::value_type;
 
         PointType expected;
@@ -140,7 +142,9 @@ check_property_value(
 
   specfem::execution::for_all(
       "set_to_value", policy,
-      KOKKOS_LAMBDA(const specfem::point::index<dimension, using_simd> &index) {
+      KOKKOS_LAMBDA(
+          const typename decltype(policy)::base_index_type &iterator_index) {
+        const auto index = iterator_index.get_index();
         PointType computed;
         specfem::assembly::load_on_device(index, properties, computed);
 
@@ -163,7 +167,9 @@ check_property_value(
 
   specfem::execution::for_all(
       "set_to_value", host_policy,
-      [=](const specfem::point::index<dimension, using_simd> &index) {
+      [=](const typename decltype(
+          host_policy)::base_index_type &iterator_index) {
+        const auto index = iterator_index.get_index();
         PointType expected(static_cast<type_real>(index.ispec + offset));
         const int ispec = index.ispec;
         const int iz = index.iz;
@@ -212,7 +218,8 @@ void check_compute_to_mesh(
 
   specfem::execution::for_all(
       "set_to_value", policy,
-      [=](const specfem::point::index<dimension, false> &index) {
+      [=](const typename decltype(policy)::base_index_type &iterator_index) {
+        const auto index = iterator_index.get_index();
         const int ispec = index.ispec;
 
         // Get the properties stored within the mesh

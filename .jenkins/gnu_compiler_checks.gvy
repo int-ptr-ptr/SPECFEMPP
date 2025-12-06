@@ -62,7 +62,12 @@ pipeline{
                                         module load cmake/3.30.8
                                         module load boost/1.85.0
                                         module load ${GNU_COMPILER_MODULE}
-                                        cmake3 -S . -B build_cpu_${GNU_COMPILER_NAME}_${CMAKE_HOST_NAME}_${SIMD_NAME}_${env.BUILD_TAG} -DCMAKE_BUILD_TYPE=Release ${CMAKE_HOST_FLAGS} ${SIMD_FLAGS} -DSPECFEM_BUILD_TESTS=ON -DSPECFEM_BUILD_BENCHMARKS=OFF
+                                        cmake3 -S . -B build_cpu_${GNU_COMPILER_NAME}_${CMAKE_HOST_NAME}_${SIMD_NAME}_${env.BUILD_TAG} \
+                                          -DCMAKE_BUILD_TYPE=Release \
+                                          -D CMAKE_INSTALL_PREFIX=install_cpu_${GNU_COMPILER_NAME}_${CMAKE_HOST_NAME}_${SIMD_NAME}_${env.BUILD_TAG}/bin \
+                                          ${CMAKE_HOST_FLAGS} ${SIMD_FLAGS} \
+                                          -D SPECFEM_BUILD_TESTS=ON \
+                                          -D SPECFEM_BUILD_BENCHMARKS=OFF
                                         cmake3 --build build_cpu_${GNU_COMPILER_NAME}_${CMAKE_HOST_NAME}_${SIMD_NAME}_${env.BUILD_TAG}
                                     """
                                     echo ' Build completed '
@@ -87,6 +92,7 @@ pipeline{
                             always {
                                 echo ' Cleaning '
                                 sh "rm -rf build_cpu_${GNU_COMPILER_NAME}_${CMAKE_HOST_NAME}_${SIMD_NAME}_${env.BUILD_TAG}"
+                                sh "rm -rf install_cpu_${GNU_COMPILER_NAME}_${CMAKE_HOST_NAME}_${SIMD_NAME}_${env.BUILD_TAG}"
                             }
                         }
                     }

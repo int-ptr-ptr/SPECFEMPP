@@ -19,56 +19,60 @@ Compiler Versions
 The following table lists the versions of compilers that are supported by SPECFEM++:
   - Recommended: The compiler versions that are tested for performance and stability.
   - Tested: The compiler versions that are tested for stability.
-  - Supported by Kokkos: The compiler versions that are supported by Kokkos. We have not tested these versions for SPECFEM++, but in theory they should work.
+  - Kokkos Tested: The compiler versions that are tested by Kokkos. We have not tested these versions for SPECFEM++, but in theory they should work.
+  - Minimum Version: The minimum compiler versions required to build SPECFEM++.
 
 .. list-table::
-    :widths: 19 27 27 27
+    :widths: 20 20 20 20 20
     :header-rows: 1
     :align: center
 
     * - Compiler
       - Recommended
       - Tested
-      - Supported by Kokkos
+      - Kokkos Tested
+      - Minimum Version
 
     * * GNU
-      * 8.5.0
-      * 8.5.0, 13.2.1
+      * 11.5.0
+      * 11.5.0, 14.2.1
       * 8.4.0, latest
+      * 8.2.0
 
     * * IntelLLVM
       * 2024.0.2
-      * 2022.2.0, 2024.0.2
-      * 2021.1.1, 2023.0.0
+      * 2024.2
+      * 2024.2
+      * 2021.1.1
 
     * * NVCC
-      * 12.6
-      * 11.7, 12.6
+      * 12.8
+      * 11.8, 12.8
       * 11.0, 11.6, 11.7
-
-    * * Clang
-      * Not Tested
-      * Not Tested
-      * 8.0.0, latest
+      * 11.0
 
     * * Apple Clang
       * 16.0.0 (MacOS Sequoia)
       * Not Tested
-      * 8.0.0, latest
+      * latest
+      * 8.0.0
 
     * * NVC++
       * Not Tested
       * Not Tested
-      * 22.3, 22.9
+      * 22.9
+      * 22.3
 
     * * ROCM
-      * 6.2.4 (Not Tested)
       * Not Tested
+      * Not Tested
+      * 5.2.0
       * 5.2.0
 
     * * ARM/Clang
       * Not Tested
       * Not Tested
+      * 20.1
       * 20.1
 
 
@@ -186,19 +190,8 @@ Below are the recommended build recipes for different architectures:
 
 .. note::
     When you have the need to switch between different build configurations
-    (e.g., from CPU to CUDA), it is recommended to use CMake presets to
-    manage the build configurations. Default presets are provided in
-    the ``CMakePresets.json`` file in the root directory of the SPECFEM++
-    repository. To customize the presets, you can create a new file
-    called ``CMakeUserPresets.json`` in the same directory and add your
-    custom configurations there. More information on CMake presets can be
-    found in the `CMake documentation <https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html>`_.
-    To compile using the default release preset, you can run:
-
-    .. code-block:: bash
-
-        cmake --preset release
-        cmake --build --preset release
+    (e.g., from CPU to CUDA), it is recommended to use :doc:`CMake presets </sections/getting_started/presets>` to
+    manage the build configurations.
 
 Adding SPECFEM to PATH
 ----------------------

@@ -37,6 +37,8 @@ struct edge_index<specfem::dimension::type::dim2>
   int iz;
   /** @brief Local x-coordinate index within element */
   int ix;
+  /** @brief Mesh entity type for the edge */
+  specfem::mesh_entity::dim2::type edge_type;
 
   /** @brief Default constructor */
   KOKKOS_INLINE_FUNCTION
@@ -53,8 +55,10 @@ struct edge_index<specfem::dimension::type::dim2>
    */
   KOKKOS_INLINE_FUNCTION
   edge_index(const int ispec_, const int iedge_, const int ipoint_,
-             const int iz_, const int ix_)
-      : ispec(ispec_), iedge(iedge_), ipoint(ipoint_), iz(iz_), ix(ix_) {}
+             const int iz_, const int ix_,
+             const specfem::mesh_entity::dim2::type edge_type_)
+      : ispec(ispec_), iedge(iedge_), ipoint(ipoint_), iz(iz_), ix(ix_),
+        edge_type(edge_type_) {}
 };
 
 /**
@@ -87,6 +91,8 @@ struct edge_index<specfem::dimension::type::dim3>
   int iy;
   /** @brief Local x-coordinate index within element */
   int ix;
+  /** @brief Mesh entity type for the edge */
+  specfem::mesh_entity::dim3::type edge_type;
 
   /** @brief Default constructor */
   KOKKOS_INLINE_FUNCTION
@@ -104,9 +110,10 @@ struct edge_index<specfem::dimension::type::dim3>
    */
   KOKKOS_INLINE_FUNCTION
   edge_index(const int ispec_, const int iedge_, const int ipoint_,
-             const int iz_, const int iy_, const int ix_)
+             const int iz_, const int iy_, const int ix_,
+             const specfem::mesh_entity::dim3::type edge_type_)
       : ispec(ispec_), iedge(iedge_), ipoint(ipoint_), iz(iz_), iy(iy_),
-        ix(ix_) {}
+        ix(ix_), edge_type(edge_type_) {}
 };
 
 } // namespace specfem::point

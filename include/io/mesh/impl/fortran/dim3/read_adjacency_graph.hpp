@@ -1,0 +1,14 @@
+#pragma once
+
+#include "enumerations/interface.hpp"
+#include "mesh/mesh.hpp"
+#include "specfem_mpi/interface.hpp"
+#include <fstream>
+
+namespace specfem::io::mesh::impl::fortran::dim3 {
+
+specfem::mesh::adjacency_graph<specfem::dimension::type::dim3>
+read_adjacency_graph(std::ifstream &stream, const int nspec,
+                     const specfem::MPI::MPI *mpi);
+
+} // namespace specfem::io::mesh::impl::fortran::dim3

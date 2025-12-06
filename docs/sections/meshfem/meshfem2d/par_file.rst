@@ -1,5 +1,5 @@
-``xmeshfem2D``: ``Par_file`` Documentation
-++++++++++++++++++++++++++++++++++++++++++
+Parameter File
+++++++++++++++
 
 Simulation input parameters
 ===========================
@@ -207,6 +207,27 @@ Type
     :caption: Example
 
     1 1 2700.d0 3000.d0 1732.051d0 0 0 9999 9999 0 0 0 0 0 0
+
+Elastic Cosserat material system
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+An elastic Cosserat medium can be described by the following parameters:
+
+- ``model_number``: integer number to refence the material system
+- ``rho``: density
+- ``kappa``: P-wave modulus
+- ``mu``: shear modulus
+- ``nu``: Poisson's ratio
+- ``j``: micro-inertia
+
+:Type: ``string``
+
+:Format: ``model_number 4 rho kappa mu nu j 0 0 0 0 0 0 0 0 0``
+
+.. code-block::
+    :caption: Example
+
+    1 5 2700.d0 1.0d10 3.0d9 0.25d0 0.1d0 0 0 0 0 0 0 0 0
 
 
 Poroelastic material system

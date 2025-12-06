@@ -38,12 +38,6 @@ public:
         h_shape3D(Kokkos::create_mirror_view(shape3D)),
         h_dshape3D(Kokkos::create_mirror_view(dshape3D)) {}
 
-  shape_functions(
-      const Kokkos::View<type_real *, Kokkos::DefaultHostExecutionSpace> xi,
-      const Kokkos::View<type_real *, Kokkos::DefaultHostExecutionSpace> eta,
-      const Kokkos::View<type_real *, Kokkos::DefaultHostExecutionSpace> zeta,
-      const int &ngll, const int &ngnod);
-
   shape_functions() = default;
 
   shape_functions(const int ngllz, const int nglly, const int ngllx,

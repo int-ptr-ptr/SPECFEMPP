@@ -58,7 +58,6 @@ void execute(
   auto start_time = std::chrono::system_clock::now();
   specfem::runtime_configuration::setup setup(parameter_dict, default_dict);
   const auto database_filename = setup.get_databases();
-  const auto mesh_parameters_filename = setup.get_mesh_parameters();
 
   // Get simulation parameters
   const specfem::simulation::type simulation_type = setup.get_simulation_type();
@@ -72,8 +71,7 @@ void execute(
   // Read mesh from the mesh database file
   mpi->cout("Reading the mesh...");
   mpi->cout("===================");
-  const auto mesh = specfem::io::read_3d_mesh(mesh_parameters_filename,
-                                              database_filename, mpi);
+  const auto mesh = specfem::io::read_3d_mesh(database_filename, mpi);
   std::chrono::duration<double> elapsed_seconds =
       std::chrono::system_clock::now() - start_time;
   mpi->cout("Time to read mesh: " + std::to_string(elapsed_seconds.count()) +

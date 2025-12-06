@@ -15,6 +15,10 @@ SPECFEM++ provides a set of default presets in the ``CMakePresets.json`` file lo
     cmake --preset <preset-name>
     cmake --build --preset <preset-name>
 
+.. note::
+
+    To list all available presets, you can run :code:`cmake --list-presets`.
+
 For example, to configure and build the default release configuration:
 
 .. code-block:: bash
@@ -32,46 +36,41 @@ To build with CUDA support:
 The binaries built with and without CUDA will be generated in the ``bin/release`` and ``bin/release-cuda`` directories, respectively.
 When running SPECFEM++, make sure you are using the correct binary for your chosen preset. You can either export the appropriate directory to your ``PATH`` environment variable, or run the executable by specifying its full path (e.g., ``<SPECFEMPP_DIR>/bin/release/specfem2d`` or ``<SPECFEMPP_DIR>/bin/release-cuda/specfem2d``).
 
+.. note::
+
+    SPECFEM++ presets use CMake's Unity build feature to speed up compilation times. However, this can lead to increased memory usage during the build process. In some cases, especially on systems with limited RAM, you may encounter out-of-memory errors during compilation. If this happens, you can reduce the unity build batch size by passing ``-D SPECFEM_UNITY_BUILD_BATCH_SIZE=<smaller_number>`` (for example, ``-D SPECFEM_UNITY_BUILD_BATCH_SIZE=4``) when invoking CMake with the preset. This will reduce memory consumption.
+
 Customizing Presets
 -------------------
 
-.. warning::
+If the provided presets do not meet your specific needs, you can create your own custom presets by defining them in a ``CMakeUserPresets.json`` file in the root directory of the SPECFEM++ repository. This file allows you to override or extend the default presets without modifying the original ``CMakePresets.json``.
 
-  Do not modify the provided ``CMakePresets.json`` file directly. Instead, create a ``CMakeUserPresets.json`` file in the root directory to add or override presets with your own custom configurations. This approach keeps your changes separate and avoids conflicts when updating the repository.
-
-**Example: Creating a custom user preset**
-
-1. Copy the structure below into a new file named ``CMakeUserPresets.json`` in the SPECFEM++ root directory:
+Below is an example of how to create a custom preset that compiles SPECFEM++ for NVIDIA A100 GPUs with an additional user-defined option:
 
 .. code-block:: json
+    :caption: CMakeUserPresets.json
 
     {
       "version": 6,
       "configurePresets": [
         {
-          "name": "my-custom-release",
+          "name": "release-ampere80",
           "inherits": "release",
           "cacheVariables": {
-            "MY_OPTION": "ON"
+            "Kokkos_ARCH_AMPERE80": "ON",
+            "Kokkos_ARCH_NATIVE": "OFF",
           }
         }
       ],
       "buildPresets":[ {
-          "name": "my-custom-release",
-          "configurePreset": "my-custom-release",
+          "name": "release-ampere80",
+          "configurePreset": "release-ampere80",
           "targets": [
             "all"
           ]
         }
       ]
     }
-
-2. Use your custom preset as usual:
-
-.. code-block:: bash
-
-    cmake --preset my-custom-release
-    cmake --build --preset my-custom-release
 
 For more details on CMake presets and user presets, see the `CMake documentation <https://cmake.org/cmake/help/latest/manual/cmake-presets.7.html>`_.
 

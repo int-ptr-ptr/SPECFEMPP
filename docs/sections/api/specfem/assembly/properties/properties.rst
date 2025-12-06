@@ -7,8 +7,17 @@
 .. doxygenstruct:: specfem::assembly::properties
     :members:
 
-Data Access Functions
-^^^^^^^^^^^^^^^^^^^^^^
+Dimension-Specific Implementations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. doxygengroup:: ComputePropertiesDataAccess
+.. doxygenstruct:: specfem::assembly::properties< specfem::dimension::type::dim2 >
+    :members:
+
+.. doxygenstruct:: specfem::assembly::properties< specfem::dimension::type::dim3 >
+    :members:
+
+Data Access Functions
+^^^^^^^^^^^^^^^^^^^^^
+
+.. doxygengroup:: PropertiesDataAccess
     :content-only:

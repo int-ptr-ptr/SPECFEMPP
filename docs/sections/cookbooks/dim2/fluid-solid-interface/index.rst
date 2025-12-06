@@ -1,5 +1,5 @@
-Wave propagration through fluid-solid interface
-===============================================
+Wave propagation through fluid-solid interface
+==============================================
 
 This `example
 <https://github.com/PrincetonUniversity/SPECFEMPP/tree/main/examples/fluid-solid-interface>`_

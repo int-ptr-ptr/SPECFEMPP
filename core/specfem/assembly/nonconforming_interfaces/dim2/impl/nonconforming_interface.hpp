@@ -127,7 +127,6 @@ public:
                   specfem::assembly::coupled_interfaces_impl::
                       stores_transfer_function_coupled<PointType>::value) {
 
-      const int &local_slot = 0;
       const int &container_slot = index.iedge;
       const int &ipoint = index.ipoint;
 
@@ -236,11 +235,11 @@ public:
           index.get_iterator(),
           [&](const typename IndexType::iterator_type::index_type
                   &iterator_index) {
-            const auto point_index = iterator_index.get_index();
-
-            const int &local_slot = point_index.iedge;
-            const int &container_slot = offset + point_index.iedge;
-            const int &ipoint = point_index.ipoint;
+            const auto &local_index = iterator_index.get_local_index();
+            const auto &index = iterator_index.get_index();
+            const int &local_slot = local_index.iedge;
+            const int &container_slot = index.iedge;
+            const int &ipoint = index.ipoint;
 
             if constexpr (on_device) {
               for (int i = 0; i < EdgeType::n_quad_intersection; i++) {

@@ -1,11 +1,11 @@
 #include "compute_source_array_from_tensor.hpp"
 #include "algorithms/interface.hpp"
-#include "enumerations/macros.hpp"
 #include "kokkos_abstractions.h"
 #include "quadrature/interface.hpp"
 #include "specfem/assembly/element_types.hpp"
 #include "specfem/assembly/jacobian_matrix.hpp"
 #include "specfem/assembly/mesh.hpp"
+#include "specfem/macros.hpp"
 #include "specfem/point.hpp"
 #include "specfem/source.hpp"
 #include "specfem_setup.hpp"
@@ -17,7 +17,7 @@ namespace specfem::assembly::compute_source_array_impl {
 void compute_source_array_from_tensor_and_element_jacobian(
     const specfem::sources::tensor_source<specfem::dimension::type::dim2>
         &tensor_source,
-    const JacobianViewType &element_jacobian_matrix,
+    const JacobianViewType2D &element_jacobian_matrix,
     const specfem::assembly::mesh_impl::quadrature<
         specfem::dimension::type::dim2> &quadrature,
     Kokkos::View<type_real ***, Kokkos::LayoutRight, Kokkos::HostSpace>
@@ -98,18 +98,16 @@ void specfem::assembly::compute_source_array_impl::from_tensor(
   const int ngllx = source_array.extent(2);
   const int ngllz = source_array.extent(1);
 
-  using PointJacobianMatrix =
-      specfem::point::jacobian_matrix<specfem::dimension::type::dim2, false,
-                                      false>;
-  specfem::kokkos::HostView2d<PointJacobianMatrix> element_jacobian(
-      "element_jacobian", ngllz, ngllx);
+  specfem::assembly::compute_source_array_impl::JacobianViewType2D
+      element_jacobian("element_jacobian", ngllz, ngllx);
 
   // Extract jacobian data from jacobian_matrix
   for (int iz = 0; iz < ngllz; ++iz) {
     for (int ix = 0; ix < ngllx; ++ix) {
       const specfem::point::index<specfem::dimension::type::dim2> index(
           tensor_source.get_local_coordinates().ispec, iz, ix);
-      PointJacobianMatrix derivatives;
+      specfem::assembly::compute_source_array_impl::PointJacobianMatrix2D
+          derivatives;
       specfem::assembly::load_on_host(index, jacobian_matrix, derivatives);
       element_jacobian(iz, ix) = derivatives;
     }

@@ -169,6 +169,10 @@ public:
   using execution_space =
       typename base_type::execution_space; ///< Execution space type
 
+  using base_index_type =
+      MappedPointIndex<DimensionTag, typename ViewType::value_type,
+                       ParallelConfig::simd::using_simd, execution_space>;
+
   MappedChunkedDomainIterator(
       const ViewType indices, const ViewType mapping,
       const specfem::mesh_entity::element_grid<DimensionTag> &element_grid)

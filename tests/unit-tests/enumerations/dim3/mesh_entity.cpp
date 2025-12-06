@@ -52,7 +52,7 @@ namespace specfem::mesh_entity_test {
  * assert(test_point == right_face); // True: x matches, y and z are wildcards
  * @endcode
  */
-struct Coordinate {
+struct Coordinate3D {
 
   /**
    * @brief Wildcard type for flexible coordinate matching
@@ -86,7 +86,7 @@ struct Coordinate {
    *
    * Creates a coordinate at the origin (0, 0, 0).
    */
-  Coordinate() = default;
+  Coordinate3D() = default;
 
   /**
    * @brief Generic constructor with type-safe coordinate assignment
@@ -119,7 +119,7 @@ struct Coordinate {
                 std::is_floating_point_v<Y> || std::is_same_v<Y, All>, int> = 0,
             typename std::enable_if_t<
                 std::is_floating_point_v<Z> || std::is_same_v<Z, All>, int> = 0>
-  Coordinate(X x_val, Y y_val, Z z_val)
+  Coordinate3D(X x_val, Y y_val, Z z_val)
       : x([&]() -> std::variant<type_real, All> {
           if constexpr (std::is_same_v<X, All>) {
             return All{};
@@ -156,7 +156,7 @@ struct Coordinate {
    * Coordinate origin = {0.0, 0.0, 0.0};
    * @endcode
    */
-  Coordinate(const std::initializer_list<type_real> &list) {
+  Coordinate3D(const std::initializer_list<type_real> &list) {
     if (list.size() != 3) {
       throw std::runtime_error(
           "Coordinate assignment requires exactly 3 values.");
@@ -185,7 +185,7 @@ struct Coordinate {
    * assert(exact == pattern); // True: x and z match, y is wildcard
    * @endcode
    */
-  bool operator==(const Coordinate &other) const {
+  bool operator==(const Coordinate3D &other) const {
     bool x_equal = false;
     if (std::holds_alternative<All>(x) ||
         std::holds_alternative<All>(other.x)) {
@@ -301,7 +301,7 @@ struct Element8Node {
    * The nodes are ordered according to standard hexahedral convention
    * with node 0 at the origin and node 6 at the opposite corner.
    */
-  std::array<Coordinate, ncontrol_nodes> control_node_coords;
+  std::array<Coordinate3D, ncontrol_nodes> control_node_coords;
 
   /**
    * @brief Physical coordinates of all GLL quadrature points
@@ -310,7 +310,7 @@ struct Element8Node {
    * within the element. Layout: quadrature_coords(iz, iy, ix) where
    * indices correspond to the ζ, η, ξ directions respectively.
    */
-  Kokkos::View<Coordinate ***, Kokkos::LayoutLeft, Kokkos::HostSpace>
+  Kokkos::View<Coordinate3D ***, Kokkos::LayoutLeft, Kokkos::HostSpace>
       quadrature_coords;
 
   /**
@@ -342,7 +342,8 @@ struct Element8Node {
    * });
    * @endcode
    */
-  Element8Node(const int ngll, const std::initializer_list<Coordinate> &coords)
+  Element8Node(const int ngll,
+               const std::initializer_list<Coordinate3D> &coords)
       : ngll(ngll), quadrature(0.0, 0.0, ngll),
         quadrature_coords("quad_coords", ngll, ngll, ngll),
         control_node_coords() {
@@ -455,7 +456,7 @@ TEST(MeshEntity3D, ConnectionsPerNode) {
  * mesh entities (faces, edges, corners) in a spectral element. Each test
  * configuration specifies a mesh entity and its expected coordinate pattern.
  */
-struct SingleElementTestConfig {
+struct SingleElement3DTestConfig {
   /** @brief Mesh entity type (face, edge, or corner) to test */
   specfem::mesh_entity::dim3::type face;
 
@@ -463,7 +464,7 @@ struct SingleElementTestConfig {
   std::string name;
 
   /** @brief Expected coordinate pattern (may include wildcards) */
-  specfem::mesh_entity_test::Coordinate expected;
+  specfem::mesh_entity_test::Coordinate3D expected;
 
   /**
    * @brief Constructor for test configuration
@@ -472,9 +473,9 @@ struct SingleElementTestConfig {
    * @param name Descriptive name for the test case
    * @param expected Expected coordinate pattern for all points on this entity
    */
-  SingleElementTestConfig(const specfem::mesh_entity::dim3::type face,
-                          const std::string &name,
-                          const specfem::mesh_entity_test::Coordinate &expected)
+  SingleElement3DTestConfig(
+      const specfem::mesh_entity::dim3::type face, const std::string &name,
+      const specfem::mesh_entity_test::Coordinate3D &expected)
       : face(face), name(name), expected(expected) {}
 };
 
@@ -489,7 +490,7 @@ struct SingleElementTestConfig {
  * @return Reference to the output stream
  */
 std::ostream &operator<<(std::ostream &os,
-                         const SingleElementTestConfig &config) {
+                         const SingleElement3DTestConfig &config) {
   return os << config.name;
 }
 
@@ -506,9 +507,10 @@ std::ostream &operator<<(std::ostream &os,
  * - 5×5×5 GLL quadrature grid
  * - Connection mapping for all mesh entity types
  *
- * @see SingleElementTestConfig
+ * @see SingleElement3DTestConfig
  */
-class SingleElement : public ::testing::TestWithParam<SingleElementTestConfig> {
+class SingleElement3D
+    : public ::testing::TestWithParam<SingleElement3DTestConfig> {
 protected:
   /**
    * @brief Test setup (currently empty)
@@ -532,7 +534,7 @@ protected:
    * containing 5×5×5 GLL points. The element geometry is defined by
    * 8 control nodes forming a unit cube from (0,0,0) to (1,1,1).
    */
-  SingleElement()
+  SingleElement3D()
       : element(5,
                 {
                     { 0.0, 0.0, 0.0 }, // 0: bottom-front-left
@@ -554,7 +556,7 @@ protected:
 };
 
 /** @brief Alias for wildcard coordinate type */
-using All = specfem::mesh_entity_test::Coordinate::All;
+using All = specfem::mesh_entity_test::Coordinate3D::All;
 
 /**
  * @brief Parameterized test for mesh entity coordinate mapping validation
@@ -573,7 +575,7 @@ using All = specfem::mesh_entity_test::Coordinate::All;
  * @note The test is parameterized over different mesh entities including
  *       faces, edges, and corners of the hexahedral element.
  */
-TEST_P(SingleElement, MapCoordinatesTest) {
+TEST_P(SingleElement3D, MapCoordinatesTest) {
   const auto &config = GetParam();
   const int face_points = mapping.number_of_points_on_orientation(config.face);
 
@@ -599,91 +601,91 @@ TEST_P(SingleElement, MapCoordinatesTest) {
 }
 
 INSTANTIATE_TEST_SUITE_P(
-    MeshEntity3D, SingleElement,
+    MeshEntity3D, SingleElement3D,
     ::testing::Values(
-        SingleElementTestConfig(
+        SingleElement3DTestConfig(
             specfem::mesh_entity::dim3::type::left, "LeftFace",
-            specfem::mesh_entity_test::Coordinate(0.0, All(), All())),
-        SingleElementTestConfig(
+            specfem::mesh_entity_test::Coordinate3D(0.0, All(), All())),
+        SingleElement3DTestConfig(
             specfem::mesh_entity::dim3::type::right, "RightFace",
-            specfem::mesh_entity_test::Coordinate(1.0, All(), All())),
-        SingleElementTestConfig(
+            specfem::mesh_entity_test::Coordinate3D(1.0, All(), All())),
+        SingleElement3DTestConfig(
             specfem::mesh_entity::dim3::type::front, "FrontFace",
-            specfem::mesh_entity_test::Coordinate(All(), 0.0, All())),
-        SingleElementTestConfig(
+            specfem::mesh_entity_test::Coordinate3D(All(), 0.0, All())),
+        SingleElement3DTestConfig(
             specfem::mesh_entity::dim3::type::back, "BackFace",
-            specfem::mesh_entity_test::Coordinate(All(), 1.0, All())),
-        SingleElementTestConfig(
+            specfem::mesh_entity_test::Coordinate3D(All(), 1.0, All())),
+        SingleElement3DTestConfig(
             specfem::mesh_entity::dim3::type::bottom, "BottomFace",
-            specfem::mesh_entity_test::Coordinate(All(), All(), 0.0)),
-        SingleElementTestConfig(
+            specfem::mesh_entity_test::Coordinate3D(All(), All(), 0.0)),
+        SingleElement3DTestConfig(
             specfem::mesh_entity::dim3::type::top, "TopFace",
-            specfem::mesh_entity_test::Coordinate(All(), All(), 1.0)),
-        SingleElementTestConfig(
+            specfem::mesh_entity_test::Coordinate3D(All(), All(), 1.0)),
+        SingleElement3DTestConfig(
             specfem::mesh_entity::dim3::type::top_right, "TopRightEdge",
-            specfem::mesh_entity_test::Coordinate(1.0, All(), 1.0)),
-        SingleElementTestConfig(
+            specfem::mesh_entity_test::Coordinate3D(1.0, All(), 1.0)),
+        SingleElement3DTestConfig(
             specfem::mesh_entity::dim3::type::top_left, "TopLeftEdge",
-            specfem::mesh_entity_test::Coordinate(0.0, All(), 1.0)),
-        SingleElementTestConfig(
+            specfem::mesh_entity_test::Coordinate3D(0.0, All(), 1.0)),
+        SingleElement3DTestConfig(
             specfem::mesh_entity::dim3::type::bottom_right, "BottomRightEdge",
-            specfem::mesh_entity_test::Coordinate(1.0, All(), 0.0)),
-        SingleElementTestConfig(
+            specfem::mesh_entity_test::Coordinate3D(1.0, All(), 0.0)),
+        SingleElement3DTestConfig(
             specfem::mesh_entity::dim3::type::bottom_left, "BottomLeftEdge",
-            specfem::mesh_entity_test::Coordinate(0.0, All(), 0.0)),
-        SingleElementTestConfig(
+            specfem::mesh_entity_test::Coordinate3D(0.0, All(), 0.0)),
+        SingleElement3DTestConfig(
             specfem::mesh_entity::dim3::type::front_right, "FrontRightEdge",
-            specfem::mesh_entity_test::Coordinate(1.0, 0.0, All())),
-        SingleElementTestConfig(
+            specfem::mesh_entity_test::Coordinate3D(1.0, 0.0, All())),
+        SingleElement3DTestConfig(
             specfem::mesh_entity::dim3::type::front_left, "FrontLeftEdge",
-            specfem::mesh_entity_test::Coordinate(0.0, 0.0, All())),
-        SingleElementTestConfig(
+            specfem::mesh_entity_test::Coordinate3D(0.0, 0.0, All())),
+        SingleElement3DTestConfig(
             specfem::mesh_entity::dim3::type::back_right, "BackRightEdge",
-            specfem::mesh_entity_test::Coordinate(1.0, 1.0, All())),
-        SingleElementTestConfig(
+            specfem::mesh_entity_test::Coordinate3D(1.0, 1.0, All())),
+        SingleElement3DTestConfig(
             specfem::mesh_entity::dim3::type::back_left, "BackLeftEdge",
-            specfem::mesh_entity_test::Coordinate(0.0, 1.0, All())),
-        SingleElementTestConfig(
+            specfem::mesh_entity_test::Coordinate3D(0.0, 1.0, All())),
+        SingleElement3DTestConfig(
             specfem::mesh_entity::dim3::type::front_bottom, "FrontBottomEdge",
-            specfem::mesh_entity_test::Coordinate(All(), 0.0, 0.0)),
-        SingleElementTestConfig(
+            specfem::mesh_entity_test::Coordinate3D(All(), 0.0, 0.0)),
+        SingleElement3DTestConfig(
             specfem::mesh_entity::dim3::type::back_bottom, "BackBottomEdge",
-            specfem::mesh_entity_test::Coordinate(All(), 1.0, 0.0)),
-        SingleElementTestConfig(
+            specfem::mesh_entity_test::Coordinate3D(All(), 1.0, 0.0)),
+        SingleElement3DTestConfig(
             specfem::mesh_entity::dim3::type::front_top, "FrontTopEdge",
-            specfem::mesh_entity_test::Coordinate(All(), 0.0, 1.0)),
-        SingleElementTestConfig(
+            specfem::mesh_entity_test::Coordinate3D(All(), 0.0, 1.0)),
+        SingleElement3DTestConfig(
             specfem::mesh_entity::dim3::type::back_top, "BackTopEdge",
-            specfem::mesh_entity_test::Coordinate(All(), 1.0, 1.0)),
-        SingleElementTestConfig(
+            specfem::mesh_entity_test::Coordinate3D(All(), 1.0, 1.0)),
+        SingleElement3DTestConfig(
             specfem::mesh_entity::dim3::type::bottom_front_left,
             "BottomFrontLeftCorner",
-            specfem::mesh_entity_test::Coordinate(0.0, 0.0, 0.0)),
-        SingleElementTestConfig(
+            specfem::mesh_entity_test::Coordinate3D(0.0, 0.0, 0.0)),
+        SingleElement3DTestConfig(
             specfem::mesh_entity::dim3::type::bottom_front_right,
             "BottomFrontRightCorner",
-            specfem::mesh_entity_test::Coordinate(1.0, 0.0, 0.0)),
-        SingleElementTestConfig(
+            specfem::mesh_entity_test::Coordinate3D(1.0, 0.0, 0.0)),
+        SingleElement3DTestConfig(
             specfem::mesh_entity::dim3::type::top_front_left,
             "TopFrontLeftCorner",
-            specfem::mesh_entity_test::Coordinate(0.0, 0.0, 1.0)),
-        SingleElementTestConfig(
+            specfem::mesh_entity_test::Coordinate3D(0.0, 0.0, 1.0)),
+        SingleElement3DTestConfig(
             specfem::mesh_entity::dim3::type::top_front_right,
             "TopFrontRightCorner",
-            specfem::mesh_entity_test::Coordinate(1.0, 0.0, 1.0)),
-        SingleElementTestConfig(
+            specfem::mesh_entity_test::Coordinate3D(1.0, 0.0, 1.0)),
+        SingleElement3DTestConfig(
             specfem::mesh_entity::dim3::type::bottom_back_left,
             "BottomBackLeftCorner",
-            specfem::mesh_entity_test::Coordinate(0.0, 1.0, 0.0)),
-        SingleElementTestConfig(
+            specfem::mesh_entity_test::Coordinate3D(0.0, 1.0, 0.0)),
+        SingleElement3DTestConfig(
             specfem::mesh_entity::dim3::type::bottom_back_right,
             "BottomBackRightCorner",
-            specfem::mesh_entity_test::Coordinate(1.0, 1.0, 0.0)),
-        SingleElementTestConfig(specfem::mesh_entity::dim3::type::top_back_left,
-                                "TopBackLeftCorner",
-                                specfem::mesh_entity_test::Coordinate(0.0, 1.0,
-                                                                      1.0)),
-        SingleElementTestConfig(
+            specfem::mesh_entity_test::Coordinate3D(1.0, 1.0, 0.0)),
+        SingleElement3DTestConfig(
+            specfem::mesh_entity::dim3::type::top_back_left,
+            "TopBackLeftCorner",
+            specfem::mesh_entity_test::Coordinate3D(0.0, 1.0, 1.0)),
+        SingleElement3DTestConfig(
             specfem::mesh_entity::dim3::type::top_back_right,
             "TopBackRightCorner",
-            specfem::mesh_entity_test::Coordinate(1.0, 1.0, 1.0))));
+            specfem::mesh_entity_test::Coordinate3D(1.0, 1.0, 1.0))));

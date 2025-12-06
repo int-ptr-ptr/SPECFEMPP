@@ -1,7 +1,6 @@
 #pragma once
 
-#include "enumerations/config_strings.hpp"
-#include "enumerations/macros_impl/config_strings.hpp"
+#include "impl/config_strings.hpp"
 #include <string>
 
 namespace specfem {

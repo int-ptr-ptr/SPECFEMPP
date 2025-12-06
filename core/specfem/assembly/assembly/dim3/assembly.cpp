@@ -18,25 +18,27 @@ specfem::assembly::assembly<specfem::dimension::type::dim3>::assembly(
     const bool allocate_boundary_values,
     const std::shared_ptr<specfem::io::reader> &property_reader) {
 
-  this->mesh = { mesh.parameters, mesh.coordinates, mesh.mapping,
-                 mesh.control_nodes, quadratures };
+  const int nspec = mesh.nspec;
+  const int ngllz = mesh.element_grid.ngllz;
+  const int nglly = mesh.element_grid.nglly;
+  const int ngllx = mesh.element_grid.ngllx;
+  const int ngnod = mesh.control_nodes.ngnod;
 
-  this->element_types = { this->mesh.nspec,
-                          this->mesh.element_grid.ngllz,
-                          this->mesh.element_grid.nglly,
-                          this->mesh.element_grid.ngllx,
-                          this->mesh,
-                          mesh.tags };
+  this->mesh = { nspec,
+                 ngnod,
+                 ngllz,
+                 nglly,
+                 ngllx,
+                 mesh.adjacency_graph,
+                 mesh.control_nodes,
+                 quadratures };
 
-  this->jacobian_matrix = { mesh.jacobian_matrix };
+  this->element_types = { nspec, ngllz, nglly, ngllx, this->mesh, mesh.tags };
 
-  this->properties = { this->mesh.nspec,
-                       this->mesh.element_grid.ngllz,
-                       this->mesh.element_grid.nglly,
-                       this->mesh.element_grid.ngllx,
-                       this->element_types,
-                       this->mesh,
-                       mesh.materials };
+  this->jacobian_matrix = { this->mesh };
+
+  this->properties = { nspec, ngllz,          nglly,
+                       ngllx, mesh.materials, this->element_types };
 
   this->kernels = { this->mesh.nspec, this->mesh.element_grid.ngllz,
                     this->mesh.element_grid.nglly,

@@ -14,29 +14,134 @@
 
 namespace specfem::assembly::boundaries_impl {
 
+/**
+ * @brief Data container used to store acoustic free surface boundary
+ * information
+ *
+ * This class provides data structures and data access functions required to
+ * implement acoustic free surface boundary conditions in 2D spectral element
+ * simulations.
+ *
+ * **Physical Background:**
+ * An acoustic free surface boundary condition enforces zero traction (pressure)
+ * at the boundary. Mathematically, this corresponds to setting the acceleration
+ * to zero at quadrature points located on the free surface. This is physically
+ * appropriate for:
+ * - Air-water interfaces
+ * - Fluid-vacuum boundaries
+ * - Ocean-atmosphere interfaces in seismic modeling
+ *
+ * **Implementation Details:**
+ * The class stores boundary tag information for each quadrature point on
+ * elements that contain acoustic free surface boundaries. The boundary tags are
+ * used during the assembly process to identify which quadrature points require
+ * free surface treatment.
+ *
+ */
 template <> struct acoustic_free_surface<specfem::dimension::type::dim2> {
 private:
+  /**
+   * @name Private Constants
+   */
+  ///@{
+  /**
+   * @brief Static boundary tag identifier for acoustic free surface conditions
+   */
   constexpr static auto boundary_tag =
-      specfem::element::boundary_tag::acoustic_free_surface; ///< Boundary tag
-
+      specfem::element::boundary_tag::acoustic_free_surface;
+  ///@}
 public:
-  constexpr static auto dimension_tag =
-      specfem::dimension::type::dim2; ///< Dimension tag
+  /**
+   * @name Public Constants
+   */
+  ///@{
+  /**
+   * @brief Dimension tag indicating this is a 2D implementation
+   */
+  constexpr static auto dimension_tag = specfem::dimension::type::dim2;
+  ///@}
+
+  /**
+   * @name Type Definitions
+   */
+  ///@{
+  /**
+   * @brief Kokkos view type for storing boundary tag containers on device
+   *
+   * This view stores boundary tag information for all quadrature points within
+   * elements that contain acoustic free surface boundaries. The view has
+   * dimensions [nspec, ngllz, ngllx] where nspec is the number of spectral
+   * elements with free surface boundaries.
+   */
   using BoundaryTagView =
       Kokkos::View<specfem::element::boundary_tag_container ***,
                    Kokkos::LayoutLeft, Kokkos::DefaultExecutionSpace>;
+  ///@}
 
-  BoundaryTagView quadrature_point_boundary_tag; ///< Boundary tag for every
-                                                 ///< quadrature point within an
-                                                 ///< element with acoustic free
-                                                 ///< surface boundary
+  /**
+   * @name Data Members
+   */
+  ///@{
+  /**
+   * @brief Device-accessible boundary tag information for quadrature points
+   *
+   * This view contains boundary tag containers for every quadrature point
+   * within spectral elements that have acoustic free surface boundaries. The
+   * boundary tags are used during device kernel execution to identify which
+   * points require free surface treatment.
+   *
+   * **Dimensions:** [nspec_acoustic_free_surface, ngllz, ngllx]
+   * - nspec_acoustic_free_surface: Number of elements with free surface
+   * boundaries
+   * - ngllz, ngllx: Number of GLL points in z and x directions respectively
+   */
+  BoundaryTagView quadrature_point_boundary_tag;
 
-  BoundaryTagView::HostMirror h_quadrature_point_boundary_tag; ///< Host mirror
-                                                               ///< of boundary
-                                                               ///< types
+  /**
+   * @brief Host-accessible mirror of boundary tag information
+   *
+   * This is the host mirror of `quadrature_point_boundary_tag`, used for CPU
+   * access during initialization, debugging, and host-side computations. Data
+   * is synchronized between host and device as needed.
+   */
+  BoundaryTagView::HostMirror h_quadrature_point_boundary_tag;
+  ///@}
 
+  /**
+   * @name Constructors
+   */
+  ///@{
+  /**
+   * @brief Default constructor
+   *
+   * Creates an empty acoustic free surface boundary condition container.
+   * Data members are left uninitialized and must be set up via assignment
+   * or the parametrized constructor.
+   */
   acoustic_free_surface() = default;
 
+  /**
+   * @brief Construct acoustic free surface boundary condition data from mesh
+   * information
+   *
+   * This constructor processes mesher-supplied boundary information and
+   * converts it into per-quadrature-point data required for implementing
+   * acoustic free surface boundary conditions during SEM simulations.
+   *
+   * @param nspec Number of spectral elements with acoustic free surface
+   * boundaries
+   * @param ngllz Number of GLL points in the z (vertical) direction
+   * @param ngllx Number of GLL points in the x (horizontal) direction
+   * @param acoustic_free_surface Mesh-level acoustic free surface boundary
+   * information containing element lists and edge definitions
+   * @param mesh Assembly mesh containing coordinate and connectivity
+   * information
+   * @param boundary_index_mapping Mapping from global spectral element indices
+   * to boundary-specific indices for elements with free surface boundaries
+   * @param boundary_tag Vector of boundary tag containers that will be
+   * populated with per-element boundary information
+   *
+   */
   acoustic_free_surface(
       const int nspec, const int ngllz, const int ngllx,
       const specfem::mesh::acoustic_free_surface<dimension_tag>
@@ -44,7 +149,26 @@ public:
       const specfem::assembly::mesh<dimension_tag> &mesh,
       const Kokkos::View<int *, Kokkos::HostSpace> &boundary_index_mapping,
       std::vector<specfem::element::boundary_tag_container> &boundary_tag);
+  ///@}
 
+  /**
+   * @name Device Data Access Methods
+   *
+   */
+  ///@{
+  /**
+   * @brief Load acoustic free surface boundary data for a non-SIMD quadrature
+   * point on device
+   *
+   * @tparam IndexType Must be a valid index type (specfem::point::index) with
+   * SIMD disabled
+   *
+   * @param index Quadrature point location specifier containing
+   * @param boundary Output boundary object
+   *
+   * @note This is an implementation detail and is typically called by a
+   * higher-level @c load_on_device function
+   */
   template <typename IndexType,
             typename std::enable_if_t<
                 specfem::data_access::is_index_type<IndexType>::value &&
@@ -61,6 +185,19 @@ public:
     return;
   }
 
+  /**
+   * @brief Load acoustic free surface data for composite boundary conditions on
+   * device
+   *
+   * @tparam IndexType Must be a valid index type with SIMD disabled
+   *
+   * @param index Quadrature point location specifier
+   * @param boundary Output composite boundary object. The acoustic free surface
+   *                 contribution is accumulated into this boundary's tag field.
+   *
+   * @see This is an implementation detail and is typically called by a
+   * higher-level @c load_on_device function
+   */
   template <typename IndexType,
             typename std::enable_if_t<
                 specfem::data_access::is_index_type<IndexType>::value &&
@@ -78,6 +215,19 @@ public:
     return;
   }
 
+  /**
+   * @brief Load acoustic free surface boundary data for SIMD quadrature points
+   * on device
+   *
+   * @tparam IndexType Must be a valid SIMD index type
+   * (specfem::point::simd_index)
+   *
+   * @param index SIMD index containing multiple quadrature point locations
+   * @param boundary Output SIMD boundary object with vectorized tag storage
+   *
+   * @note This is an implementation detail and is typically called by a
+   * higher-level @c load_on_device function
+   */
   template <typename IndexType,
             typename std::enable_if_t<
                 specfem::data_access::is_index_type<IndexType>::value &&
@@ -106,6 +256,17 @@ public:
     return;
   }
 
+  /**
+   * @brief Load acoustic free surface data for SIMD composite boundaries on
+   * device
+   *
+   * @tparam IndexType Must be a valid SIMD index type
+   * @param index SIMD index with masked lanes
+   * @param boundary Output SIMD composite boundary object
+   *
+   * @note This is an implementation detail and is typically called by a
+   * higher-level @c load_on_device function
+   */
   template <typename IndexType,
             typename std::enable_if_t<
                 specfem::data_access::is_index_type<IndexType>::value &&
@@ -134,7 +295,28 @@ public:
 
     return;
   }
+  ///@}
 
+  /**
+   * @name Host Data Access Methods
+   *
+   * Methods for loading boundary condition data on CPU hosts. These functions
+   * provide equivalent functionality to the device methods but operate on
+   * host-accessible data.
+   */
+  ///@{
+  /**
+   * @brief Load acoustic free surface boundary data for a quadrature point on
+   * host
+   *
+   * @tparam IndexType Must be a valid non-SIMD index type
+   * @param index Quadrature point location specifier
+   * @param boundary Output boundary object for tag accumulation
+   *
+   * @note This is an implementation detail and is typically called by a
+   * higher-level
+   * @c load_on_host function
+   */
   template <typename IndexType,
             typename std::enable_if_t<
                 specfem::data_access::is_index_type<IndexType>::value &&
@@ -149,6 +331,18 @@ public:
     return;
   }
 
+  /**
+   * @brief Load acoustic free surface data for composite boundaries on host
+   *
+   *
+   * @tparam IndexType Must be a valid non-SIMD index type
+   * @param index Quadrature point location specifier
+   * @param boundary Output composite boundary object
+   *
+   * @note This is an implementation detail and is typically called by a
+   * higher-level
+   * @c load_on_host function
+   */
   template <typename IndexType,
             typename std::enable_if_t<
                 specfem::data_access::is_index_type<IndexType>::value &&
@@ -166,6 +360,17 @@ public:
     return;
   }
 
+  /**
+   * @brief Load acoustic free surface boundary data for SIMD quadrature points
+   * on host
+   *
+   * @tparam IndexType Must be a valid SIMD index type
+   * @param index SIMD index with masked lanes for multiple quadrature points
+   * @param boundary Output SIMD boundary object with vectorized storage
+   *
+   * @note This is an implementation detail and is typically called by a
+   * higher-level @c load_on_device function
+   */
   template <typename IndexType,
             typename std::enable_if_t<
                 specfem::data_access::is_index_type<IndexType>::value &&
@@ -190,6 +395,17 @@ public:
     return;
   }
 
+  /**
+   * @brief Load acoustic free surface data for SIMD composite boundaries on
+   * host
+   *
+   * @tparam IndexType Must be a valid SIMD index type
+   * @param index SIMD index with masked lanes
+   * @param boundary Output SIMD composite boundary object
+   *
+   * @note This is an implementation detail and is typically called by a
+   * higher-level @c load_on_host function
+   */
   template <typename IndexType,
             typename std::enable_if_t<
                 specfem::data_access::is_index_type<IndexType>::value &&
@@ -215,6 +431,6 @@ public:
     }
     return;
   }
+  ///@}
 };
-
 } // namespace specfem::assembly::boundaries_impl

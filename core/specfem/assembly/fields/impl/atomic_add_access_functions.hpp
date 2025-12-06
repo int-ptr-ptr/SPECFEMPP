@@ -1,8 +1,8 @@
 #pragma once
 
 #include "check_accessor_compatibility.hpp"
-#include "enumerations/macros.hpp"
 #include "field_impl.hpp"
+#include "specfem/macros.hpp"
 #include <Kokkos_Core.hpp>
 #include <type_traits>
 

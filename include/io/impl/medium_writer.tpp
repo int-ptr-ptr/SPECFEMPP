@@ -3,7 +3,7 @@
 #include "specfem/assembly.hpp"
 #include "domain_view.hpp"
 #include "enumerations/dimension.hpp"
-#include "enumerations/material_definitions.hpp"
+#include "specfem/macros.hpp"
 #include "enumerations/medium.hpp"
 #include "io/impl/medium_writer.hpp"
 #include "kokkos_abstractions.h"

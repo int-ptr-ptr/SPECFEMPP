@@ -1,6 +1,5 @@
 #pragma once
 
-#include "macros.hpp"
 #include "policy.hpp"
 #include "void_iterator.hpp"
 #include <Kokkos_Core.hpp>

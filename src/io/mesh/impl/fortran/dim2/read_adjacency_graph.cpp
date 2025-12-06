@@ -14,21 +14,6 @@ specfem::io::mesh::impl::fortran::dim2::read_adjacency_graph(
   using EdgeProperties = specfem::mesh::adjacency_graph<
       specfem::dimension::type::dim2>::EdgeProperties;
 
-  bool read_adjacency_graph;
-  auto current_position = stream.tellg();
-  try {
-    specfem::io::fortran_read_line(stream, &read_adjacency_graph);
-  } catch (std::runtime_error &e) {
-    stream.clear();
-    stream.seekg(current_position);
-    read_adjacency_graph = false;
-  }
-  if (!read_adjacency_graph) {
-    specfem::mesh::adjacency_graph<specfem::dimension::type::dim2>
-        empty_graph{};
-    return empty_graph;
-  }
-
   specfem::mesh::adjacency_graph<specfem::dimension::type::dim2> graph(nspec);
 
   auto &g = graph.graph();

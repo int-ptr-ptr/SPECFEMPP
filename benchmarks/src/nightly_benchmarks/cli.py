@@ -5,7 +5,7 @@ from .kp_parser import (
     parse_metadata,
     total_execution_time,
 )
-from .io_utils import read_file, write_json
+from .io_utils import read_file, write_json, get_git_commit
 
 
 def main():
@@ -24,6 +24,9 @@ def main():
     total_time = total_execution_time(text)
     ## append total execution time to metadata
     metadata["total_execution_time"] = total_time
+    ## append git commit information to metadata
+    git_commit = get_git_commit()
+    metadata["git_commit"] = git_commit
     # Save outputs
     write_json(metadata, df_kernels, df_regions, args.output)
 

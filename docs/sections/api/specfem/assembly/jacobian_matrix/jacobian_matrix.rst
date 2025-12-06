@@ -7,8 +7,17 @@
 .. doxygenstruct:: specfem::assembly::jacobian_matrix
     :members:
 
+Dimension-Specific Implementations
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. doxygenstruct:: specfem::assembly::jacobian_matrix< specfem::dimension::type::dim2 >
+    :members:
+
+.. doxygenstruct:: specfem::assembly::jacobian_matrix< specfem::dimension::type::dim3 >
+    :members:
+
 Data Access Functions
 ^^^^^^^^^^^^^^^^^^^^^
 
-.. doxygengroup:: ComputeJacobianMatrixDataAccess
+.. doxygengroup:: JacobianMatrixDataAccess
     :content-only:

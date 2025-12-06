@@ -116,15 +116,14 @@ void specfem::assembly::mesh<specfem::dimension::type::dim2>::assemble() {
   // Create a filtered graph view
   const auto fg = boost::make_filtered_graph(graph, filter);
 
-  const auto element_connections =
-      specfem::connections::connection_mapping(ngllx, ngllz);
+  const auto element = specfem::mesh_entity::element(ngllz, ngllx);
 
   // Now lets iterate over all edges
   // We only take interior edge points, corners will be treated later
   for (int ichunk = 0; ichunk < nspec; ichunk += chunk_size) {
     for (auto iedge : specfem::mesh_entity::dim2::edges) {
       const auto npoints =
-          element_connections.number_of_points_on_orientation(iedge);
+          element.number_of_points_on_orientation(iedge);
       for (int ipoint = 1; ipoint < npoints - 1;
            ipoint++) { // we loop only over interior points of edge
         for (int ielement = 0; ielement < chunk_size; ielement++) {
@@ -135,7 +134,7 @@ void specfem::assembly::mesh<specfem::dimension::type::dim2>::assemble() {
           // ----
           bool previously_assigned = false;
           const auto [iz, ix] =
-              element_connections.coordinates_at_edge(iedge, ipoint);
+              element.map_coordinates(iedge, ipoint);
 
           // get all connections for this element
           for (auto edge :
@@ -147,13 +146,14 @@ void specfem::assembly::mesh<specfem::dimension::type::dim2>::assemble() {
               // Return edge
               const auto other_edge = boost::edge(jspec, ispec, fg).first;
               const auto mapped_iedge = fg[other_edge].orientation;
+              const auto connection_mapping = specfem::connections::connection_mapping(
+                  ngllz, ngllx, Kokkos::subview(this->h_control_node_mapping, ispec, Kokkos::ALL()),
+                  Kokkos::subview(this->h_control_node_mapping, jspec, Kokkos::ALL()));
 
               // Get the correct coordinates for the edge point on the other
               // edge
-              const auto [from_coords, to_coords] =
-                  element_connections.map_coordinates(iedge, mapped_iedge,
-                                                      ipoint);
-              const auto [mapped_iz, mapped_ix] = to_coords;
+              const auto [mapped_iz, mapped_ix] =
+                  connection_mapping.map_coordinates(iedge, mapped_iedge, iz, ix);
 
               if (this->h_index_mapping(jspec, mapped_iz, mapped_ix) != -1) {
 
@@ -193,12 +193,12 @@ void specfem::assembly::mesh<specfem::dimension::type::dim2>::assemble() {
         if (ispec >= nspec)
           break;
 
-        const auto [iz, ix] = element_connections.coordinates_at_corner(corner);
+        const auto [iz, ix] = element.map_coordinates(corner);
 
         bool previously_assigned = false;
 
         // Get the edges that are connected to this corner
-        auto valid_connections = specfem::mesh_entity::dim2::edges_of_corner(corner);
+        auto valid_connections = specfem::mesh_entity::edges_of_corner(corner);
 
         // We also need to add the corner itself to the valid connections
         // This is necessary to handle cases where a corner connection is made
@@ -210,21 +210,22 @@ void specfem::assembly::mesh<specfem::dimension::type::dim2>::assemble() {
           // Only consider edges that contain the corner
           if (specfem::mesh_entity::contains(valid_connections,
                                              fg[edge].orientation)) {
+            const auto iedge = fg[edge].orientation;
             const int jspec = boost::target(edge, fg);
 
             // Return edge
             const auto other_edge = boost::edge(jspec, ispec, fg).first;
             const auto mapped_iedge = fg[other_edge].orientation;
 
+            const auto connection_mapping = specfem::connections::connection_mapping(
+                ngllz, ngllx, Kokkos::subview(this->h_control_node_mapping, ispec, Kokkos::ALL()),
+                Kokkos::subview(this->h_control_node_mapping, jspec, Kokkos::ALL()));
+
             // Check if the connection is an edge connection
             if (specfem::mesh_entity::contains(specfem::mesh_entity::dim2::edges,
-                                               fg[edge].orientation)) {
-              const auto point = element_connections.find_corner_on_edge(
-                  corner, fg[edge].orientation);
-              const auto [from_coords, to_coords] =
-                  element_connections.map_coordinates(fg[edge].orientation,
-                                                      mapped_iedge, point);
-              const auto [mapped_iz, mapped_ix] = to_coords;
+                                               iedge)) {
+              const auto [mapped_iz, mapped_ix] =
+                  connection_mapping.map_coordinates(iedge, mapped_iedge, iz, ix);
 
               if (this->h_index_mapping(jspec, mapped_iz, mapped_ix) != -1) {
                 this->h_index_mapping(ispec, iz, ix) =
@@ -238,9 +239,8 @@ void specfem::assembly::mesh<specfem::dimension::type::dim2>::assemble() {
               }
             } else {
               // Corner to corner connection
-              const auto [from_coords, to_coords] =
-                  element_connections.map_coordinates(corner, mapped_iedge, 0);
-              const auto [mapped_iz, mapped_ix] = to_coords;
+              const auto [mapped_iz, mapped_ix] =
+                  connection_mapping.map_coordinates(iedge, mapped_iedge);
 
               if (this->h_index_mapping(jspec, mapped_iz, mapped_ix) != -1) {
                 this->h_index_mapping(ispec, iz, ix) =

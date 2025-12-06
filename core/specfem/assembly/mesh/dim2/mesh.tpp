@@ -1,7 +1,7 @@
 #pragma once
 
 #include "enumerations/interface.hpp"
-#include "enumerations/material_definitions.hpp"
+#include "specfem/macros.hpp"
 #include "kokkos_abstractions.h"
 #include "mesh.hpp"
 #include "parallel_configuration/chunk_config.hpp"
@@ -73,12 +73,6 @@ build_assembly_adjacency_graph(
         specfem::dimension::type::dim2> &mapping,
     const specfem::mesh::adjacency_graph<specfem::dimension::type::dim2>
         &mesh_adjacency_graph) {
-
-  if (mesh_adjacency_graph.empty()) {
-    return specfem::assembly::mesh_impl::adjacency_graph<
-        specfem::dimension::type::dim2>();
-  }
-
   specfem::assembly::mesh_impl::adjacency_graph<specfem::dimension::type::dim2>
       adjacency_graph(nspec);
 
@@ -162,61 +156,5 @@ specfem::assembly::mesh<specfem::dimension::type::dim2>::mesh(
   adjacency_graph =
       build_assembly_adjacency_graph(nspec, mapping, mesh_adjacency_graph);
 
-  if (adjacency_graph.empty()) {
-    this->assemble_legacy(); /// This functions needs to be deprecated after we
-                             /// update all databases with adjacency graph
-  } else {
-    // If the adjacency graph is not empty, we use it to assemble the mesh
-    this->assemble();
-  }
-
-}
-
-void specfem::assembly::mesh<
-    specfem::dimension::type::dim2>::assemble_legacy() {
-
-  const int ngnod = this->ngnod;
-  const int nspec = this->nspec;
-
-  const auto xi = this->h_xi;
-  const auto gamma = this->h_xi;
-
-  const auto ngllz = this->element_grid.ngllz;
-  const auto ngllx = this->element_grid.ngllx;
-
-  const auto shape2D = this->h_shape2D;
-  const auto coord = this->h_control_node_coord;
-
-  const int scratch_size =
-      specfem::kokkos::HostScratchView2d<type_real>::shmem_size(ndim, ngnod);
-
-  specfem::kokkos::HostView4d<double> global_coordinates(
-      "specfem::assembly::mesh::assemble::global_coordinates", nspec, ngllz,
-      ngllx, 2);
-
-  for (int ispec = 0; ispec < nspec; ispec++) {
-    for (int iz = 0; iz < ngllz; iz++) {
-      for (int ix = 0; ix < ngllx; ix++) {
-        auto shape_functions =
-            specfem::shape_function::shape_function(xi(ix), gamma(iz), ngnod);
-
-        double xcor = 0.0;
-        double zcor = 0.0;
-
-        for (int in = 0; in < ngnod; in++) {
-          xcor += coord(0, ispec, in) * shape_functions[in];
-          zcor += coord(1, ispec, in) * shape_functions[in];
-        }
-
-        global_coordinates(ispec, iz, ix, 0) = xcor;
-        global_coordinates(ispec, iz, ix, 1) = zcor;
-      }
-    }
-  }
-
-  auto &points = static_cast<
-      specfem::assembly::mesh_impl::points<specfem::dimension::type::dim2> &>(
-      *this);
-
-  points = assign_numbering(global_coordinates);
+  this->assemble();
 }

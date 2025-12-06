@@ -1,10 +1,10 @@
 #pragma once
 
 #include "enumerations/dimension.hpp"
-#include "enumerations/material_definitions.hpp"
 #include "kokkos_abstractions.h"
 #include "medium/material.hpp"
 #include "mesh/mesh_base.hpp"
+#include "specfem/macros.hpp"
 #include "specfem_mpi/interface.hpp"
 #include "specfem_setup.hpp"
 #include <variant>
@@ -17,7 +17,7 @@ namespace mesh {
  */
 
 template <> struct materials<specfem::dimension::type::dim2> {
-  constexpr static auto dimension =
+  constexpr static auto dimension_tag =
       specfem::dimension::type::dim2; ///< Dimension type
 
   struct material_specification {
@@ -50,13 +50,14 @@ template <> struct materials<specfem::dimension::type::dim2> {
             specfem::element::property_tag property>
   struct material {
     int n_materials; ///< Number of elements
-    std::vector<specfem::medium::material<type, property> >
+    std::vector<specfem::medium::material<dimension_tag, type, property> >
         element_materials; ///< Material properties
 
     material() = default;
 
     material(const int n_materials,
-             const std::vector<specfem::medium::material<type, property> >
+             const std::vector<
+                 specfem::medium::material<dimension_tag, type, property> >
                  &l_material);
   };
 
@@ -110,7 +111,7 @@ public:
    * @param index Spectral element index
    * @return std::variant Material properties
    */
-  specfem::medium::material<MediumTag, PropertyTag>
+  specfem::medium::material<dimension_tag, MediumTag, PropertyTag>
   get_material(const int index) const {
     const auto &material_specification = this->material_index_mapping(index);
 
@@ -140,7 +141,7 @@ public:
    */
   template <specfem::element::medium_tag MediumTag,
             specfem::element::property_tag PropertyTag>
-  specfem::mesh::materials<dimension>::material<MediumTag, PropertyTag> &
+  specfem::mesh::materials<dimension_tag>::material<MediumTag, PropertyTag> &
   get_container() {
 
     FOR_EACH_IN_PRODUCT(
@@ -156,6 +157,39 @@ public:
         })
 
     Kokkos::abort("Invalid material type detected in material specification");
+  }
+
+  /**
+   * @brief Get the medium and property types for a given element index
+   *
+   * Returns a tuple containing the medium and property tags associated with
+   * the material specification for the specified element index.
+   *
+   * @param index Element index to query
+   * @return Tuple of (medium_tag, property_tag) for the element's material
+   *
+   * @code
+   * // Get material type for element 42
+   * auto [medium, property] = materials.get_material_type(42);
+   *
+   * // Use in conditional logic
+   * if (medium == specfem::element::medium_tag::elastic &&
+   *     property == specfem::element::property_tag::isotropic) {
+   *     // Handle elastic isotropic case
+   * }
+   * @endcode
+   */
+  std::tuple<specfem::element::medium_tag, specfem::element::property_tag>
+  get_material_type(const int index) const {
+#ifndef NDEBUG
+    if (index < 0 || index >= this->material_index_mapping.size()) {
+      KOKKOS_ABORT_WITH_LOCATION(
+          "Element index out of range in get_material_type");
+    }
+#endif
+    const auto &material_specification = this->material_index_mapping[index];
+    return std::make_tuple(material_specification.type,
+                           material_specification.property);
   }
 };
 

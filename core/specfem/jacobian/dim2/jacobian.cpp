@@ -1,5 +1,4 @@
 #include "specfem/jacobian.hpp"
-#include "macros.hpp"
 #include "specfem/shape_functions.hpp"
 
 specfem::point::global_coordinates<specfem::dimension::type::dim2>

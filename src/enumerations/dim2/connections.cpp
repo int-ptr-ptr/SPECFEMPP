@@ -24,242 +24,81 @@ specfem::connections::to_string(const specfem::connections::type &conn) {
   }
 }
 
-/**
- * @brief Helper function to determine if orientation mapping requires
- * coordinate flipping
- *
- * @param from Source mesh entity orientation
- * @param to Target mesh entity orientation
- * @return bool True if coordinates should be flipped during mapping
- *
- * This function implements the logic for determining when coordinate
- * mappings between edges require flipping to maintain proper orientation.
- * The flipping rules ensure consistent connectivity across mesh elements.
- */
-bool specfem::connections::connection_mapping<specfem::dimension::type::dim2>::
-    flip_orientation(const specfem::mesh_entity::dim2::type &from,
-                     const specfem::mesh_entity::dim2::type &to) const {
-  if ((from == specfem::mesh_entity::dim2::type::top &&
-       to == specfem::mesh_entity::dim2::type::bottom) ||
-      (from == specfem::mesh_entity::dim2::type::bottom &&
-       to == specfem::mesh_entity::dim2::type::top) ||
-      (from == specfem::mesh_entity::dim2::type::left &&
-       to == specfem::mesh_entity::dim2::type::right) ||
-      (from == specfem::mesh_entity::dim2::type::right &&
-       to == specfem::mesh_entity::dim2::type::left)) {
-    return false;
+template <typename ViewType>
+std::array<int, 2> get_edge_nodes(const specfem::mesh_entity::dim2::type &edge,
+                                  const ViewType element) {
+  if (specfem::mesh_entity::contains(specfem::mesh_entity::dim2::edges, edge)) {
+    auto nodes = specfem::mesh_entity::nodes_on_orientation(edge);
+    return { element(nodes[0]), element(nodes[1]) };
   }
 
-  if ((from == specfem::mesh_entity::dim2::type::top &&
-       to == specfem::mesh_entity::dim2::type::right) ||
-      (from == specfem::mesh_entity::dim2::type::right &&
-       to == specfem::mesh_entity::dim2::type::top) ||
-      (from == specfem::mesh_entity::dim2::type::left &&
-       to == specfem::mesh_entity::dim2::type::bottom) ||
-      (from == specfem::mesh_entity::dim2::type::bottom &&
-       to == specfem::mesh_entity::dim2::type::left)) {
-    return false;
-  }
-
-  return true;
+  throw std::runtime_error("The provided entity is not an edge.");
 }
 
-specfem::connections::connection_mapping<
-    specfem::dimension::type::dim2>::connection_mapping(const int ngllx,
-                                                        const int ngllz)
-    : ngllx(ngllx), ngllz(ngllz) {
-  // corner coordinates
-  corner_coordinates[specfem::mesh_entity::dim2::type::top_left] =
-      std::make_tuple(ngllz - 1, 0);
-  corner_coordinates[specfem::mesh_entity::dim2::type::top_right] =
-      std::make_tuple(ngllz - 1, ngllx - 1);
-  corner_coordinates[specfem::mesh_entity::dim2::type::bottom_right] =
-      std::make_tuple(0, ngllx - 1);
-  corner_coordinates[specfem::mesh_entity::dim2::type::bottom_left] =
-      std::make_tuple(0, 0);
-
-  // coordinates along edges
-  // The element is defined as (z, x) in 2D
-  // Where the diagram is as follows:
-  // 3 --- 2
-  // |     |
-  // |     |
-  // 0 --- 1
-
-  edge_coordinates[specfem::mesh_entity::dim2::type::top] =
-      [ngllx, ngllz](int point) { return std::make_tuple(ngllz - 1, point); };
-
-  edge_coordinates[specfem::mesh_entity::dim2::type::bottom] =
-      [ngllx, ngllz](int point) { return std::make_tuple(0, point); };
-
-  edge_coordinates[specfem::mesh_entity::dim2::type::left] =
-      [ngllx, ngllz](int point) { return std::make_tuple(point, 0); };
-
-  edge_coordinates[specfem::mesh_entity::dim2::type::right] =
-      [ngllx, ngllz](int point) { return std::make_tuple(point, ngllx - 1); };
-}
-
-std::tuple<std::tuple<int, int>, std::tuple<int, int> >
-specfem::connections::connection_mapping<specfem::dimension::type::dim2>::
-    map_coordinates(const specfem::mesh_entity::dim2::type &from,
-                    const specfem::mesh_entity::dim2::type &to,
-                    const int point) const {
-
-  if (corner_coordinates.find(from) != corner_coordinates.end() &&
-      corner_coordinates.find(to) != corner_coordinates.end()) {
-    // both are corner points
-    if (point != 0) {
-      throw std::runtime_error(
-          "Point index should be 0 when both from and to are corner points");
-    }
-    return std::make_tuple(corner_coordinates.at(from),
-                           corner_coordinates.at(to));
+int edge_transform(const std::array<int, 2> &from_nodes,
+                   const std::array<int, 2> &to_nodes, const int index,
+                   const int ngll) {
+  if (from_nodes[0] == to_nodes[0] && from_nodes[1] == to_nodes[1]) {
+    return index;
+  } else if (from_nodes[0] == to_nodes[1] && from_nodes[1] == to_nodes[0]) {
+    return ngll - 1 - index;
+  } else {
+    throw std::runtime_error("Edges do not match for transformation.");
   }
-
-  if (corner_coordinates.find(from) != corner_coordinates.end() ||
-      corner_coordinates.find(to) != corner_coordinates.end()) {
-    throw std::runtime_error(
-        "Corner is connecting to an edge which is not allowed");
-  }
-
-  const auto total_points_on_to = number_of_points_on_orientation(to);
-
-  const auto coord_from = edge_coordinates.at(from)(point);
-
-  const auto flip = this->flip_orientation(from, to);
-
-  const auto coord_to =
-      flip ? edge_coordinates.at(to)(total_points_on_to - 1 - point)
-           : edge_coordinates.at(to)(point);
-
-  return std::make_tuple(coord_from, coord_to);
-}
-
-int specfem::connections::connection_mapping<specfem::dimension::type::dim2>::
-    number_of_points_on_orientation(
-        const specfem::mesh_entity::dim2::type &edge) const {
-  if ((edge == specfem::mesh_entity::dim2::type::top) ||
-      (edge == specfem::mesh_entity::dim2::type::bottom)) {
-    return ngllx;
-  }
-
-  if ((edge == specfem::mesh_entity::dim2::type::left) ||
-      (edge == specfem::mesh_entity::dim2::type::right)) {
-    return ngllz;
-  }
-
-  // Corner points
-  if (specfem::mesh_entity::contains(specfem::mesh_entity::dim2::corners,
-                                     edge)) {
-    return 1;
-  }
-
-  throw std::runtime_error("Invalid edge orientation");
-}
-
-int specfem::connections::connection_mapping<specfem::dimension::type::dim2>::
-    find_corner_on_edge(const specfem::mesh_entity::dim2::type &corner,
-                        const specfem::mesh_entity::dim2::type &edge) const {
-  // Check if the corner is a corner
-  if (!specfem::mesh_entity::contains(specfem::mesh_entity::dim2::corners,
-                                      corner)) {
-    throw std::runtime_error("The first argument is not a corner");
-  }
-
-  // Check if the edge is an edge
-  if (!specfem::mesh_entity::contains(specfem::mesh_entity::dim2::edges,
-                                      edge)) {
-    throw std::runtime_error("The second argument is not an edge");
-  }
-
-  // Check if the corner belongs to the edge
-  const auto edges_of_the_corner =
-      specfem::mesh_entity::dim2::edges_of_corner(corner);
-  if (std::find(edges_of_the_corner.begin(), edges_of_the_corner.end(), edge) ==
-      edges_of_the_corner.end()) {
-    throw std::runtime_error("The corner does not belong to the edge");
-  }
-
-  // Find the index of the corner on the edge
-  if (corner == specfem::mesh_entity::dim2::type::top_left) {
-    if (edge == specfem::mesh_entity::dim2::type::top) {
-      return 0;
-    } else if (edge == specfem::mesh_entity::dim2::type::left) {
-      return ngllz - 1;
-    }
-  }
-
-  if (corner == specfem::mesh_entity::dim2::type::top_right) {
-    if (edge == specfem::mesh_entity::dim2::type::top) {
-      return ngllx - 1;
-    } else if (edge == specfem::mesh_entity::dim2::type::right) {
-      return ngllz - 1;
-    }
-  }
-
-  if (corner == specfem::mesh_entity::dim2::type::bottom_right) {
-    if (edge == specfem::mesh_entity::dim2::type::bottom) {
-      return ngllx - 1;
-    } else if (edge == specfem::mesh_entity::dim2::type::right) {
-      return 0;
-    }
-  }
-
-  if (corner == specfem::mesh_entity::dim2::type::bottom_left) {
-    if (edge == specfem::mesh_entity::dim2::type::bottom) {
-      return 0;
-    } else if (edge == specfem::mesh_entity::dim2::type::left) {
-      return 0;
-    }
-  }
-
-  throw std::runtime_error("The corner does not belong to the edge");
 }
 
 std::tuple<int, int>
 specfem::connections::connection_mapping<specfem::dimension::type::dim2>::
-    coordinates_at_edge(const specfem::mesh_entity::dim2::type &edge,
-                        const int point) const {
-  if (!specfem::mesh_entity::contains(specfem::mesh_entity::dim2::edges,
-                                      edge)) {
-    throw std::runtime_error("The argument is not an edge");
-  }
+    map_coordinates(const specfem::mesh_entity::dim2::type &from,
+                    const specfem::mesh_entity::dim2::type &to, const int iz,
+                    const int ix) const {
 
-  return edge_coordinates.at(edge)(point);
+  // get nodes associated with edges
+  const auto edge1_nodes = get_edge_nodes(from, element1);
+  const auto edge2_nodes = get_edge_nodes(to, element2);
+
+  const auto [i, n] = [=]() {
+    switch (from) {
+    case specfem::mesh_entity::dim2::type::bottom:
+    case specfem::mesh_entity::dim2::type::top:
+      return std::make_pair(ix, ngllx);
+    case specfem::mesh_entity::dim2::type::left:
+    case specfem::mesh_entity::dim2::type::right:
+      return std::make_pair(iz, ngllz);
+    default:
+      throw std::runtime_error("Invalid edge orientation.");
+    }
+  }();
+
+  const int i_prime = edge_transform(edge1_nodes, edge2_nodes, i, n);
+
+  return [=](const int i_prime) {
+    switch (to) {
+    case specfem::mesh_entity::dim2::type::bottom:
+      return std::make_tuple(0, i_prime);
+    case specfem::mesh_entity::dim2::type::top:
+      return std::make_tuple(ngllz - 1, i_prime);
+    case specfem::mesh_entity::dim2::type::left:
+      return std::make_tuple(i_prime, 0);
+    case specfem::mesh_entity::dim2::type::right:
+      return std::make_tuple(i_prime, ngllx - 1);
+    default:
+      throw std::runtime_error("Invalid edge orientation.");
+    }
+  }(i_prime);
 }
 
-std::tuple<int, int> specfem::connections::
-    connection_mapping<specfem::dimension::type::dim2>::coordinates_at_corner(
-        const specfem::mesh_entity::dim2::type &corner) const {
-  if (!specfem::mesh_entity::contains(specfem::mesh_entity::dim2::corners,
-                                      corner)) {
-    throw std::runtime_error("The argument is not a corner");
-  }
+std::tuple<int, int>
+specfem::connections::connection_mapping<specfem::dimension::type::dim2>::
+    map_coordinates(const specfem::mesh_entity::dim2::type &from,
+                    const specfem::mesh_entity::dim2::type &to) const {
+  // Implementation of coordinate mapping logic for 2D entities without point
+  // specification goes here
+  if (!(specfem::mesh_entity::contains(specfem::mesh_entity::dim2::corners,
+                                       from) &&
+        specfem::mesh_entity::contains(specfem::mesh_entity::dim2::corners,
+                                       to)))
+    throw std::runtime_error("Both entities must be corners for this mapping.");
 
-  return corner_coordinates.at(corner);
-}
-
-std::list<specfem::mesh_entity::dim2::type>
-specfem::mesh_entity::dim2::corners_of_edge(
-    const specfem::mesh_entity::dim2::type &edge) {
-  if (!specfem::mesh_entity::contains(specfem::mesh_entity::dim2::edges,
-                                      edge)) {
-    throw std::runtime_error("The argument is not an edge");
-  }
-
-  if (edge == specfem::mesh_entity::dim2::type::top) {
-    return { specfem::mesh_entity::dim2::type::top_left,
-             specfem::mesh_entity::dim2::type::top_right };
-  } else if (edge == specfem::mesh_entity::dim2::type::right) {
-    return { specfem::mesh_entity::dim2::type::top_right,
-             specfem::mesh_entity::dim2::type::bottom_right };
-  } else if (edge == specfem::mesh_entity::dim2::type::bottom) {
-    return { specfem::mesh_entity::dim2::type::bottom_right,
-             specfem::mesh_entity::dim2::type::bottom_left };
-  } else if (edge == specfem::mesh_entity::dim2::type::left) {
-    return { specfem::mesh_entity::dim2::type::bottom_left,
-             specfem::mesh_entity::dim2::type::top_left };
-  }
-
-  throw std::runtime_error("The edge does not have corners");
+  return specfem::mesh_entity::element(ngllz, ngllx).map_coordinates(to);
 }

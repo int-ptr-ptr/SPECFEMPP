@@ -18,6 +18,7 @@ class Layer:
 
     nx: int
     nz: int
+    skip_acoustic_free_surface: bool = False
 
     def is_conforming(self, other: "Layer"):
         return self.nx == other.nx

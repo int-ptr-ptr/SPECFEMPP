@@ -3,7 +3,6 @@
 #include "adjacency_graph/adjacency_graph.hpp"
 #include "boundaries/boundaries.hpp"
 #include "control_nodes/control_nodes.hpp"
-#include "coupled_interfaces/coupled_interfaces.hpp"
 #include "elements/axial_elements.hpp"
 #include "elements/tangential_elements.hpp"
 #include "enumerations/dimension.hpp"
@@ -35,10 +34,6 @@ template <> struct mesh<specfem::dimension::type::dim2> {
   specfem::mesh::parameters<dimension> parameters; ///< Struct to store
                                                    ///< simulation launch
                                                    ///< parameters (never used)
-
-  specfem::mesh::coupled_interfaces<dimension>
-      coupled_interfaces; ///< Struct to store
-                          ///< coupled interfaces
 
   specfem::mesh::boundaries<dimension> boundaries; ///< Struct to store
                                                    ///< information at the
@@ -109,7 +104,6 @@ template <> struct mesh<specfem::dimension::type::dim2> {
   mesh(const int npgeo, const int nspec, const int nproc,
        const specfem::mesh::control_nodes<dimension> &control_nodes,
        const specfem::mesh::parameters<dimension> &parameters,
-       const specfem::mesh::coupled_interfaces<dimension> &coupled_interfaces,
        const specfem::mesh::boundaries<dimension> &boundaries,
        const specfem::mesh::tags<dimension> &tags,
        const specfem::mesh::elements::tangential_elements<dimension>
@@ -117,9 +111,9 @@ template <> struct mesh<specfem::dimension::type::dim2> {
        const specfem::mesh::elements::axial_elements<dimension> &axial_nodes,
        const specfem::mesh::materials<dimension> &materials)
       : npgeo(npgeo), nspec(nspec), nproc(nproc), control_nodes(control_nodes),
-        parameters(parameters), coupled_interfaces(coupled_interfaces),
-        boundaries(boundaries), tags(tags), tangential_nodes(tangential_nodes),
-        axial_nodes(axial_nodes), materials(materials) {};
+        parameters(parameters), boundaries(boundaries), tags(tags),
+        tangential_nodes(tangential_nodes), axial_nodes(axial_nodes),
+        materials(materials) {};
   ///@} // Constructors
 
   /**
@@ -149,6 +143,19 @@ template <> struct mesh<specfem::dimension::type::dim2> {
    *
    */
   void check_consistency() const;
+
+  /**
+   * @brief Setup and check coupled interfaces in the mesh
+   *
+   * This function checks whether the coupled interfaces are correctly defined
+   * in the mesh data structure and are contistent with the adjacency graph.
+   *
+   * @note This function should be called after the mesh has been fully
+   * initialized and all components (control nodes, materials, boundaries)
+   * have been populated from MESHFEM2D database files.
+   */
+  void setup_coupled_interfaces(
+      const std::set<std::pair<int, int> > &coupled_interfaces);
 };
 } // namespace mesh
 } // namespace specfem

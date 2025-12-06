@@ -77,8 +77,9 @@ public:
         ParallelConfig(), this->edges, this->num_points);
     specfem::execution::for_all(
         "test_chunked_edge_iterator", iterator,
-        KOKKOS_CLASS_LAMBDA(
-            const typename decltype(iterator)::base_index_type &index) {
+        KOKKOS_CLASS_LAMBDA(const typename decltype(
+            iterator)::base_index_type &iterator_index) {
+          const auto index = iterator_index.get_index();
           Kokkos::atomic_add(&view(index.ispec, index.ipoint), 1);
         });
 
@@ -106,7 +107,8 @@ public:
           for (int j = 0; j < num_points; ++j)
             view(i, j) = 0;
           edges(i) = specfem::mesh_entity::edge<specfem::dimension::type::dim2>(
-              static_cast<int>(i), specfem::mesh_entity::dim2::type::top);
+              static_cast<int>(i), static_cast<int>(i),
+              specfem::mesh_entity::dim2::type::top);
         });
   }
 };
@@ -137,8 +139,9 @@ public:
         ParallelConfig(), edges, intersection_edges, num_points);
     specfem::execution::for_all(
         "test_chunked_intersection_edge_iterator", iterator,
-        KOKKOS_CLASS_LAMBDA(
-            const typename decltype(iterator)::base_index_type &index) {
+        KOKKOS_CLASS_LAMBDA(const typename decltype(
+            iterator)::base_index_type &iterator_index) {
+          const auto index = iterator_index.get_index();
           const auto self_index = index.self_index;
           const auto coupled_index = index.coupled_index;
           Kokkos::atomic_add(&self_view(self_index.ispec, self_index.ipoint),
@@ -178,10 +181,12 @@ public:
             coupled_view(i, j) = 0;
           }
           edges(i) = specfem::mesh_entity::edge<specfem::dimension::type::dim2>(
-              static_cast<int>(i), specfem::mesh_entity::dim2::type::top);
+              static_cast<int>(i), static_cast<int>(i),
+              specfem::mesh_entity::dim2::type::top);
           intersection_edges(i) =
               specfem::mesh_entity::edge<specfem::dimension::type::dim2>(
                   static_cast<int>(number_of_edges - i - 1),
+                  static_cast<int>(i),
                   specfem::mesh_entity::dim2::type::bottom);
         });
   }

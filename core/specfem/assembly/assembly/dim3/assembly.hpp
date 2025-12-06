@@ -20,36 +20,81 @@
 namespace specfem::assembly {
 
 /**
- * @brief 3D specialization of the assembly class for finite element problems
+ * @brief Specialization of the assembly class for 3D SEM simulations
+ *
+ * Provides 3D specializations for containers used to store simulation data
+ * required for & computed during 3D SEM simulations
  *
  */
 template <> struct assembly<specfem::dimension::type::dim3> {
 
-  constexpr static auto dimension_tag = specfem::dimension::type::dim3;
+  /**
+   * @name Public Constants
+   *
+   */
+  ///@{
+  constexpr static auto dimension_tag =
+      specfem::dimension::type::dim3; ///< Dimension tag
+  ///@}
 
-  specfem::assembly::mesh<dimension_tag> mesh; ///< Properties of the assembled
-                                               ///< mesh
+  /** @name Data Containers
+   *
+   * Data containers used to store computation data required for different terms
+   * in the constitutive equations
+   */
+  ///@{
 
-  specfem::assembly::element_types<dimension_tag> element_types; ///< Element
-                                                                 ///< tags for
-                                                                 ///< every
-                                                                 ///< spectral
-                                                                 ///< element
-  specfem::assembly::jacobian_matrix<dimension_tag>
-      jacobian_matrix;                                     ///< Partial
-                                                           ///< derivatives
-                                                           ///< of the
-                                                           ///< basis
-                                                           ///< functions
-  specfem::assembly::properties<dimension_tag> properties; ///< Material
-                                                           ///< properties
-  specfem::assembly::kernels<dimension_tag> kernels; ///< Frechet derivatives
-                                                     ///< (Misfit kernels)
-  specfem::assembly::sources<dimension_tag> sources; ///< Source information
-  specfem::assembly::receivers<dimension_tag> receivers; ///< Receiver
-                                                         ///< information
-  specfem::assembly::fields<dimension_tag> fields; ///< Displacement, velocity,
-                                                   ///< and acceleration fields
+  /**
+   * @brief Properties of the assembled mesh
+   *
+   */
+  specfem::assembly::mesh<dimension_tag> mesh;
+
+  /**
+   * @brief Element types for every spectral element in the mesh
+   *
+   */
+  specfem::assembly::element_types<dimension_tag> element_types;
+
+  /**
+   * @brief Partial derivatives of the basis functions at every quadrature point
+   *
+   */
+  specfem::assembly::jacobian_matrix<dimension_tag> jacobian_matrix;
+
+  /**
+   * @brief Material properties for the mesh at every quadrature point
+   *
+   */
+  specfem::assembly::properties<dimension_tag> properties;
+
+  /**
+   * @brief Misfit kernels (Frechet derivatives) computed at every quadrature
+   * point during adjoint simulations. The container is empty for forward
+   * simulations.
+   *
+   */
+  specfem::assembly::kernels<dimension_tag> kernels;
+
+  /**
+   * @brief Information about sources, locations, source time functions,
+   * lagrange interpolation, etc.
+   *
+   */
+  specfem::assembly::sources<dimension_tag> sources;
+
+  /**
+   * @brief Information about receivers, locations, seismogram types,
+   * lagrange interpolation, etc.
+   *
+   */
+  specfem::assembly::receivers<dimension_tag> receivers;
+
+  /**
+   * @brief Wavefield values at every distinct quadrature point in the mesh,
+   * \f$(s, \partial s / \partial t, \partial^2 s /\partial t^2)\f$
+   */
+  specfem::assembly::fields<dimension_tag> fields;
 
   // specfem::assembly::boundaries<dimension_tag> boundaries; ///< Boundary
   //                                                 ///< conditions
@@ -64,6 +109,8 @@ template <> struct assembly<specfem::dimension::type::dim3> {
   //             ///< values at
   //             ///< the
   //             ///< boundaries
+
+  ///@}
 
   /**
    * @brief Generate a finite element assembly
@@ -116,12 +163,28 @@ template <> struct assembly<specfem::dimension::type::dim3> {
       const specfem::wavefield::simulation_field wavefield,
       const specfem::wavefield::type component);
 
+  /**
+   * @brief Get the total number of spectral elements in the mesh
+   * @return int Total number of spectral elements
+   */
   int get_total_number_of_elements() const { return mesh.nspec; }
 
+  /**
+   * @brief Get the total number of degrees of freedom in the mesh
+   * @return int Total number of degrees of freedom
+   */
   int get_total_degrees_of_freedom() {
     return fields.buffer.get_total_degrees_of_freedom();
   }
 
+  /**
+   * @brief Print assembly information
+   *
+   * Generates a formatted string containing relevant information about the
+   * assembly. This information is logged into the output of the simulation.
+   *
+   * @return std::string Assembly information as a string
+   */
   std::string print() const;
 
   /**

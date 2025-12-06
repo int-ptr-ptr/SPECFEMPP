@@ -246,6 +246,7 @@ struct ExpectedJacobian3D {
    */
   void check(const specfem::assembly::jacobian_matrix<dimension>
                  &jacobian_matrix) const {
+
     // Validate mesh configuration parameters
     ASSERT_EQ(jacobian_matrix.nspec, total_gll_points.nelements)
         << "Total number of elements mismatch. "
@@ -344,6 +345,10 @@ struct ExpectedJacobian3D {
         }
       }
     }
+
+    const auto [small_jacobian, dummy] = jacobian_matrix.check_small_jacobian();
+    EXPECT_FALSE(small_jacobian)
+        << "Small Jacobian determinant detected in the computed matrix.";
 
     SUCCEED()
         << "Jacobian matrix check passed for all elements and GLL points.";

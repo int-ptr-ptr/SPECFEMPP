@@ -56,11 +56,6 @@ void check_adjacency_graph(
     const specfem::mesh::adjacency_graph<specfem::dimension::type::dim2> &graph,
     const specfem::mesh::control_nodes<specfem::dimension::type::dim2>
         &control_nodes) {
-
-  if (graph.empty()) {
-    return; // No edges to check
-  }
-
   // Get xmin and xmax from the control nodes
   type_real xmin = std::numeric_limits<type_real>::max();
   type_real xmax = std::numeric_limits<type_real>::lowest();
@@ -108,9 +103,9 @@ void check_adjacency_graph(
       const auto jedge = g[returned_edge].orientation;
 
       const auto corners1 = convert_corners_to_mesher_index(
-          specfem::mesh_entity::dim2::corners_of_edge(iedge));
+          specfem::mesh_entity::corners_of_edge(iedge));
       const auto corners2 = convert_corners_to_mesher_index(
-          specfem::mesh_entity::dim2::corners_of_edge(jedge));
+          specfem::mesh_entity::corners_of_edge(jedge));
 
       std::set<int> control_nodes1 = {
         control_nodes.knods(corners1[0], ispec_mesh),
@@ -222,4 +217,47 @@ void specfem::mesh::mesh<specfem::dimension::type::dim2>::check_consistency()
   }
 
   check_adjacency_graph(this->adjacency_graph, this->control_nodes);
+}
+
+void specfem::mesh::mesh<specfem::dimension::type::dim2>::
+    setup_coupled_interfaces(
+        const std::set<std::pair<int, int> > &coupled_interfaces) {
+  auto &graph = this->adjacency_graph.graph();
+  auto &materials = this->materials;
+
+  int n_matched = 0;
+  for (const auto v : boost::make_iterator_range(boost::vertices(graph))) {
+    for (const auto e :
+         boost::make_iterator_range(boost::out_edges(v, graph))) {
+      const auto target = boost::target(e, graph);
+      auto &edge_props = graph[e];
+
+      const auto [self_medium, self_property] = materials.get_material_type(v);
+      const auto [neighbor_medium, neighbor_property] =
+          materials.get_material_type(target);
+      if ((self_medium != neighbor_medium) &&
+          (edge_props.connection ==
+           specfem::connections::type::strongly_conforming)) {
+        // Change strongly conforming to weakly conforming if media differ
+        edge_props.connection = specfem::connections::type::weakly_conforming;
+        if (coupled_interfaces.count(std::make_pair(v, target))) {
+          n_matched++;
+        }
+      }
+    }
+  }
+
+  if (n_matched != static_cast<int>(coupled_interfaces.size())) {
+    std::cout << "Number of coupled interfaces specified: "
+              << coupled_interfaces.size() << "\n";
+    std::cout << "Number of coupled interfaces matched in the mesh: "
+              << n_matched << "\n";
+    throw std::runtime_error(
+        "Not all coupled interfaces were matched in the mesh adjacency "
+        "graph.");
+  }
+
+  this->adjacency_graph.assert_symmetry();
+
+  return;
 }

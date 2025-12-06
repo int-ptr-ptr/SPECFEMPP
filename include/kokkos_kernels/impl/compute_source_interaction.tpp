@@ -85,7 +85,8 @@ void specfem::kokkos_kernels::impl::compute_source_interaction(
 
   specfem::execution::for_all(
       "specfem::kokkos_kernels::compute_source_interaction", mapped_policy,
-      KOKKOS_LAMBDA(const PointIndexType &mapped_index) {
+      KOKKOS_LAMBDA(const typename decltype(mapped_policy)::base_index_type &iterator_index) {
+        const auto mapped_index = iterator_index.get_index();
         PointSourceType point_source;
         specfem::assembly::load_on_device(mapped_index, sources, point_source);
 

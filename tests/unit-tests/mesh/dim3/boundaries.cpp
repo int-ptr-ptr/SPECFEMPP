@@ -9,8 +9,8 @@
 
 namespace specfem::test_configuration {
 
-using face_direction = specfem::mesh::meshfem3d::Boundaries<
-    specfem::dimension::type::dim3>::FaceDirection;
+using face_direction =
+    specfem::mesh::boundaries<specfem::dimension::type::dim3>::FaceDirection;
 
 /**
  * @brief Represents the total number of faces and elements in the mesh.
@@ -55,8 +55,8 @@ struct ExpectedBoundaries3D {
                        const std::initializer_list<Boundaries3D> faces)
       : total_faces(total_faces), faces(faces) {}
 
-  void check(const specfem::mesh::meshfem3d::Boundaries<dimension>
-                 &absorbing_boundary) const {
+  void
+  check(const specfem::mesh::boundaries<dimension> &absorbing_boundary) const {
     // Verify that the absorbing boundary object has the expected number of
     // faces
     if (absorbing_boundary.nfaces != total_faces.nfaces) {

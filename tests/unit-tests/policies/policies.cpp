@@ -97,7 +97,10 @@ execute_range_policy(const int nglob) {
   Kokkos::fence();
 
   specfem::execution::for_all(
-      "execute_range_policy", iterator, KOKKOS_LAMBDA(const PointIndex &index) {
+      "execute_range_policy", iterator,
+      KOKKOS_LAMBDA(
+          const typename decltype(iterator)::base_index_type &iterator_index) {
+        const auto index = iterator_index.get_index();
         const auto l_test_view = test_view;
         constexpr bool is_simd = using_simd;
         if constexpr (is_simd) {
@@ -172,7 +175,9 @@ execute_chunk_element_policy(const int nspec, const int ngllz,
 
   specfem::execution::for_all(
       "specfem::tests::execution::chunked_domain", policy,
-      KOKKOS_LAMBDA(const PointIndex &point_index) {
+      KOKKOS_LAMBDA(
+          const typename decltype(policy)::base_index_type &iterator_index) {
+        const auto point_index = iterator_index.get_index();
         const int ispec = point_index.ispec;
         const int iz = point_index.iz;
         const int ix = point_index.ix;
@@ -251,7 +256,9 @@ execute_chunk_element_policy_3d(const int nspec, const int ngllz,
 
   specfem::execution::for_all(
       "specfem::tests::execution::chunked_domain_3d", policy,
-      KOKKOS_LAMBDA(const PointIndex &point_index) {
+      KOKKOS_LAMBDA(
+          const typename decltype(policy)::base_index_type &iterator_index) {
+        const auto point_index = iterator_index.get_index();
         const int ispec = point_index.ispec;
         const int iz = point_index.iz;
         const int iy = point_index.iy;

@@ -39,7 +39,15 @@ Boundary conditions can be set on the top, bottom, left, and right sides of the 
 python gmshlayerbuilder gmshlayerbuilder/test_topo.dat ../results/gmsh_demo/ --top acoustic_free_surface
 ```
 
-Note that `gmshlayerbuilder` is not aware of the material, so make sure that you do not set an incompatible boundary condition to the material (`acoustic free surface` for elastic materials).
+Note that `gmshlayerbuilder` is not aware of the material by default. Currently, there is only one way of telling which material type each layer is:
+
+- `--materials [string-code]`: `string-code` is a case-insensitive string of material-type characters, which must have a length equal to the number of layers.
+  - `S`: solid
+  - `F`: fluid
+
+  Each layer's material type is set according to this string, from bottom to top. For example, `--materials SF` places a fluid layer on top of a solid layer.
+
+If materials are not specified, then for the purposes of setting the `acoustic_free_surface` condition, all layers are treated as fluid and given the `acoustic_free_surface` tag when relevant to the top, bottom, left, and right sides of the domain.
 
 ## Development Notes
 

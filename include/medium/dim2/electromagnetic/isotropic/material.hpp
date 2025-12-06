@@ -17,13 +17,14 @@ namespace medium {
  * properties
  *
  */
-template <specfem::element::medium_tag MediumTag>
+template <specfem::dimension::type DimensionTag,
+          specfem::element::medium_tag MediumTag>
 class material<
-    MediumTag, specfem::element::property_tag::isotropic,
+    DimensionTag, MediumTag, specfem::element::property_tag::isotropic,
     std::enable_if_t<specfem::element::is_electromagnetic<MediumTag>::value> > {
 public:
-  constexpr static auto dimension =
-      specfem::dimension::type::dim2;           ///< Dimension of the material
+  constexpr static auto dimension_tag =
+      DimensionTag;                             ///< Dimension of the material
   constexpr static auto medium_tag = MediumTag; ///< Medium tag
   constexpr static auto property_tag =
       specfem::element::property_tag::isotropic; ///< Property tag
@@ -74,8 +75,8 @@ public:
    * @return true If the materials have the same properties
    */
   bool operator==(
-      const material<MediumTag, specfem::element::property_tag::isotropic>
-          &other) const {
+      const material<dimension_tag, medium_tag,
+                     specfem::element::property_tag::isotropic> &other) const {
 
     return (std::abs(this->mu0 - other.mu0) < 1e-6 &&
             std::abs(this->e0 - other.e0) < 1e-6 &&
@@ -96,7 +97,8 @@ public:
    * @return true If the materials have different properties
    */
   bool operator!=(
-      const material<specfem::element::medium_tag::electromagnetic_te,
+      const material<dimension_tag,
+                     specfem::element::medium_tag::electromagnetic_te,
                      specfem::element::property_tag::isotropic> &other) const {
     return !(*this == other);
   }
@@ -106,7 +108,8 @@ public:
    *
    * @return specfem::point::properties Material properties
    */
-  inline specfem::point::properties<dimension, medium_tag, property_tag, false>
+  inline specfem::point::properties<dimension_tag, medium_tag, property_tag,
+                                    false>
   get_properties() const {
     return { static_cast<type_real>(1.0) / this->mu0, this->e0 * this->e11_e0,
              this->e0 * this->e33_e0, this->sig11, this->sig33 };

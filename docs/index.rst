@@ -255,6 +255,7 @@ Getting Started
     sections/getting_started/index
     sections/cookbooks/index
     sections/getting_started/presets
+    sections/getting_started/special_machines
 
 User Documentation
 ------------------
@@ -280,7 +281,6 @@ Contribution
     sections/developer_documentation/git_workflow
     sections/developer_documentation/build_requirements
     sections/developer_documentation/continuous_integration
-    sections/developer_documentation/special_machines
 
 .. sections/developer_documentation/tutorials/index
 

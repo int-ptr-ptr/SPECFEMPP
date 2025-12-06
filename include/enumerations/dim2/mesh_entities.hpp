@@ -75,6 +75,7 @@ const std::list<type> edges = { type::top, type::right, type::bottom,
 const std::list<type> corners = { type::top_left, type::top_right,
                                   type::bottom_right, type::bottom_left };
 
+} // namespace dim2
 /**
  * @brief Returns the edges that form a given corner
  *
@@ -92,7 +93,7 @@ const std::list<type> corners = { type::top_left, type::top_right,
  *
  * @throws std::runtime_error if the input is not a valid corner type
  */
-std::list<type> edges_of_corner(const type &corner);
+std::list<dim2::type> edges_of_corner(const dim2::type &corner);
 
 /**
  * @brief Returns the corners that are adjacent to a given edge.
@@ -112,9 +113,7 @@ std::list<type> edges_of_corner(const type &corner);
  *
  * @throws std::runtime_error if the input is not a valid edge type.
  */
-std::list<type> corners_of_edge(const type &edge);
-
-} // namespace dim2
+std::list<dim2::type> corners_of_edge(const dim2::type &edge);
 
 /**
  * @brief Generic utility function to check if a container contains a specific
@@ -139,15 +138,20 @@ template <typename T> bool contains(const T &list, const dim2::type &value) {
   return std::find(list.begin(), list.end(), value) != list.end();
 }
 
+std::vector<int>
+nodes_on_orientation(const specfem::mesh_entity::dim2::type &entity);
+
 template <> struct edge<specfem::dimension::type::dim2> {
   specfem::mesh_entity::dim2::type edge_type;
   int ispec;
+  int iedge;
   bool reverse_orientation;
 
   KOKKOS_INLINE_FUNCTION
-  edge(const int ispec, const specfem::mesh_entity::dim2::type edge_type,
+  edge(const int ispec, const int iedge,
+       const specfem::mesh_entity::dim2::type edge_type,
        const bool reverse_orientation = false)
-      : edge_type(edge_type), ispec(ispec),
+      : edge_type(edge_type), ispec(ispec), iedge(iedge),
         reverse_orientation(reverse_orientation) {}
 
   KOKKOS_INLINE_FUNCTION
@@ -218,6 +222,37 @@ public:
    *
    */
   bool operator!=(const int ngll_in) const { return !(*this == ngll_in); }
+};
+
+template <>
+struct element<specfem::dimension::type::dim2>
+    : public element_grid<specfem::dimension::type::dim2> {
+private:
+  using base = element_grid<specfem::dimension::type::dim2>;
+
+public:
+  element() = default;
+
+  element(const int ngll);
+
+  element(const int ngllz, const int ngllx);
+
+  int number_of_points_on_orientation(
+      const specfem::mesh_entity::dim2::type &entity) const;
+
+  std::tuple<int, int>
+  map_coordinates(const specfem::mesh_entity::dim2::type &entity,
+                  const int point) const;
+
+  std::tuple<int, int>
+  map_coordinates(const specfem::mesh_entity::dim2::type &corner) const;
+
+private:
+  std::unordered_map<specfem::mesh_entity::dim2::type,
+                     std::function<std::tuple<int, int>(int)> >
+      edge_coordinates; ///< Maps edge types to coordinate functions
+  std::unordered_map<specfem::mesh_entity::dim2::type, std::tuple<int, int> >
+      corner_coordinates; ///< Maps corner types to coordinates
 };
 
 } // namespace specfem::mesh_entity

@@ -26,8 +26,8 @@ struct Connection {
 
   ~Connection() = default;
 
-  void expect_in(const specfem::mesh::meshfem3d::adjacency_graph<dimension>
-                     &adjacency_graph) const {
+  void expect_in(
+      const specfem::mesh::adjacency_graph<dimension> &adjacency_graph) const {
     const auto &g = adjacency_graph.graph();
 
     const auto [edge_, exists] = boost::edge(ispec, jspec, g);
@@ -71,8 +71,8 @@ struct ExpectedAdjacency3D {
                       const std::initializer_list<Connection> &connections)
       : nelements(nelements), connections(connections) {}
 
-  void check(const specfem::mesh::meshfem3d::adjacency_graph<dimension>
-                 &adjacency_graph) const {
+  void check(
+      const specfem::mesh::adjacency_graph<dimension> &adjacency_graph) const {
     // Verify total number of elements
     if (adjacency_graph.nspec != nelements) {
       FAIL() << "Total number of elements mismatch. "

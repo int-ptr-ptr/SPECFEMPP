@@ -79,35 +79,46 @@ class LayeredBuilder:
             # set physical groups for 4 sides. These aren't used by Model,
             # but may be useful for future implementation.
             # We will select from these physical groups when setting BCs
-            left_tag = gmsh.model.add_physical_group(
-                1, left_walls, name="left_boundary"
-            )
-            right_tag = gmsh.model.add_physical_group(
-                1, right_walls, name="right_boundary"
-            )
-            bottom_tag = gmsh.model.add_physical_group(
-                1, [built_layerbds[0].curve], name="bottom_boundary"
-            )
-            top_tag = gmsh.model.add_physical_group(
-                1, [built_layerbds[-1].curve_copy], name="top_boundary"
-            )
+            bottom_floor = built_layerbds[0].curve
+            top_ceiling = built_layerbds[-1].curve_copy
+
+            gmsh.model.add_physical_group(1, left_walls, name="left_boundary")
+            gmsh.model.add_physical_group(1, right_walls, name="right_boundary")
+            gmsh.model.add_physical_group(1, [bottom_floor], name="bottom_boundary")
+            gmsh.model.add_physical_group(1, [top_ceiling], name="top_boundary")
 
             # append edge tags to these arrays
             # we will physical group afterwards
             bdry_by_name = {condition: [] for condition in BOUNDARY_TYPES}
 
-            bdry_by_name[self.domain_boundary_type_bottom].extend(
-                gmsh.model.get_entities_for_physical_group(1, bottom_tag)
-            )
-            bdry_by_name[self.domain_boundary_type_top].extend(
-                gmsh.model.get_entities_for_physical_group(1, top_tag)
-            )
-            bdry_by_name[self.domain_boundary_type_left].extend(
-                gmsh.model.get_entities_for_physical_group(1, left_tag)
-            )
-            bdry_by_name[self.domain_boundary_type_right].extend(
-                gmsh.model.get_entities_for_physical_group(1, right_tag)
-            )
+            for layer, leftwall, rightwall in zip(
+                self.layers, left_walls, right_walls, strict=True
+            ):
+                # add left and right to boundaries, with exception of skipping AFS when desired
+                if not (
+                    self.domain_boundary_type_left == "acoustic_free_surface"
+                    and layer.skip_acoustic_free_surface
+                ):
+                    bdry_by_name[self.domain_boundary_type_left].append(leftwall)
+                if not (
+                    self.domain_boundary_type_right == "acoustic_free_surface"
+                    and layer.skip_acoustic_free_surface
+                ):
+                    bdry_by_name[self.domain_boundary_type_right].append(rightwall)
+
+            # same for top and bottom: add to bdries, except a skipped AFS
+            if not (
+                self.domain_boundary_type_bottom == "acoustic_free_surface"
+                and self.layers[0].skip_acoustic_free_surface
+            ):
+                bdry_by_name[self.domain_boundary_type_bottom].append(bottom_floor)
+            if not (
+                self.domain_boundary_type_top == "acoustic_free_surface"
+                and self.layers[-1].skip_acoustic_free_surface
+            ):
+                bdry_by_name[self.domain_boundary_type_top].append(top_ceiling)
+
+            # boundary condition marking complete: give info to gmsh
 
             # set physical group
             for name, bdry in bdry_by_name.items():

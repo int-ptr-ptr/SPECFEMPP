@@ -1,7 +1,7 @@
 .. _homogeneous_example:
 
-Wave propagration through homogeneous media
-===========================================
+Wave propagation through homogeneous media
+==========================================
 
 In this `example <https://github.com/PrincetonUniversity/SPECFEMPP/tree/main/examples/homogeneous-medium-flat-topography>`_ we simulate wave propagation through a 2-dimensional homogeneous medium.
 

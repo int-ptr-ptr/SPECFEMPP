@@ -5,9 +5,9 @@
 #include <vector>
 
 #include "enumerations/interface.hpp"
-#include "enumerations/material_definitions.hpp"
 #include "medium/material.hpp"
 #include "mesh/mesh.hpp"
+#include "specfem/macros.hpp"
 #include "specfem_setup.hpp"
 #include "test_fixture.hpp"
 
@@ -57,8 +57,7 @@ struct ExpectedMaterials3D {
                       const std::initializer_list<ElementMaterial> &elements)
       : total_materials(total_materials), element_materials(elements) {}
 
-  void
-  check(const specfem::mesh::meshfem3d::Materials<dimension> &materials) const {
+  void check(const specfem::mesh::materials<dimension> &materials) const {
     // Verify total number of material
     if (materials.n_materials != total_materials.nmaterials) {
       FAIL() << "Total number of materials mismatch. "
@@ -103,9 +102,10 @@ struct ExpectedMaterials3D {
               const auto computed_material =
                   materials.get_material<_medium_tag_, _property_tag_>(
                       expected.element_id);
-              const auto expected_material = std::any_cast<
-                  specfem::medium::material<_medium_tag_, _property_tag_> >(
-                  expected.material);
+              const auto expected_material =
+                  std::any_cast<specfem::medium::material<
+                      _dimension_tag_, _medium_tag_, _property_tag_> >(
+                      expected.material);
               if (computed_material != expected_material) {
                 FAIL() << "Material mismatch for element "
                        << expected.element_id << ". "
@@ -136,6 +136,7 @@ static const std::unordered_map<std::string, ExpectedMaterials3D>
               ElementMaterial(specfem::element::medium_tag::elastic,
                               specfem::element::property_tag::isotropic, 0,
                               specfem::medium::material<
+                                  specfem::dimension::type::dim3,
                                   specfem::element::medium_tag::elastic,
                                   specfem::element::property_tag::isotropic>(
                                   2300.0, 1500.0, 2800.0, 2444.4, 300.0, 0.0)),
@@ -144,6 +145,7 @@ static const std::unordered_map<std::string, ExpectedMaterials3D>
                   specfem::element::medium_tag::elastic,
                   specfem::element::property_tag::isotropic, 5,
                   specfem::medium::material<
+                      specfem::dimension::type::dim3,
                       specfem::element::medium_tag::elastic,
                       specfem::element::property_tag::isotropic>(
                       2300.0, 1500.0, 2800.0, 2444.4, 300.0, 0.0)) }),

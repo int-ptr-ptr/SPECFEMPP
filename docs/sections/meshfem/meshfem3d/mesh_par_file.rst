@@ -1,6 +1,6 @@
 
-``xmeshfem3D``: ``Mesh_Par_file`` Documentation
-===============================================
+Parameter File
+==============
 
 
 ``MESH_A_CHUNK_OF_THE_EARTH``

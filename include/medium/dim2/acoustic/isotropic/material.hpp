@@ -15,13 +15,13 @@ namespace medium {
  * @brief Template specialization for acoustic isotropic material properties
  *
  */
-template <>
-class material<specfem::element::medium_tag::acoustic,
+template <specfem::dimension::type DimensionTag>
+class material<DimensionTag, specfem::element::medium_tag::acoustic,
                specfem::element::property_tag::isotropic> {
 
 public:
-  constexpr static auto dimension =
-      specfem::dimension::type::dim2; ///< Dimension of the material
+  constexpr static auto dimension_tag =
+      DimensionTag; ///< Dimension of the material
   constexpr static auto medium_tag =
       specfem::element::medium_tag::acoustic; ///< Medium tag
   constexpr static auto property_tag =
@@ -59,7 +59,7 @@ public:
    * @return true If the materials have the same properties
    */
   bool operator==(
-      const material<specfem::element::medium_tag::acoustic,
+      const material<dimension_tag, specfem::element::medium_tag::acoustic,
                      specfem::element::property_tag::isotropic> &other) const {
 
     return (std::abs(this->density - other.density) < 1e-6 &&
@@ -76,7 +76,7 @@ public:
    * @return true If the materials have different properties
    */
   bool operator!=(
-      const material<specfem::element::medium_tag::acoustic,
+      const material<dimension_tag, specfem::element::medium_tag::acoustic,
                      specfem::element::property_tag::isotropic> &other) const {
     return !(*this == other);
   }
@@ -95,7 +95,8 @@ public:
    *
    * @return specfem::point::properties Material properties
    */
-  inline specfem::point::properties<dimension, medium_tag, property_tag, false>
+  inline specfem::point::properties<dimension_tag, medium_tag, property_tag,
+                                    false>
   get_properties() const {
     return { static_cast<type_real>(1.0) / static_cast<type_real>(density),
              this->kappa };

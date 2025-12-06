@@ -75,43 +75,6 @@ subroutine read_parameter_file(imesher,BROADCAST_AFTER_READ)
       endif
       call read_parameter_file_receiversets()
 
-      ! only mesher needs to reads this
-      if (imesher == 1) then
-         ! reads material definitions
-         call read_material_table()
-
-         ! mesher reads in internal region table for setting up mesh elements
-         if (.not. read_external_mesh) then
-            ! internal meshing
-            ! user output
-            write(IMAIN,*)
-            write(IMAIN,*) 'Mesh from internal meshing:'
-            write(IMAIN,*)
-            call flush_IMAIN()
-
-            ! reads interface definitions from interface file (we need to have nxread & nzread value for checking regions)
-            call read_interfaces_file()
-
-            ! internal meshing
-            nx_elem_internal = nxread
-            nz_elem_internal = nzread
-
-            ! setup mesh array
-            ! multiply by 2 if elements have 9 nodes
-            if (NGNOD == 9) then
-               nx_elem_internal = nx_elem_internal * 2
-               nz_elem_internal = nz_elem_internal * 2
-               nz_layer(:) = nz_layer(:) * 2
-            endif
-
-            ! total number of elements
-            nelmnts = nxread * nzread
-
-            ! reads material regions defined in Par_file
-            call read_regions()
-         endif
-      endif
-
       ! closes file Par_file
       call close_parameter_file()
    endif
@@ -421,6 +384,41 @@ subroutine read_parameter_file_only()
          write(*,*)
       endif
 
+      ! optional parameter (to have backward compatibility)
+      call read_value_string_p(nummaterial_velocity_file, 'nummaterial_velocity_file')
+      if (err_occurred() /= 0) then
+         ! couldn't find entry
+         has_nummaterial_velocity_file = .false.
+         nummaterial_velocity_file = ''
+
+         ! for future use - imposes strict parameter file
+         !some_parameters_missing_from_Par_file = .true.
+         !write(*,'(a)') 'nummaterial_velocity_file       = ./MESH/nummaterial_velocity_file'
+         !write(*,*)
+      else
+         ! check if entry is valid
+         nummaterial_velocity_file = adjustl(nummaterial_velocity_file)
+         if (len_trim(nummaterial_velocity_file) == 0 .or. trim(nummaterial_velocity_file) == 'dummy') then
+         ! not a valid entry
+         has_nummaterial_velocity_file = .false.
+         nummaterial_velocity_file = ''
+         else
+         ! everything ok - so far...
+         has_nummaterial_velocity_file = .true.
+         endif
+      endif
+
+      ! in case no nummaterial_velocity_file is provided, must have/read material properties from table in Par_file
+      if (.not. has_nummaterial_velocity_file) then
+         ! read the different material properties (i.e. the number of models)
+         call read_value_integer_p(nbmodels, 'nbmodels')
+         if (err_occurred() /= 0) then
+         some_parameters_missing_from_Par_file = .true.
+         write(*,'(a)') 'nbmodels                        = 1'
+         write(*,*)
+         endif
+      endif
+
       call read_value_string_p(free_surface_file, 'free_surface_file')
       if (err_occurred() /= 0) then
          some_parameters_missing_from_Par_file = .true.
@@ -541,16 +539,6 @@ subroutine read_parameter_file_only()
          write(*,*)
       endif
 ! note: if internal mesh, then region tables will be read in by read_regions (from meshfem2D)
-   endif
-
-   !--------------------------------------------------------------------
-   ! Database output parameters
-   !--------------------------------------------------------------------
-
-   call read_value_logical_p(write_adjacency_map, 'write_adjacency_map')
-   if (err_occurred() /= 0) then
-      write(*,*) 'Warning: write_adjacency_map parameter not found in Par_file, setting to .true. by default.'
-      write_adjacency_map = .true.
    endif
 
    !--------------------------------------------------------------------

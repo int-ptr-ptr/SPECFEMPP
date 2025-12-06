@@ -16,15 +16,9 @@ specfem::algorithms::locate_point(
     const specfem::assembly::mesh<specfem::dimension::type::dim2> &mesh) {
 
   // Extract mesh data and delegate to core implementation
-  if (mesh.adjacency_graph_empty()) {
-    return specfem::algorithms::locate_point_impl::locate_point_core(
-        coordinates, mesh.h_coord, mesh.h_index_mapping,
-        mesh.h_control_node_coord, mesh.ngnod, mesh.element_grid.ngllx);
-  } else {
-    return specfem::algorithms::locate_point_impl::locate_point_core(
-        mesh.graph(), coordinates, mesh.h_coord, mesh.h_control_node_coord,
-        mesh.ngnod);
-  }
+  return specfem::algorithms::locate_point_impl::locate_point_core(
+      mesh.graph(), coordinates, mesh.h_coord, mesh.h_control_node_coord,
+      mesh.ngnod);
 }
 
 specfem::point::global_coordinates<specfem::dimension::type::dim2>

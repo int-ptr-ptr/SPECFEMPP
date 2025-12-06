@@ -2,10 +2,10 @@
 #define _SPECFEM_KERNELS_FRECHET_KERNELS_HPP
 
 #include "enumerations/dimension.hpp"
-#include "enumerations/material_definitions.hpp"
 #include "enumerations/medium.hpp"
 #include "impl/compute_material_derivatives.hpp"
 #include "specfem/assembly.hpp"
+#include "specfem/macros.hpp"
 
 namespace specfem {
 namespace kokkos_kernels {

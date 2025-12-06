@@ -74,7 +74,6 @@ TEST_P(CheckConnections, Test) {
 
   const auto &adjacency_graph = mesh.adjacency_graph;
 
-  ASSERT_FALSE(adjacency_graph.empty()) << "Adjacency graph is empty";
   EXPECT_NO_THROW(adjacency_graph.assert_symmetry());
 
   for (const auto &rule : expected_adjacency_rules.at(mesh_name)) {

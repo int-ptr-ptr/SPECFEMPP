@@ -7,10 +7,10 @@
 #include <vector>
 
 #include "enumerations/interface.hpp"
-#include "macros.hpp"
 #include "stacey.hpp"
 #include "utilities.hpp"
 #include <Kokkos_Core.hpp>
+#include "specfem/macros.hpp"
 
 specfem::assembly::boundaries_impl::stacey<specfem::dimension::type::dim2>::
     stacey(const int nspec, const int ngllz, const int ngllx,
@@ -72,8 +72,10 @@ specfem::assembly::boundaries_impl::stacey<specfem::dimension::type::dim2>::
     ++total_indices;
   }
 
-  ASSERT(total_indices == total_stacey_elements,
-         "Error: Total number of Stacey elements do not match");
+  if (total_indices != total_stacey_elements) {
+    KOKKOS_ABORT_WITH_LOCATION(
+        "Error: Mismatch in total Stacey surface elements");
+  }
 
   // -------------------------------------------------------------------
   // Make sure the index mapping is contiguous

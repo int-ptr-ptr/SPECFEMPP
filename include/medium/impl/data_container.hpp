@@ -34,10 +34,12 @@
   (_ACCESS_ELEMENT_ON_HOST(elem, BOOST_PP_TUPLE_ELEM(1, data)),                \
    BOOST_PP_SEQ_ELEM(1, elem));
 
-#define _DATA_ACCESSOR(seq)                                                    \
+#define _DATA_ACCESSOR_2D(seq)                                                 \
   template <typename FunctorType, typename IndexType>                          \
   KOKKOS_INLINE_FUNCTION std::enable_if_t<                                     \
-      std::is_invocable_v<FunctorType, const type_real &, std::size_t>, void>  \
+      (std::is_invocable_v<FunctorType, const type_real &, std::size_t> &&     \
+       IndexType::dimension_tag == specfem::dimension::type::dim2),            \
+      void>                                                                    \
   for_each_on_device(const IndexType &index, FunctorType f) const {            \
     const auto &mapping =                                                      \
         BOOST_PP_SEQ_ELEM(0, BOOST_PP_SEQ_ELEM(0, seq)).get_mapping();         \
@@ -47,7 +49,8 @@
   template <typename FunctorType, typename IndexType>                          \
   KOKKOS_INLINE_FUNCTION std::enable_if_t<                                     \
       (!std::is_invocable_v<FunctorType, const type_real &, std::size_t> &&    \
-       std::is_invocable_v<FunctorType, type_real &, std::size_t>),            \
+       std::is_invocable_v<FunctorType, type_real &, std::size_t> &&           \
+       IndexType::dimension_tag == specfem::dimension::type::dim2),            \
       void>                                                                    \
   for_each_on_device(const IndexType &index, FunctorType f) const {            \
     const auto &mapping =                                                      \
@@ -55,11 +58,52 @@
     const std::size_t _index = mapping(index.ispec, index.iz, index.ix);       \
     BOOST_PP_SEQ_FOR_EACH(_CALL_FUNCTOR_ON_DEVICE, (f, _index), seq)           \
   }                                                                            \
-  template <typename FunctorType, typename IndexType>                          \
+  template <typename FunctorType, typename IndexType,                          \
+            std::enable_if_t<(IndexType::dimension_tag ==                      \
+                              specfem::dimension::type::dim2),                 \
+                             int> = 0>                                         \
   void for_each_on_host(const IndexType &index, FunctorType f) const {         \
     const auto &mapping =                                                      \
         BOOST_PP_SEQ_ELEM(0, BOOST_PP_SEQ_ELEM(0, seq)).get_mapping();         \
     const std::size_t _index = mapping(index.ispec, index.iz, index.ix);       \
+    BOOST_PP_SEQ_FOR_EACH(_CALL_FUNCTOR_ON_HOST, (f, _index), seq)             \
+  }
+
+#define _DATA_ACCESSOR_3D(seq)                                                 \
+  template <typename FunctorType, typename IndexType>                          \
+  KOKKOS_INLINE_FUNCTION std::enable_if_t<                                     \
+      (std::is_invocable_v<FunctorType, const type_real &, std::size_t> &&     \
+       IndexType::dimension_tag == specfem::dimension::type::dim3),            \
+      void>                                                                    \
+  for_each_on_device(const IndexType &index, FunctorType f) const {            \
+    const auto &mapping =                                                      \
+        BOOST_PP_SEQ_ELEM(0, BOOST_PP_SEQ_ELEM(0, seq)).get_mapping();         \
+    const std::size_t _index =                                                 \
+        mapping(index.ispec, index.iz, index.iy, index.ix);                    \
+    BOOST_PP_SEQ_FOR_EACH(_CALL_FUNCTOR_ON_DEVICE_CONST, (f, _index), seq)     \
+  }                                                                            \
+  template <typename FunctorType, typename IndexType>                          \
+  KOKKOS_INLINE_FUNCTION std::enable_if_t<                                     \
+      (!std::is_invocable_v<FunctorType, const type_real &, std::size_t> &&    \
+       std::is_invocable_v<FunctorType, type_real &, std::size_t> &&           \
+       IndexType::dimension_tag == specfem::dimension::type::dim3),            \
+      void>                                                                    \
+  for_each_on_device(const IndexType &index, FunctorType f) const {            \
+    const auto &mapping =                                                      \
+        BOOST_PP_SEQ_ELEM(0, BOOST_PP_SEQ_ELEM(0, seq)).get_mapping();         \
+    const std::size_t _index =                                                 \
+        mapping(index.ispec, index.iz, index.iy, index.ix);                    \
+    BOOST_PP_SEQ_FOR_EACH(_CALL_FUNCTOR_ON_DEVICE, (f, _index), seq)           \
+  }                                                                            \
+  template <typename FunctorType, typename IndexType,                          \
+            std::enable_if_t<(IndexType::dimension_tag ==                      \
+                              specfem::dimension::type::dim3),                 \
+                             int> = 0>                                         \
+  void for_each_on_host(const IndexType &index, FunctorType f) const {         \
+    const auto &mapping =                                                      \
+        BOOST_PP_SEQ_ELEM(0, BOOST_PP_SEQ_ELEM(0, seq)).get_mapping();         \
+    const std::size_t _index =                                                 \
+        mapping(index.ispec, index.iz, index.iy, index.ix);                    \
     BOOST_PP_SEQ_FOR_EACH(_CALL_FUNCTOR_ON_HOST, (f, _index), seq)             \
   }
 
@@ -138,7 +182,8 @@
 #define _DATA_CONTAINER_NUMBERED_SEQ(seq)                                      \
   _DATA_DEFINITION(seq)                                                        \
   _DATA_CONSTRUCTORS(seq)                                                      \
-  _DATA_ACCESSOR(seq)                                                          \
+  _DATA_ACCESSOR_2D(seq)                                                       \
+  _DATA_ACCESSOR_3D(seq)                                                       \
   _VIEW_ACCESSOR(seq)                                                          \
   _DATA_SYNCHRONIZE(seq)
 

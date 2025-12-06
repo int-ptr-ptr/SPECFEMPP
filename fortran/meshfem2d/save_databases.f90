@@ -855,16 +855,12 @@ end subroutine save_databases_VTK_files
 subroutine save_databases_adjacency_graph()
 
    use constants, only: IOUT
-   use shared_parameters, only: nelmnts, write_adjacency_map
+   use shared_parameters, only: nelmnts
    use part_unstruct_par, only: num_adjacent, adjacency_type, adjacency_id, adjacent_elements
 
    implicit none
 
    integer :: i,j, total_adjacencies
-
-   write(IOUT) write_adjacency_map
-
-   if (.not. write_adjacency_map) return
 
    ! Find total number of adjacent elements
 

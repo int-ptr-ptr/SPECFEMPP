@@ -1,8 +1,8 @@
 #include "kokkos_kernels/impl/compute_mass_matrix.hpp"
 #include "enumerations/interface.hpp"
-#include "enumerations/material_definitions.hpp"
 #include "kokkos_kernels/impl/compute_mass_matrix.tpp"
 #include "specfem/assembly.hpp"
+#include "specfem/macros.hpp"
 
 FOR_EACH_IN_PRODUCT(
     (DIMENSION_TAG(DIM2),

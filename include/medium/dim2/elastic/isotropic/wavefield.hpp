@@ -1,9 +1,9 @@
 #pragma once
 
 #include "algorithms/gradient.hpp"
-#include "enumerations/macros.hpp"
 #include "enumerations/medium.hpp"
 #include "medium/compute_stress.hpp"
+#include "specfem/macros.hpp"
 #include "specfem/point.hpp"
 #include <Kokkos_Core.hpp>
 

@@ -1,5 +1,5 @@
-Wave propagration through anisotropic zinc crystal
-==================================================
+Wave propagation through anisotropic zinc crystal
+=================================================
 
 In this `example
 <https://github.com/PrincetonUniversity/SPECFEMPP/tree/main/examples/anisotropic-crystal>`_

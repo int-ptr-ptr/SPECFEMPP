@@ -41,7 +41,8 @@ int corrector_phase_impl(
 
   specfem::execution::for_all(
       "specfem::TimeScheme::Newmark::corrector_phase_impl", range,
-      KOKKOS_LAMBDA(const IndexType &index) {
+      KOKKOS_LAMBDA(const typename decltype(range)::base_index_type &iterator_index) {
+        const auto index = iterator_index.get_index();
         PointAccelerationType acceleration;
         PointVelocityType velocity;
 
@@ -99,7 +100,8 @@ int predictor_phase_impl(
 
   specfem::execution::for_all(
       "specfem::TimeScheme::Newmark::corrector_phase_impl", range,
-      KOKKOS_LAMBDA(const IndexType &index) {
+      KOKKOS_LAMBDA(const typename decltype(range)::base_index_type &iterator_index) {
+        const auto index = iterator_index.get_index();
         PointDisplacementType displacement;
         PointVelocityType velocity;
         PointAccelerationType acceleration;

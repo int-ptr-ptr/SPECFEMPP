@@ -311,7 +311,7 @@ nbmodels                        = 2
 2 4 12.566d-7 8.85d-12 1 1 0d-3 0d-3 90 90 90 90 0 0 0
 
 # file containing interfaces for internal mesh
-interfacesfile                  = interfaces_GPR_AIR.dat
+interfacesfile                  = topography.dat
 
 # geometry of the model (origin lower-left corner = 0,0) and mesh description
 xmin                            = 0d0            # abscissa of left side of the model
@@ -448,3 +448,8 @@ BROADCAST_SAME_MESH_AND_MODEL   = .true.
 
 # set to true to use GPUs
 GPU_MODE                        = .false.
+
+# SPECFEM++ configurations
+database_filename               = ../OUTPUT_FILES/database.bin
+stations_filename               = ../OUTPUT_FILES/STATIONS_pp
+OUTPUT_FILES                    = ../OUTPUT_FILES

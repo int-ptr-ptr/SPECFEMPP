@@ -34,13 +34,14 @@ namespace medium {
  * @see specfem::medium::material
  *
  */
-template <specfem::element::medium_tag MediumTag>
+template <specfem::dimension::type DimensionTag,
+          specfem::element::medium_tag MediumTag>
 struct material<
-    MediumTag, specfem::element::property_tag::isotropic,
+    DimensionTag, MediumTag, specfem::element::property_tag::isotropic,
     std::enable_if_t<specfem::element::is_elastic<MediumTag>::value> > {
 public:
-  constexpr static auto dimension =
-      specfem::dimension::type::dim2;           ///< Dimension of the material
+  constexpr static auto dimension_tag =
+      DimensionTag;                             ///< Dimension of the material
   constexpr static auto medium_tag = MediumTag; ///< Medium tag
   constexpr static auto property_tag =
       specfem::element::property_tag::isotropic; ///< Property tag
@@ -94,8 +95,8 @@ public:
    * @return true If the materials have the same properties
    */
   bool operator==(
-      const material<MediumTag, specfem::element::property_tag::isotropic>
-          &other) const {
+      const material<dimension_tag, medium_tag,
+                     specfem::element::property_tag::isotropic> &other) const {
 
     return (std::abs(this->density - other.density) < 1e-6 &&
             std::abs(this->cp - other.cp) < 1e-6 &&
@@ -112,8 +113,8 @@ public:
    * @return true If the materials have different properties
    */
   bool operator!=(
-      const material<MediumTag, specfem::element::property_tag::isotropic>
-          &other) const {
+      const material<dimension_tag, medium_tag,
+                     specfem::element::property_tag::isotropic> &other) const {
     return !(*this == other);
   }
 
@@ -122,7 +123,8 @@ public:
    *
    * @return specfem::point::properties Material properties
    */
-  inline specfem::point::properties<dimension, medium_tag, property_tag, false>
+  inline specfem::point::properties<dimension_tag, medium_tag, property_tag,
+                                    false>
   get_properties() const {
     return { this->kappa, this->mu, this->density };
   }

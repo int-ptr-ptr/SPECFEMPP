@@ -1,26 +1,26 @@
 #include "compute_source_array_from_tensor.hpp"
 #include "algorithms/interface.hpp"
-#include "enumerations/macros.hpp"
 #include "kokkos_abstractions.h"
 #include "quadrature/interface.hpp"
 #include "specfem/assembly/element_types.hpp"
 #include "specfem/assembly/jacobian_matrix.hpp"
 #include "specfem/assembly/mesh.hpp"
+#include "specfem/macros.hpp"
 #include "specfem/point.hpp"
 #include "specfem/source.hpp"
 #include "specfem_setup.hpp"
 
-/*
 // Local namespace for implementation details
 namespace specfem::assembly::compute_source_array_impl {
 
 void compute_source_array_from_tensor_and_element_jacobian(
     const specfem::sources::tensor_source<specfem::dimension::type::dim3>
         &tensor_source,
-    const JacobianViewType &element_jacobian_matrix,
+    const JacobianViewType3D &element_jacobian_matrix,
     const specfem::assembly::mesh_impl::quadrature<
         specfem::dimension::type::dim3> &quadrature,
-    specfem::kokkos::HostView3d<type_real> source_array) {
+    Kokkos::View<type_real ****, Kokkos::LayoutRight, Kokkos::HostSpace>
+        source_array) {
 
   const int ngllx = quadrature.N;
   const int nglly = quadrature.N;
@@ -78,35 +78,35 @@ void compute_source_array_from_tensor_and_element_jacobian(
         type_real dsrc_dx =
             (hpxi_source(ix) * derivatives_source.xix) * heta_source(iy) *
                 hgamma_source(iz) +
-            hxi_source(ix) * (hpeta_source * derivatives_source.etax) *
+            hxi_source(ix) * (hpeta_source(iy) * derivatives_source.etax) *
                 hgamma_source(iz) +
             hxi_source(ix) * heta_source(iy) *
                 (hpgamma_source(iz) * derivatives_source.gammax);
         type_real dsrc_dy =
             (hpxi_source(ix) * derivatives_source.xiy) * heta_source(iy) *
                 hgamma_source(iz) +
-            hxi_source(ix) * (hpeta_source * derivatives_source.etay) *
+            hxi_source(ix) * (hpeta_source(iy) * derivatives_source.etay) *
                 hgamma_source(iz) +
             hxi_source(ix) * heta_source(iy) *
                 (hpgamma_source(iz) * derivatives_source.gammay);
         type_real dsrc_dz =
             (hpxi_source(ix) * derivatives_source.xiz) * heta_source(iy) *
                 hgamma_source(iz) +
-            hxi_source(ix) * (hpeta_source * derivatives_source.etaz) *
+            hxi_source(ix) * (hpeta_source(iy) * derivatives_source.etaz) *
                 hgamma_source(iz) +
             hxi_source(ix) * heta_source(iy) *
                 (hpgamma_source(iz) * derivatives_source.gammaz);
 
         for (int i = 0; i < ncomponents; ++i) {
-          source_array(i, iz, ix) = source_tensor(i, 0) * dsrc_dx +
-                                    source_tensor(i, 1) * dsrc_dy +
-                                    source_tensor(i, 2) * dsrc_dz;
+          source_array(i, iz, iy, ix) = source_tensor(i, 0) * dsrc_dx +
+                                        source_tensor(i, 1) * dsrc_dy +
+                                        source_tensor(i, 2) * dsrc_dz;
         }
       }
     }
-
-    return;
   }
+  return;
+}
 
 } // namespace specfem::assembly::compute_source_array_impl
 
@@ -116,17 +116,15 @@ void specfem::assembly::compute_source_array_impl::from_tensor(
     const specfem::assembly::mesh<specfem::dimension::type::dim3> &mesh,
     const specfem::assembly::jacobian_matrix<specfem::dimension::type::dim3>
         &jacobian_matrix,
-    specfem::kokkos::HostView4d<type_real> source_array) {
+    Kokkos::View<type_real ****, Kokkos::LayoutRight, Kokkos::HostSpace>
+        source_array) {
 
   const int ngllz = source_array.extent(1);
   const int nglly = source_array.extent(2);
   const int ngllx = source_array.extent(3);
 
-  using PointJacobianMatrix =
-      specfem::point::jacobian_matrix<specfem::dimension::type::dim3, false,
-                                      false>;
-  Kokkos::View<PointJacobianMatrix ***, Kokkos::LayoutRight, Kokkos::HostSpace>
-element_jacobian( "element_jacobian", ngllz, nglly, ngllx);
+  specfem::assembly::compute_source_array_impl::JacobianViewType3D
+      element_jacobian("element_jacobian", ngllz, nglly, ngllx);
 
   // Extract jacobian data from jacobian_matrix
   for (int iz = 0; iz < ngllz; ++iz) {
@@ -134,7 +132,8 @@ element_jacobian( "element_jacobian", ngllz, nglly, ngllx);
       for (int ix = 0; ix < ngllx; ++ix) {
         const specfem::point::index<specfem::dimension::type::dim3> index(
             tensor_source.get_local_coordinates().ispec, iz, iy, ix);
-        PointJacobianMatrix derivatives;
+        specfem::assembly::compute_source_array_impl::PointJacobianMatrix3D
+            derivatives;
         specfem::assembly::load_on_host(index, jacobian_matrix, derivatives);
         element_jacobian(iz, iy, ix) = derivatives;
       }
@@ -149,4 +148,3 @@ element_jacobian( "element_jacobian", ngllz, nglly, ngllx);
           tensor_source, element_jacobian, quadrature, source_array);
   return;
 }
-*/

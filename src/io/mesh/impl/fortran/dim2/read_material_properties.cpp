@@ -97,7 +97,8 @@ read_materials(
     std::cout << "Number of material systems = " << numat << "\n\n";
 
   // Section for acoustic isotropic
-  std::vector<specfem::medium::material<acoustic, isotropic> >
+  std::vector<specfem::medium::material<specfem::dimension::type::dim2,
+                                        acoustic, isotropic> >
       l_acoustic_isotropic;
 
   l_acoustic_isotropic.reserve(numat);
@@ -105,10 +106,12 @@ read_materials(
   int index_acoustic_isotropic = 0;
 
   // Section for elastic isotropic
-  std::vector<specfem::medium::material<elastic_psv, isotropic> >
+  std::vector<specfem::medium::material<specfem::dimension::type::dim2,
+                                        elastic_psv, isotropic> >
       l_elastic_psv_isotropic;
 
-  std::vector<specfem::medium::material<elastic_sh, isotropic> >
+  std::vector<specfem::medium::material<specfem::dimension::type::dim2,
+                                        elastic_sh, isotropic> >
       l_elastic_sh_isotropic;
 
   l_elastic_psv_isotropic.reserve(numat);
@@ -117,10 +120,12 @@ read_materials(
   int index_elastic_isotropic = 0;
 
   // Section for elastic anisotropic
-  std::vector<specfem::medium::material<elastic_psv, anisotropic> >
+  std::vector<specfem::medium::material<specfem::dimension::type::dim2,
+                                        elastic_psv, anisotropic> >
       l_elastic_psv_anisotropic;
 
-  std::vector<specfem::medium::material<elastic_sh, anisotropic> >
+  std::vector<specfem::medium::material<specfem::dimension::type::dim2,
+                                        elastic_sh, anisotropic> >
       l_elastic_sh_anisotropic;
 
   l_elastic_psv_anisotropic.reserve(numat);
@@ -129,7 +134,8 @@ read_materials(
   int index_elastic_anisotropic = 0;
 
   // Section for elastic isotropic cosserat medium psv
-  std::vector<specfem::medium::material<elastic_psv_t, isotropic_cosserat> >
+  std::vector<specfem::medium::material<specfem::dimension::type::dim2,
+                                        elastic_psv_t, isotropic_cosserat> >
       l_elastic_psv_t_isotropic_cosserat;
 
   l_elastic_psv_t_isotropic_cosserat.reserve(numat);
@@ -137,13 +143,15 @@ read_materials(
   int index_elastic_psv_t_isotropic_cosserat = 0;
 
   // Section for poroelastic isotropic
-  std::vector<specfem::medium::material<poroelastic, isotropic> >
+  std::vector<specfem::medium::material<specfem::dimension::type::dim2,
+                                        poroelastic, isotropic> >
       l_poroelastic_isotropic;
   l_poroelastic_isotropic.reserve(numat);
   int index_poroelastic_isotropic = 0;
 
   // Section for electromagnetic isotropic
-  std::vector<specfem::medium::material<electromagnetic_te, isotropic> >
+  std::vector<specfem::medium::material<specfem::dimension::type::dim2,
+                                        electromagnetic_te, isotropic> >
       l_electromagnetic_te_isotropic;
 
   l_electromagnetic_te_isotropic.reserve(numat);
@@ -179,7 +187,8 @@ read_materials(
         const type_real Qkappa = static_cast<type_real>(read_values.val5);
         const type_real Qmu = static_cast<type_real>(read_values.val6);
 
-        specfem::medium::material<acoustic, isotropic>
+        specfem::medium::material<specfem::dimension::type::dim2, acoustic,
+                                  isotropic>
             acoustic_isotropic_holder(density, cp, Qkappa, Qmu,
                                       compaction_grad);
 
@@ -206,7 +215,8 @@ read_materials(
         const type_real Qmu = static_cast<type_real>(read_values.val6);
 
         if (elastic_wave == specfem::enums::elastic_wave::psv) {
-          specfem::medium::material<elastic_psv, isotropic>
+          specfem::medium::material<specfem::dimension::type::dim2, elastic_psv,
+                                    isotropic>
               elastic_isotropic_holder(density, cs, cp, Qkappa, Qmu,
                                        compaction_grad);
 
@@ -218,7 +228,8 @@ read_materials(
                   specfem::element::property_tag::isotropic,
                   index_elastic_isotropic, read_values.n - 1);
         } else {
-          specfem::medium::material<elastic_sh, isotropic>
+          specfem::medium::material<specfem::dimension::type::dim2, elastic_sh,
+                                    isotropic>
               elastic_isotropic_holder(density, cs, cp, Qkappa, Qmu,
                                        compaction_grad);
 
@@ -256,7 +267,8 @@ read_materials(
 
       if (elastic_wave == specfem::enums::elastic_wave::psv) {
 
-        specfem::medium::material<elastic_psv, anisotropic>
+        specfem::medium::material<specfem::dimension::type::dim2, elastic_psv,
+                                  anisotropic>
             elastic_anisotropic_holder(density, c11, c13, c15, c33, c35, c55,
                                        c12, c23, c25, Qkappa, Qmu);
 
@@ -269,7 +281,8 @@ read_materials(
                 index_elastic_anisotropic, read_values.n - 1);
       } else {
 
-        specfem::medium::material<elastic_sh, anisotropic>
+        specfem::medium::material<specfem::dimension::type::dim2, elastic_sh,
+                                  anisotropic>
             elastic_anisotropic_holder(density, c11, c13, c15, c33, c35, c55,
                                        c12, c23, c25, Qkappa, Qmu);
 
@@ -303,7 +316,8 @@ read_materials(
       const type_real mufr = static_cast<type_real>(read_values.val11);
       const type_real Qmu = static_cast<type_real>(read_values.val12);
 
-      specfem::medium::material<poroelastic, isotropic>
+      specfem::medium::material<specfem::dimension::type::dim2, poroelastic,
+                                isotropic>
           poroelastic_isotropic_holder(rhos, rhof, phi, c, kxx, kxz, kzz, Ks,
                                        Kf, Kfr, etaf, mufr, Qmu);
       poroelastic_isotropic_holder.print();
@@ -332,7 +346,8 @@ read_materials(
       const type_real Qs33 = static_cast<type_real>(read_values.val9);
 
       if (elastic_wave == specfem::enums::elastic_wave::psv) {
-        specfem::medium::material<electromagnetic_te, isotropic>
+        specfem::medium::material<specfem::dimension::type::dim2,
+                                  electromagnetic_te, isotropic>
             electromagnetic_te_isotropic_holder(mu0, e0, e11, e33, sig11, sig33,
                                                 Qe11, Qe33, Qs11, Qs33);
 
@@ -362,7 +377,8 @@ read_materials(
         const type_real nu_c = static_cast<type_real>(read_values.val7);
 
         // Create the material
-        specfem::medium::material<elastic_psv_t, isotropic_cosserat>
+        specfem::medium::material<specfem::dimension::type::dim2, elastic_psv_t,
+                                  isotropic_cosserat>
             elastic_psv_t_isotropic_cosserat_holder(rho, kappa, mu, nu, j,
                                                     lambda_c, mu_c, nu_c);
         // Print the material properties
@@ -489,11 +505,20 @@ void read_material_indices(
                                    &pml_read);
 
     if (n < 1 || n > nspec) {
-      throw std::runtime_error("Error reading material indices");
+      std::ostringstream message;
+      message << "Error reading material indices: element index out of bounds, "
+                 "read "
+              << n << " but should be between 1 and " << nspec;
+      throw std::runtime_error(message.str());
     }
 
     if (kmato_read < 1 || kmato_read > numat) {
-      throw std::runtime_error("Error reading material indices");
+      std::ostringstream message;
+      message
+          << "Error reading material indices: material index out of bounds, "
+             "read "
+          << kmato_read << " but should be between 1 and " << numat;
+      throw std::runtime_error(message.str());
     }
 
     for (int i = 0; i < ngnod; i++) {

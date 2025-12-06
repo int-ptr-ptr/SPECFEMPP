@@ -40,22 +40,22 @@ void specfem::assembly::compute_source_array(
                                                               source_array);
     break;
   }
-  // case specfem::sources::source_type::tensor_source: {
+  case specfem::sources::source_type::tensor_source: {
 
-  //   // Cast to derived class to access specific methods
-  //   auto tensor_source = static_cast<const specfem::sources::tensor_source<
-  //       specfem::dimension::type::dim3> *>(source.get());
+    // Cast to derived class to access specific methods
+    auto tensor_source = static_cast<const specfem::sources::tensor_source<
+        specfem::dimension::type::dim3> *>(source.get());
 
-  //   if (!tensor_source) {
-  //     KOKKOS_ABORT_WITH_LOCATION(
-  //         "Source is not of tensor type. Cannot compute tensor source "
-  //         "array.");
-  //   }
+    if (!tensor_source) {
+      KOKKOS_ABORT_WITH_LOCATION(
+          "Source is not of tensor type. Cannot compute tensor source "
+          "array.");
+    }
 
-  //   specfem::assembly::compute_source_array_impl::from_tensor(
-  //       *tensor_source, mesh, jacobian_matrix, source_array);
-  //   break;
-  // }
+    specfem::assembly::compute_source_array_impl::from_tensor(
+        *tensor_source, mesh, jacobian_matrix, source_array);
+    break;
+  }
   default:
     // Handle unsupported source types
     KOKKOS_ABORT_WITH_LOCATION(

@@ -22,7 +22,6 @@ What the 3D mesh struct holds
     materials/index
     mass_matrix/index
     boundaries/index
-    coupled_interfaces/index
     coloring/index
     inner_outer/index
     mpi/index

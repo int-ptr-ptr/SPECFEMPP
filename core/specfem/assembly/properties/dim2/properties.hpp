@@ -15,32 +15,56 @@
 
 namespace specfem::assembly {
 
+/**
+ * @brief 2D spectral element material properties data container
+ *
+ * This template specialization provides storage and management of material
+ * properties for 2-dimensional spectral elements. It stores properties such
+ * as density, elastic constants, and medium-specific parameters at quadrature
+ * points throughout the spectral element mesh.
+ *
+ * The class inherits from value_containers which provides the underlying
+ * storage mechanism and data access patterns for different material types
+ * (elastic, acoustic, poroelastic) and property variations (isotropic,
+ * anisotropic, Cosserat).
+ *
+ * Related classes:
+ * - specfem::medium::properties_container: Base storage container
+ * - specfem::assembly::mesh: Mesh geometry and connectivity
+ * - specfem::mesh::materials: Material assignment per element
+ */
 template <>
 struct properties<specfem::dimension::type::dim2>
     : public impl::value_containers<specfem::dimension::type::dim2,
                                     specfem::medium::properties_container> {
-  /**
-   * @name Constructors
-   */
-  ///@{
 
   /**
-   * @brief Default constructor
+   * @brief Default constructor.
    *
+   * Initializes an empty properties container with no allocated storage.
    */
   properties() = default;
 
   /**
-   * @brief Construct a new properties object from mesh information
+   * @brief Construct properties container from mesh and material data.
    *
-   * @param nspec Number of spectral elements
-   * @param ngllz Number of quadrature points in z direction
-   * @param ngllx Number of quadrature points in x direction
-   * @param mapping Mapping of spectral element index from mesh to assembly
-   * @param tags Element Tags for every spectral element
-   * @param materials Material properties for every spectral element
-   * @param has_gll_model Whether a GLL model is present (skip material property
-   * assignment if true)
+   * Initializes the material properties container by extracting material
+   * properties from the mesh materials and storing them at quadrature points
+   * for all spectral elements.
+   *
+   * @param nspec Number of spectral elements in the mesh
+   * @param ngllz Number of quadrature points in z-direction (vertical)
+   * @param ngllx Number of quadrature points in x-direction (horizontal)
+   * @param element_types Element type information for each spectral element
+   * @param mesh Spectral element mesh containing geometry and connectivity
+   * @param materials Material properties database indexed by element
+   * @param has_gll_model If true, skips material property assignment (for GLL
+   * models)
+   *
+   * @code
+   * specfem::assembly::properties<specfem::dimension::type::dim2> props(
+   *     1000, 5, 5, element_types, mesh, materials, false);
+   * @endcode
    */
   properties(
       const int nspec, const int ngllz, const int ngllx,
@@ -49,23 +73,52 @@ struct properties<specfem::dimension::type::dim2>
       const specfem::mesh::materials<dimension_tag> &materials,
       bool has_gll_model);
 
-  ///@}
-
   /**
-   * @brief Copy misfit kernel data to host
+   * @brief Copy material properties data from device to host memory.
    *
+   * Transfers all material property data stored in device memory back to
+   * host-accessible memory for post-processing, I/O operations, or debugging.
    */
   void copy_to_host() {
     impl::value_containers<
         dimension_tag, specfem::medium::properties_container>::copy_to_host();
   }
 
+  /**
+   * @brief Copy material properties data from host to device memory.
+   *
+   * Transfers material property data from host memory to device-accessible
+   * memory for use in GPU-accelerated computations.
+   */
   void copy_to_device() {
     impl::value_containers<
         dimension_tag, specfem::medium::properties_container>::copy_to_device();
   }
 };
 
+/**
+ * @brief Compute maximum material property values across specified elements.
+ *
+ * This function performs a parallel reduction to find the maximum values
+ * of material properties across a subset of spectral elements. It maps
+ * element indices to property indices and delegates the reduction operation
+ * to the appropriate material property container.
+ *
+ * @tparam IndexViewType Kokkos view type containing element indices
+ * @tparam PointPropertiesType Material properties type (e.g., density, wave
+ * speeds)
+ *
+ * @param ispecs View containing spectral element indices to process
+ * @param properties Material properties container for the 2D mesh
+ * @param point_properties Output container for maximum property values
+ *
+ * @code
+ * // Find maximum density across elements 0-99
+ * Kokkos::View<int*> elements("elements", 100);
+ * specfem::point::properties<dim2, elastic, isotropic> max_props;
+ * max(elements, assembly_props, max_props);
+ * @endcode
+ */
 template <typename IndexViewType, typename PointPropertiesType>
 void max(const IndexViewType &ispecs,
          const specfem::assembly::properties<specfem::dimension::type::dim2>

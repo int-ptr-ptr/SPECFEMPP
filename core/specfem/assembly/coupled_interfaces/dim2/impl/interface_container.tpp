@@ -6,12 +6,13 @@
 #include "specfem/assembly/jacobian_matrix.hpp"
 #include "specfem/assembly/mesh.hpp"
 #include "specfem/data_access.hpp"
-#include "enumerations/macros.hpp"
+#include "specfem/macros.hpp"
 
 template <specfem::interface::interface_tag InterfaceTag,
           specfem::element::boundary_tag BoundaryTag>
 specfem::assembly::coupled_interfaces_impl::interface_container<
-    specfem::dimension::type::dim2, InterfaceTag, BoundaryTag, specfem::connections::type::weakly_conforming>::
+    specfem::dimension::type::dim2, InterfaceTag, BoundaryTag,
+    specfem::connections::type::weakly_conforming>::
     interface_container(
         const int ngllz, const int ngllx,
         const specfem::assembly::edge_types<specfem::dimension::type::dim2>
@@ -29,13 +30,11 @@ specfem::assembly::coupled_interfaces_impl::interface_container<
         "The number of GLL points in z and x must be the same.");
   }
 
-  const auto connection_mapping =
-      specfem::connections::connection_mapping(ngllx, ngllz);
-
   const auto [self_edges, coupled_edges] = edge_types.get_edges_on_host(
       specfem::connections::type::weakly_conforming, InterfaceTag, BoundaryTag);
 
-  const auto nedges = self_edges.size();
+  const int nedges = self_edges.n_edges;
+  const int npoints = self_edges.n_points;
 
   this->edge_factor = EdgeFactorView(
       "specfem::assembly::coupled_interfaces::edge_factor", nedges, ngllx);
@@ -48,28 +47,24 @@ specfem::assembly::coupled_interfaces_impl::interface_container<
   const auto weights = mesh.h_weights;
 
   for (int i = 0; i < nedges; ++i) {
-    const int ispec = self_edges(i).ispec;
-    const auto edge_type = self_edges(i).edge_type;
-
-    const int npoints =
-        connection_mapping.number_of_points_on_orientation(edge_type);
+    const auto edge = self_edges(i);
     for (int ipoint = 0; ipoint < npoints; ++ipoint) {
-      const auto [iz, ix] =
-          connection_mapping.coordinates_at_edge(edge_type, ipoint);
+      const auto edge_index = edge(ipoint);
       specfem::point::jacobian_matrix<specfem::dimension::type::dim2, true,
                                       false>
           point_jacobian_matrix;
       specfem::point::index<specfem::dimension::type::dim2, false> point_index{
-        ispec, iz, ix
+        edge_index.ispec, edge_index.iz, edge_index.ix
       };
       specfem::assembly::load_on_host(point_index, jacobian_matrix,
                                       point_jacobian_matrix);
-      const auto dn = point_jacobian_matrix.compute_normal(edge_type);
-      this->h_edge_normal(i, ipoint, 0) = dn(0);
-      this->h_edge_normal(i, ipoint, 1) = dn(1);
-      const std::array<type_real, 2> w{ weights(ix), weights(iz) };
-      this->h_edge_factor(i, ipoint) = [&]() {
-        switch (edge_type) {
+      const auto dn = point_jacobian_matrix.compute_normal(edge_index.edge_type);
+      this->h_edge_normal(edge_index.iedge, edge_index.ipoint, 0) = dn(0);
+      this->h_edge_normal(edge_index.iedge, edge_index.ipoint, 1) = dn(1);
+      const std::array<type_real, 2> w{ weights(edge_index.ix),
+                                        weights(edge_index.iz) };
+      this->h_edge_factor(edge_index.iedge, edge_index.ipoint) = [&]() {
+        switch (edge_index.edge_type) {
         case specfem::mesh_entity::dim2::type::bottom:
         case specfem::mesh_entity::dim2::type::top:
           return w[0];

@@ -33,7 +33,8 @@
  * // Create chunked iterator and process edges
  * specfem::execution::ChunkedEdgeIterator iterator(ParallelConfig(), edges,
  * num_points); specfem::execution::for_all("process_edges", iterator,
- *     KOKKOS_LAMBDA(const auto& index) {
+ *     KOKKOS_LAMBDA(const auto& iterator_index) {
+ *       const auto index = iterator_index.get_index();
  *         // Access edge point data
  *         int ispec = index.ispec;     // Element index
  *         int ipoint = index.ipoint;   // Point index along edge
@@ -47,8 +48,8 @@
 #pragma once
 
 #include "chunked_edge_iterator.hpp"
-#include "macros.hpp"
 #include "policy.hpp"
+#include "specfem/macros.hpp"
 #include "specfem/point.hpp"
 #include "void_iterator.hpp"
 #include <Kokkos_Core.hpp>
@@ -80,7 +81,8 @@ namespace specfem::execution {
  * @code{.cpp}
  * // Typically used within chunked edge iterator lambdas
  * specfem::execution::for_all("process_edges", iterator,
- *     KOKKOS_LAMBDA(const EdgePointIndex<dim2, int, ExecutionSpace>& index) {
+ *     KOKKOS_LAMBDA(const auto & iterator_index) {
+*        const auto index = iterator_index.get_index();
  *         int element_id = index.ispec;    // Element containing this edge point
  *         int z_coord = index.iz;          // Local z-coordinate within element
  *         int x_coord = index.ix;          // Local x-coordinate within element
@@ -121,17 +123,23 @@ public:
   KOKKOS_INLINE_FUNCTION
   constexpr const index_type &get_index() const { return this->index; }
 
+  KOKKOS_INLINE_FUNCTION
+  constexpr const index_type &get_local_index() const {
+    return this->local_index; ///< Returns the local point index
+  }
+
   /**
    * @brief Constructor for EdgePointIndex
    *
    * @param index Local element coordinates of the edge point
-   * @param ipoint Position of point along the edge (0 to num_points-1)
+   * @param iedge Position of edge within the chunk
    * @param kokkos_index Underlying Kokkos policy index
    */
   KOKKOS_INLINE_FUNCTION
-  EdgePointIndex(const specfem::point::index<DimensionTag, false> &index,
-                 const int ipoint, const KokkosIndexType &kokkos_index)
-      : index(index.ispec, kokkos_index, ipoint, index.iz, index.ix),
+  EdgePointIndex(const specfem::point::edge_index<DimensionTag> &index_,
+                 const int iedge, const KokkosIndexType &kokkos_index)
+      : index(index_), local_index(index_.ispec, iedge, index_.ipoint,
+                                   index_.iz, index_.ix, index_.edge_type),
         kokkos_index(kokkos_index) {}
 
   /**
@@ -144,7 +152,8 @@ public:
   constexpr const iterator_type get_iterator() const { return iterator_type{}; }
 
 private:
-  index_type index; ///< Local element coordinates of the edge point
+  index_type index;       ///< Local element coordinates of the edge point
+  index_type local_index; ///< Local element coordinates relative to chunk
 
   KokkosIndexType kokkos_index; ///< Kokkos index type
 };
@@ -200,16 +209,9 @@ public:
   const index_type operator()(const policy_index_type &i) const {
     const int iedge = i % nedges;
     const int ipoint = i / nedges;
-    const int ispec = edges(iedge).ispec;
-    const specfem::mesh_entity::dim2::type edge_type = edges(iedge).edge_type;
-    const auto index =
-        (edges(iedge).reverse_orientation)
-            ? ChunkEdgeIterator::compute_index(ispec, num_points - 1 - ipoint,
-                                               num_points, edge_type)
-            : ChunkEdgeIterator::compute_index(ispec, ipoint, num_points,
-                                               edge_type);
+    const auto edge = edges(iedge);
 
-    return index_type{ index, ipoint, iedge };
+    return index_type{ edge(ipoint), iedge, i };
   }
 
   /**
@@ -220,50 +222,15 @@ public:
    * @param npoints Number of GLL points per edge
    */
   KOKKOS_INLINE_FUNCTION
-  ChunkEdgeIterator(const TeamMemberType &team_member, const ViewType &edges,
-                    const int npoints)
-      : num_points(npoints), nedges(edges.extent(0)),
-        base_type(team_member, edges.extent(0) * npoints), edges(edges) {}
+  ChunkEdgeIterator(const TeamMemberType &team_member, const ViewType &edges_)
+      : num_points(edges_.n_points), nedges(edges_.n_edges),
+        base_type(team_member, edges_.n_edges * edges_.n_points),
+        edges(edges_) {}
 
   const int nedges; ///< Total number of edges in this chunk
 private:
   ViewType edges;         ///< View of mesh edges to iterate over
   std::size_t num_points; ///< Number of GLL points per edge
-
-  /**
-   * @brief Compute element coordinates for an edge point
-   *
-   * Maps edge point position to local element coordinates based on edge type.
-   * Handles different edge orientations (bottom, top, left, right).
-   *
-   * @param ispec Element index
-   * @param ipoint Point position along edge
-   * @param num_points Total points per edge
-   * @param edge Edge type (bottom, top, left, right)
-   * @return specfem::point::index Local element coordinates
-   */
-  KOKKOS_INLINE_FUNCTION
-  static specfem::point::index<DimensionTag, false>
-  compute_index(const int ispec, const int ipoint, const int num_points,
-                const specfem::mesh_entity::dim2::type edge) {
-    switch (edge) {
-    case specfem::mesh_entity::dim2::type::bottom:
-      return { ispec, 0, ipoint };
-      break;
-    case specfem::mesh_entity::dim2::type::top:
-      return { ispec, num_points - 1, ipoint };
-      break;
-    case specfem::mesh_entity::dim2::type::left:
-      return { ispec, ipoint, 0 };
-      break;
-    case specfem::mesh_entity::dim2::type::right:
-      return { ispec, ipoint, num_points - 1 };
-      break;
-    default:
-      DEVICE_ASSERT(false, "Invalid edge type");
-      return { 0, 0, 0 };
-    }
-  }
 };
 
 /**
@@ -358,9 +325,8 @@ public:
    * @param kokkos_index Kokkos team member responsible for this chunk
    */
   KOKKOS_INLINE_FUNCTION
-  ChunkEdgeIndex(const ViewType &edges, const int num_points,
-                 const KokkosIndexType &kokkos_index)
-      : kokkos_index(kokkos_index), iterator(kokkos_index, edges, num_points) {}
+  ChunkEdgeIndex(const ViewType &edges, const KokkosIndexType &kokkos_index)
+      : kokkos_index(kokkos_index), iterator(kokkos_index, edges) {}
 
   KOKKOS_INLINE_FUNCTION int nedges() const { return iterator.nedges; }
 
@@ -453,32 +419,32 @@ public:
                          ///< Evaluates to
                          ///< @c Kokkos::TeamPolicy::member_type
   using index_type =
-      ChunkEdgeIndex<ParallelConfig::dimension,
-                     decltype(Kokkos::subview(
-                         std::declval<ViewType>(),
-                         std::declval<Kokkos::pair<int, int> >())),
+      ChunkEdgeIndex<ParallelConfig::dimension, ViewType,
                      policy_index_type>; ///< Underlying index type. This index
                                          ///< will be passed to the closure when
                                          ///< calling @ref
                                          ///< specfem::execution::for_each_level
   using execution_space =
       typename base_type::execution_space; ///< Execution space type.
-  using base_index_type = specfem::point::edge_index<
-      ParallelConfig::dimension>; ///< Index type to be used when calling
-                                  ///< @ref specfem::execution::for_all
-                                  ///< with this iterator.
+  using base_index_type = EdgePointIndex<
+      ParallelConfig::dimension, int,
+      typename base_type::execution_space>; ///< Index type
+                                            ///< to be used
+                                            ///< when calling
+                                            ///< @ref
+                                            ///< specfem::execution::for_all
+                                            ///< with this
+                                            ///< iterator.
 
   /**
    * @brief Constructor with explicit edge view and point count
    *
    * @param edges View of mesh edges to process
-   * @param num_points Number of GLL points per edge
    */
-  ChunkedEdgeIterator(const ViewType edges, int num_points)
-      : edges(edges), num_points(num_points),
-        base_type(((edges.extent(0) / chunk_size) +
-                   ((edges.extent(0) % chunk_size) != 0)),
-                  Kokkos::AUTO, Kokkos::AUTO) {}
+  ChunkedEdgeIterator(const ViewType edges)
+      : edges(edges), base_type(((edges.n_edges / chunk_size) +
+                                 ((edges.n_edges % chunk_size) != 0)),
+                                Kokkos::AUTO, Kokkos::AUTO) {}
 
   /**
    * @brief Constructor with parallel configuration
@@ -486,11 +452,9 @@ public:
    * @param config Parallel configuration (unused but required for interface
    * compatibility)
    * @param edges View of mesh edges to process
-   * @param num_points Number of GLL points per edge
    */
-  ChunkedEdgeIterator(const ParallelConfig, const ViewType edges,
-                      int num_points)
-      : ChunkedEdgeIterator(edges, num_points) {}
+  ChunkedEdgeIterator(const ParallelConfig, const ViewType edges)
+      : ChunkedEdgeIterator(edges) {}
 
   /**
    * @brief Team operator for chunk processing
@@ -505,10 +469,9 @@ public:
   const index_type operator()(const policy_index_type &team) const {
     const auto league_id = team.league_rank();
     const int start = league_id * chunk_size;
-    const int end = (start + chunk_size < edges.extent(0)) ? start + chunk_size
-                                                           : edges.extent(0);
-    return index_type{ Kokkos::subview(edges, Kokkos::make_pair(start, end)),
-                       num_points, team };
+    const int end = (start + chunk_size < edges.n_edges) ? start + chunk_size
+                                                         : edges.n_edges;
+    return index_type{ edges(Kokkos::make_pair(start, end)), team };
   }
 
   /**
@@ -528,7 +491,6 @@ public:
 
 private:
   ViewType edges; ///< View of indices of edges within this iterator.
-  int num_points; ///< Number of GLL points on each edge
 };
 
 } // namespace specfem::execution

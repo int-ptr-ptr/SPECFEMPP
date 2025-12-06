@@ -8,13 +8,18 @@ message(STATUS "Configuring Boost library...")
 # Prepend the CMAKE_MESSAGE_INDENT variable to ensure proper indentation in messages
 list(APPEND CMAKE_MESSAGE_INDENT "  Boost: ")
 
-set(SAVE_UNITY_BUILD ${CMAKE_UNITY_BUILD})
-set(CMAKE_UNITY_BUILD OFF)
+# First, try to find Boost system-wide (unless force install is enabled)
+if(NOT SPECFEM_ENABLE_BOOST_FORCE_INSTALL)
+    find_package(Boost 1.85.0 QUIET COMPONENTS program_options filesystem system graph)
+endif()
 
-# Try finding boost and if not found install.
-find_package(Boost 1.85.0 QUIET COMPONENTS program_options filesystem system graph)
+# If not found or force install is enabled, fetch and build Boost from source
+if ((NOT Boost_FOUND) OR SPECFEM_ENABLE_BOOST_FORCE_INSTALL)
 
-if (NOT ${Boost_FOUND})
+    set(SAVE_UNITY_BUILD ${CMAKE_UNITY_BUILD})
+    set(CMAKE_UNITY_BUILD OFF)
+
+    message(STATUS "Installing Boost from GitHub release...")
     # Add boost lib sources
     set(BOOST_INCLUDE_LIBRARIES program_options filesystem system algorithm tokenizer preprocessor vmd graph)
     set(BOOST_ENABLE_CMAKE ON)
@@ -49,7 +54,14 @@ if (NOT ${Boost_FOUND})
     set(BOOST_LIBS Boost::program_options Boost::filesystem Boost::system
                    Boost::algorithm Boost::tokenizer Boost::preprocessor Boost::vmd Boost::graph)
 
-else()
+    message(STATUS "Boost downloaded and configured from source.")
+
+    # Restore the original unity build setting
+    set(CMAKE_UNITY_BUILD ${SAVE_UNITY_BUILD})
+    unset(SAVE_UNITY_BUILD)
+
+elseif(Boost_FOUND)
+    message(STATUS "Using system-wide Boost")
     # Create Boost::system target manually since it's header-only in newer versions
     if(NOT TARGET Boost::system)
         add_library(Boost::system INTERFACE IMPORTED)
@@ -63,6 +75,8 @@ else()
     message(STATUS "    LIB:   ${Boost_LIBRARY_DIRS}")
     message(STATUS "    INC:   ${Boost_INCLUDE_DIRS}")
     message(STATUS "    LIBSO: ${Boost_LIBRARIES}")
+else()
+    message(STATUS "Boost not found.")
 endif()
 
 # Create unified boost target for modern CMake usage
@@ -73,6 +87,3 @@ endif()
 
 # Pop the indentation for Boost messages
 list(POP_BACK CMAKE_MESSAGE_INDENT)
-
-set(CMAKE_UNITY_BUILD ${SAVE_UNITY_BUILD})
-unset(SAVE_UNITY_BUILD)

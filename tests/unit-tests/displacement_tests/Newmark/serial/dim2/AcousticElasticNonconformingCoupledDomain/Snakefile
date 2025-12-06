@@ -1,0 +1,57 @@
+# nonconformimg piggy-backs off of the conforming traces, so we skip specfem2d.smk
+# this is a modified verson of meshfem2d.smk
+
+envvars:
+    "SPECFEMPP_BINDIR",
+    "SPECFEMPP_SCRIPTS_DIR",
+
+pathvars:
+    cwd=os.getcwd()
+
+rule specfempp_external_mesher:
+    input:
+        topography="<cwd>/provenance/topography.dat",
+    output:
+        external_mesh=directory("<cwd>/specfem2d_workdir/MESH"),
+    shell:
+        """
+            python $SPECFEMPP_SCRIPTS_DIR/gmshlayerbuilder provenance/topography.dat specfem2d_workdir/MESH
+        """
+
+rule specfempp_mesher:
+    input:
+        par_file="<cwd>/provenance/Par_file",
+        external_mesh=rules.specfempp_external_mesher.output,
+        cwd="<cwd>/specfem2d_workdir",
+    output:
+        database="<cwd>/specfem2d_workdir/OUTPUT_FILES/database.bin",
+    shell:
+        """
+            cd {input.cwd}/MESH
+            $SPECFEMPP_BINDIR/xmeshfem2D -p {input.par_file}
+        """
+
+rule specfempp_move_database:
+    input:
+        database=rules.specfempp_mesher.output.database,
+    output:
+        database="<cwd>/database.bin",
+    shell:
+        """
+            mv {input.database} {output.database}
+        """
+
+rule all:
+    input:
+        database="<cwd>/database.bin",
+    localrule: True
+
+
+# from specfem2d.smk
+rule clean:
+    localrule: True
+    shell:
+        """
+            rm -rf specfem2d_workdir
+            rm -f database.bin
+        """

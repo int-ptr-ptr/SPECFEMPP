@@ -20,13 +20,14 @@ namespace medium {
  * putput by the mesher and read by the mesh reader.
  *
  */
-template <specfem::element::medium_tag MediumTag>
+template <specfem::dimension::type DimensionTag,
+          specfem::element::medium_tag MediumTag>
 class material<
-    MediumTag, specfem::element::property_tag::isotropic_cosserat,
+    DimensionTag, MediumTag, specfem::element::property_tag::isotropic_cosserat,
     std::enable_if_t<specfem::element::is_elastic<MediumTag>::value> > {
 public:
-  constexpr static auto dimension =
-      specfem::dimension::type::dim2;           ///< Dimension of the material
+  constexpr static auto dimension_tag =
+      DimensionTag;                             ///< Dimension of the material
   constexpr static auto medium_tag = MediumTag; ///< Medium tag
   constexpr static auto property_tag =
       specfem::element::property_tag::isotropic_cosserat; ///< Property tag
@@ -71,7 +72,7 @@ public:
    * @return true If the materials have the same properties
    */
   bool operator==(
-      const material<MediumTag,
+      const material<dimension_tag, medium_tag,
                      specfem::element::property_tag::isotropic_cosserat> &other)
       const {
 
@@ -92,7 +93,7 @@ public:
    * @return true If the materials have different properties
    */
   bool operator!=(
-      const material<specfem::element::medium_tag::elastic_psv_t,
+      const material<dimension_tag, specfem::element::medium_tag::elastic_psv_t,
                      specfem::element::property_tag::isotropic_cosserat> &other)
       const {
     return !(*this == other);
@@ -103,7 +104,8 @@ public:
    *
    * @return specfem::point::properties Material properties
    */
-  inline specfem::point::properties<dimension, medium_tag, property_tag, false>
+  inline specfem::point::properties<dimension_tag, medium_tag, property_tag,
+                                    false>
   get_properties() const {
     return { rho, kappa, mu, nu, j, lambda_c, mu_c, nu_c };
   }

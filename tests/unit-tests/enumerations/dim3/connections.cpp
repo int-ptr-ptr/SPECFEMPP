@@ -15,20 +15,20 @@
 
 namespace specfem::connections_test {
 
-enum class Axes { X, Y, Z };
+enum class Axes2D { X, Y, Z };
 
-struct Coordinate {
+struct Coordinate3D {
   type_real x;
   type_real y;
   type_real z;
 
-  Coordinate() : x(0.0), y(0.0), z(0.0) {}
+  Coordinate3D() : x(0.0), y(0.0), z(0.0) {}
 
-  Coordinate(const type_real x_val, const type_real y_val,
-             const type_real z_val)
+  Coordinate3D(const type_real x_val, const type_real y_val,
+               const type_real z_val)
       : x(x_val), y(y_val), z(z_val) {}
 
-  bool operator==(const Coordinate &other) const {
+  bool operator==(const Coordinate3D &other) const {
     return specfem::utilities::is_close(x, other.x) &&
            specfem::utilities::is_close(y, other.y) &&
            specfem::utilities::is_close(z, other.z);
@@ -66,12 +66,12 @@ struct Coordinate {
  * @endcode
  *
  */
-struct TestElement {
+struct TestElement3D {
   Kokkos::View<int *, Kokkos::HostSpace> control_nodes;
 
-  TestElement() : control_nodes("control_nodes", 8) {}
+  TestElement3D() : control_nodes("control_nodes", 8) {}
 
-  TestElement(const std::array<int, 8> nodes)
+  TestElement3D(const std::array<int, 8> nodes)
       : control_nodes("control_nodes", 8) {
     for (int i = 0; i < 8; ++i) {
       this->control_nodes(i) = nodes[i];
@@ -83,7 +83,7 @@ struct TestElement {
     if (from == to)
       return; // No rotation needed
     // Determine rotation axis and number of 90-degree rotations needed
-    std::vector<Axes> axes;
+    std::vector<Axes2D> axes;
     // 3 rotation along x-axis
     if ((from == specfem::mesh_entity::dim3::type::top &&
          to == specfem::mesh_entity::dim3::type::back) ||
@@ -93,7 +93,7 @@ struct TestElement {
          to == specfem::mesh_entity::dim3::type::front) ||
         (from == specfem::mesh_entity::dim3::type::front &&
          to == specfem::mesh_entity::dim3::type::top)) {
-      axes.push_back(Axes::X);
+      axes.push_back(Axes2D::X);
     }
     // 3 rotation along y-axis
     else if ((from == specfem::mesh_entity::dim3::type::top &&
@@ -104,7 +104,7 @@ struct TestElement {
               to == specfem::mesh_entity::dim3::type::right) ||
              (from == specfem::mesh_entity::dim3::type::right &&
               to == specfem::mesh_entity::dim3::type::top)) {
-      axes.push_back(Axes::Y);
+      axes.push_back(Axes2D::Y);
     }
     // 3 rotation along z-axis
     else if ((from == specfem::mesh_entity::dim3::type::front &&
@@ -115,27 +115,27 @@ struct TestElement {
               to == specfem::mesh_entity::dim3::type::right) ||
              (from == specfem::mesh_entity::dim3::type::right &&
               to == specfem::mesh_entity::dim3::type::front)) {
-      axes.push_back(Axes::Z);
+      axes.push_back(Axes2D::Z);
     }
     // opposite faces - two rotations along any axis
     else if ((from == specfem::mesh_entity::dim3::type::top &&
               to == specfem::mesh_entity::dim3::type::bottom) ||
              (from == specfem::mesh_entity::dim3::type::bottom &&
               to == specfem::mesh_entity::dim3::type::top)) {
-      axes.push_back(Axes::X);
-      axes.push_back(Axes::X);
+      axes.push_back(Axes2D::X);
+      axes.push_back(Axes2D::X);
     } else if ((from == specfem::mesh_entity::dim3::type::left &&
                 to == specfem::mesh_entity::dim3::type::right) ||
                (from == specfem::mesh_entity::dim3::type::right &&
                 to == specfem::mesh_entity::dim3::type::left)) {
-      axes.push_back(Axes::Y);
-      axes.push_back(Axes::Y);
+      axes.push_back(Axes2D::Y);
+      axes.push_back(Axes2D::Y);
     } else if ((from == specfem::mesh_entity::dim3::type::front &&
                 to == specfem::mesh_entity::dim3::type::back) ||
                (from == specfem::mesh_entity::dim3::type::back &&
                 to == specfem::mesh_entity::dim3::type::front)) {
-      axes.push_back(Axes::Z);
-      axes.push_back(Axes::Z);
+      axes.push_back(Axes2D::Z);
+      axes.push_back(Axes2D::Z);
     }
     // 3 rotations along x-axis
     else if ((from == specfem::mesh_entity::dim3::type::back &&
@@ -146,9 +146,9 @@ struct TestElement {
               to == specfem::mesh_entity::dim3::type::bottom) ||
              (from == specfem::mesh_entity::dim3::type::top &&
               to == specfem::mesh_entity::dim3::type::front)) {
-      axes.push_back(Axes::X);
-      axes.push_back(Axes::X);
-      axes.push_back(Axes::X);
+      axes.push_back(Axes2D::X);
+      axes.push_back(Axes2D::X);
+      axes.push_back(Axes2D::X);
     }
     // 3 rotations along y-axis
     else if ((from == specfem::mesh_entity::dim3::type::left &&
@@ -159,9 +159,9 @@ struct TestElement {
               to == specfem::mesh_entity::dim3::type::bottom) ||
              (from == specfem::mesh_entity::dim3::type::top &&
               to == specfem::mesh_entity::dim3::type::right)) {
-      axes.push_back(Axes::Y);
-      axes.push_back(Axes::Y);
-      axes.push_back(Axes::Y);
+      axes.push_back(Axes2D::Y);
+      axes.push_back(Axes2D::Y);
+      axes.push_back(Axes2D::Y);
     }
     // 3 rotations along z-axis
     else if ((from == specfem::mesh_entity::dim3::type::left &&
@@ -172,9 +172,9 @@ struct TestElement {
               to == specfem::mesh_entity::dim3::type::back) ||
              (from == specfem::mesh_entity::dim3::type::front &&
               to == specfem::mesh_entity::dim3::type::right)) {
-      axes.push_back(Axes::Z);
-      axes.push_back(Axes::Z);
-      axes.push_back(Axes::Z);
+      axes.push_back(Axes2D::Z);
+      axes.push_back(Axes2D::Z);
+      axes.push_back(Axes2D::Z);
     } else {
       throw std::runtime_error("Invalid rotation from " +
                                specfem::mesh_entity::dim3::to_string(from) +
@@ -189,15 +189,15 @@ struct TestElement {
   }
 
 private:
-  void rotate(const Axes axis) {
+  void rotate(const Axes2D axis) {
     switch (axis) {
-    case Axes::X:
+    case Axes2D::X:
       rotate_x();
       break;
-    case Axes::Y:
+    case Axes2D::Y:
       rotate_y();
       break;
-    case Axes::Z:
+    case Axes2D::Z:
       rotate_z();
       break;
     default:
@@ -254,7 +254,7 @@ private:
   }
 };
 
-std::vector<int> get_nodes(const TestElement &element,
+std::vector<int> get_nodes(const TestElement3D &element,
                            const specfem::mesh_entity::dim3::type &entity) {
   if (specfem::mesh_entity::contains(specfem::mesh_entity::dim3::edges,
                                      entity)) {
@@ -271,39 +271,41 @@ std::vector<int> get_nodes(const TestElement &element,
 }
 
 // Define 12 nodes
-const static std::array<specfem::connections_test::Coordinate, 12>
-    coordinates = {
+const static std::array<specfem::connections_test::Coordinate3D, 12>
+    coordinates3D = {
       // z = 0.0 plane
-      specfem::connections_test::Coordinate{ 0.0, 0.0, 0.0 },
-      specfem::connections_test::Coordinate{ 1.0, 0.0, 0.0 },
-      specfem::connections_test::Coordinate{ 1.0, 1.0, 0.0 },
-      specfem::connections_test::Coordinate{ 0.0, 1.0, 0.0 },
+      specfem::connections_test::Coordinate3D{ 0.0, 0.0, 0.0 },
+      specfem::connections_test::Coordinate3D{ 1.0, 0.0, 0.0 },
+      specfem::connections_test::Coordinate3D{ 1.0, 1.0, 0.0 },
+      specfem::connections_test::Coordinate3D{ 0.0, 1.0, 0.0 },
       // z = 1.0 plane
-      specfem::connections_test::Coordinate{ 0.0, 0.0, 1.0 },
-      specfem::connections_test::Coordinate{ 1.0, 0.0, 1.0 },
-      specfem::connections_test::Coordinate{ 1.0, 1.0, 1.0 },
-      specfem::connections_test::Coordinate{ 0.0, 1.0, 1.0 },
+      specfem::connections_test::Coordinate3D{ 0.0, 0.0, 1.0 },
+      specfem::connections_test::Coordinate3D{ 1.0, 0.0, 1.0 },
+      specfem::connections_test::Coordinate3D{ 1.0, 1.0, 1.0 },
+      specfem::connections_test::Coordinate3D{ 0.0, 1.0, 1.0 },
       // z = 2.0 plane
-      specfem::connections_test::Coordinate{ 0.0, 0.0, 2.0 },
-      specfem::connections_test::Coordinate{ 1.0, 0.0, 2.0 },
-      specfem::connections_test::Coordinate{ 1.0, 1.0, 2.0 },
-      specfem::connections_test::Coordinate{ 0.0, 1.0, 2.0 },
+      specfem::connections_test::Coordinate3D{ 0.0, 0.0, 2.0 },
+      specfem::connections_test::Coordinate3D{ 1.0, 0.0, 2.0 },
+      specfem::connections_test::Coordinate3D{ 1.0, 1.0, 2.0 },
+      specfem::connections_test::Coordinate3D{ 0.0, 1.0, 2.0 },
     };
 
 } // namespace specfem::connections_test
 
-struct ConnectionTestConfig {
+struct ConnectionTest3DConfig {
   specfem::mesh_entity::dim3::type entity1;
   specfem::mesh_entity::dim3::type entity2;
   std::string name;
 };
 
-std::ostream &operator<<(std::ostream &os, const ConnectionTestConfig &config) {
+std::ostream &operator<<(std::ostream &os,
+                         const ConnectionTest3DConfig &config) {
   os << config.name;
   return os;
 }
 
-class CoupledElements : public ::testing::TestWithParam<ConnectionTestConfig> {
+class CoupledElements3D
+    : public ::testing::TestWithParam<ConnectionTest3DConfig> {
 protected:
   void SetUp() override {
     const auto &config = GetParam();
@@ -325,24 +327,24 @@ protected:
 public:
   // Define two elements s.t. element1's top face coincides with element2's
   // bottom face
-  CoupledElements()
+  CoupledElements3D()
       : element1({ 0, 1, 2, 3, 4, 5, 6, 7 }),
         element2({ 4, 5, 6, 7, 8, 9, 10, 11 }) {}
 
-  ~CoupledElements() override = default;
+  ~CoupledElements3D() override = default;
 
-  specfem::connections_test::TestElement element1;
-  specfem::connections_test::TestElement element2;
+  specfem::connections_test::TestElement3D element1;
+  specfem::connections_test::TestElement3D element2;
 
   std::array<specfem::mesh_entity::dim3::type, 4> edges_on_face1;
   std::array<specfem::mesh_entity::dim3::type, 4> edges_on_face2;
 };
 
-Kokkos::View<specfem::connections_test::Coordinate ***, Kokkos::HostSpace>
-compute_coordinates(const specfem::connections_test::TestElement &element) {
+Kokkos::View<specfem::connections_test::Coordinate3D ***, Kokkos::HostSpace>
+compute_coordinates3D(const specfem::connections_test::TestElement3D &element) {
   const int ncontrol_nodes = 8;
   const int ngll = 5; // 5 GLL points per direction
-  Kokkos::View<specfem::connections_test::Coordinate ***, Kokkos::HostSpace>
+  Kokkos::View<specfem::connections_test::Coordinate3D ***, Kokkos::HostSpace>
       coords("coords", ngll, ngll, ngll);
 
   const specfem::quadrature::gll::gll quadrature(0.0, 0.0, ngll);
@@ -362,15 +364,18 @@ compute_coordinates(const specfem::connections_test::TestElement &element) {
         type_real y = 0.0;
         type_real z = 0.0;
         for (int a = 0; a < ncontrol_nodes; ++a) {
-          x += shape_function[a] *
-               specfem::connections_test::coordinates[element.control_nodes[a]]
-                   .x;
-          y += shape_function[a] *
-               specfem::connections_test::coordinates[element.control_nodes[a]]
-                   .y;
-          z += shape_function[a] *
-               specfem::connections_test::coordinates[element.control_nodes[a]]
-                   .z;
+          x +=
+              shape_function[a] *
+              specfem::connections_test::coordinates3D[element.control_nodes[a]]
+                  .x;
+          y +=
+              shape_function[a] *
+              specfem::connections_test::coordinates3D[element.control_nodes[a]]
+                  .y;
+          z +=
+              shape_function[a] *
+              specfem::connections_test::coordinates3D[element.control_nodes[a]]
+                  .z;
         }
         coords(iz, iy, ix) = { x, y, z };
       }
@@ -380,7 +385,7 @@ compute_coordinates(const specfem::connections_test::TestElement &element) {
   return coords;
 }
 
-TEST_P(CoupledElements, FaceConnections) {
+TEST_P(CoupledElements3D, FaceConnections) {
   const auto &config = GetParam();
   // Create connection mapping between the two elements
   specfem::mesh_entity::element mapping(5, 5, 5);
@@ -390,8 +395,8 @@ TEST_P(CoupledElements, FaceConnections) {
 
   const int num_points =
       mapping.number_of_points_on_orientation(config.entity1);
-  const auto element_coord1 = compute_coordinates(element1);
-  const auto element_coord2 = compute_coordinates(element2);
+  const auto element_coord1 = compute_coordinates3D(element1);
+  const auto element_coord2 = compute_coordinates3D(element2);
   for (int ipoint = 0; ipoint < num_points; ++ipoint) {
     const auto [iz1, iy1, ix1] =
         mapping.map_coordinates(config.entity1, ipoint);
@@ -400,9 +405,9 @@ TEST_P(CoupledElements, FaceConnections) {
 
     const auto coordinate1 = element_coord1(iz1, iy1, ix1);
     const auto coordinate2 = element_coord2(iz2, iy2, ix2);
-    // Verify that the coordinates match on the shared face
+    // Verify that the coordinates3D match on the shared face
     EXPECT_TRUE(coordinate1 == coordinate2)
-        << "Mapped coordinates do not match for point index " << ipoint
+        << "Mapped coordinates3D do not match for point index " << ipoint
         << " on entities "
         << specfem::mesh_entity::dim3::to_string(config.entity1) << " and "
         << specfem::mesh_entity::dim3::to_string(config.entity2) << ".\n"
@@ -413,7 +418,7 @@ TEST_P(CoupledElements, FaceConnections) {
   }
 }
 
-TEST_P(CoupledElements, EdgeConnections) {
+TEST_P(CoupledElements3D, EdgeConnections) {
   const auto &config = GetParam();
   // Create connection mapping between the two elements
   specfem::mesh_entity::element mapping(5, 5, 5);
@@ -423,8 +428,8 @@ TEST_P(CoupledElements, EdgeConnections) {
 
   // Test edge connections
 
-  const auto element_coord1 = compute_coordinates(element1);
-  const auto element_coord2 = compute_coordinates(element2);
+  const auto element_coord1 = compute_coordinates3D(element1);
+  const auto element_coord2 = compute_coordinates3D(element2);
   for (const auto edge1 : edges_on_face1) {
     for (const auto edge2 : edges_on_face2) {
       if (specfem::connections_test::get_nodes(element1, edge1) ==
@@ -437,9 +442,9 @@ TEST_P(CoupledElements, EdgeConnections) {
 
           const auto coordinate1 = element_coord1(iz1, iy1, ix1);
           const auto coordinate2 = element_coord2(iz2, iy2, ix2);
-          // Verify that the coordinates match on the shared edge
+          // Verify that the coordinates3D match on the shared edge
           EXPECT_TRUE(coordinate1 == coordinate2)
-              << "Mapped coordinates do not match for point index " << ipoint
+              << "Mapped coordinates3D do not match for point index " << ipoint
               << " on edges " << specfem::mesh_entity::dim3::to_string(edge1)
               << " and " << specfem::mesh_entity::dim3::to_string(edge2)
               << ".\n"
@@ -453,7 +458,7 @@ TEST_P(CoupledElements, EdgeConnections) {
   }
 }
 
-TEST_P(CoupledElements, NodeConnections) {
+TEST_P(CoupledElements3D, NodeConnections) {
   const auto &config = GetParam();
   // Create connection mapping between the two elements
   specfem::mesh_entity::element mapping(5, 5, 5);
@@ -461,22 +466,22 @@ TEST_P(CoupledElements, NodeConnections) {
   specfem::connections::connection_mapping<specfem::dimension::type::dim3>
       connection(5, 5, 5, element1.control_nodes, element2.control_nodes);
 
-  const auto element_coord1 = compute_coordinates(element1);
-  const auto element_coord2 = compute_coordinates(element2);
+  const auto element_coord1 = compute_coordinates3D(element1);
+  const auto element_coord2 = compute_coordinates3D(element2);
   for (const auto node1 :
        specfem::mesh_entity::corners_of_face(config.entity1)) {
     for (const auto node2 :
          specfem::mesh_entity::corners_of_face(config.entity2)) {
       if (specfem::connections_test::get_nodes(element1, node1) ==
           specfem::connections_test::get_nodes(element2, node2)) {
-        // Get local coordinates of the nodes
+        // Get local coordinates3D of the nodes
         const auto [iz1, iy1, ix1] = mapping.map_coordinates(node1);
         const auto [iz2, iy2, ix2] = connection.map_coordinates(node1, node2);
         const auto coordinate1 = element_coord1(iz1, iy1, ix1);
         const auto coordinate2 = element_coord2(iz2, iy2, ix2);
-        // Verify that the coordinates match on the shared node
+        // Verify that the coordinates3D match on the shared node
         EXPECT_TRUE(coordinate1 == coordinate2)
-            << "Mapped coordinates do not match for node "
+            << "Mapped coordinates3D do not match for node "
             << specfem::mesh_entity::dim3::to_string(node1) << " on entities "
             << specfem::mesh_entity::dim3::to_string(config.entity1) << " and "
             << specfem::mesh_entity::dim3::to_string(config.entity2) << ".\n"
@@ -490,113 +495,113 @@ TEST_P(CoupledElements, NodeConnections) {
 }
 
 INSTANTIATE_TEST_SUITE_P(
-    ConnectionTest, CoupledElements,
+    ConnectionTest3D, CoupledElements3D,
     ::testing::Values(
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::top,
-                              specfem::mesh_entity::dim3::type::bottom,
-                              "Top-Bottom" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::top,
-                              specfem::mesh_entity::dim3::type::front,
-                              "Top-Front" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::top,
-                              specfem::mesh_entity::dim3::type::back,
-                              "Top-Back" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::top,
-                              specfem::mesh_entity::dim3::type::left,
-                              "Top-Left" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::top,
-                              specfem::mesh_entity::dim3::type::right,
-                              "Top-Right" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::top,
-                              specfem::mesh_entity::dim3::type::top,
-                              "Top-Top" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::bottom,
-                              specfem::mesh_entity::dim3::type::top,
-                              "Bottom-Top" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::bottom,
-                              specfem::mesh_entity::dim3::type::front,
-                              "Bottom-Front" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::bottom,
-                              specfem::mesh_entity::dim3::type::back,
-                              "Bottom-Back" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::bottom,
-                              specfem::mesh_entity::dim3::type::left,
-                              "Bottom-Left" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::bottom,
-                              specfem::mesh_entity::dim3::type::right,
-                              "Bottom-Right" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::bottom,
-                              specfem::mesh_entity::dim3::type::bottom,
-                              "Bottom-Bottom" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::front,
-                              specfem::mesh_entity::dim3::type::top,
-                              "Front-Top" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::front,
-                              specfem::mesh_entity::dim3::type::bottom,
-                              "Front-Bottom" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::front,
-                              specfem::mesh_entity::dim3::type::front,
-                              "Front-Front" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::front,
-                              specfem::mesh_entity::dim3::type::back,
-                              "Front-Back" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::front,
-                              specfem::mesh_entity::dim3::type::left,
-                              "Front-Left" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::front,
-                              specfem::mesh_entity::dim3::type::right,
-                              "Front-Right" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::back,
-                              specfem::mesh_entity::dim3::type::top,
-                              "Back-Top" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::back,
-                              specfem::mesh_entity::dim3::type::bottom,
-                              "Back-Bottom" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::back,
-                              specfem::mesh_entity::dim3::type::front,
-                              "Back-Front" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::back,
-                              specfem::mesh_entity::dim3::type::back,
-                              "Back-Back" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::back,
-                              specfem::mesh_entity::dim3::type::left,
-                              "Back-Left" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::back,
-                              specfem::mesh_entity::dim3::type::right,
-                              "Back-Right" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::left,
-                              specfem::mesh_entity::dim3::type::top,
-                              "Left-Top" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::left,
-                              specfem::mesh_entity::dim3::type::bottom,
-                              "Left-Bottom" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::left,
-                              specfem::mesh_entity::dim3::type::front,
-                              "Left-Front" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::left,
-                              specfem::mesh_entity::dim3::type::back,
-                              "Left-Back" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::left,
-                              specfem::mesh_entity::dim3::type::left,
-                              "Left-Left" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::left,
-                              specfem::mesh_entity::dim3::type::right,
-                              "Left-Right" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::right,
-                              specfem::mesh_entity::dim3::type::top,
-                              "Right-Top" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::right,
-                              specfem::mesh_entity::dim3::type::bottom,
-                              "Right-Bottom" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::right,
-                              specfem::mesh_entity::dim3::type::front,
-                              "Right-Front" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::right,
-                              specfem::mesh_entity::dim3::type::back,
-                              "Right-Back" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::right,
-                              specfem::mesh_entity::dim3::type::left,
-                              "Right-Left" },
-        ConnectionTestConfig{ specfem::mesh_entity::dim3::type::right,
-                              specfem::mesh_entity::dim3::type::right,
-                              "Right-Right" }));
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::top,
+                                specfem::mesh_entity::dim3::type::bottom,
+                                "Top-Bottom" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::top,
+                                specfem::mesh_entity::dim3::type::front,
+                                "Top-Front" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::top,
+                                specfem::mesh_entity::dim3::type::back,
+                                "Top-Back" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::top,
+                                specfem::mesh_entity::dim3::type::left,
+                                "Top-Left" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::top,
+                                specfem::mesh_entity::dim3::type::right,
+                                "Top-Right" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::top,
+                                specfem::mesh_entity::dim3::type::top,
+                                "Top-Top" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::bottom,
+                                specfem::mesh_entity::dim3::type::top,
+                                "Bottom-Top" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::bottom,
+                                specfem::mesh_entity::dim3::type::front,
+                                "Bottom-Front" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::bottom,
+                                specfem::mesh_entity::dim3::type::back,
+                                "Bottom-Back" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::bottom,
+                                specfem::mesh_entity::dim3::type::left,
+                                "Bottom-Left" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::bottom,
+                                specfem::mesh_entity::dim3::type::right,
+                                "Bottom-Right" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::bottom,
+                                specfem::mesh_entity::dim3::type::bottom,
+                                "Bottom-Bottom" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::front,
+                                specfem::mesh_entity::dim3::type::top,
+                                "Front-Top" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::front,
+                                specfem::mesh_entity::dim3::type::bottom,
+                                "Front-Bottom" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::front,
+                                specfem::mesh_entity::dim3::type::front,
+                                "Front-Front" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::front,
+                                specfem::mesh_entity::dim3::type::back,
+                                "Front-Back" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::front,
+                                specfem::mesh_entity::dim3::type::left,
+                                "Front-Left" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::front,
+                                specfem::mesh_entity::dim3::type::right,
+                                "Front-Right" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::back,
+                                specfem::mesh_entity::dim3::type::top,
+                                "Back-Top" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::back,
+                                specfem::mesh_entity::dim3::type::bottom,
+                                "Back-Bottom" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::back,
+                                specfem::mesh_entity::dim3::type::front,
+                                "Back-Front" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::back,
+                                specfem::mesh_entity::dim3::type::back,
+                                "Back-Back" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::back,
+                                specfem::mesh_entity::dim3::type::left,
+                                "Back-Left" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::back,
+                                specfem::mesh_entity::dim3::type::right,
+                                "Back-Right" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::left,
+                                specfem::mesh_entity::dim3::type::top,
+                                "Left-Top" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::left,
+                                specfem::mesh_entity::dim3::type::bottom,
+                                "Left-Bottom" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::left,
+                                specfem::mesh_entity::dim3::type::front,
+                                "Left-Front" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::left,
+                                specfem::mesh_entity::dim3::type::back,
+                                "Left-Back" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::left,
+                                specfem::mesh_entity::dim3::type::left,
+                                "Left-Left" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::left,
+                                specfem::mesh_entity::dim3::type::right,
+                                "Left-Right" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::right,
+                                specfem::mesh_entity::dim3::type::top,
+                                "Right-Top" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::right,
+                                specfem::mesh_entity::dim3::type::bottom,
+                                "Right-Bottom" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::right,
+                                specfem::mesh_entity::dim3::type::front,
+                                "Right-Front" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::right,
+                                specfem::mesh_entity::dim3::type::back,
+                                "Right-Back" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::right,
+                                specfem::mesh_entity::dim3::type::left,
+                                "Right-Left" },
+        ConnectionTest3DConfig{ specfem::mesh_entity::dim3::type::right,
+                                specfem::mesh_entity::dim3::type::right,
+                                "Right-Right" }));

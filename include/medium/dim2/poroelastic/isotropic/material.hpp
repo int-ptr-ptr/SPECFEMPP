@@ -17,12 +17,12 @@ namespace medium {
  * properties
  *
  */
-template <>
-class material<specfem::element::medium_tag::poroelastic,
+template <specfem::dimension::type DimensionTag>
+class material<DimensionTag, specfem::element::medium_tag::poroelastic,
                specfem::element::property_tag::isotropic> {
 public:
-  constexpr static auto dimension =
-      specfem::dimension::type::dim2; ///< Dimension of the material
+  constexpr static auto dimension_tag =
+      DimensionTag; ///< Dimension of the material
   constexpr static auto medium_tag =
       specfem::element::medium_tag::poroelastic; ///< Medium tag
   constexpr static auto property_tag =
@@ -73,7 +73,7 @@ public:
    * @return true If the materials have the same properties
    */
   bool operator==(
-      const material<specfem::element::medium_tag::poroelastic,
+      const material<dimension_tag, specfem::element::medium_tag::poroelastic,
                      specfem::element::property_tag::isotropic> &other) const {
     return (std::abs(this->rhos - other.rhos) < 1e-6 &&
             std::abs(this->rhof - other.rhof) < 1e-6 &&
@@ -97,12 +97,13 @@ public:
    * @return true If the materials have different properties
    */
   bool operator!=(
-      const material<specfem::element::medium_tag::poroelastic,
+      const material<dimension_tag, specfem::element::medium_tag::poroelastic,
                      specfem::element::property_tag::isotropic> &other) const {
     return !(*this == other);
   }
 
-  inline specfem::point::properties<dimension, medium_tag, property_tag, false>
+  inline specfem::point::properties<dimension_tag, medium_tag, property_tag,
+                                    false>
   get_properties() const {
 
     const type_real phi = this->phi;

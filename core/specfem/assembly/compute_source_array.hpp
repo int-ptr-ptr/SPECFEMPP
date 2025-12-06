@@ -1,6 +1,5 @@
 #pragma once
 
-#include "enumerations/macros.hpp"
 #include "kokkos_abstractions.h"
 #include "specfem/assembly/element_types.hpp"
 #include "specfem/assembly/jacobian_matrix.hpp"

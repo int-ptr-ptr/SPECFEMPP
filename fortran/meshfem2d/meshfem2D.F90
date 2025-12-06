@@ -427,6 +427,20 @@ program meshfem2D
          write(IMAIN,*) 'Mesh from external meshing:'
          call flush_IMAIN()
 
+         write(IMAIN,*) 'Has nummaterial_velocity_file = ', has_nummaterial_velocity_file
+         ! reads material definitions in external file
+         if (has_nummaterial_velocity_file) then
+            call read_external_material_properties(nummaterial_velocity_file)
+         else
+            ! reads material properties from Par_file
+            ! re-opens file Par_file
+            call open_parameter_file()
+            ! reads material definitions
+            call read_material_table()
+            ! closes file Par_file
+            call close_parameter_file()
+         endif
+
          ! reads in mesh
          call read_external_mesh_file(mesh_file, remove_min_to_start_at_zero, NGNOD)
 
@@ -434,10 +448,47 @@ program meshfem2D
          call read_external_materials_file(materials_file)
 
       else
+
          ! internal meshing
          ! user output
          write(IMAIN,*)
          write(IMAIN,*) 'Mesh from internal meshing:'
+         call flush_IMAIN()
+
+
+         ! re-opens file Par_file
+         call open_parameter_file()
+
+         ! reads material definitions
+         call read_material_table()
+
+         ! mesher reads in internal region table for setting up mesh elements
+         ! reads interface definitions from interface file (we need to have nxread & nzread value for checking regions)
+         call read_interfaces_file()
+
+         ! internal meshing
+         nx_elem_internal = nxread
+         nz_elem_internal = nzread
+
+         ! setup mesh array
+         ! multiply by 2 if elements have 9 nodes
+         if (NGNOD == 9) then
+         nx_elem_internal = nx_elem_internal * 2
+         nz_elem_internal = nz_elem_internal * 2
+         nz_layer(:) = nz_layer(:) * 2
+         endif
+
+         ! total number of elements
+         nelmnts = nxread * nzread
+
+         ! reads material regions defined in Par_file
+         call read_regions()
+
+         ! closes file Par_file
+         call close_parameter_file()
+
+         ! user output
+         write(IMAIN,*) 'creating mesh from internal meshing:'
          call flush_IMAIN()
 
          allocate(elmnts(0:NGNOD*nelmnts-1),stat=ier)

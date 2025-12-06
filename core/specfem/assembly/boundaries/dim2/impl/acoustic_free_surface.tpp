@@ -5,8 +5,8 @@
 #include <vector>
 
 #include "acoustic_free_surface.hpp"
-#include "macros.hpp"
 #include "utilities.hpp"
+#include "specfem/macros.hpp"
 
 specfem::assembly::boundaries_impl::acoustic_free_surface<specfem::dimension::type::dim2>::
     acoustic_free_surface(
@@ -68,8 +68,10 @@ specfem::assembly::boundaries_impl::acoustic_free_surface<specfem::dimension::ty
     ++total_indices;
   }
 
-  ASSERT(total_indices == total_acfree_surface_elements,
-         "Total indices do not match");
+  if (total_indices != total_acfree_surface_elements) {
+    KOKKOS_ABORT_WITH_LOCATION(
+        "Error: Mismatch in total acoustic free surface elements");
+  }
 
   // -------------------------------------------------------------------
 

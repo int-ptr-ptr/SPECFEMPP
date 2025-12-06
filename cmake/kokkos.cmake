@@ -1,5 +1,11 @@
 
 
+if (DEFINED Kokkos_ROOT)
+    message(STATUS "Using user-defined Kokkos root: ${Kokkos_ROOT}")
+    find_package(Kokkos REQUIRED PATHS ${Kokkos_ROOT} NO_DEFAULT_PATH)
+    return()
+endif()
+
 message(STATUS "Configuring Kokkos library...")
 
 # Prepend the CMAKE_MESSAGE_INDENT variable to ensure proper indentation in messages
@@ -27,26 +33,33 @@ if (CMAKE_VERSION VERSION_GREATER "3.30.0")
     endif()
 endif()
 
-set(KOKKOS_VERSION "4.7.00")
-
-# Set common FetchContent parameters
-set(KOKKOS_URL "https://github.com/kokkos/kokkos/archive/refs/tags/${KOKKOS_VERSION}.zip")
-
-# For CMake versions < 3.28, EXCLUDE_FROM_ALL is not supported in FetchContent_Declare
-if (CMAKE_VERSION VERSION_LESS "3.28.0")
-    FetchContent_Declare(kokkos DOWNLOAD_EXTRACT_TIMESTAMP FALSE URL ${KOKKOS_URL})
-
-    FetchContent_GetProperties(kokkos)
-    if(NOT kokkos_POPULATED)
-        FetchContent_Populate(kokkos)
-        add_subdirectory(${kokkos_SOURCE_DIR} ${kokkos_BINARY_DIR} EXCLUDE_FROM_ALL)
-    endif()
-
-# For CMake versions >= 3.28, EXCLUDE_FROM_ALL is supported in FetchContent_Declare
+if (DEFINED KOKKOS_PATH)
+    message(STATUS "Using Kokkos from KOKKOS_PATH: ${KOKKOS_PATH}")
+    add_subdirectory(${KOKKOS_PATH} ${CMAKE_CURRENT_BINARY_DIR}/kokkos EXCLUDE_FROM_ALL)
+    # Pop the indentation for Kokkos messages
 else()
 
-    FetchContent_Declare(kokkos DOWNLOAD_EXTRACT_TIMESTAMP FALSE URL ${KOKKOS_URL} EXCLUDE_FROM_ALL)
-    FetchContent_MakeAvailable(kokkos)
+    set(KOKKOS_VERSION "4.7.00")
+
+    # Set common FetchContent parameters
+    set(KOKKOS_URL "https://github.com/kokkos/kokkos/archive/refs/tags/${KOKKOS_VERSION}.zip")
+
+    # For CMake versions < 3.28, EXCLUDE_FROM_ALL is not supported in FetchContent_Declare
+    if (CMAKE_VERSION VERSION_LESS "3.28.0")
+        FetchContent_Declare(kokkos DOWNLOAD_EXTRACT_TIMESTAMP FALSE URL ${KOKKOS_URL})
+
+        FetchContent_GetProperties(kokkos)
+        if(NOT kokkos_POPULATED)
+            FetchContent_Populate(kokkos)
+            add_subdirectory(${kokkos_SOURCE_DIR} ${kokkos_BINARY_DIR} EXCLUDE_FROM_ALL)
+        endif()
+
+    # For CMake versions >= 3.28, EXCLUDE_FROM_ALL is supported in FetchContent_Declare
+    else()
+
+        FetchContent_Declare(kokkos DOWNLOAD_EXTRACT_TIMESTAMP FALSE URL ${KOKKOS_URL} EXCLUDE_FROM_ALL)
+        FetchContent_MakeAvailable(kokkos)
+    endif()
 endif()
 
 # Pop the indentation for Kokkos messages

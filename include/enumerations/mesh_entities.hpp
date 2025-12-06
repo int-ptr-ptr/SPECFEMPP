@@ -33,6 +33,8 @@ element_grid(const int, const int)
 element_grid(const int, const int, const int)
     -> element_grid<specfem::dimension::type::dim3>;
 
+element(const int, const int) -> element<specfem::dimension::type::dim2>;
+
 element(const int, const int, const int)
     -> element<specfem::dimension::type::dim3>;
 } // namespace specfem::mesh_entity

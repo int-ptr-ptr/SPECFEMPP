@@ -1,7 +1,7 @@
 #include "enumerations/interface.hpp"
-#include "enumerations/material_definitions.hpp"
 #include "helper.hpp"
 #include "specfem/assembly/assembly.hpp"
+#include "specfem/macros.hpp"
 #include <Kokkos_Core.hpp>
 #include <stdexcept>
 #include <type_traits>

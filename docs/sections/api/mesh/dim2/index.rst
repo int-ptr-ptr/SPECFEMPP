@@ -13,6 +13,5 @@ SPECFEM++ 2D Mesh
 
     boundaries/index
     control_nodes/index
-    coupled_interfaces/index
     materials/index
     tags/index

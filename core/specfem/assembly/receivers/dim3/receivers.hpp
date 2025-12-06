@@ -56,20 +56,6 @@ public:
    */
   receivers() = default;
 
-  /**
-   * @brief Construct a new receivers object
-   *
-   * @param max_sig_step Maximum number seismogram sample points
-   * @param dt Time increament
-   * @param t0 Initial time
-   * @param nsteps_between_samples Number of time steps between samples
-   * @param receivers Vector of receivers
-   * @param stypes Vector of seismogram types (displacement, velocity,
-   * acceleration, pressure, or rotation)
-   * @param mesh Mesh object
-   * @param tags Tags for every element in the mesh
-   * @param properties Properties object
-   */
   receivers(
       const int max_sig_step, const type_real dt, const type_real t0,
       const int nsteps_between_samples,

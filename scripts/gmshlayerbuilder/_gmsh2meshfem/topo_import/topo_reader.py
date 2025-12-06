@@ -28,12 +28,16 @@ def _file_get_line(file_input_stream):
     return line
 
 
+IS_FLUID_PER_MATERIAL_STRCODE: dict[str, bool] = {"S": False, "F": True}
+
+
 def builder_from_topo_file(
     file: Path | str,
     set_left_boundary: BoundaryConditionType = "neumann",
     set_right_boundary: BoundaryConditionType = "neumann",
     set_top_boundary: BoundaryConditionType = "neumann",
     set_bottom_boundary: BoundaryConditionType = "neumann",
+    materialtype_strcode: str | None = None,
 ) -> LayeredBuilder:
     with Path(file).open("r") as f:
         ninterfaces = int(_file_get_line(f))
@@ -66,8 +70,17 @@ def builder_from_topo_file(
             layer_boundaries.append(bd)
 
         # points complete, recover num cells in vertical for each layer
+        nlayers = ninterfaces - 1
+        if materialtype_strcode is not None and len(materialtype_strcode) != nlayers:
+            e = ValueError(
+                f"Material type string code '{materialtype_strcode}' is of length "
+                f"{len(materialtype_strcode)}, but the topography file specifies {nlayers} layers!"
+            )
+            e.add_note("Make sure that there is only one material type per layer.")
+            raise e
+
         layers = []
-        for ilayer in range(ninterfaces - 1):
+        for ilayer in range(nlayers):
             nz = int(_file_get_line(f))
 
             # guess nx by attempting to have aspect ratio 1. We need height of layer
@@ -79,7 +92,18 @@ def builder_from_topo_file(
             )
             layer_aspect_ratio = (xmax - xmin) / (zavg_above - zavg_below)
             nx = max(1, round(nz * layer_aspect_ratio))
-            layers.append(Layer(nx, nz))
+            if materialtype_strcode is None:
+                layers.append(Layer(nx, nz))
+            else:
+                layers.append(
+                    Layer(
+                        nx,
+                        nz,
+                        skip_acoustic_free_surface=not IS_FLUID_PER_MATERIAL_STRCODE[
+                            materialtype_strcode[ilayer]
+                        ],
+                    )
+                )
 
         builder = LayeredBuilder(
             xmin,

@@ -1,4 +1,6 @@
-from argparse import ArgumentParser
+from argparse import ArgumentParser, Action
+import re
+from typing import override
 
 # ensure _gmsh2meshfem is in path.
 # There may be a better way to go about this.
@@ -13,6 +15,30 @@ except ImportError:
 
 
 from _gmsh2meshfem.topo_import.layer_builder.layeredbuilder import BOUNDARY_TYPES
+from _gmsh2meshfem.topo_import.topo_reader import IS_FLUID_PER_MATERIAL_STRCODE
+
+
+class MaterialTypeStringCode(Action):
+    def __init__(self, option_strings, dest, nargs=1, **kwargs):
+        super().__init__(option_strings, dest, **kwargs)
+
+    @override
+    def __call__(self, parser, namespace, values, option_string=None):
+        valid_chars = "".join(k for k in IS_FLUID_PER_MATERIAL_STRCODE.keys())
+        if isinstance(values, str):
+            strcode = values.upper()
+            # do we have any characters not in IS_FLUID_PER_MATERIAL_STRCODE ?
+            if not re.search(f"[^{valid_chars}]", strcode):
+                # we know how to handle each character. Good.
+                setattr(namespace, self.dest, strcode)
+                return
+
+        # failed somewhere, error out
+        parser.error(
+            f"argument {option_string}: Invalid string-code '{values}' "
+            f"(Give a case-insensitive string containing only '{valid_chars}'. e.g. 'sf' for"
+            "fluid layer on top of solid layer)"
+        )
 
 
 def get_parser():
@@ -68,6 +94,14 @@ def get_parser():
         dest="bdry_right",
         default="neumann",
     )
+    parser.add_argument(
+        "--materials",
+        help="A list of material types (F for fluid, S for solid, ...) from the "
+        "bottom layer to the top.",
+        dest="materialtype_strcode",
+        default=None,
+        action=MaterialTypeStringCode,
+    )
     return parser
 
 
@@ -83,6 +117,7 @@ def run2D():
         set_top_boundary=args.bdry_top,
         set_left_boundary=args.bdry_left,
         set_right_boundary=args.bdry_right,
+        materialtype_strcode=args.materialtype_strcode,
     )
 
     model = builder.create_model()

@@ -34,10 +34,11 @@ namespace medium {
  * @see specfem::medium::material
  */
 template <specfem::element::medium_tag MediumTag>
-struct material<MediumTag, specfem::element::property_tag::anisotropic>
+struct material<specfem::dimension::type::dim2, MediumTag,
+                specfem::element::property_tag::anisotropic>
     : specfem::element::is_elastic<MediumTag> {
 public:
-  constexpr static auto dimension =
+  constexpr static auto dimension_tag =
       specfem::dimension::type::dim2;           ///< Dimension of the material
   constexpr static auto medium_tag = MediumTag; ///< Medium tag
   constexpr static auto property_tag =
@@ -92,9 +93,9 @@ public:
    * @param other Material to compare with
    * @return true If the materials have the same properties
    */
-  bool operator==(
-      const material<MediumTag, specfem::element::property_tag::anisotropic>
-          &other) const {
+  bool operator==(const material<dimension_tag, medium_tag,
+                                 specfem::element::property_tag::anisotropic>
+                      &other) const {
     return (std::abs(this->density - other.density) < 1e-6 &&
             std::abs(this->c11 - other.c11) < 1e-6 &&
             std::abs(this->c13 - other.c13) < 1e-6 &&
@@ -115,9 +116,9 @@ public:
    * @param other Material to compare with
    * @return true If the materials have different properties
    */
-  bool operator!=(
-      const material<MediumTag, specfem::element::property_tag::anisotropic>
-          &other) const {
+  bool operator!=(const material<dimension_tag, medium_tag,
+                                 specfem::element::property_tag::anisotropic>
+                      &other) const {
     return !(*this == other);
   }
 
@@ -126,7 +127,8 @@ public:
    *
    * @return specfem::point::properties Material properties
    */
-  inline specfem::point::properties<dimension, medium_tag, property_tag, false>
+  inline specfem::point::properties<dimension_tag, medium_tag, property_tag,
+                                    false>
   get_properties() const {
     return { c11, c13, c15, c33, c35, c55, c12, c23, c25, density };
   }

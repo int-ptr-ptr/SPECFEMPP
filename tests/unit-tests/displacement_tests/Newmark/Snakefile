@@ -1,0 +1,28 @@
+configfile: "dim2/tests.yaml"
+
+tests = config["tests2d"]
+
+rule all:
+    input:
+        traces=expand("serial/dim2/{test_name}/traces/trace_list.txt", test_name=tests),
+        database=expand("serial/dim2/{test_name}/database.bin", test_name=tests),
+
+# for test_name in config["tests"]:
+for test_name in tests:
+    alias = f'{test_name}_'
+
+    module:
+        name: test_name
+        snakefile: f"serial/dim2/{test_name}/Snakefile"
+        pathvars:
+            cwd=f"serial/dim2/{test_name}"
+
+    use rule * from test_name as alias*
+
+rule clean:
+    shell:
+        """
+        rm -rf serial/dim2/*/specfem2d_workdir
+        rm -rf serial/dim2/*/database.bin
+        rm -rf serial/dim2/*/traces
+        """

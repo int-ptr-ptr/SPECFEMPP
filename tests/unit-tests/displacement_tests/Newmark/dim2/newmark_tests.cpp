@@ -69,7 +69,7 @@ struct TestConfig {
 // ----- Parse test directories ------------- //
 
 std::vector<std::string> parse_test_directories(const std::string &tests_file) {
-  YAML::Node yaml = YAML::LoadFile(tests_file);
+  YAML::Node yaml = YAML::LoadFile(tests_file)["tests2d"];
 
   std::vector<std::string> test_names;
 

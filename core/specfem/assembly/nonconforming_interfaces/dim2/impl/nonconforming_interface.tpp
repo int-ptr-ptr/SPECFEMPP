@@ -2,7 +2,6 @@
 
 #include "enumerations/coupled_interface.hpp"
 #include "enumerations/interface.hpp"
-#include "enumerations/macros.hpp"
 #include "enumerations/medium.hpp"
 #include "kokkos_abstractions.h"
 #include "specfem/assembly/coupled_interfaces.hpp"
@@ -11,6 +10,7 @@
 #include "specfem/assembly/mesh.hpp"
 #include "specfem/assembly/nonconforming_interfaces/dim2/impl/compute_intersection.tpp"
 #include "specfem/data_access.hpp"
+#include "specfem/macros.hpp"
 
 template <specfem::interface::interface_tag InterfaceTag,
           specfem::element::boundary_tag BoundaryTag>
@@ -42,11 +42,6 @@ specfem::assembly::coupled_interfaces_impl::interface_container<
 
   const int nquad_intersection = interface_quadrature.extent(0);
 
-  // transfer function setting is not symmetric, so we need to make sure we know
-  // what side 1 is.
-  bool is_side1 =
-      (InterfaceTag == specfem::interface::interface_tag::elastic_acoustic);
-
   if (ngllz <= 0 || ngllx <= 0) {
     KOKKOS_ABORT_WITH_LOCATION("Invalid GLL grid size");
   }
@@ -56,21 +51,20 @@ specfem::assembly::coupled_interfaces_impl::interface_container<
         "The number of GLL points in z and x must be the same.");
   }
 
-  const auto connection_mapping =
-      specfem::connections::connection_mapping(ngllx, ngllz);
+  const auto element = specfem::mesh_entity::element(ngllz, ngllx);
 
   const auto [self_edges, coupled_edges] = edge_types.get_edges_on_host(
       specfem::connections::type::nonconforming, InterfaceTag, BoundaryTag);
 
-  const auto nedges = self_edges.size();
+  const auto nedges = self_edges.n_edges;
 
   this->intersection_factor = EdgeFactorView(
       "specfem::assembly::nonconforming_interfaces::intersection_factor",
       nedges, nquad_intersection);
 
-  this->intersection_normal =
-      EdgeNormalView("specfem::assembly::nonconforming_interfaces::intersection_normal",
-                     nedges, nquad_intersection, 2);
+  this->intersection_normal = EdgeNormalView(
+      "specfem::assembly::nonconforming_interfaces::intersection_normal",
+      nedges, nquad_intersection, 2);
   this->h_intersection_normal = Kokkos::create_mirror_view(intersection_normal);
 
   // consider linking conjugate containers so that we don't need to do
@@ -101,9 +95,9 @@ specfem::assembly::coupled_interfaces_impl::interface_container<
       jcoorg("jcoorg", mesh.ngnod);
 
   for (int i = 0; i < nedges; ++i) {
-    const int ispec = self_edges(i).ispec;
+    const int ispec = self_edges(i).element_index;
     const auto iedge_type = self_edges(i).edge_type;
-    const int jspec = coupled_edges(i).ispec;
+    const int jspec = coupled_edges(i).element_index;
     const auto jedge_type = coupled_edges(i).edge_type;
     for (int inod = 0; inod < mesh.ngnod; inod++) {
       icoorg(inod).x = mesh.h_control_node_coord(0, ispec, inod);
@@ -115,18 +109,11 @@ specfem::assembly::coupled_interfaces_impl::interface_container<
         Kokkos::subview(h_transfer_function, i, Kokkos::ALL, Kokkos::ALL);
     auto transfer_subview_other =
         Kokkos::subview(h_transfer_function_other, i, Kokkos::ALL, Kokkos::ALL);
-    if (is_side1) {
-      specfem::assembly::nonconforming_interfaces_impl::set_transfer_functions(
-          icoorg, jcoorg, iedge_type, jedge_type, interface_quadrature,
-          mesh.h_xi, transfer_subview, transfer_subview_other);
-    } else {
-      specfem::assembly::nonconforming_interfaces_impl::set_transfer_functions(
-          jcoorg, icoorg, jedge_type, iedge_type, interface_quadrature,
-          mesh.h_xi, transfer_subview_other, transfer_subview);
-    }
+    specfem::assembly::nonconforming_interfaces_impl::set_transfer_functions(
+        icoorg, jcoorg, iedge_type, jedge_type, interface_quadrature, mesh.h_xi,
+        transfer_subview, transfer_subview_other);
     // compute normal on edge
-    const int npoints =
-        connection_mapping.number_of_points_on_orientation(iedge_type);
+    const int npoints = element.number_of_points_on_orientation(iedge_type);
 
     // compute factor by finding first derivative of position
     // along the edge and multiplying by the quadrature weight

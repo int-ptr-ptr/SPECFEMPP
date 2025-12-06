@@ -3,7 +3,6 @@
 #include "domain_view.hpp"
 #include "enumerations/interface.hpp"
 #include "kokkos_abstractions.h"
-#include "macros.hpp"
 #include "quadrature/interface.hpp"
 #include "specfem/assembly/mesh.hpp"
 #include "specfem/data_access.hpp"
@@ -13,6 +12,40 @@
 
 namespace specfem::assembly {
 
+// clang-format off
+/**
+ * @brief 2D Jacobian matrix container for spectral element coordinate transformations
+ *
+ * The Jacobian matrix enables mapping between physical coordinates (x,z) and reference
+ * coordinates (ξ,γ) for each quadrature point in spectral elements.
+ *
+ * **Mathematical Foundation:**
+ * The Jacobian matrix represents the coordinate transformation:
+ * \f[
+ * J = \begin{pmatrix}
+ * \frac{\partial x}{\partial \xi} & \frac{\partial z}{\partial \xi} \\
+ * \frac{\partial x}{\partial \gamma} & \frac{\partial z}{\partial \gamma}
+ * \end{pmatrix}
+ * \f]
+ *
+ * **Storage Components:**
+ * - `xix`: \f$\frac{\partial \xi}{\partial x}\f$ (inverse transformation derivatives)
+ * - `xiz`: \f$\frac{\partial \xi}{\partial z}\f$
+ * - `gammax`: \f$\frac{\partial \gamma}{\partial x}\f$
+ * - `gammaz`: \f$\frac{\partial \gamma}{\partial z}\f$
+ * - `jacobian`: Determinant \f$|J|\f$ for integration weights
+ *
+ * @code
+ * // Example usage
+ * specfem::assembly::jacobian_matrix<specfem::dimension::type::dim2> jacobian(...);
+ *
+ * // Access in device kernel
+ * specfem::point::index<specfem::dimension::type::dim2> idx(ispec, iz, ix);
+ * specfem::point::jacobian_matrix<specfem::dimension::type::dim2> point_jac;
+ * specfem::assembly::load_on_device(idx, jacobian, point_jac);
+ * @endcode
+ */
+// clang-format on
 template <>
 struct jacobian_matrix<specfem::dimension::type::dim2>
     : public specfem::data_access::Container<
@@ -20,327 +53,148 @@ struct jacobian_matrix<specfem::dimension::type::dim2>
           specfem::data_access::DataClassType::jacobian_matrix,
           specfem::dimension::type::dim2> {
   /**
-   * @name Typedefs
+   * @name Type Definitions
    *
    */
   ///@{
+
+  /**
+   * @brief Base container type providing data access infrastructure
+   *
+   * @see specfem::data_access::Container
+   */
   using base_type = specfem::data_access::Container<
       specfem::data_access::ContainerType::domain,
       specfem::data_access::DataClassType::jacobian_matrix,
-      specfem::dimension::type::dim2>; ///< Base type of the point partial
-                                       ///< derivatives
+      specfem::dimension::type::dim2>;
+
+  /**
+   * @brief Kokkos view type for storing Jacobian matrix components
+   */
   using view_type = typename base_type::scalar_type<
       type_real, Kokkos::DefaultExecutionSpace::memory_space>;
   ///@}
 
-  int nspec; ///< Number of spectral elements
-  int ngllz; ///< Number of quadrature points in z direction
-  int ngllx; ///< Number of quadrature points in x direction
+  /**
+   * @brief Number of spectral elements in the computational domain
+   */
+  int nspec;
 
-  view_type xix;                    ///< @xix
-  view_type::HostMirror h_xix;      ///< Host mirror of @xix
-  view_type xiz;                    ///< @xiz
-  view_type::HostMirror h_xiz;      ///< Host mirror of @xiz
-  view_type gammax;                 ///< @gammax
-  view_type::HostMirror h_gammax;   ///< Host mirror of @gammax
-  view_type gammaz;                 ///< @gammaz
-  view_type::HostMirror h_gammaz;   ///< Host mirror of @gammaz
-  view_type jacobian;               ///< Jacobian
-  view_type::HostMirror h_jacobian; ///< Host mirror of Jacobian
+  /**
+   * @brief Number of Gauss-Lobatto-Legendre quadrature points in z-direction
+   */
+  int ngllz;
+
+  /**
+   * @brief Number of Gauss-Lobatto-Legendre quadrature points in x-direction
+   */
+  int ngllx;
+
+  view_type xix; // ∂ξ/∂x derivatives (device) [nspec][ngllz][ngllx]
+  view_type::HostMirror h_xix; // ∂ξ/∂x derivatives (host) [nspec][ngllz][ngllx]
+  view_type xiz; // ∂ξ/∂z derivatives (device) [nspec][ngllz][ngllx]
+  view_type::HostMirror h_xiz; // ∂ξ/∂z derivatives (host) [nspec][ngllz][ngllx]
+  view_type gammax; // ∂γ/∂x derivatives (device) [nspec][ngllz][ngllx]
+  view_type::HostMirror h_gammax; // ∂γ/∂x derivatives (host)
+                                  // [nspec][ngllz][ngllx]
+  view_type gammaz; // ∂γ/∂z derivatives (device) [nspec][ngllz][ngllx]
+  view_type::HostMirror h_gammaz; // ∂γ/∂z derivatives (host)
+                                  // [nspec][ngllz][ngllx]
+  view_type jacobian; // Jacobian determinant (device) [nspec][ngllz][ngllx]
+  view_type::HostMirror h_jacobian; // Jacobian determinant (host)
+                                    // [nspec][ngllz][ngllx]
 
   /**
    * @name Constructors
    *
+   * Object lifecycle management for Jacobian matrix data structures.
    */
   ///@{
+
   /**
    * @brief Default constructor
    *
+   * Creates an empty Jacobian matrix container. Use parameterized constructors
+   * to initialize with actual mesh data and compute transformation derivatives.
    */
   jacobian_matrix() = default;
 
-  jacobian_matrix(const int nspec, const int ngllz, const int ngllx);
   /**
-   * @brief Construct a new Jacobian matrix object from mesh information
+   * @brief Construct Jacobian matrix with specified dimensions
    *
-   * @param mesh Mesh information
+   * Allocates storage for Jacobian matrix components based on problem
+   * dimensions and quadrature point specifications. The actual derivative
+   * values must be computed and populated separately.
+   *
+   * @param nspec Number of spectral elements in the domain
+   * @param ngllz Number of GLL quadrature points in z-direction
+   * @param ngllx Number of GLL quadrature points in x-direction
+   */
+  jacobian_matrix(const int nspec, const int ngllz, const int ngllx);
+
+  /**
+   * @brief Construct Jacobian matrix from 2D mesh information
+   *
+   * Computes and initializes all Jacobian matrix components from mesh geometry.
+   * This constructor:
+   * - Computes coordinate transformation derivatives at all quadrature points
+   * - Calculates Jacobian determinants for integration weights
+   * - Sets up efficient device/host memory layouts
+   * - Validates mesh geometry and transformation quality
+   *
+   * @param mesh 2D finite element mesh containing element connectivity,
+   *             node coordinates, and geometric information
+   *
+   * @code
+   * specfem::assembly::mesh<specfem::dimension::type::dim2> mesh;
+   * // ... initialize mesh
+   * specfem::assembly::jacobian_matrix<specfem::dimension::type::dim2>
+   * jac(mesh);
+   * @endcode
    */
   jacobian_matrix(
       const specfem::assembly::mesh<specfem::dimension::type::dim2> &mesh);
   ///@}
 
+  /**
+   * @brief Synchronize device and host memory views
+   *
+   * Ensures consistency between device and host copies of Jacobian matrix
+   * data by copying from device to host. This is typically called after
+   * device-based computations to make results available on the host.
+   */
   void sync_views();
 
   /**
-   * @brief Check if the Jacobian is a small value
+   * @brief Validate Jacobian determinant values for numerical stability
    *
-   * @return std::tuple<bool, Kokkos::View> Tuple containing a boolean
-   * indicating whether a small Jacobian was found and a view containing the
-   * indices of the spectral elements with small Jacobian
+   * Checks all Jacobian determinant values to identify elements with
+   * potentially problematic transformations that could cause numerical
+   * instability during computation. Small or negative Jacobians indicate
+   * degenerate or inverted elements.
+   *
+   * @return std::tuple containing:
+   *         - Boolean flag indicating if any small Jacobians were found
+   *         - Boolean array flagging elements with small Jacobian values
+   *
+   * @note Small Jacobians are typically defined as values below a threshold
+   *       that could cause numerical instability in the finite element
+   * computation.
+   *
+   * @code
+   * auto [has_small_jac, element_flags] = jacobian.check_small_jacobian();
+   * if (has_small_jac) {
+   *     // Handle problematic elements
+   *     for (int i = 0; i < nspec; ++i) {
+   *         if (element_flags(i)) {
+   *             std::cout << "Element " << i << " has small Jacobian" <<
+   * std::endl;
+   *         }
+   *     }
+   * }
+   * @endcode
    */
   std::tuple<bool, Kokkos::View<bool *, Kokkos::DefaultHostExecutionSpace> >
   check_small_jacobian() const;
 };
-
-/**
- * @defgroup ComputeJacobianMatrixDataAccess
- *
- * @brief Functions to load and store Jacobian matrix at a given quadrature
- * point
- *
- */
-
-template <bool on_device, typename PointJacobianMatrixType,
-          typename std::enable_if_t<PointJacobianMatrixType::simd::using_simd,
-                                    int> = 0>
-KOKKOS_FORCEINLINE_FUNCTION void impl_load(
-    const specfem::point::simd_index<PointJacobianMatrixType::dimension_tag>
-        &index,
-    const specfem::assembly::jacobian_matrix<specfem::dimension::type::dim2>
-        &derivatives,
-    PointJacobianMatrixType &jacobian_matrix) {
-
-  const int ispec = index.ispec;
-  const int iz = index.iz;
-  const int ix = index.ix;
-
-  using simd = typename PointJacobianMatrixType::simd;
-  using mask_type = typename simd::mask_type;
-  using tag_type = typename simd::tag_type;
-
-  constexpr static bool StoreJacobian = PointJacobianMatrixType::store_jacobian;
-
-  const auto &mapping = derivatives.xix.get_mapping();
-  const std::size_t _index = mapping(ispec, iz, ix);
-
-  mask_type mask([&](std::size_t lane) { return index.mask(lane); });
-
-  if constexpr (on_device) {
-    Kokkos::Experimental::where(mask, jacobian_matrix.xix)
-        .copy_from(&derivatives.xix[_index], tag_type());
-    Kokkos::Experimental::where(mask, jacobian_matrix.gammax)
-        .copy_from(&derivatives.gammax[_index], tag_type());
-    Kokkos::Experimental::where(mask, jacobian_matrix.xiz)
-        .copy_from(&derivatives.xiz[_index], tag_type());
-    Kokkos::Experimental::where(mask, jacobian_matrix.gammaz)
-        .copy_from(&derivatives.gammaz[_index], tag_type());
-    if constexpr (StoreJacobian) {
-      Kokkos::Experimental::where(mask, jacobian_matrix.jacobian)
-          .copy_from(&derivatives.jacobian[_index], tag_type());
-    }
-  } else {
-    Kokkos::Experimental::where(mask, jacobian_matrix.xix)
-        .copy_from(&derivatives.h_xix[_index], tag_type());
-    Kokkos::Experimental::where(mask, jacobian_matrix.gammax)
-        .copy_from(&derivatives.h_gammax[_index], tag_type());
-    Kokkos::Experimental::where(mask, jacobian_matrix.xiz)
-        .copy_from(&derivatives.h_xiz[_index], tag_type());
-    Kokkos::Experimental::where(mask, jacobian_matrix.gammaz)
-        .copy_from(&derivatives.h_gammaz[_index], tag_type());
-    if constexpr (StoreJacobian) {
-      Kokkos::Experimental::where(mask, jacobian_matrix.jacobian)
-          .copy_from(&derivatives.h_jacobian[_index], tag_type());
-    }
-  }
-}
-
-template <bool on_device, typename PointJacobianMatrixType,
-          typename std::enable_if_t<!PointJacobianMatrixType::simd::using_simd,
-                                    int> = 0>
-KOKKOS_FORCEINLINE_FUNCTION void impl_load(
-    const specfem::point::index<PointJacobianMatrixType::dimension_tag> &index,
-    const specfem::assembly::jacobian_matrix<specfem::dimension::type::dim2>
-        &derivatives,
-    PointJacobianMatrixType &jacobian_matrix) {
-
-  const int ispec = index.ispec;
-  const int iz = index.iz;
-  const int ix = index.ix;
-
-  constexpr static bool StoreJacobian = PointJacobianMatrixType::store_jacobian;
-
-  const auto &mapping = derivatives.xix.get_mapping();
-  const std::size_t _index = mapping(ispec, iz, ix);
-
-  if constexpr (on_device) {
-    Kokkos::View<const type_real *, Kokkos::DefaultExecutionSpace::memory_space,
-                 Kokkos::MemoryTraits<Kokkos::RandomAccess> >
-        xix = derivatives.xix.get_base_view();
-    Kokkos::View<const type_real *, Kokkos::DefaultExecutionSpace::memory_space,
-                 Kokkos::MemoryTraits<Kokkos::RandomAccess> >
-        gammax = derivatives.gammax.get_base_view();
-    Kokkos::View<const type_real *, Kokkos::DefaultExecutionSpace::memory_space,
-                 Kokkos::MemoryTraits<Kokkos::RandomAccess> >
-        xiz = derivatives.xiz.get_base_view();
-    Kokkos::View<const type_real *, Kokkos::DefaultExecutionSpace::memory_space,
-                 Kokkos::MemoryTraits<Kokkos::RandomAccess> >
-        gammaz = derivatives.gammaz.get_base_view();
-    Kokkos::View<const type_real *, Kokkos::DefaultExecutionSpace::memory_space,
-                 Kokkos::MemoryTraits<Kokkos::RandomAccess> >
-        jacobian = derivatives.jacobian.get_base_view();
-
-    jacobian_matrix.xix = xix(_index);
-    jacobian_matrix.gammax = gammax(_index);
-    jacobian_matrix.xiz = xiz(_index);
-    jacobian_matrix.gammaz = gammaz(_index);
-    if constexpr (StoreJacobian) {
-      jacobian_matrix.jacobian = jacobian(_index);
-    }
-  } else {
-    jacobian_matrix.xix = derivatives.h_xix[_index];
-    jacobian_matrix.gammax = derivatives.h_gammax[_index];
-    jacobian_matrix.xiz = derivatives.h_xiz[_index];
-    jacobian_matrix.gammaz = derivatives.h_gammaz[_index];
-    if constexpr (StoreJacobian) {
-      jacobian_matrix.jacobian = derivatives.h_jacobian[_index];
-    }
-  }
-}
-
-template <typename PointJacobianMatrixType,
-          typename std::enable_if_t<PointJacobianMatrixType::simd::using_simd,
-                                    int> = 0>
-inline void impl_store_on_host(
-    const specfem::point::simd_index<PointJacobianMatrixType::dimension_tag>
-        &index,
-    const specfem::assembly::jacobian_matrix<specfem::dimension::type::dim2>
-        &derivatives,
-    const PointJacobianMatrixType &jacobian_matrix) {
-
-  const int ispec = index.ispec;
-  const int nspec = derivatives.nspec;
-  const int iz = index.iz;
-  const int ix = index.ix;
-
-  constexpr static bool StoreJacobian = PointJacobianMatrixType::store_jacobian;
-
-  using simd = typename PointJacobianMatrixType::simd;
-  using mask_type = typename simd::mask_type;
-  using tag_type = typename simd::tag_type;
-
-  mask_type mask([&](std::size_t lane) { return index.mask(lane); });
-
-  const auto &mapping = derivatives.xix.get_mapping();
-  const std::size_t _index = mapping(ispec, iz, ix);
-
-  Kokkos::Experimental::where(mask, jacobian_matrix.xix)
-      .copy_to(&derivatives.h_xix[_index], tag_type());
-  Kokkos::Experimental::where(mask, jacobian_matrix.gammax)
-      .copy_to(&derivatives.h_gammax[_index], tag_type());
-  Kokkos::Experimental::where(mask, jacobian_matrix.xiz)
-      .copy_to(&derivatives.h_xiz[_index], tag_type());
-  Kokkos::Experimental::where(mask, jacobian_matrix.gammaz)
-      .copy_to(&derivatives.h_gammaz[_index], tag_type());
-  if constexpr (StoreJacobian) {
-    Kokkos::Experimental::where(mask, jacobian_matrix.jacobian)
-        .copy_to(&derivatives.h_jacobian[_index], tag_type());
-  }
-}
-
-template <typename PointJacobianMatrixType,
-          typename std::enable_if_t<!PointJacobianMatrixType::simd::using_simd,
-                                    int> = 0>
-inline void impl_store_on_host(
-    const specfem::point::index<PointJacobianMatrixType::dimension_tag> &index,
-    const specfem::assembly::jacobian_matrix<specfem::dimension::type::dim2>
-        &derivatives,
-    const PointJacobianMatrixType &jacobian_matrix) {
-
-  const int ispec = index.ispec;
-  const int iz = index.iz;
-  const int ix = index.ix;
-
-  constexpr static bool StoreJacobian = PointJacobianMatrixType::store_jacobian;
-
-  const auto &mapping = derivatives.xix.get_mapping();
-  const std::size_t _index = mapping(ispec, iz, ix);
-
-  derivatives.h_xix[_index] = jacobian_matrix.xix;
-  derivatives.h_gammax[_index] = jacobian_matrix.gammax;
-  derivatives.h_xiz[_index] = jacobian_matrix.xiz;
-  derivatives.h_gammaz[_index] = jacobian_matrix.gammaz;
-  if constexpr (StoreJacobian) {
-    derivatives.h_jacobian[_index] = jacobian_matrix.jacobian;
-  }
-}
-
-/**
- * @brief Load the Jacobian matrix at a given quadrature point on the device
- *
- * @ingroup ComputeJacobianMatrixDataAccess
- *
- * @tparam PointJacobianMatrixType Point Jacobian matrix type. Needs to
- * be of @ref specfem::point::jacobian_matrix
- * @tparam IndexType Index type. Needs to be of @ref specfem::point::index or
- * @ref specfem::point::simd_index
- * @param index Index of the quadrature point
- * @param derivatives Jacobian matrix container
- * @param jacobian_matrix Jacobian matrix at the given quadrature point
- */
-template <
-    typename PointJacobianMatrixType, typename IndexType,
-    typename std::enable_if_t<IndexType::using_simd ==
-                                  PointJacobianMatrixType::simd::using_simd,
-                              int> = 0>
-KOKKOS_FORCEINLINE_FUNCTION void load_on_device(
-    const IndexType &index,
-    const specfem::assembly::jacobian_matrix<specfem::dimension::type::dim2>
-        &derivatives,
-    PointJacobianMatrixType &jacobian_matrix) {
-  impl_load<true>(index, derivatives, jacobian_matrix);
-}
-
-/**
- * @brief Store the Jacobian matrix at a given quadrature point on the
- * device
- *
- * @ingroup ComputeJacobianMatrixDataAccess
- *
- * @tparam PointJacobianMatrixType Point Jacobian matrix type. Needs to
- * be of @ref specfem::point::jacobian_matrix
- * @tparam IndexType Index type. Needs to be of @ref specfem::point::index or
- * @ref specfem::point::simd_index
- * @param index Index of the quadrature point
- * @param derivatives Jacobian matrix container
- * @param jacobian_matrix Jacobian matrix at the given quadrature point
- */
-template <
-    typename PointJacobianMatrixType, typename IndexType,
-    typename std::enable_if_t<IndexType::using_simd ==
-                                  PointJacobianMatrixType::simd::using_simd,
-                              int> = 0>
-inline void load_on_host(
-    const IndexType &index,
-    const specfem::assembly::jacobian_matrix<specfem::dimension::type::dim2>
-        &derivatives,
-    PointJacobianMatrixType &jacobian_matrix) {
-  impl_load<false>(index, derivatives, jacobian_matrix);
-}
-
-/**
- * @brief Store the Jacobian matrix at a given quadrature point on the
- * device
- *
- * @ingroup ComputeJacobianMatrixDataAccess
- *
- * @tparam PointJacobianMatrixType Point Jacobian matrix type. Needs to
- * be of @ref specfem::point::jacobian_matrix
- * @tparam IndexType Index type. Needs to be of @ref specfem::point::index or
- * @ref specfem::point::simd_index
- * @param index Index of the quadrature point
- * @param derivatives Jacobian matrix container
- * @param jacobian_matrix Jacobian matrix at the given quadrature point
- */
-template <
-    typename PointJacobianMatrixType, typename IndexType,
-    typename std::enable_if_t<IndexType::using_simd ==
-                                  PointJacobianMatrixType::simd::using_simd,
-                              int> = 0>
-inline void store_on_host(
-    const IndexType &index,
-    const specfem::assembly::jacobian_matrix<specfem::dimension::type::dim2>
-        &derivatives,
-    const PointJacobianMatrixType &jacobian_matrix) {
-  impl_store_on_host(index, derivatives, jacobian_matrix);
-}
 } // namespace specfem::assembly

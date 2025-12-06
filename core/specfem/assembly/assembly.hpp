@@ -3,18 +3,33 @@
 #include "enumerations/interface.hpp"
 
 /**
- * @brief Assembly namespace defines data structures used to store data related
- * to finite element assembly.
+ * @namespace specfem::assembly
+ * @brief Data structures for SEM computational data
  *
- * The data is organized in a manner that makes it effiecient to access when
- * computing finite element compute kernels.
+ * Provides core infrastructure for SEM simulations, managing computational data
+ * for finite element kernels. Transforms mesher-supplied element data and
+ * computes per-GLL-point values.
+ *
+ * **Organization:**
+ *
+ * - Containers : The namespace contains data storage containers (@ref
+ * specfem::assembly::mesh, @ref specfem::assembly::jacobian_matrix, etc) that
+ * store data computed at all GLL points
+ * - Data access functions : Each container provides functions to load/store
+ * data on device/host (e.g., @c load_on_device , @c store_on_device )
+ *
  */
 namespace specfem::assembly {
 
 /**
- * @brief Assembly class for finite element problems in different dimensions.
+ * @brief Data class used to store computational data required for SEM
+ * simulations
  *
- * @tparam DimensionTag
+ * Provides classes to transform mesher-supplied element data and compute
+ * per-GLL-point values. The per-GLL-point data is stored in @c Kokkos::Views
+ * which provide portability & data management across CPU and GPU architectures.
+ * The assembly class is specialized for 2D and 3D
+ * problems.
  */
 template <specfem::dimension::type DimensionTag> struct assembly;
 

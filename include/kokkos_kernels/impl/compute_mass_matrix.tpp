@@ -92,7 +92,8 @@ void specfem::kokkos_kernels::impl::compute_mass_matrix(
 
   specfem::execution::for_all(
       "specfem::kokkos_kernels::compute_mass_matrix", chunk,
-      KOKKOS_LAMBDA(const PointIndex &index) {
+      KOKKOS_LAMBDA(const typename decltype(chunk)::base_index_type &iterator_index) {
+        const auto index = iterator_index.get_index();
         PointPropertyType point_property;
         specfem::assembly::load_on_device(index, properties, point_property);
 

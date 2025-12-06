@@ -1,16 +1,10 @@
 MESHFEM
 =======
 
-We took meshfem code from SPECFEM2D and SPECFEM3D and updated some parameters
-to allow for calling of the meshfem code from anywhere in the filesystem.
-
-The full description of the parameters that are available in the meshfem codes
-is available in the follwoing sections.
+This section provides detailed documentation on the parameters used in MESHFEM2D and MESHFEM3D, the mesh generation tools integrated within SPECFEM++.
 
 .. toctree::
-    :caption: CONTRIBUTION
-    :maxdepth: 2
-    :hidden:
+    :maxdepth: 1
 
     meshfem2d/index
     meshfem3d/index

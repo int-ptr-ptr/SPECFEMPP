@@ -1,11 +1,11 @@
 
 #include "enumerations/interface.hpp"
-#include "enumerations/material_definitions.hpp"
 #include "impl/interface_container.tpp"
 #include "specfem/assembly/coupled_interfaces.hpp"
 #include "specfem/assembly/edge_types.hpp"
 #include "specfem/assembly/jacobian_matrix.hpp"
 #include "specfem/assembly/mesh.hpp"
+#include "specfem/macros.hpp"
 
 #include "specfem/assembly/nonconforming_interfaces/dim2/impl/nonconforming_interface.tpp"
 

@@ -16,8 +16,7 @@ specfem::assembly::element_types<specfem::dimension::type::dim3>::element_types(
   }
 
   FOR_EACH_IN_PRODUCT(
-      (DIMENSION_TAG(DIM3), MEDIUM_TAG(ELASTIC), PROPERTY_TAG(ISOTROPIC),
-       BOUNDARY_TAG(NONE)),
+      (DIMENSION_TAG(DIM3), MEDIUM_TAG(ELASTIC)),
       CAPTURE(elements, h_elements) {
         int count = 0;
         int index = 0;
@@ -39,8 +38,7 @@ specfem::assembly::element_types<specfem::dimension::type::dim3>::element_types(
       })
 
   FOR_EACH_IN_PRODUCT(
-      (DIMENSION_TAG(DIM3), MEDIUM_TAG(ELASTIC), PROPERTY_TAG(ISOTROPIC),
-       BOUNDARY_TAG(NONE)),
+      (DIMENSION_TAG(DIM3), MEDIUM_TAG(ELASTIC), PROPERTY_TAG(ISOTROPIC)),
       CAPTURE(elements, h_elements) {
         int count = 0;
         int index = 0;

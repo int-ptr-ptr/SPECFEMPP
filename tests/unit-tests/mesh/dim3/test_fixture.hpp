@@ -3,7 +3,7 @@
 #include "MPI_environment.hpp"
 #include "enumerations/interface.hpp"
 #include "io/interface.hpp"
-#include "mesh/dim3/meshfem3d/mesh.hpp"
+#include "mesh/mesh.hpp"
 #include <gtest/gtest.h>
 #include <string>
 
@@ -11,12 +11,12 @@ namespace specfem::test_configuration {
 struct ActualMesh3D {
   constexpr static specfem::dimension::type dimension =
       specfem::dimension::type::dim3;
-  specfem::mesh::meshfem3d::mesh<dimension> mesh;
+  specfem::mesh::mesh<dimension> mesh;
 
   ActualMesh3D() = default;
 
   ActualMesh3D(const std::string &database_file, const specfem::MPI::MPI *mpi) {
-    mesh = specfem::io::meshfem3d::read_3d_mesh(database_file, mpi);
+    mesh = specfem::io::read_3d_mesh(database_file, mpi);
   }
 };
 } // namespace specfem::test_configuration

@@ -63,7 +63,13 @@ pipeline{
                                         module load ${INTEL_MODULE}
                                         export CC=icx
                                         export CXX=icpx
-                                        cmake3 -S . -B build_cpu_${INTEL_COMPILER_NAME}_${CMAKE_HOST_NAME}_${SIMD_NAME}_${env.BUILD_TAG} -DCMAKE_BUILD_TYPE=Release ${CMAKE_HOST_FLAGS} ${SIMD_FLAGS} -D SPECFEM_BUILD_TESTS=ON -D SPECFEM_BUILD_BENCHMARKS=OFF
+                                        cmake3 -S . -B build_cpu_${INTEL_COMPILER_NAME}_${CMAKE_HOST_NAME}_${SIMD_NAME}_${env.BUILD_TAG} \
+                                          -DCMAKE_BUILD_TYPE=Release \
+                                          -DCMAKE_INSTALL_PREFIX=install_cpu_${INTEL_COMPILER_NAME}_${CMAKE_HOST_NAME}_${SIMD_NAME}_${env.BUILD_TAG}/bin \
+                                          ${CMAKE_HOST_FLAGS} \
+                                          ${SIMD_FLAGS} \
+                                          -D SPECFEM_BUILD_TESTS=ON \
+                                          -D SPECFEM_BUILD_BENCHMARKS=OFF
                                         cmake3 --build build_cpu_${INTEL_COMPILER_NAME}_${CMAKE_HOST_NAME}_${SIMD_NAME}_${env.BUILD_TAG}
                                     """
                                     echo ' Build completed '
@@ -88,6 +94,7 @@ pipeline{
                             always {
                                 echo ' Cleaning '
                                 sh "rm -rf build_cpu_${INTEL_COMPILER_NAME}_${CMAKE_HOST_NAME}_${SIMD_NAME}_${env.BUILD_TAG}"
+                                sh "rm -rf install_cpu_${INTEL_COMPILER_NAME}_${CMAKE_HOST_NAME}_${SIMD_NAME}_${env.BUILD_TAG}"
                             }
                         }
                     }

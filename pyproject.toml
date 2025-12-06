@@ -52,7 +52,7 @@ doc = [
 ]
 
 examples = [
-  "snakemake==9.11.2",
+  "snakemake==9.13.4",
   "obspy==1.4.1",
   "snakemake-executor-plugin-slurm==0.10.2",
   "imageio==2.36.1",

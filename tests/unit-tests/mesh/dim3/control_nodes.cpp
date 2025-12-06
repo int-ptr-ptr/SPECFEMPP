@@ -73,8 +73,8 @@ struct ExpectedControlNodes3D {
    * @param control_nodes The control nodes to check against.
    * @return true if all expected control nodes are present, false otherwise.
    */
-  void check(const specfem::mesh::meshfem3d::ControlNodes<dimension>
-                 &control_nodes) const {
+  void
+  check(const specfem::mesh::control_nodes<dimension> &control_nodes) const {
     // Verify that the control nodes object has the expected number of nodes
     if (control_nodes.nnodes != total_nodes.nnodes) {
       FAIL() << "Total number of control nodes mismatch. "

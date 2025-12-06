@@ -1,8 +1,8 @@
 #pragma once
 
 #include "enumerations/interface.hpp"
-#include "enumerations/material_definitions.hpp"
 #include "impl/point_container.hpp"
+#include "specfem/macros.hpp"
 #include "specfem_setup.hpp"
 
 namespace specfem {

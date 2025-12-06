@@ -32,7 +32,7 @@
                             ibelm_xmin,ibelm_xmax,ibelm_ymin,ibelm_ymax,ibelm_bottom,ibelm_top)
 
   use constants, only: MAX_STRING_LEN,IDOMAIN_ACOUSTIC,IDOMAIN_ELASTIC,IDOMAIN_POROELASTIC, &
-    NDIM,IMAIN,IIN_DB,myrank
+    NDIM,IMAIN,IIN_DB,myrank,NGLLZ,NGLLY,NGLLX
 
   use constants_meshfem, only: NGLLX_M,NGLLY_M,NGLLZ_M,MAX_NEIGHBORS
 
@@ -249,6 +249,7 @@
   !
   ! note: check with routine write_partition_database() to produce identical output
   write(IIN_database) nspec
+  write(IIN_database) NGLLZ, NGLLY, NGLLX
 
   ! sets up node addressing
   call hex_nodes_anchor_ijk_NGLL(NGNOD,anchor_iax,anchor_iay,anchor_iaz,NGLLX_M,NGLLY_M,NGLLZ_M)

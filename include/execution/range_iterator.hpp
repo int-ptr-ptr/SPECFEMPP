@@ -130,6 +130,14 @@ public:
                                        ///< calling @ref
                                        ///< specfem::execution::for_each_level
 
+  using base_index_type = RangeIndex<
+      typename base_type::index_type, ParallelConfig::simd::using_simd,
+      typename base_type::execution_space>; ///< Index type to be
+                                            ///< used when calling
+                                            ///< @ref
+                                            ///< specfem::execution::for_all
+                                            ///< with this iterator.
+
   using execution_space =
       typename base_type::execution_space; ///< Execution space type.
 

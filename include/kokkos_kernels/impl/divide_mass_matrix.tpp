@@ -43,7 +43,8 @@ void specfem::kokkos_kernels::impl::divide_mass_matrix(
 
   specfem::execution::for_all(
       "specfem::kokkos_kernels::divide_mass_matrix", range,
-      KOKKOS_LAMBDA(const IndexType &index) {
+      KOKKOS_LAMBDA(const typename decltype(range)::base_index_type &iterator_index) {
+        const auto index = iterator_index.get_index();
         PointAccelerationType acceleration;
         PointMassInverseType mass_inverse;
         specfem::assembly::load_on_device(index, field, acceleration,

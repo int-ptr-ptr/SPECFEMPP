@@ -24,7 +24,7 @@ specfem::assembly::assembly<specfem::dimension::type::dim2>::assembly(
                           mesh.tags };
   this->edge_types = { this->mesh.element_grid.ngllx,
                        this->mesh.element_grid.ngllz, this->mesh,
-                       this->element_types, mesh.coupled_interfaces };
+                       this->element_types };
   this->jacobian_matrix = { this->mesh };
   this->properties = { this->mesh.nspec,
                        this->mesh.element_grid.ngllz,

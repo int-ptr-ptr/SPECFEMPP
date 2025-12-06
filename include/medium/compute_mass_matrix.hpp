@@ -7,8 +7,8 @@
 #include "dim2/poroelastic/isotropic/mass_matrix.tpp"
 #include "dim3/elastic/isotropic/mass_matrix.tpp"
 #include "enumerations/dimension.hpp"
-#include "enumerations/material_definitions.hpp"
 #include "enumerations/medium.hpp"
+#include "specfem/macros.hpp"
 #include "specfem/point.hpp"
 #include "specfem_setup.hpp"
 #include <Kokkos_Core.hpp>

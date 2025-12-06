@@ -1,1 +1,2 @@
-- "HomogeneousHalfspaceSmallNoABCForceSource"
+tests3d:
+  - "HomogeneousHalfspaceSmallNoABCForceSource"

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "enumerations/specfem_enums.hpp"
+#include "specfem/macros.hpp"
 #include "specfem/point.hpp"
 #include <Kokkos_Core.hpp>
 
@@ -146,7 +147,8 @@ private:
       return { self_element, npoints - 1 - ipoint, npoints - 1 };
       break;
     default:
-      DEVICE_ASSERT(false, "Invalid edge type");
+      KOKKOS_ABORT_WITH_LOCATION(
+          "Error: Unknown edge type in edge::self_index");
       return { 0, 0, 0 };
     }
   }
@@ -167,7 +169,8 @@ private:
       return { coupled_element, ipoint, 0 };
       break;
     default:
-      DEVICE_ASSERT(false, "Invalid edge type");
+      KOKKOS_ABORT_WITH_LOCATION(
+          "Error: Unknown edge type in edge::coupled_index");
       return { 0, 0, 0 };
     }
   }

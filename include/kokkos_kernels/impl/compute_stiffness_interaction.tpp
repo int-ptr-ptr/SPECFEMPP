@@ -123,7 +123,8 @@ int specfem::kokkos_kernels::impl::compute_stiffness_interaction(
     specfem::execution::for_all(
         "specfem::kokkos_kernels::compute_stiffness_interaction", chunk,
         KOKKOS_LAMBDA(
-            const specfem::point::index<dimension_tag, using_simd> &index) {
+            const typename decltype(chunk)::base_index_type &iterator_index) {
+            const auto index = iterator_index.get_index();
           PointAccelerationType acceleration;
           specfem::assembly::load_on_device(istep, index, boundary_values,
                                             acceleration);

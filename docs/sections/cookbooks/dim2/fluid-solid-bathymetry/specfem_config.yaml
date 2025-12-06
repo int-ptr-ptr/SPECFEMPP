@@ -43,7 +43,7 @@ parameters:
     angle: 0.0
     seismogram-type:
       - pressure
-    nstep_between_samples: 10
+    nstep_between_samples: 1
 
   ## Runtime setup
   run-setup:

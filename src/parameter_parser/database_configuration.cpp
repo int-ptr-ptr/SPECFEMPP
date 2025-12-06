@@ -6,15 +6,8 @@
 specfem::runtime_configuration::database_configuration::database_configuration(
     const YAML::Node &database_node) {
   try {
-    if (database_node["mesh-parameters"]) {
-      *this = specfem::runtime_configuration::database_configuration(
-          database_node["mesh-database"].as<std::string>(),
-          database_node["mesh-parameters"].as<std::string>());
-
-    } else {
-      *this = specfem::runtime_configuration::database_configuration(
-          database_node["mesh-database"].as<std::string>());
-    }
+    *this = specfem::runtime_configuration::database_configuration(
+        database_node["mesh-database"].as<std::string>());
 
   } catch (YAML::ParserException &e) {
 

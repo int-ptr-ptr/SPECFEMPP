@@ -45,6 +45,22 @@ apply_boundary_conditions(const PointBoundaryType &boundary,
   return;
 }
 
+// for some reason, the nonconforming kernel doesn't compile on cuda 11.8
+// without an instance of a stacey and composite overload.
+// this should not be called at runtime.
+template <typename PointBoundaryType, typename PointAccelerationType,
+          typename std::enable_if_t<
+              ((PointBoundaryType::boundary_tag ==
+                specfem::element::boundary_tag::stacey) ||
+               (PointBoundaryType::boundary_tag ==
+                specfem::element::boundary_tag::composite_stacey_dirichlet)),
+              int> = 0>
+KOKKOS_FORCEINLINE_FUNCTION void
+apply_boundary_conditions(const PointBoundaryType &boundary,
+                          PointAccelerationType &acceleration) {
+  return;
+}
+
 template <typename PointBoundaryType, typename PointPropertyType,
           typename PointVelocityType, typename PointAccelerationType>
 KOKKOS_FORCEINLINE_FUNCTION void apply_boundary_conditions(
