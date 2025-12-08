@@ -7,6 +7,9 @@
 #include "compute_coupling/parameter/interface_configuration.hpp"
 #include "kernel.hpp"
 
+#include "test_macros.hpp" // for expected_got()
+#include <gtest/gtest.h>
+
 template <specfem::dimension::type DimensionTag,
           specfem::interface::interface_tag InterfaceTag>
 struct PointData {
@@ -24,14 +27,13 @@ struct PointData {
 
   specfem::datatype::VectorPointViewType<type_real, ncomp_self, use_simd>
       field_self;
-  specfem::datatype::VectorPointViewType<type_real, ncomp_self, use_simd>
+  specfem::datatype::VectorPointViewType<type_real, ncomp_coupled, use_simd>
       field_coupled;
   specfem::point::field_derivatives<DimensionTag, self_medium, use_simd>
       field_gradient_self;
   specfem::point::field_derivatives<DimensionTag, coupled_medium, use_simd>
       field_gradient_coupled;
-  specfem::datatype::VectorPointViewType<type_real, ncomp_self, use_simd>
-      normal;
+  specfem::datatype::VectorPointViewType<type_real, ndim, use_simd> normal;
 };
 
 template <specfem::dimension::type DimensionTag,
@@ -111,21 +113,106 @@ void test_interface(
         intersection.interface_transfer);
     for (int icomp = 0; icomp < interface_config.ncomp_self; icomp++) {
       intersection.interface_shape.template set_edge_field<true>(
-          Kokkos::subview(kernel_data.field_self, ichunk, iedge, Kokkos::ALL,
+          Kokkos::subview(kernel_data.h_field_self, ichunk, iedge, Kokkos::ALL,
                           icomp),
           intersection.field_self(icomp), intersection.interface_transfer);
     }
     for (int icomp = 0; icomp < interface_config.ncomp_coupled; icomp++) {
       intersection.interface_shape.template set_edge_field<false>(
-          Kokkos::subview(kernel_data.field_coupled, ichunk, iedge, Kokkos::ALL,
-                          icomp),
+          Kokkos::subview(kernel_data.h_field_coupled, ichunk, iedge,
+                          Kokkos::ALL, icomp),
           intersection.field_coupled(icomp), intersection.interface_transfer);
     }
   }
+
+  kernel_data.sync_to_device();
 
   // ====================================================================
   // run kernel
   // ===================================================================='
   compute_kernel<DimensionTag, InterfaceTag, chunk_size, nquad_edge,
                  nquad_intersection>(kernel_data);
+
+  kernel_data.sync_to_host();
+
+  int num_comparisons = 0;
+  for (auto intersection : interface_config.edges) {
+    const int ichunk = intersection.iedge / chunk_size;
+    const int iedge = intersection.iedge % chunk_size;
+
+    // verify self transfers
+    for (int ipoint = 0; ipoint < nquad_intersection; ipoint++) {
+      PointData<DimensionTag, InterfaceTag> point_data;
+
+      const type_real edge_coord = intersection.interface_transfer
+                                       .intersection_quadrature_points[ipoint];
+
+      const auto point_loc =
+          intersection.interface_shape.coordinate(edge_coord);
+      const auto point_normal = intersection.interface_shape.normal(edge_coord);
+
+      for (int idim = 0; idim < point_data.ndim; idim++) {
+        point_data.normal(idim) = point_normal(idim);
+      }
+      for (int icomp = 0; icomp < interface_config.ncomp_self; icomp++) {
+        point_data.field_self(icomp) =
+            intersection.field_self(icomp).eval(point_loc);
+        const auto grad = intersection.field_self(icomp).gradient(point_loc);
+        for (int idim = 0; idim < point_data.ndim; idim++) {
+          point_data.field_gradient_self.du(icomp, idim) = grad(idim);
+        }
+      }
+      for (int icomp = 0; icomp < interface_config.ncomp_coupled; icomp++) {
+        point_data.field_coupled(icomp) =
+            intersection.field_coupled(icomp).eval(point_loc);
+        const auto grad = intersection.field_coupled(icomp).gradient(point_loc);
+        for (int idim = 0; idim < point_data.ndim; idim++) {
+          point_data.field_gradient_coupled.du(icomp, idim) = grad(idim);
+        }
+      }
+      const auto expected = compute_coupling_expected(point_data);
+
+      for (int icomp = 0; icomp < interface_config.ncomp_self; icomp++) {
+        // TODO replace with more verbose test
+
+        type_real got =
+            kernel_data.h_computed_coupling(ichunk, iedge, ipoint, icomp);
+
+        EXPECT_TRUE(specfem::utilities::is_close(got, expected[icomp]))
+            << expected_got(expected[icomp], got);
+        num_comparisons++;
+      }
+    }
+
+    // skip coupled side, since we don't have a way to get the conjugate
+    // interface tag.
+
+    // // verify coupled transfers
+    // for (int ipoint = 0; ipoint < nquad_intersection; ipoint++) {
+    //   PointData<DimensionTag, CONJUGATE_INTERFACE<InterfaceTag>> point_data;
+    //   const auto expected = compute_coupling_expected(point_data);
+
+    //   for (int icomp = 0; icomp < interface_config.ncomp_self; icomp++) {
+    //     // TODO replace with more verbose test
+
+    //     type_real got =
+    //         kernel_data.h_computed_coupling(ichunk, iedge, ipoint, icomp);
+
+    //     EXPECT_TRUE(specfem::utilities::is_close(got, expected[icomp]))
+    //         << expected_got(expected[icomp], got);
+    //   }
+    // }
+  }
+
+  EXPECT_EQ(num_comparisons, num_chunks * chunk_size * nquad_intersection *
+                                 interface_config.ncomp_self)
+      << "Test failed to perform the correct number of comparisons!\n"
+      << "  - " << num_chunks << " chunks of " << chunk_size
+      << " edges for a total of " << num_chunks * chunk_size << " edges\n"
+      << "  - each edge has " << nquad_intersection
+      << " points on the intersection quadrature ("
+      << num_chunks * chunk_size * nquad_intersection << " quadrature points)\n"
+      << "  - " << interface_config.ncomp_self
+      << " components in self_field and " << interface_config.ncomp_coupled
+      << " components in coupled_field";
 }
