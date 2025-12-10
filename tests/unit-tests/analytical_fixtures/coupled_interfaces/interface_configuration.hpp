@@ -1,9 +1,9 @@
+#include "analytical_fixtures/coupled_interfaces/interface_shape.hpp"
+#include "analytical_fixtures/coupled_interfaces/interface_transfer.hpp"
 #include "analytical_fixtures/field.hpp"
-#include "analytical_fixtures/interface_shape.hpp"
 #include "enumerations/medium.hpp"
-#include "interface_transfer.hpp"
 
-namespace specfem::testing::interface_configuration {
+namespace specfem::test::analytical::interface_configuration {
 
 /**
  * @brief Specifies a configuration for a (nonconforming) interface. This is a
@@ -11,11 +11,14 @@ namespace specfem::testing::interface_configuration {
  * of the interface and fields. Each connection, however, is independent,
  * lacking an assembly or universal coordinate system.
  *
+ * @tparam use_full_element whether or not the interface uses a full element, or
+ * a representation of the mating faces.
  * @tparam InterfaceTag type of interface to model
  * @tparam DimensionTag dimension of the domain (the interface has codimension
  * 1)
- * @tparam use_full_element whether or not the interface uses a full element, or
- * a representation of the mating faces.
+ * @tparam nquad_edge number of quadrature points on the edge (for kernel)
+ * @tparam nquad_edge number of quadrature points on the intersection (for
+ * kernel)
  */
 template <bool use_full_element, specfem::interface::interface_tag InterfaceTag,
           specfem::dimension::type DimensionTag, int nquad_edge,
@@ -45,7 +48,7 @@ public:
       &field_generator;
   const specfem::test::analytical::interface_shape::Generator<DimensionTag>
       &interface_shape_generator;
-  const specfem::testing::interface_transfer::Generator<
+  const specfem::test::analytical::interface_transfer::Generator<
       DimensionTag, nquad_edge, nquad_intersection>
       &interface_transfer_generator;
   const int num_intersections;
@@ -68,14 +71,14 @@ private:
         fields_coupled_;
     specfem::test::analytical::interface_shape::Iterator<DimensionTag>
         interface_shape_;
-    specfem::testing::interface_transfer::Iterator<DimensionTag, nquad_edge,
-                                                   nquad_intersection>
+    specfem::test::analytical::interface_transfer::Iterator<
+        DimensionTag, nquad_edge, nquad_intersection>
         interface_transfer_;
 
   public:
     const specfem::test::analytical::interface_shape::InterfaceShapeBase<
         DimensionTag> &interface_shape;
-    const specfem::testing::interface_transfer::InterfaceTransfer<
+    const specfem::test::analytical::interface_transfer::InterfaceTransfer<
         DimensionTag, nquad_edge, nquad_intersection> &interface_transfer;
 
     const specfem::test::analytical::field::FieldBase<DimensionTag> &
@@ -93,7 +96,7 @@ private:
             &field_iter,
         const specfem::test::analytical::interface_shape::Iterator<DimensionTag>
             &interface_shape_iter,
-        const specfem::testing::interface_transfer::Iterator<
+        const specfem::test::analytical::interface_transfer::Iterator<
             DimensionTag, nquad_edge, nquad_intersection>
             &interface_transfer_iter)
         : parent(parent), iedge(iedge),
@@ -114,6 +117,7 @@ private:
     }
   };
 
+  // IntersectionFrame iterator boilerplate: necessary for foreach loops.
   struct IntersectionIterable {
     const InterfaceConfiguration &parent;
     struct IntersectionIterator {
@@ -122,8 +126,8 @@ private:
       specfem::test::analytical::field::Iterator<DimensionTag> field_iter;
       specfem::test::analytical::interface_shape::Iterator<DimensionTag>
           interface_shape_iter;
-      specfem::testing::interface_transfer::Iterator<DimensionTag, nquad_edge,
-                                                     nquad_intersection>
+      specfem::test::analytical::interface_transfer::Iterator<
+          DimensionTag, nquad_edge, nquad_intersection>
           interface_transfer_iter;
       IntersectionIterator(const InterfaceConfiguration &parent,
                            const bool &start)
@@ -173,7 +177,7 @@ public:
           &field_generator,
       const specfem::test::analytical::interface_shape::Generator<DimensionTag>
           &interface_shape_generator,
-      const specfem::testing::interface_transfer::Generator<
+      const specfem::test::analytical::interface_transfer::Generator<
           DimensionTag, nquad_edge, nquad_intersection>
           &interface_transfer_generator,
       int num_intersections)
@@ -183,4 +187,4 @@ public:
         num_intersections(num_intersections), edges(*this) {}
 };
 
-} // namespace specfem::testing::interface_configuration
+} // namespace specfem::test::analytical::interface_configuration

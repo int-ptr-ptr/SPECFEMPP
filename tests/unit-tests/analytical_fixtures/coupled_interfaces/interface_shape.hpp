@@ -154,14 +154,6 @@ public:
         outward_normal(outward_normal) {}
 };
 
-const Generator<dimension::type::dim2> interface_shapes_2d =
-    Generator<dimension::type::dim2>()
-        .add_interface_shape<Flat2D>(Flat2D(0.1, false))
-        .add_interface_shape<Flat2D>(Flat2D(2.4, true))
-        .add_interface_shape<Flat2D>(Flat2D(-2.5))
-        .add_interface_shape<Arc>(Arc(5.0, -1.3, 0.3, true))
-        .add_interface_shape<Arc>(Arc(8.0, 3.0, 0.3, false));
-
 template <>
 template <typename ViewType, typename InterfaceTransferType>
 void InterfaceShapeBase<specfem::dimension::type::dim2>::
@@ -178,5 +170,13 @@ void InterfaceShapeBase<specfem::dimension::type::dim2>::
     }
   }
 }
+
+const Generator<dimension::type::dim2> interface_shapes_2d =
+    Generator<dimension::type::dim2>()
+        .add_interface_shape<Flat2D>(Flat2D(0.1, false))
+        .add_interface_shape<Flat2D>(Flat2D(2.4, true))
+        .add_interface_shape<Flat2D>(Flat2D(-2.5))
+        .add_interface_shape<Arc>(Arc(5.0, -1.3, 0.3, true))
+        .add_interface_shape<Arc>(Arc(8.0, 3.0, 0.3, false));
 
 } // namespace specfem::test::analytical::interface_shape

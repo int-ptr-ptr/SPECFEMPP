@@ -1,10 +1,10 @@
+#include "analytical_fixtures/coupled_interfaces/interface_shape.hpp"
+#include "analytical_fixtures/coupled_interfaces/interface_transfer.hpp"
 #include "analytical_fixtures/field.hpp"
-#include "analytical_fixtures/interface_shape.hpp"
-#include "compute_coupling/parameter/interface_transfer.hpp"
 #include "datatypes/point_view.hpp"
 #include "specfem/point/field_derivatives.hpp"
 
-#include "compute_coupling/parameter/interface_configuration.hpp"
+#include "analytical_fixtures/coupled_interfaces/interface_configuration.hpp"
 #include "kernel.hpp"
 
 #include "test_macros.hpp" // for expected_got()
@@ -63,7 +63,7 @@ void test_interface(
         &interface_shape_generator,
     const specfem::test::analytical::field::Generator<DimensionTag>
         &field_generator,
-    const specfem::testing::interface_transfer::Generator<
+    const specfem::test::analytical::interface_transfer::Generator<
         DimensionTag, nquad_edge, nquad_intersection>
         &interface_transfer_generator,
     const int &num_edges) {
@@ -80,7 +80,7 @@ void test_interface(
   ComputeCouplingKernelStorage<DimensionTag, InterfaceTag, chunk_size,
                                nquad_edge, nquad_intersection>
       kernel_data(num_chunks);
-  specfem::testing::interface_configuration::InterfaceConfiguration<
+  specfem::test::analytical::interface_configuration::InterfaceConfiguration<
       false, InterfaceTag, DimensionTag, nquad_edge, nquad_intersection>
       interface_config(field_generator, interface_shape_generator,
                        interface_transfer_generator, num_chunks * chunk_size);
@@ -180,8 +180,9 @@ void test_interface(
             kernel_data.h_computed_coupling(ichunk, iedge, ipoint, icomp);
 
         EXPECT_TRUE(specfem::utilities::is_close(got, expected[icomp]))
-            << expected_got(expected[icomp], got);
-        std::cout << got << "(" << expected[icomp] << ")" << std::endl;
+            << expected_got(expected[icomp], got)
+            << intersection.interface_transfer.verbose_intersection_point(
+                   ipoint);
         num_comparisons++;
       }
     }
