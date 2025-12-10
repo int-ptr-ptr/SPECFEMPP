@@ -19,7 +19,7 @@ TEST(NonconformingComputeCoupling, ElasticAcoustic) {
 
   test_interface<specfem::interface::interface_tag::elastic_acoustic>(
       specfem::testing::interface_shape::RandomFlat2DGenerator(33576),
-      specfem::testing::field::RandomPolynomial2DGenerator(4, 34631),
+      specfem::test::analytical::field::sample_fields_2d,
       specfem::testing::interface_transfer::Vector<
           specfem::dimension::type::dim2, 5, 4>(
           specfem::testing::interface_transfer::InterfaceTransfer<

@@ -1,4 +1,4 @@
-#include "compute_coupling/parameter/field.hpp"
+#include "analytical_fixtures/field.hpp"
 #include "compute_coupling/parameter/interface_shape.hpp"
 #include "compute_coupling/parameter/interface_transfer.hpp"
 #include "datatypes/point_view.hpp"
@@ -61,7 +61,8 @@ template <specfem::interface::interface_tag InterfaceTag,
 void test_interface(
     const specfem::testing::interface_shape::Generator<DimensionTag>
         &interface_shape_generator,
-    const specfem::testing::field::Generator<DimensionTag> &field_generator,
+    const specfem::test::analytical::field::Generator<DimensionTag>
+        &field_generator,
     const specfem::testing::interface_transfer::Generator<
         DimensionTag, nquad_edge, nquad_intersection>
         &interface_transfer_generator,
@@ -180,6 +181,7 @@ void test_interface(
 
         EXPECT_TRUE(specfem::utilities::is_close(got, expected[icomp]))
             << expected_got(expected[icomp], got);
+        std::cout << got << "(" << expected[icomp] << ")" << std::endl;
         num_comparisons++;
       }
     }

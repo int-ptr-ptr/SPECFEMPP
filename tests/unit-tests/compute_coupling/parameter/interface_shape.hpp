@@ -1,5 +1,5 @@
 #pragma once
-#include "compute_coupling/parameter/field.hpp"
+#include "analytical_fixtures/field.hpp"
 #include "datatypes/point_view.hpp"
 #include "enumerations/dimension.hpp"
 #include "interface_transfer.hpp"
@@ -53,10 +53,10 @@ public:
    * coordinates for sampling.
    */
   template <bool is_self, typename ViewType, typename InterfaceTransferType>
-  void
-  set_edge_field(const ViewType &edge_field,
-                 const specfem::testing::field::FieldBase<DimensionTag> &field,
-                 const InterfaceTransferType &interface_transfer) const {
+  void set_edge_field(
+      const ViewType &edge_field,
+      const specfem::test::analytical::field::FieldBase<DimensionTag> &field,
+      const InterfaceTransferType &interface_transfer) const {
     const auto &edge_points = [&]() -> auto & {
       if constexpr (is_self) {
         return interface_transfer.edge_quadrature_points_self;
