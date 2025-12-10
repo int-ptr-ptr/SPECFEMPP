@@ -96,6 +96,10 @@ const Generator<dimension::type::dim2> sample_fields_2d =
         .add_field<Polynomial2D>(Polynomial2D({ { { 1, 0 }, 1 } }))
         .add_field<Polynomial2D>(Polynomial2D({ { { 1, 1 }, 1 } }))
         .add_field<Polynomial2D>(Polynomial2D({ { { 2, 1 }, 1 } }))
-        .add_field<Polynomial2D>(Polynomial2D({ { { 1, 2 }, 1 } }));
+        .add_field<Polynomial2D>(Polynomial2D({ { { 1, 2 }, 1 } }))
+        .add_field<Polynomial2D>(
+            Polynomial2D({ { { 2, 2 }, 1 }, { { 0, 0 }, -2.0 } }))
+        .add_field<Polynomial2D>(
+            Polynomial2D({ { { 1, 2 }, 1 }, { { 0, 1 }, -2.0 } }));
 
 } // namespace specfem::test::analytical::field

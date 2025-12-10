@@ -2,11 +2,10 @@
 #include "analytical_fixtures/field.hpp"
 #include "datatypes/point_view.hpp"
 #include "enumerations/dimension.hpp"
-#include "interface_transfer.hpp"
 #include "specfem/point/coordinates.hpp"
 #include <memory>
 
-namespace specfem::testing::interface_shape {
+namespace specfem::test::analytical::interface_shape {
 
 /**
  * @brief A testing parameter that sets the shape of the interface being tested.
@@ -75,66 +74,32 @@ public:
   virtual ~InterfaceShapeBase() {}
 };
 
-/**
- * @brief Iterator for interface shapes
- *
- * @tparam DimensionTag - dimension of the domain - the interface has
- * codimension 1
- */
-template <specfem::dimension::type DimensionTag> struct Iterator {
-public:
-  using InterfaceShapeType = InterfaceShapeBase<DimensionTag>;
-
-  // impl and unique_ptr is used to hide away the abstract nature of the
-  // iterator.
-  struct IteratorImpl {
-    virtual const InterfaceShapeType &operator*() const = 0;
-    virtual void operator++() = 0;
-    virtual std::unique_ptr<IteratorImpl> copy() const = 0;
-    virtual ~IteratorImpl() {}
-  };
-
+template <specfem::dimension::type DimensionTag> struct Generator {
 private:
-  std::unique_ptr<IteratorImpl> iter;
+  std::vector<std::shared_ptr<InterfaceShapeBase<DimensionTag> > >
+      interface_shapes;
 
 public:
-  Iterator(std::unique_ptr<IteratorImpl> &&iter) : iter(std::move(iter)) {}
-  Iterator(const Iterator &other) { *this = other; }
-  Iterator() = default;
-  void operator=(const Iterator &other) {
-    if (other.iter == nullptr) {
-      iter = nullptr;
-    } else {
-      iter = other.iter->copy();
-    }
+  Generator() {};
+
+  template <typename InterfaceShapeType,
+            std::enable_if_t<std::is_base_of_v<InterfaceShapeBase<DimensionTag>,
+                                               InterfaceShapeType>,
+                             int> = 0>
+  Generator &add_interface_shape(const InterfaceShapeType &interface_shape) {
+    interface_shapes.push_back(
+        std::make_shared<InterfaceShapeType>(interface_shape));
+    return *this;
   }
-  const InterfaceShapeType &operator*() const { return **iter; };
-  void operator++() { ++(*iter); };
-  const InterfaceShapeType &next() {
-    ++(*this);
-    return **this;
+
+  RoundRobinIterator<InterfaceShapeBase<DimensionTag> > iterator() const {
+    return RoundRobinIterator<InterfaceShapeBase<DimensionTag> >(
+        &interface_shapes);
   }
 };
 
-/**
- * @brief Abstract iterator for interface shapes
- *
- * @tparam DimensionTag - dimension of the domain - the interface has
- * codimension 1
- */
-template <specfem::dimension::type DimensionTag> class Generator {
-protected:
-  using IteratorType = Iterator<DimensionTag>;
-  using IteratorPtrType = std::unique_ptr<typename IteratorType::IteratorImpl>;
-  using InterfaceShapeType = InterfaceShapeBase<DimensionTag>;
-
-  virtual IteratorPtrType get_iterator_impl() const = 0;
-
-public:
-  IteratorType iterator() const { return IteratorType(get_iterator_impl()); };
-
-  virtual ~Generator() {}
-};
+template <specfem::dimension::type DimensionTag>
+using Iterator = RoundRobinIterator<InterfaceShapeBase<DimensionTag> >;
 
 /**
  * @brief interface is flat (straight line at given angle)
@@ -189,57 +154,13 @@ public:
         outward_normal(outward_normal) {}
 };
 
-class RandomFlat2DGenerator : public Generator<specfem::dimension::type::dim2> {
-private:
-  using BaseGeneratorType = Generator<specfem::dimension::type::dim2>;
-
-public:
-  struct Iterator : public specfem::testing::interface_shape::Iterator<
-                        specfem::dimension::type::dim2>::IteratorImpl {
-    std::shared_ptr<InterfaceShapeBase<specfem::dimension::type::dim2> >
-        current_shape;
-    int next_seed;
-    const RandomFlat2DGenerator &parent;
-
-  public:
-    Iterator(
-        const RandomFlat2DGenerator &parent, const int &next_seed,
-        std::shared_ptr<InterfaceShapeBase<specfem::dimension::type::dim2> >
-            current_shape = nullptr)
-        : parent(parent), next_seed(next_seed), current_shape(current_shape) {
-      if (current_shape == nullptr) {
-        operator++();
-      }
-    }
-
-    const typename BaseGeneratorType::InterfaceShapeType &
-    operator*() const override {
-      return *current_shape;
-    }
-
-    void operator++() override {
-      std::srand(next_seed);
-      current_shape =
-          std::make_shared<Flat2D>(((type_real)std::rand()) / RAND_MAX, false);
-      next_seed = std::rand();
-    }
-
-    std::unique_ptr<IteratorImpl> copy() const override {
-      return std::make_unique<Iterator>(parent, next_seed, current_shape);
-    }
-  };
-
-private:
-  int seed_offset;
-
-public:
-  RandomFlat2DGenerator(int seed_offset = 0) : seed_offset(seed_offset) {}
-
-  typename BaseGeneratorType::IteratorPtrType
-  get_iterator_impl() const override {
-    return std::make_unique<Iterator>(*this, seed_offset);
-  };
-};
+const Generator<dimension::type::dim2> interface_shapes_2d =
+    Generator<dimension::type::dim2>()
+        .add_interface_shape<Flat2D>(Flat2D(0.1, false))
+        .add_interface_shape<Flat2D>(Flat2D(2.4, true))
+        .add_interface_shape<Flat2D>(Flat2D(-2.5))
+        .add_interface_shape<Arc>(Arc(5.0, -1.3, 0.3, true))
+        .add_interface_shape<Arc>(Arc(8.0, 3.0, 0.3, false));
 
 template <>
 template <typename ViewType, typename InterfaceTransferType>
@@ -258,4 +179,4 @@ void InterfaceShapeBase<specfem::dimension::type::dim2>::
   }
 }
 
-} // namespace specfem::testing::interface_shape
+} // namespace specfem::test::analytical::interface_shape

@@ -1,5 +1,5 @@
 #include "analytical_fixtures/field.hpp"
-#include "compute_coupling/parameter/interface_shape.hpp"
+#include "analytical_fixtures/interface_shape.hpp"
 #include "compute_coupling/parameter/interface_transfer.hpp"
 #include "datatypes/point_view.hpp"
 #include "specfem/point/field_derivatives.hpp"
@@ -59,7 +59,7 @@ template <specfem::interface::interface_tag InterfaceTag,
           specfem::dimension::type DimensionTag, int nquad_edge,
           int nquad_intersection>
 void test_interface(
-    const specfem::testing::interface_shape::Generator<DimensionTag>
+    const specfem::test::analytical::interface_shape::Generator<DimensionTag>
         &interface_shape_generator,
     const specfem::test::analytical::field::Generator<DimensionTag>
         &field_generator,

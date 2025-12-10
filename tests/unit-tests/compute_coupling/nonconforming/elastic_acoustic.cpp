@@ -18,7 +18,7 @@ compute_coupling_expected<specfem::dimension::type::dim2,
 TEST(NonconformingComputeCoupling, ElasticAcoustic) {
 
   test_interface<specfem::interface::interface_tag::elastic_acoustic>(
-      specfem::testing::interface_shape::RandomFlat2DGenerator(33576),
+      specfem::test::analytical::interface_shape::interface_shapes_2d,
       specfem::test::analytical::field::sample_fields_2d,
       specfem::testing::interface_transfer::Vector<
           specfem::dimension::type::dim2, 5, 4>(
