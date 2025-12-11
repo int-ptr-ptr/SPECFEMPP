@@ -2,6 +2,11 @@
 #include "analytical_fixtures/coupled_interfaces/interface_transfer.hpp"
 #include "analytical_fixtures/field.hpp"
 #include "enumerations/medium.hpp"
+#include "utilities/include/tabulate.hpp"
+#include <iomanip>
+#include <ios>
+#include <sstream>
+#include <vector>
 
 namespace specfem::test::analytical::interface_configuration {
 
@@ -114,6 +119,97 @@ private:
         fields_coupled_[icomp] = field;
         ++field;
       }
+    }
+
+    std::string verbose_intersection_data() {
+      std::ostringstream oss;
+
+      specfem::test::Table self_table(3, nquad_edge);
+      specfem::test::Table coupled_table(3, nquad_edge);
+      specfem::test::Table intersection_table(4, nquad_intersection);
+
+      self_table.set_row_format(0, specfem::test::Table::EntryType::integer);
+      self_table.set_row_label(0, "ipoint");
+      self_table.set_row_format(1, specfem::test::Table::EntryType::real);
+      self_table.set_row_label(1, "interface coord");
+      self_table.set_row_format(2, specfem::test::Table::EntryType::vector);
+      self_table.set_row_label(2, "field");
+
+      coupled_table.set_row_format(-1,
+                                   specfem::test::Table::EntryType::integer);
+      coupled_table.set_row_label(-1, "ipoint");
+      coupled_table.set_row_format(-2, specfem::test::Table::EntryType::real);
+      coupled_table.set_row_label(-2, "interface coord");
+      coupled_table.set_row_format(-3, specfem::test::Table::EntryType::vector);
+      coupled_table.set_row_label(-3, "field");
+
+      intersection_table.set_row_format(
+          0, specfem::test::Table::EntryType::vector);
+      intersection_table.set_row_label(0, "self field");
+      intersection_table.set_row_format(1,
+                                        specfem::test::Table::EntryType::real);
+      intersection_table.set_row_label(1, "interface coord");
+      intersection_table.set_row_format(
+          2, specfem::test::Table::EntryType::vector);
+      intersection_table.set_row_label(2, "normal");
+      intersection_table.set_row_format(
+          -1, specfem::test::Table::EntryType::vector);
+      intersection_table.set_row_label(-1, "coupled field");
+
+      for (int ipoint = 0; ipoint < nquad_edge; ipoint++) {
+        type_real local_coord_self =
+            interface_transfer.edge_quadrature_points_self[ipoint];
+        self_table.set_data(0, ipoint, ipoint);
+        self_table.set_data(1, ipoint, local_coord_self);
+        std::vector<type_real> field_data;
+        for (int icomp = 0; icomp < ncomp_self; icomp++) {
+          field_data.push_back(field_self(icomp).eval(
+              interface_shape.coordinate(local_coord_self)));
+        }
+        self_table.set_data(2, ipoint, field_data);
+
+        type_real local_coord_coupled =
+            interface_transfer.edge_quadrature_points_coupled[ipoint];
+        coupled_table.set_data(-1, ipoint, ipoint);
+        coupled_table.set_data(-2, ipoint, local_coord_coupled);
+        field_data = std::vector<type_real>();
+        for (int icomp = 0; icomp < ncomp_coupled; icomp++) {
+          field_data.push_back(field_coupled(icomp).eval(
+              interface_shape.coordinate(local_coord_coupled)));
+        }
+        coupled_table.set_data(-3, ipoint, field_data);
+      }
+
+      for (int ipoint = 0; ipoint < nquad_intersection; ipoint++) {
+        std::vector<type_real> field_data;
+        type_real local_coord =
+            interface_transfer.intersection_quadrature_points[ipoint];
+        for (int icomp = 0; icomp < ncomp_self; icomp++) {
+          field_data.push_back(
+              field_self(icomp).eval(interface_shape.coordinate(local_coord)));
+        }
+        intersection_table.set_data(0, ipoint, field_data);
+
+        intersection_table.set_data(1, ipoint, local_coord);
+
+        const auto normal = interface_shape.normal(local_coord);
+        field_data = { normal(0), normal(1) };
+        intersection_table.set_data(2, ipoint, field_data);
+
+        field_data = std::vector<type_real>();
+        for (int icomp = 0; icomp < ncomp_coupled; icomp++) {
+          field_data.push_back(field_coupled(icomp).eval(
+              interface_shape.coordinate(local_coord)));
+        }
+        intersection_table.set_data(-1, ipoint, field_data);
+      }
+
+      oss << "self\n" << self_table << "\n";
+
+      oss << "intersection\n" << intersection_table << "\n";
+
+      oss << "coupled\n" << coupled_table << "\n";
+      return oss.str();
     }
   };
 

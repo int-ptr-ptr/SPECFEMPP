@@ -25,6 +25,6 @@ TEST(NonconformingComputeCoupling, AcousticElastic) {
   test_interface<specfem::interface::interface_tag::acoustic_elastic>(
       specfem::test::analytical::interface_shape::interface_shapes_2d,
       specfem::test::analytical::field::sample_fields_2d,
-      specfem::test::analytical::interface_transfer::interface_transfer_2d_2_2,
+      specfem::test::analytical::interface_transfer::interface_transfer_2d_6_6,
       3);
 }

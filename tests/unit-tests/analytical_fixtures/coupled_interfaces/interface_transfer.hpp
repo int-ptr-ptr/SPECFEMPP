@@ -39,16 +39,21 @@ namespace specfem::test::analytical::interface_transfer {
  *
  * @tparam DimensionTag - dimension of the domain - the interface has
  * codimension 1
- * @tparam nquad_edge_ - the number of quadrature points on (dimension of) the
+ * @tparam nquad_edge - the number of quadrature points on (dimension of) the
  * edge
- * @tparam nquad_intersection_ - the number of quadrature points on (dimension
+ * @tparam nquad_intersection - the number of quadrature points on (dimension
  * of) the intersections
  */
-template <specfem::dimension::type DimensionTag, int nquad_edge_,
-          int nquad_intersection_>
-class InterfaceTransfer {
+template <specfem::dimension::type DimensionTag, int nquad_edge,
+          int nquad_intersection>
+class InterfaceTransfer;
+
+template <int nquad_edge_, int nquad_intersection_>
+class InterfaceTransfer<specfem::dimension::type::dim2, nquad_edge_,
+                        nquad_intersection_> {
 public:
-  static constexpr specfem::dimension::type dimension_tag = DimensionTag;
+  static constexpr specfem::dimension::type dimension_tag =
+      specfem::dimension::type::dim2;
   static constexpr int nquad_edge = nquad_edge_;
   static constexpr int nquad_intersection = nquad_intersection_;
 
@@ -74,7 +79,7 @@ public:
               std::begin(this->intersection_quadrature_points));
   }
 
-  InterfaceTransfer(const InterfaceTransfer<DimensionTag, nquad_edge,
+  InterfaceTransfer(const InterfaceTransfer<dimension_tag, nquad_edge,
                                             nquad_intersection> &orig)
       : edge_quadrature_points_self(orig.edge_quadrature_points_self),
         intersection_quadrature_points(orig.intersection_quadrature_points),
@@ -107,15 +112,6 @@ public:
             edge_points, iedge, intersection_quadrature_points[iintersection]);
       }
     }
-  }
-
-  std::string verbose_intersection_point(const int &iintersection) const {
-    std::ostringstream oss;
-
-    oss << "intersection_points[" << iintersection
-        << "] == " << intersection_quadrature_points[iintersection];
-
-    return oss.str();
   }
 };
 
@@ -163,8 +159,10 @@ const Generator<dimension::type::dim2, 5, 4> interface_transfer_2d_5_4 =
                                   { -0.38, -0.3, 0.2, 0.38 },
                                   { -0.25, -0.1, 0, 0.5, 1 } });
 
-const Generator<dimension::type::dim2, 2, 2> interface_transfer_2d_2_2 =
-    Generator<dimension::type::dim2, 2, 2>().add_interface_transfer(
-        { { -1, 1 }, { 0, 1 }, { 0, 2 } });
+const Generator<dimension::type::dim2, 6, 6> interface_transfer_2d_6_6 =
+    Generator<dimension::type::dim2, 6, 6>().add_interface_transfer(
+        { { -1, -0.6, -0.2, 0.2, 0.6, 1 },
+          { 0, 0.2, 0.4, 0.6, 0.8, 1.0 },
+          { 0, 0.4, 0.8, 1.2, 1.6, 2 } });
 
 } // namespace specfem::test::analytical::interface_transfer

@@ -8,6 +8,7 @@
 #include "kernel.hpp"
 
 #include "test_macros.hpp" // for expected_got()
+#include "utilities/include/tabulate.hpp"
 #include <gtest/gtest.h>
 
 template <specfem::dimension::type DimensionTag,
@@ -179,10 +180,15 @@ void test_interface(
         type_real got =
             kernel_data.h_computed_coupling(ichunk, iedge, ipoint, icomp);
 
-        EXPECT_TRUE(specfem::utilities::is_close(got, expected[icomp]))
-            << expected_got(expected[icomp], got)
-            << intersection.interface_transfer.verbose_intersection_point(
-                   ipoint);
+        if (!specfem::utilities::is_close(got, expected[icomp])) {
+
+          FAIL() << "iedge (global) =" << intersection.iedge
+                 << " quadrature point =" << ipoint << ", component =" << icomp
+                 << "\n"
+                 << expected_got(expected[icomp], got)
+                 << intersection.verbose_intersection_data() << std::endl;
+        }
+
         num_comparisons++;
       }
     }

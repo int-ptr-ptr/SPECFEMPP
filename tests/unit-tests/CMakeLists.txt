@@ -47,6 +47,16 @@ add_library(
   utilities/src/compare_array.cpp
 )
 
+
+add_library(
+  tabulate
+  utilities/src/tabulate.cpp
+)
+target_link_libraries(
+  tabulate
+  # kokkos_environment
+  Kokkos::kokkos
+)
 target_link_libraries(
   compare_arrays
   Kokkos::kokkos
@@ -716,6 +726,7 @@ add_executable(
 
 target_link_libraries(
   compute_coupling_tests
+  tabulate
   point
   gtest
   kokkos_environment
