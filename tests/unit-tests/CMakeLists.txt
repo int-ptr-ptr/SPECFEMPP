@@ -929,6 +929,7 @@ if(NOT MPI_PARALLEL)
     locate_point_fixture_2d
     locate_point_fixture_3d
     gradient_tests
+    transfer_tests
     mass_matrix_tests
     compute_coupling_tests
     mesh_dim2_tests
