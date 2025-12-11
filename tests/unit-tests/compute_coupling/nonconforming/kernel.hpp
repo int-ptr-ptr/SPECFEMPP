@@ -1,3 +1,5 @@
+#pragma once
+
 #include "enumerations/dimension.hpp"
 #include "medium/compute_coupling.hpp"
 #include "parallel_configuration/chunk_edge_config.hpp"

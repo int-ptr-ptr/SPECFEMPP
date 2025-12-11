@@ -1,3 +1,4 @@
+#pragma once
 #include "analytical_fixtures/coupled_interfaces/interface_shape.hpp"
 #include "analytical_fixtures/coupled_interfaces/interface_transfer.hpp"
 #include "analytical_fixtures/field.hpp"
