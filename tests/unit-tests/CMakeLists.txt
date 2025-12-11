@@ -616,6 +616,22 @@ target_link_libraries(
   -lpthread -lm
 )
 
+add_executable(
+  transfer_tests
+  algorithms/dim2/transfer_test.cpp
+)
+
+target_link_libraries(
+  transfer_tests
+  algorithms
+  kokkos_environment
+  gtest_main
+  Kokkos::kokkos
+  mpi_environment
+  utilities
+  -lpthread -lm
+)
+
 # Turn unity build off for gradient_tests
 set_target_properties(gradient_tests PROPERTIES UNITY_BUILD OFF)
 
@@ -692,9 +708,11 @@ target_link_libraries(
 
 add_executable(
   compute_coupling_tests
-  compute_coupling/acoustic_elastic.cpp
-  compute_coupling/elastic_acoustic.cpp
-  compute_coupling/nonconforming.cpp
+  compute_coupling/main.cpp
+  compute_coupling/conforming/acoustic_elastic.cpp
+  compute_coupling/conforming/elastic_acoustic.cpp
+  compute_coupling/nonconforming/acoustic_elastic.cpp
+  compute_coupling/nonconforming/elastic_acoustic.cpp
 )
 
 target_link_libraries(
