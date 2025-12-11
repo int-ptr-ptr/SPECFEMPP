@@ -12,7 +12,7 @@ namespace specfem::test::tabulate_impl {
  * @brief The type of entry (grid cell) we expect to use
  *
  */
-enum class EntryType {
+enum class EntryType : int {
   string,
   real,
   vector,
@@ -164,10 +164,10 @@ public:
  * expansion.(Helper)
  *
  */
-template <std::underlying_type_t<EntryType>... types>
-static EntryFormat formatter_from_type(
-    const EntryType &type,
-    std::integer_sequence<std::underlying_type_t<EntryType>, types...>) {
+template <int... types> // explicit "int" instead of underlying_type -- not sure
+                        // why it doesn't compile on cuda 12.8
+static EntryFormat formatter_from_type(const EntryType &type,
+                                       std::integer_sequence<int, types...>) {
   std::unique_ptr<EntryFormatBase> data;
 
   (
@@ -196,10 +196,8 @@ static EntryFormat formatter_from_type(
  */
 static EntryFormat formatter_from_type(const EntryType &type) {
   return formatter_from_type(
-      type, std::make_integer_sequence<
-                std::underlying_type_t<EntryType>,
-                static_cast<std::underlying_type_t<EntryType> >(
-                    EntryType::num_types)>{});
+      type, std::make_integer_sequence<int, static_cast<int>(
+                                                EntryType::num_types)>{});
 }
 
 } // namespace specfem::test::tabulate_impl
