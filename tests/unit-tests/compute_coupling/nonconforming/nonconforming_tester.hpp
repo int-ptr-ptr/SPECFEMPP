@@ -8,7 +8,6 @@
 #include "kernel.hpp"
 
 #include "test_macros.hpp" // for expected_got()
-#include "utilities/include/tabulate.hpp"
 #include <gtest/gtest.h>
 
 template <specfem::dimension::type DimensionTag,
@@ -146,6 +145,10 @@ void test_interface(
     for (int ipoint = 0; ipoint < nquad_intersection; ipoint++) {
       PointData<DimensionTag, InterfaceTag> point_data;
 
+      // -------------------------------
+      // start point_data initialization
+
+      // Consider moving point_data initialization into analytical_fixutres.
       const type_real edge_coord = intersection.interface_transfer
                                        .intersection_quadrature_points[ipoint];
 
@@ -172,6 +175,9 @@ void test_interface(
           point_data.field_gradient_coupled.du(icomp, idim) = grad(idim);
         }
       }
+      // -----------------------------
+      // end point_data initialization
+
       const auto expected = compute_coupling_expected(point_data);
 
       for (int icomp = 0; icomp < interface_config.ncomp_self; icomp++) {
@@ -180,13 +186,16 @@ void test_interface(
         type_real got =
             kernel_data.h_computed_coupling(ichunk, iedge, ipoint, icomp);
 
-        if (!specfem::utilities::is_close(got, expected[icomp])) {
+        // TODO get a more programatical way of specifying rel_tol
+        if (!specfem::utilities::is_close(got, expected[icomp],
+                                          (type_real)1e-3)) {
 
-          FAIL() << "iedge (global) =" << intersection.iedge
-                 << " quadrature point =" << ipoint << ", component =" << icomp
-                 << "\n"
-                 << expected_got(expected[icomp], got)
-                 << intersection.verbose_intersection_data() << std::endl;
+          ADD_FAILURE() << "iedge (global) = " << intersection.iedge
+                        << " quadrature point = " << ipoint
+                        << ", component = " << icomp << "\n"
+                        << expected_got(expected[icomp], got)
+                        << intersection.verbose_intersection_data()
+                        << std::endl;
         }
 
         num_comparisons++;

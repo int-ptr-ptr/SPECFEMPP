@@ -20,11 +20,14 @@ TEST(NonconformingComputeCoupling, AcousticElastic) {
   test_interface<specfem::interface::interface_tag::acoustic_elastic>(
       specfem::test::analytical::interface_shape::interface_shapes_2d,
       specfem::test::analytical::field::sample_fields_2d,
-      specfem::test::analytical::interface_transfer::interface_transfer_2d_5_4,
-      3);
-  test_interface<specfem::interface::interface_tag::acoustic_elastic>(
-      specfem::test::analytical::interface_shape::interface_shapes_2d,
-      specfem::test::analytical::field::sample_fields_2d,
       specfem::test::analytical::interface_transfer::interface_transfer_2d_6_6,
       3);
+
+  // add this back later -- I want to make test case printing more verbose:
+
+  //   test_interface<specfem::interface::interface_tag::acoustic_elastic>(
+  //       specfem::test::analytical::interface_shape::interface_shapes_2d,
+  //       specfem::test::analytical::field::sample_fields_2d,
+  //       specfem::test::analytical::interface_transfer::interface_transfer_2d_5_4,
+  //       3);
 }

@@ -1,7 +1,7 @@
+#include "enumerations/dimension.hpp"
 #include "medium/compute_coupling.hpp"
 #include "parallel_configuration/chunk_edge_config.hpp"
 #include "specfem/chunk_edge.hpp"
-#include "specfem/chunk_edge/nonconforming_transfer_and_normal.hpp"
 #include <Kokkos_Core.hpp>
 
 template <specfem::dimension::type DimensionTag,
@@ -122,14 +122,10 @@ void compute_kernel(
   static constexpr auto coupled_medium =
       specfem::interface::attributes<DimensionTag,
                                      InterfaceTag>::coupled_medium();
-
-  using InterfaceDataType =
-      specfem::chunk_edge::nonconforming_transfer_and_normal<
-          false, chunk_size, nquad_edge, nquad_intersection, DimensionTag,
-          specfem::connections::type::nonconforming, InterfaceTag,
-          specfem::element::boundary_tag::none,
-          specfem::kokkos::DevScratchSpace,
-          Kokkos::MemoryTraits<Kokkos::Unmanaged> >;
+  using InterfaceDataType = specfem::chunk_edge::coupling_terms_pack<
+      specfem::dimension::type::dim2, InterfaceTag,
+      specfem::element::boundary_tag::none, chunk_size, nquad_edge,
+      nquad_intersection>;
   using CoupledFieldType = std::conditional_t<
       InterfaceTag == specfem::interface::interface_tag::acoustic_elastic,
       specfem::chunk_edge::displacement<chunk_size, nquad_edge, DimensionTag,
@@ -171,8 +167,11 @@ void compute_kernel(
               for (int ipoint = 0; ipoint < nquad_edge; ipoint++) {
                 for (int iintersection = 0; iintersection < nquad_intersection;
                      iintersection++) {
-                  interface_data.transfer_function_coupled(iedge, ipoint,
-                                                           iintersection) =
+
+                  // transfer_function_coupled
+                  static_cast<decltype(std::get<0>(
+                      typename InterfaceDataType::packed_accessors()))>(
+                      interface_data)(iedge, ipoint, iintersection) =
                       kernel_data.transfer_coupled(ichunk, iedge, ipoint,
                                                    iintersection);
                 }
@@ -186,8 +185,10 @@ void compute_kernel(
               for (int iintersection = 0; iintersection < nquad_intersection;
                    iintersection++) {
                 for (int icomp = 0; icomp < ndim; icomp++) {
-                  interface_data.intersection_normal(iedge, iintersection,
-                                                     icomp) =
+                  // intersection_normal
+                  static_cast<decltype(std::get<1>(
+                      typename InterfaceDataType::packed_accessors()))>(
+                      interface_data)(iedge, iintersection, icomp) =
                       kernel_data.normals(ichunk, iedge, iintersection, icomp);
                 }
               }

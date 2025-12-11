@@ -263,16 +263,16 @@ struct EdgeToInterfaceParams : EdgeToInterfaceParamsBase {
           // barrier in between them)
 
           specfem::algorithms::transfer(
-              ChunkEdgeIndexSimulator<dimension_tag>(num_edges, team),
-              self_transfer, self_disp,
+              ChunkEdgeIndexSimulator(num_edges, team), self_transfer,
+              self_disp,
               [&](const auto &index, const PointSelfDisplacementType &point) {
                 for (int icomp = 0; icomp < SelfDisplacementType::components;
                      icomp++)
                   self_on_interface(index(0), index(1), icomp) = point(icomp);
               });
           specfem::algorithms::transfer(
-              ChunkEdgeIndexSimulator<dimension_tag>(num_edges, team),
-              coupled_transfer, coupled_disp,
+              ChunkEdgeIndexSimulator(num_edges, team), coupled_transfer,
+              coupled_disp,
               [&](const auto &index,
                   const PointCoupledDisplacementType &point) {
                 for (int icomp = 0; icomp < CoupledDisplacementType::components;
