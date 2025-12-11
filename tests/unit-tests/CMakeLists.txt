@@ -47,6 +47,15 @@ add_library(
   utilities/src/compare_array.cpp
 )
 
+
+add_library(
+  tabulate
+  utilities/src/tabulate.cpp
+)
+target_link_libraries(
+  tabulate
+  Kokkos::kokkos
+)
 target_link_libraries(
   compare_arrays
   Kokkos::kokkos
