@@ -3,8 +3,10 @@
 #include "enumerations/coupled_interface.hpp"
 #include "enumerations/dimension.hpp"
 #include "initializers.hpp"
+#include "intersection_factor.hpp"
 #include "specfem/data_access/accessor.hpp"
 #include "specfem_setup.hpp"
+#include "transfer_function.hpp"
 
 #include <type_traits>
 static constexpr specfem::dimension::type dimension_tag_ =
@@ -12,7 +14,7 @@ static constexpr specfem::dimension::type dimension_tag_ =
 namespace specfem::test_fixture {
 
 template <specfem::interface::interface_tag InterfaceTag, typename... Accessors>
-struct IntersectionDataPack
+struct IntersectionAccessorPack
     : public specfem::data_access::Accessor<
           specfem::data_access::AccessorType::chunk_edge,
           specfem::data_access::DataClassType::nonconforming_interface,
@@ -28,7 +30,7 @@ struct IntersectionDataPack
   using packed_accessors = std::tuple<Accessors...>;
 
   KOKKOS_INLINE_FUNCTION
-  IntersectionDataPack(const Accessors &...accessors)
+  IntersectionAccessorPack(const Accessors &...accessors)
       : Accessors(accessors)... {};
 
   template <typename... Indices>
@@ -36,8 +38,42 @@ struct IntersectionDataPack
       delete;
 
   static std::string description() {
-    return std::string("IntersectionDataPack (...)");
+    return std::string("IntersectionAccessorPack (...)");
   }
 };
+
+template <typename Initializer,
+          specfem::data_access::AccessorType... AccessorTypes>
+struct IntersectionDataPack2D {};
+
+namespace IntersectionDataInitializer2D {
+
+template <typename QuadraturePointsType, typename EdgeCoordinateField>
+struct Conforming : IntersectionDataInitializer2D {
+  using QuadraturePoints = QuadraturePointsType;
+  static_assert(std::is_base_of_v<
+                    specfem::test_fixture::QuadraturePoints::QuadraturePoints,
+                    QuadraturePoints>,
+                "Conforming IntersectionDataInitializer needs a "
+                "QuadraturePoints parameter in its first argument!");
+
+  using EdgeCoordinates = EdgeCoordinateField;
+  static_assert(
+      std::is_base_of_v<
+          specfem::test_fixture::AnalyticalFunctionType::AnalyticalFunctionType,
+          EdgeCoordinates>,
+      "Conforming IntersectionDataInitializer needs an AnalyticalFunctionType "
+      "parameter in its second argument!");
+
+  using SelfTransferInitializer =
+      TransferFunctionInitializer2D::Identity<QuadraturePoints::nquad>;
+  using CoupledTransferInitializer =
+      TransferFunctionInitializer2D::Identity<QuadraturePoints::nquad>;
+
+  using IntersectionFactorInitializer =
+      IntersectionFactorInitializer2D::FromIntersectionKnots<QuadraturePoints,
+                                                             EdgeCoordinates>;
+};
+} // namespace IntersectionDataInitializer2D
 
 } // namespace specfem::test_fixture
