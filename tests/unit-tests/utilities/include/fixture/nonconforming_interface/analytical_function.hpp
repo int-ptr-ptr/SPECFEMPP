@@ -14,9 +14,14 @@ namespace AnalyticalFunctionType {
  */
 template <int power> struct Power : AnalyticalFunctionType {
   static constexpr int num_components = 1;
-  static std::array<type_real, num_components>
-  evaluate(const type_real &coord) {
-    return { (type_real)std::pow(coord, power) };
+
+  static std::array<double, num_components> evaluate(const double &coord) {
+    return { std::pow(coord, power) };
+  }
+
+  static std::array<double, num_components>
+  evaluate_derivative(const double &coord) {
+    return { (power * std::pow(coord, power - 1)) };
   }
 
   static std::string description() {
