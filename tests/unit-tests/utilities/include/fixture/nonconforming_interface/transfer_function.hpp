@@ -33,6 +33,37 @@ public:
   }
 };
 
+/**
+ * @brief Identity matrix, for when the intersection and edge use the same
+ * discretization
+ *
+ * @tparam nquad The number of quadrature points (and corresponding size of each
+ * axis of the matrix)
+ */
+template <int nquad> struct Identity : TransferFunctionInitializer2D {
+  static constexpr int num_edges = 1;
+  static constexpr int nquad_edge = nquad;
+  static constexpr int nquad_intersection = nquad;
+
+private:
+  using ArrayType = std::array<
+      std::array<std::array<type_real, nquad_intersection>, nquad_edge>,
+      num_edges>;
+
+public:
+  static ArrayType init_transfer_function() {
+    ArrayType arr{ 0 };
+    for (int i = 0; i < nquad; ++i) {
+      arr[i][i] = 1;
+    }
+    return arr;
+  }
+
+  static std::string description() {
+    return "A blank transfer function. This should zero out all values";
+  }
+};
+
 template <typename EdgeQuadraturePoints_,
           typename IntersectionQuadraturePoints_>
 struct FromQuadratureRules : TransferFunctionInitializer2D {
