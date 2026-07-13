@@ -74,7 +74,11 @@ def _interfaces_from_boundaryspec(
     nonconform_itype = []
     nonconform_jtype = []
 
+    count = 0
     for item_a in bdspec.rtree.intersection(bdspec.rtree.bounds, objects=True):
+        count += 1
+        if count % 100 == 0:
+            print(f"NCIs: {count / bdspec.num_faces:.3%}", end="\r")
         bd_a = item_a.id
         bbox_a = item_a.bbox
         elem_a: int = bdspec.element_inds[bd_a]  # type: ignore
@@ -117,6 +121,26 @@ def _interfaces_from_boundaryspec(
                 if matching_localcoords is not None:
                     break
 
+            # ispec = 935
+            # itype = FaceType.LEFT
+            # if (elem_a == ispec and type_a == itype) or (
+            #     elem_b == ispec and type_b == itype
+            # ):
+            #     import matplotlib.pyplot as plt
+
+            #     plt.plot(
+            #         facenode_locs_a[:, 0],
+            #         facenode_locs_a[:, 1],
+            #         "r" if elem_a == ispec else ":b",
+            #     )
+            #     plt.plot(
+            #         facenode_locs_b[:, 0],
+            #         facenode_locs_b[:, 1],
+            #         "r" if elem_b == ispec else ":b",
+            #     )
+            #     plt.show()
+            #     breakpoint()
+
             if faces_intersect(
                 facenode_locs_a,
                 facenode_locs_b,
@@ -126,6 +150,24 @@ def _interfaces_from_boundaryspec(
                 nonconform_jspec.append(elem_b)
                 nonconform_itype.append(type_a)
                 nonconform_jtype.append(type_b)
+
+                # if (elem_a == ispec and type_a == itype) or (
+                #     elem_b == ispec and type_b == itype
+                # ):
+                #     import matplotlib.pyplot as plt
+
+                #     plt.plot(
+                #         facenode_locs_a[:, 0],
+                #         facenode_locs_a[:, 1],
+                #         "r" if elem_a == ispec else ":b",
+                #     )
+                #     plt.plot(
+                #         facenode_locs_b[:, 0],
+                #         facenode_locs_b[:, 1],
+                #         "r" if elem_b == ispec else ":b",
+                #     )
+                #     plt.show()
+                #     breakpoint()
 
     return NonconformingInterfaces(
         elements_a=np.array(nonconform_ispec, dtype=np.int32),

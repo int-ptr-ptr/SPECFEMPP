@@ -1,15 +1,13 @@
+import itertools
 import os
 from pathlib import Path, PurePath
 
-from .model.model import Model
-from .model.faces import FaceType
-from ..helper import material_properties
+import numpy as np
 
-# from .model.edges import EdgeType
-# from .model.physical_group import (
-#     NullPhysicalGroup,
-#     PhysicalGroupBase,
-# )
+from ..helper import material_properties
+from .model.faces import FaceType
+from .model.model import Model
+from .model.physical_group import SurfacePhysicalGroup
 
 NONCONFORMING_CONNECTION_TYPE = 3
 
@@ -121,8 +119,8 @@ class Exporter:
 
     model: Model
 
-    # acoustic_free_surface_physical_group: PhysicalGroupBase
-    # absorbing_surface_physical_group: PhysicalGroupBase
+    acoustic_free_surface_physical_group: str
+    absorbing_surface_physical_group: str
 
     material_models: list[material_properties.MaterialModel] | None
 
@@ -143,6 +141,8 @@ class Exporter:
         | None = "free_or_absorbing_surface_file_zmax",
         nonconforming_adjacencies_file: str | None = "nonconforming_adjacencies",
         material_models: list[material_properties.MaterialModel] | None = None,
+        acoustic_free_surface_physical_group: str = "acoustic_free_surface",
+        absorbing_surface_physical_group: str = "absorbing",
     ):
         """Initialize an Exporter3D object to write `model` to files for meshfem.
 
@@ -227,6 +227,9 @@ class Exporter:
         )
         self.material_models = material_models
 
+        self.acoustic_free_surface_physical_group = acoustic_free_surface_physical_group
+        self.absorbing_surface_physical_group = absorbing_surface_physical_group
+
     def export_mesh(self):
         if not self.destination_folder.exists():
             self.destination_folder.mkdir()
@@ -297,33 +300,43 @@ class Exporter:
         # =========================
         # boundaries
         # =========================
-        for (filename,) in [
-            (self.absorbing_surface_file_xmin,),
-            (self.absorbing_surface_file_xmax,),
-            (self.absorbing_surface_file_ymin,),
-            (self.absorbing_surface_file_ymax,),
-            (self.absorbing_surface_file_bottom,),
-            (self.free_or_absorbing_surface_file_zmax,),
+        free_surface_group = self.model.surface_physical_groups[
+            self.acoustic_free_surface_physical_group
+        ]
+        absorbing_surface_group = self.model.surface_physical_groups[
+            self.absorbing_surface_physical_group
+        ]
+        for filename, face_type in [
+            (self.absorbing_surface_file_xmin, FaceType.LEFT),
+            (self.absorbing_surface_file_xmax, FaceType.RIGHT),
+            (self.absorbing_surface_file_ymin, FaceType.FRONT),
+            (self.absorbing_surface_file_ymax, FaceType.BACK),
+            (self.absorbing_surface_file_bottom, FaceType.BOTTOM),
+            (self.free_or_absorbing_surface_file_zmax, FaceType.TOP),
         ]:
             if filename is None:
                 continue
 
-            # TODO write later. below is 2d version:
+            face_inds = FaceType.HEX_27_node_indices_on_type(face_type)
 
-            # with (self.destination_folder / filename).open("w") as f:
-            #     elements, edgetypes = (
-            #         self.acoustic_free_surface_physical_group.get_all_edges()
-            #     )
+            with (self.destination_folder / filename).open("w") as f:
+                these_afs = free_surface_group.element_faces == face_type
+                nafs = np.count_nonzero(these_afs)
+                these_abs = absorbing_surface_group.element_faces == face_type
+                nabs = np.count_nonzero(these_abs)
 
-            #     f.write(str(elements.shape[0]) + "\n")
+                f.write(str(nafs + nabs) + "\n")
 
-            #     for elem, edgetype in zip(elements, edgetypes):
-            #         node_indices = self.model.elements[
-            #             elem, EdgeType.QUA_9_node_indices_on_type(edgetype)[::2]
-            #         ]
-            #         f.write(
-            #             f"{elem + 1} 2 {node_indices[0] + 1} {node_indices[1] + 1}\n"
-            #         )
+                for elem in itertools.chain(
+                    free_surface_group.element_inds[these_afs],
+                    absorbing_surface_group.element_inds[these_abs],
+                ):
+                    node_indices = self.model.elements[elem, face_inds]
+                    f.write(
+                        f"{elem + 1} "
+                        + " ".join(str(nod + 1) for nod in node_indices)
+                        + "\n"
+                    )
 
         # =========================
         # nonconforming adjacencies (if needed)

@@ -131,8 +131,6 @@ def locate_intersection(
         x0=np.concatenate([face1_local_coords_guess, face2_local_coords_guess]),
         jac=jac,  # type: ignore
         bounds=((-1, -1, -1, -1), (1, 1, 1, 1)),
-        xtol=1e-6,
-        ftol=1e-6,
         method="trf",
     )
 
@@ -187,7 +185,7 @@ def get_interior_tangent_vector(
         return vbisect, np.acos(np.dot(v1, v2)) / 2
 
     v1[0] = 1
-    return v1, 2 * np.pi
+    return v1, np.pi
 
 
 def faces_intersect(
@@ -241,7 +239,11 @@ def faces_intersect(
 
     # project onto avg direction of face1 and face2 norms (face*_norm are normalized,
     # so projection_normal gives the direction of the angle bisector)
-    projection_normal = face1_norm + face2_norm
+    projection_normal = (
+        face1_norm + face2_norm
+        if np.dot(face1_norm, face2_norm) > 0
+        else face1_norm - face2_norm
+    )
 
     # CHECK: inward directions overlap
     face1_interior, face1_theta = get_interior_tangent_vector(
@@ -250,6 +252,10 @@ def faces_intersect(
     face2_interior, face2_theta = get_interior_tangent_vector(
         face2_jac, face2_coord, projected_plane_normal=projection_normal
     )
+
+    if face1_theta >= np.pi or face2_theta >= np.pi:
+        # interior
+        return True
 
     # assuming the tangent planes are the same, we want to see if the cones intersect:
     # face*_interior is the bisector of the cone, face*_theta is the angle from the bisector

@@ -1,4 +1,4 @@
-from collections.abc import Iterable
+from collections.abc import Collection
 from dataclasses import dataclass
 
 import numpy as np
@@ -6,6 +6,7 @@ import numpy as np
 from ...gmsh_dep import GmshContext
 from ...helper import index_mapping
 from .model import Model
+from .physical_group import SurfacePhysicalGroup
 
 
 @dataclass(frozen=True, init=False)
@@ -19,21 +20,34 @@ class GmshModel3D:
 
     gmsh: GmshContext
     volumes: list[int]
+    registered_surface_physical_groups: list[str]
 
-    def __init__(self, gmsh: GmshContext, volume: int | Iterable[int]):
+    def __init__(
+        self,
+        gmsh: GmshContext,
+        volume: int | Collection[int],
+        registered_surface_physical_groups: Collection[str] | None = None,
+    ):
         """Creates a GmshModel3D object from a single or list of volume entity IDs.
 
         Parameters
         ----------
         gmsh : GmshContext
             GmshContext object, which must persist through GmshModel3D lifetime
-        volume : int | Iterable[int]
+        volume : int | Collection[int]
             the gmsh.model space entity IDs
         """
         object.__setattr__(self, "gmsh", gmsh)
 
         object.__setattr__(
             self, "volumes", [volume] if isinstance(volume, int) else list(volume)
+        )
+        object.__setattr__(
+            self,
+            "registered_surface_physical_groups",
+            ["acoustic_free_surface", "absorbing"]
+            if registered_surface_physical_groups is None
+            else list(registered_surface_physical_groups),
         )
 
     def to_model(self, materials_per_volume: dict[int, int]) -> Model:
@@ -81,4 +95,17 @@ class GmshModel3D:
             ]
             element_increment = element_increment_next
 
-        return Model(nodes=nodes, elements=elements, materials=materials)
+        return Model(
+            nodes=nodes,
+            elements=elements,
+            materials=materials,
+            surface_physical_groups={
+                name: SurfacePhysicalGroup.from_gmsh(
+                    self.gmsh,
+                    name=name,
+                    element_nodes=elements,
+                    node_reindexing=node_reindexing,
+                )
+                for name in self.registered_surface_physical_groups
+            },
+        )

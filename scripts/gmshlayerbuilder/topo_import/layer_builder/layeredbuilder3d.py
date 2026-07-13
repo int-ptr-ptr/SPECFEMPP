@@ -169,7 +169,7 @@ class LayeredBuilder3D:
             # set physical group
             for name, bdry in bdry_by_name.items():
                 if bdry:
-                    gmsh.model.add_physical_group(1, bdry, name=name)
+                    gmsh.model.add_physical_group(2, bdry, name=name)
 
             # required for ngnod = 27
             gmsh.option.setNumber("Mesh.ElementOrder", 2)

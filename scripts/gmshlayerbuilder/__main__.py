@@ -154,7 +154,6 @@ def get_parser():
 
 def run2D():
     args = get_parser().parse_args()
-    print(args)
 
     if args.dimension.lower() == "2d":
         from gmsh2meshfem.dim2.exporter import Exporter as Exporter2D
@@ -200,6 +199,47 @@ def run2D():
             depth_block_m=depth_block_m,
         )
         model = builder.create_model()
+
+        # import matplotlib.pyplot as plt
+        # from gmsh2meshfem.dim3.model.faces import FaceType
+
+        # ispec = 1523
+        # iface = FaceType.RIGHT
+        # face_nodes = model.nodes[
+        #     model.elements[ispec, FaceType.HEX_27_node_indices_on_type(iface)], :
+        # ]
+        # plt.plot(face_nodes[:, 0], face_nodes[:, 1], "r")
+        # for j, jspec in enumerate(model.nonconforming_interfaces.elements_b):
+        #     if model.nonconforming_interfaces.elements_a[j] == ispec:
+        #         face_nodes = model.nodes[
+        #             model.elements[
+        #                 jspec,
+        #                 FaceType.HEX_27_node_indices_on_type(
+        #                     model.nonconforming_interfaces.faces_b[j]
+        #                 ),
+        #             ],
+        #             :,
+        #         ]
+        #         plt.plot(face_nodes[:, 0], face_nodes[:, 1], ":b")
+        # for j, jspec in enumerate(model.nonconforming_interfaces.elements_a):
+        #     if model.nonconforming_interfaces.elements_b[j] == ispec:
+        #         face_nodes = model.nodes[
+        #             model.elements[
+        #                 jspec,
+        #                 FaceType.HEX_27_node_indices_on_type(
+        #                     model.nonconforming_interfaces.faces_a[j]
+        #                 ),
+        #             ],
+        #             :,
+        #         ]
+        #         plt.plot(face_nodes[:, 0], face_nodes[:, 1], ":b")
+        # plt.scatter(
+        #     [-13964],
+        #     [10000],
+        #     # [-29813.8],
+        # )
+        # plt.show()
+
         Exporter3D(
             model, args.output_folder, nonconforming_adjacencies_file="nc_adjacencies"
         ).export_mesh()
@@ -207,3 +247,5 @@ def run2D():
 
 if __name__ == "__main__":
     run2D()
+
+# ^.* [^24]\n

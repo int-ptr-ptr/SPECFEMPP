@@ -11,6 +11,7 @@ from ...gmsh_dep import GmshContext
 from ...helper.index_mapping import IndexMapping, JoinedIndexMapping
 from .boundary import BoundarySpec
 from .nonconforming_interfaces import NonconformingInterfaces
+from .physical_group import SurfacePhysicalGroup
 
 # from .nonconforming_interfaces import (
 #     NonconformingInterfaces,
@@ -35,6 +36,9 @@ class Model:
 
     boundary_faces: BoundarySpec = field(init=False)
     nonconforming_interfaces: NonconformingInterfaces = field(init=False)
+    surface_physical_groups: dict[str, SurfacePhysicalGroup] = field(
+        default_factory=dict
+    )
 
     def __post_init__(self):
         self.boundary_faces = BoundarySpec.from_missing_keystones(

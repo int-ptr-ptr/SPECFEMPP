@@ -87,9 +87,13 @@ class BoundarySpec:
                 :,
             ]
         )
-        # shrink bboxes by a tiny amount
+
+        # shrink or expand bboxes by a tiny amount
+        scaling_factor = 1 + 1e-3
         face_bbox_centers = (face_bboxes[:, :3] + face_bboxes[:, 3:]) / 2
-        face_bbox_radii = (face_bboxes[:, 3:] - face_bboxes[:, :3]) * ((1 - 1e-8) / 2)
+        face_bbox_radii = (face_bboxes[:, 3:] - face_bboxes[:, :3]) * (
+            scaling_factor / 2
+        )
         face_bboxes[:, :3] = face_bbox_centers - face_bbox_radii
         face_bboxes[:, 3:] = face_bbox_centers + face_bbox_radii
 
