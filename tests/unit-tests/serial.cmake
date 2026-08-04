@@ -347,6 +347,8 @@ add_executable(
   nonconforming_tests
   nonconforming/reparameterizations/compute_intersection_test.cpp
   nonconforming/reparameterizations/set_transfer_functions_test.cpp
+  nonconforming/kernel/kerneltest3d.cpp
+  nonconforming/kernel/acoustic_elastic3d.cpp
   nonconforming/runner.cpp
 )
 
