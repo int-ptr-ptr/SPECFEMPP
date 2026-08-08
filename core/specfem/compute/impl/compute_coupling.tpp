@@ -149,9 +149,7 @@ void compute_coupling_core_nonconforming(
   if (self_intersections.N == 0 && coupled_intersections.N == 0)
     return;
 
-  specfem::element_coupling::TMP_extra_kernel::compute_coupling_extra_kernel<
-      dimension_tag, interface_tag, boundary_tag, connection_tag,
-      flux_scheme_tag>::template execute<NGLL, wavefield>(assembly);
+  specfem::element_coupling::TMP_extra_kernel::execute<NGLL, Tags>(assembly);
 
   const auto field = assembly.fields.template get_simulation_field<wavefield>();
 
