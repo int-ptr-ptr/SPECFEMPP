@@ -4,6 +4,8 @@
 #include "specfem/element_coupling.hpp"
 #include "specfem/quadrature/quadrature.hpp"
 
+#include <stdexcept>
+#include <unordered_map>
 #include <vector>
 
 namespace specfem::element_coupling {
@@ -30,7 +32,7 @@ private:
   bool was_quadrature_set;
   // ==== end acoustic-elastic ====
 
-  std::vector<type_real> scheme_parameters;
+  std::unordered_map<std::string, type_real> scheme_parameters;
 
 public:
   flux_scheme_configuration()
@@ -107,6 +109,36 @@ public:
       specfem::element_coupling::interfacial_meshing_type
           interfacial_meshing_type) {
     this->interfacial_meshing_type = interfacial_meshing_type;
+  }
+
+  /**
+   * @brief Get the flux scheme parameter according to its name.
+   *
+   * @param parameter_name the name of the parameter
+   *
+   * @return type_real the value of the parameter
+   */
+  type_real get_scheme_parameter(const std::string &parameter_name) const {
+    auto search = scheme_parameters.find(parameter_name);
+    if (search == scheme_parameters.end()) {
+      throw std::runtime_error("Requested flux scheme parameter not found: \"" +
+                               parameter_name + "\"");
+    }
+    return search->second;
+  }
+  bool has_scheme_parameter(const std::string &parameter_name) const {
+    auto search = scheme_parameters.find(parameter_name);
+    return search != scheme_parameters.end();
+  }
+  /**
+   * @brief Set the given parameter according to its name.
+   *
+   * @param parameter_name the name of the parameter
+   * @param value the value to set it to
+   */
+  void set_scheme_parameter(const std::string &parameter_name,
+                            const type_real &value) {
+    this->scheme_parameters[parameter_name] = value;
   }
 };
 } // namespace specfem::element_coupling

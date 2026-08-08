@@ -19,7 +19,9 @@ specfem::assembly::nonconforming_interfaces_impl::interface_container<
             &jacobian_matrix,
         const specfem::assembly::mesh<dimension_tag> &mesh,
         const specfem::element_coupling::flux_scheme_configuration
-            &flux_scheme_config) {
+            &flux_scheme_config)
+    : flux_scheme_data(element_intersections, jacobian_matrix, mesh,
+                       flux_scheme_config) {
 
   if (ngllz <= 0 || nglly <= 0 || ngllx <= 0) {
     KOKKOS_ABORT_WITH_LOCATION("Invalid GLL grid size");
@@ -87,6 +89,9 @@ specfem::assembly::nonconforming_interfaces_impl::interface_container<
       "specfem::assembly::nonconforming_interfaces::coupled_coordinates",
       num_faces, ngll, ngll, ndim - 1);
   h_coupled_coordinates = Kokkos::create_mirror_view(coupled_coordinates);
+
+  const type_real coupled_neumann_merge_parameter =
+      1 - flux_scheme_data.self_neumann_merge_parameter;
 
   for (int iface = 0; iface < num_faces; ++iface) {
     const auto &self_face = self_faces(iface);
@@ -181,7 +186,7 @@ specfem::assembly::nonconforming_interfaces_impl::interface_container<
             KOKKOS_ABORT_WITH_LOCATION("Invalid face type");
             return static_cast<type_real>(0.0);
           }
-        }();
+        }() * coupled_neumann_merge_parameter;
       }
     }
   }

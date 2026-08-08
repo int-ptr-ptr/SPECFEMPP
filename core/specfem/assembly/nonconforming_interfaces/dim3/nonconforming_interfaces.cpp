@@ -1,6 +1,8 @@
 
 #include "nonconforming_interfaces.hpp"
+#include "impl/flux_scheme_data/flux_scheme_data.tpp"
 #include "impl/interface_container.tpp"
+#include "impl/unique_faces_container.tpp"
 #include "specfem/assembly/element_intersections.hpp"
 #include "specfem/assembly/mesh.hpp"
 #include "specfem/enums.hpp"

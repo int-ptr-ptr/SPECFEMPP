@@ -23,6 +23,7 @@
 #include <Kokkos_Core.hpp>
 #include <type_traits>
 
+#include "specfem/element_coupling/TMP_extra_kernel/extra_kernel.hpp"
 #include "specfem/element_coupling/accessor.hpp"
 
 namespace specfem::compute::impl {
@@ -147,6 +148,10 @@ void compute_coupling_core_nonconforming(
 
   if (self_intersections.N == 0 && coupled_intersections.N == 0)
     return;
+
+  specfem::element_coupling::TMP_extra_kernel::compute_coupling_extra_kernel<
+      dimension_tag, interface_tag, boundary_tag, connection_tag,
+      flux_scheme_tag>::template execute<NGLL, wavefield>(assembly);
 
   const auto field = assembly.fields.template get_simulation_field<wavefield>();
 

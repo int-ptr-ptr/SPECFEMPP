@@ -1,5 +1,6 @@
 #pragma once
 
+#include "flux_scheme_data/flux_scheme_data.hpp"
 #include "specfem/assembly/element_intersections.hpp"
 #include "specfem/assembly/jacobian_matrix.hpp"
 #include "specfem/assembly/mesh.hpp"
@@ -9,6 +10,9 @@
 #include "specfem/element_coupling/tags.hpp"
 #include "specfem/enums.hpp"
 #include "specfem/execution.hpp"
+
+// TODO (Hanson: switch tpp to hpp, or change flux_scheme_data to unique_ptr)
+#include "flux_scheme_data/flux_scheme_data.tpp"
 
 namespace specfem::assembly::nonconforming_interfaces_impl {
 
@@ -88,6 +92,12 @@ public:
   FaceNormalView::host_mirror_type h_face_normal;
   /** @brief Device view for self nodes in coupled coordinates */
   CoupledCoordinatesView::host_mirror_type h_coupled_coordinates;
+
+  /** @brief data necessary for computing a specific flux scheme */
+  specfem::assembly::nonconforming_interfaces_impl::flux_scheme_data<
+      specfem::element::dimension_tag::dim3, InterfaceTag, BoundaryTag,
+      specfem::element_connections::type::nonconforming, FluxSchemeTag>
+      flux_scheme_data;
 
 public:
   /**
