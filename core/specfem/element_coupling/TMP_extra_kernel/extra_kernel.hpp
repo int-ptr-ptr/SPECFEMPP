@@ -36,7 +36,5 @@ struct compute_coupling_extra_kernel<
 };
 
 template <int NGLL, typename Tags>
-void execute(const specfem::assembly::assembly<Tags::dimension_tag> &assembly) {
-  compute_coupling_extra_kernel<NGLL, Tags>().execute(assembly);
-}
+void execute(const specfem::assembly::assembly<Tags::dimension_tag> &assembly);
 } // namespace specfem::element_coupling::TMP_extra_kernel

@@ -15,6 +15,7 @@ struct specfem::assembly::nonconforming_interfaces_impl::flux_scheme_data<
         InterfaceTag ==
             specfem::element_coupling::interface_tag::elastic_acoustic>> {
   type_real self_neumann_merge_parameter;
+  bool should_symmetrize_coupling;
   specfem::assembly::nonconforming_interfaces_impl::unique_faces_container
       self_faces;
 
@@ -44,6 +45,9 @@ struct specfem::assembly::nonconforming_interfaces_impl::flux_scheme_data<
             ? flux_scheme_config.get_scheme_parameter(
                   "self_neumann_merge_parameter")
             : 0;
+    should_symmetrize_coupling =
+        (flux_scheme_config.has_scheme_parameter("symmetrize") &&
+         flux_scheme_config.get_scheme_parameter("symmetrize") >= 0.5);
     if (std::abs(self_neumann_merge_parameter - 0) < 1e-4) {
       self_neumann_merge_parameter = 0;
       return;

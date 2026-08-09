@@ -12,6 +12,12 @@ using specfem::element::medium_tag;
 using specfem::simulation::field_type;
 
 template <int NGLL, typename Tags>
+void specfem::element_coupling::TMP_extra_kernel::execute(
+    const specfem::assembly::assembly<Tags::dimension_tag> &assembly) {
+  compute_coupling_extra_kernel<NGLL, Tags>().execute(assembly);
+}
+
+template <int NGLL, typename Tags>
 void _impl_expand_like_compute_coupling(
     const specfem::assembly::assembly<Tags::dimension_tag> &assembly) {
 

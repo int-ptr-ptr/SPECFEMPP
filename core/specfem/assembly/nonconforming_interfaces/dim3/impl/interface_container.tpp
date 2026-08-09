@@ -168,25 +168,31 @@ specfem::assembly::nonconforming_interfaces_impl::interface_container<
         this->h_face_normal(iface, ipoint_i, ipoint_j, 0) = dn(0);
         this->h_face_normal(iface, ipoint_i, ipoint_j, 1) = dn(1);
         this->h_face_normal(iface, ipoint_i, ipoint_j, 2) = dn(2);
-        this->h_face_factor(iface, ipoint_i, ipoint_j) = [&]() {
-          switch (iface_type) {
-          case specfem::mesh_entity::dim3::type::left:
-          case specfem::mesh_entity::dim3::type::right:
-            // Face in (iy, iz) plane; integrate over iy and iz
-            return mesh.h_weights(iy) * mesh.h_weights(iz);
-          case specfem::mesh_entity::dim3::type::bottom:
-          case specfem::mesh_entity::dim3::type::top:
-            // Face in (ix, iy) plane; integrate over ix and iy
-            return mesh.h_weights(ix) * mesh.h_weights(iy);
-          case specfem::mesh_entity::dim3::type::front:
-          case specfem::mesh_entity::dim3::type::back:
-            // Face in (ix, iz) plane; integrate over ix and iz
-            return mesh.h_weights(ix) * mesh.h_weights(iz);
-          default:
-            KOKKOS_ABORT_WITH_LOCATION("Invalid face type");
-            return static_cast<type_real>(0.0);
-          }
-        }() * coupled_neumann_merge_parameter;
+        this->h_face_factor(iface, ipoint_i, ipoint_j) =
+            [&]() {
+              switch (iface_type) {
+              case specfem::mesh_entity::dim3::type::left:
+              case specfem::mesh_entity::dim3::type::right:
+                // Face in (iy, iz) plane; integrate over iy and iz
+                return mesh.h_weights(iy) * mesh.h_weights(iz);
+              case specfem::mesh_entity::dim3::type::bottom:
+              case specfem::mesh_entity::dim3::type::top:
+                // Face in (ix, iy) plane; integrate over ix and iy
+                return mesh.h_weights(ix) * mesh.h_weights(iy);
+              case specfem::mesh_entity::dim3::type::front:
+              case specfem::mesh_entity::dim3::type::back:
+                // Face in (ix, iz) plane; integrate over ix and iz
+                return mesh.h_weights(ix) * mesh.h_weights(iz);
+              default:
+                KOKKOS_ABORT_WITH_LOCATION("Invalid face type");
+                return static_cast<type_real>(0.0);
+              }
+            }() *
+            coupled_neumann_merge_parameter
+            // TODO (Hanson: This 1/2 factor is here, since we are symmetrizing
+            // with the TMP_extra_kernel routine. Remove when done.)
+            * (flux_scheme_data.should_symmetrize_coupling ? (type_real)0.5
+                                                           : (type_real)1);
       }
     }
   }
