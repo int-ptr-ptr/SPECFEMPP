@@ -2,6 +2,7 @@
 
 #include "interface_container.hpp"
 #include "specfem/algorithms/locate_point.hpp"
+#include "specfem/element_coupling/tags.hpp"
 #include "specfem/point/global_coordinates.hpp"
 #include <cmath>
 
@@ -191,8 +192,13 @@ specfem::assembly::nonconforming_interfaces_impl::interface_container<
             coupled_neumann_merge_parameter
             // TODO (Hanson: This 1/2 factor is here, since we are symmetrizing
             // with the TMP_extra_kernel routine. Remove when done.)
-            * (flux_scheme_data.should_symmetrize_coupling ? (type_real)0.5
-                                                           : (type_real)1);
+            * (flux_scheme_data.should_symmetrize_coupling
+                   ? (type_real)(InterfaceTag ==
+                                         specfem::element_coupling::
+                                             interface_tag::acoustic_elastic
+                                     ? 1
+                                     : 0)
+                   : (type_real)1);
       }
     }
   }
