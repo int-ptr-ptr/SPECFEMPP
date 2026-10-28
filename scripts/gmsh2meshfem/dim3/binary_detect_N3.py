@@ -10,7 +10,11 @@ maxfind_coefs_a = -Lp[:, 1]
 maxfind_coefs_b = Lp[:, 0]
 
 
-def sample_face(face_nodes: np.ndarray, local_coords: np.ndarray) -> np.ndarray:
+def sample_face(
+    face_nodes: np.ndarray,
+    local_coords: np.ndarray,
+    result_arr: np.ndarray | None = None,
+) -> np.ndarray:
     """samples the face at the given coordinates.
 
     Parameters
@@ -19,6 +23,8 @@ def sample_face(face_nodes: np.ndarray, local_coords: np.ndarray) -> np.ndarray:
         shape - (...,9,3) array of node locations (MSH_QUAD_9 layout)
     local_coords : np.ndarray
         shape - (...,2) array of local coordinates
+    result_arr : np.ndarray | None, optional
+        if set, instead of creating a new array, the result is placed into this. By default None
 
     Returns
     -------
@@ -30,7 +36,11 @@ def sample_face(face_nodes: np.ndarray, local_coords: np.ndarray) -> np.ndarray:
     # k - power
     # d - dimension of local coordinate
     coefs = np.einsum("ik,...dk->...id", L, local_coords[..., None] ** np.arange(3))
-    out = face_nodes[..., 0, :] * coefs[..., 0, 0] * coefs[..., 0, 1]
+    if result_arr is None:
+        out = face_nodes[..., 0, :] * coefs[..., 0, 0] * coefs[..., 0, 1]
+    else:
+        out = result_arr
+        out[...] = face_nodes[..., 0, :] * coefs[..., 0, 0] * coefs[..., 0, 1]
     out += face_nodes[..., 1, :] * coefs[..., 2, 0] * coefs[..., 0, 1]
     out += face_nodes[..., 2, :] * coefs[..., 2, 0] * coefs[..., 2, 1]
     out += face_nodes[..., 3, :] * coefs[..., 0, 0] * coefs[..., 2, 1]
@@ -43,7 +53,9 @@ def sample_face(face_nodes: np.ndarray, local_coords: np.ndarray) -> np.ndarray:
 
 
 def sample_face_jacobian(
-    face_nodes: np.ndarray, local_coords: np.ndarray
+    face_nodes: np.ndarray,
+    local_coords: np.ndarray,
+    result_arr: np.ndarray | None = None,
 ) -> np.ndarray:
     """samples the Jacobian matrix of a face at the given coordinates.
 
@@ -53,6 +65,8 @@ def sample_face_jacobian(
         shape - (...,9,3) array of node locations (MSH_QUAD_9 layout)
     local_coords : np.ndarray
         shape - (...,2) array of local coordinates
+    result_arr : np.ndarray | None, optional
+        if set, instead of creating a new array, the result is placed into this. By default None
 
     Returns
     -------
@@ -74,8 +88,11 @@ def sample_face_jacobian(
         "ik,...dk->...id", Lp, local_coords[..., None] ** np.arange(2)
     )  # L'(u)
 
-    out = np.empty(stack_shape + (3, 2))
-    out = face_nodes[..., 0, :, None] * coefs[..., 0, 0, :] * coefs[..., 0, 1, :]
+    if result_arr is None:
+        out = np.empty(stack_shape + (3, 2))
+    else:
+        out = result_arr
+    out[...] = face_nodes[..., 0, :, None] * coefs[..., 0, 0, :] * coefs[..., 0, 1, :]
     out += face_nodes[..., 1, :, None] * coefs[..., 2, 0, :] * coefs[..., 0, 1, :]
     out += face_nodes[..., 2, :, None] * coefs[..., 2, 0, :] * coefs[..., 2, 1, :]
     out += face_nodes[..., 3, :, None] * coefs[..., 0, 0, :] * coefs[..., 2, 1, :]
@@ -135,6 +152,100 @@ def locate_intersection(
     )
 
     return result.x[:2], result.x[2:], result.fun
+
+
+def locate_intersection2(
+    face1: np.ndarray,
+    face2: np.ndarray,
+    face1_local_coords_guess: np.ndarray,
+    face2_local_coords_guess: np.ndarray,
+    length_scale: float,
+):
+    """Finds a point on either face that minimizes the distance between the surfaces.
+
+    Returns the tuple (face1_coords, face2_coords, residual displacement)
+
+    Parameters
+    ----------
+    face1 : np.ndarray
+        nodal representation of face1
+    face2 : np.ndarray
+        nodal representation of face2
+    face1_local_coords_guess : np.ndarray
+        initial guess in local coordinates
+    face2_local_coords_guess : np.ndarray
+        initial guess in local coordinates
+    """
+    max_iters = 100
+    displacement_eps = 1e-5
+    face1_local_coords = np.copy(face1_local_coords_guess)
+    face2_local_coords = np.copy(face2_local_coords_guess)
+
+    face1_loc = sample_face(face1, face1_local_coords)
+    face2_loc = sample_face(face2, face2_local_coords)
+
+    face1_jac = sample_face_jacobian(face1, face1_local_coords)
+    face2_jac = sample_face_jacobian(face2, face2_local_coords)
+
+    for iiter in range(max_iters):
+        resid = face2_loc - face1_loc
+
+        # compute orthogonal residual
+        face1_norm = np.cross(face1_jac[:, 0], face1_jac[:, 1])
+        face1_norm /= np.linalg.norm(face1_norm)
+        face2_norm = np.cross(face2_jac[:, 0], face2_jac[:, 1])
+        face2_norm /= np.linalg.norm(face2_norm)
+
+        # we break into cases based on if the tangents are ortho or not
+        sintheta = np.linalg.norm(np.cross(face1_norm, face2_norm))
+
+        if sintheta > 0.1:  # approx 5.<something> degrees
+            # planes intersect. choose a point on that intersection
+
+            if np.linalg.norm(resid) < displacement_eps * length_scale:
+                return face1_local_coords, face2_local_coords, resid
+
+            along_intersection = np.cross(face1_norm, face2_norm)
+            along_intersection /= np.linalg.norm(along_intersection)
+
+            face1_stepdir = np.cross(along_intersection, face1_norm)
+            face2_stepdir = np.cross(along_intersection, face2_norm)
+
+            (neg_face1stepfac, face2_stepfac), resid_norm2 = np.linalg.lstsq(
+                np.stack([face1_stepdir, face2_stepdir], axis=1), resid
+            )[:2]
+            assert np.shape(resid_norm2) == (1,) and resid_norm2 < 1e-10, (
+                "Step should have zero residual."
+            )
+            face1_stepdir *= -neg_face1stepfac
+            face2_stepdir *= face2_stepfac
+
+            # convert to local coordinates
+            face1_localstep = np.linalg.lstsq(face1_jac, face1_stepdir)[0]
+            face2_localstep = np.linalg.lstsq(face2_jac, face2_stepdir)[0]
+        else:
+            # planes are (near) parallel. shift down to 2D (local coords)
+            resid_in_face1_local = np.linalg.lstsq(face1_jac, resid)[0]
+            resid_in_face2_local = np.linalg.lstsq(face2_jac, resid)[0]
+
+            # midpoint (split the difference)
+            face1_localstep = resid_in_face1_local / 2
+            face2_localstep = -resid_in_face2_local / 2
+
+            if (
+                np.linalg.norm(resid_in_face1_local) < displacement_eps
+                and np.linalg.norm(resid_in_face2_local) < displacement_eps
+            ):
+                return face1_local_coords, face2_local_coords, resid
+
+        face1_local_coords += face1_localstep
+        face2_local_coords += face2_localstep
+
+        # clamp to boundary
+        face1_local_coords[:] = np.minimum(1, face1_local_coords)
+        face1_local_coords[:] = np.maximum(-1, face1_local_coords)
+        face2_local_coords[:] = np.minimum(1, face2_local_coords)
+        face2_local_coords[:] = np.maximum(-1, face2_local_coords)
 
 
 def get_interior_tangent_vector(
@@ -262,7 +373,7 @@ def faces_intersect(
     # to the surface of the cone (think FOV)
     # pad by e-2, which would be the intersection sliver.
     if np.dot(face1_interior, face2_interior) < np.cos(
-        max(face1_theta + face2_theta - 1e-2, 0)
+        max(face1_theta + face2_theta - 5e-2, 0)
     ):
         return False
 

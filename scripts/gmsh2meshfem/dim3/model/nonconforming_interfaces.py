@@ -110,7 +110,7 @@ def _interfaces_from_boundaryspec(
                 continue
 
             # likely scenario: these faces may share an edge or corner. If so, then skip the
-            # point-localization
+            # point-localization, since we already have a matching point
             matching_localcoords = None
             for imatch_face in np.where(np.isin(facenodes_a, facenodes_b))[0]:
                 localcoord_a = QUA_9_facecoords_at_node(imatch_face)
